@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<Forms>
+    <!-- Random Craft Button -->
+    <Form Class="Button" Base="CRB_Basekit:kitBtn_Metal_LargeBlue" Font="CRB_Button" ButtonType="PushButton" RadioGroup="" LAnchorPoint="0" LAnchorOffset="911" TAnchorPoint="0" TAnchorOffset="471" RAnchorPoint="0" RAnchorOffset="1102" BAnchorPoint="0" BAnchorOffset="519" DT_VCENTER="1" DT_CENTER="1" Name="RandomCraftButton" BGColor="white" TextColor="white" NormalTextColor="UI_BtnTextBlueNormal" PressedTextColor="UI_BtnTextBluePressed" FlybyTextColor="UI_BtnTextBlueFlyby" PressedFlybyTextColor="UI_BtnTextBluePressedFlyby" DisabledTextColor="UI_BtnTextBlueDisabled" IgnoreTooltipDelay="0" RelativeToClient="1" Text="" TooltipColor="" Visible="1" HideInEditor="0" TooltipType="OnCursor" TooltipFont="CRB_InterfaceSmall_O" WindowSoundTemplate="MetalButtonLarge" NeverBringToFront="1" />
+</Forms>

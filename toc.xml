@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Addon Author="Sezz" APIVersion="8" Name="s:UI" Description="Minimalistic User Interface">
+	<!-- Libraries -->
+	<Script Name="libs\CallbackHandler\CallbackHandler-1.0.lua" />
+    <Script Name="libs\GeminiEvent\GeminiEvent-1.0.lua" />
+    <Script Name="libs\GeminiAddon\GeminiAddon.lua" />
+    <Script Name="libs\GeminiLogging\GeminiLogging.lua" />
+    <Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
+
+    <!-- Core -->
+    <Script Name="sUI.lua" />
+    <Form Name="sUI.xml" />
+
+    <Script Name="core\Modules.lua" />
+
+    <!-- Modules -->
+    <!-- Crafting -->
+    <Script Name="modules\crafting\RandomCraft.lua" />
+    <Form Name="modules\crafting\RandomCraft.xml" />
+</Addon>
