@@ -141,7 +141,6 @@ end
 		tSocketItems[4] Brutality (or whatever, check with layout indexes) :GetItemId() -> tAdditives
 		tSocketItems[nLayoutLoc]
 
-	local nTradeskillId = tSchematicInfo.eTradeskillId;
 
 	tSchematicInfo.tSockets => table mit sockeln eSocketType
 	log:debug(tSchematicInfo.tSockets);
@@ -173,6 +172,7 @@ function M:StartRandomCraft()
 	local tAdditives = {}; -- NYI, maybe useful later if we don't want to use the default crafting addon
 	local tAlreadyPresentTypes = {};
 	local tSchematicInfo = CraftingLib.GetSchematicInfo(tCurrentCraft.nSchematicId);
+--	local nTradeskillId = tSchematicInfo.eTradeskillId;
 	log:debug("Name: "..tSchematicInfo.strName);
 
 	-- Specify Power Core
@@ -245,6 +245,10 @@ function M:StartRandomCraft()
 					self.Crafting.luaSchematic:OnBuildPropertyPicker(wndCurcuitPickerButton);
 					wndCurcuitPickerButton:SetData({ wndSocketButton, iSelectedAttributeId, nLayoutIndex });
 					self.Crafting.luaSchematic:OnPropertyBtn(wndCurcuitPickerButton);
+
+					local strMicroChipItemName = self.Crafting.luaSchematic.tSocketItems[nLayoutIndex]:GetName();
+					local strMicroChipItemId = self.Crafting.luaSchematic.tSocketItems[nLayoutIndex]:GetItemId();
+					table.insert(tAdditives, strMicroChipItemId);
 				end
 			end
 		elseif (tSocket.eSocketType ~= Item.CodeEnumMicrochipType.PowerSource) then
@@ -256,10 +260,12 @@ function M:StartRandomCraft()
 
 	-- Start Crafting
 --	log:debug(tAdditives);
---	log:debug(self.Crafting.luaSchematic:HelperGetUserSelection()); -- tMicrochips
+--	log:debug(self.Crafting.luaSchematic:HelperGetUserSelection());
 	local wndCraftButton = self.Crafting.wndMain:FindChild("CraftButton");
 	if (wndCraftButton and wndCraftButton:IsEnabled()) then
 		self.Crafting:OnCraftBtnClicked();
+--		local _, tThresholds = self.Crafting.luaSchematic:HelperGetUserSelection();
+--		CraftingLib.CompleteCraft(tAdditives, tThresholds);
 	end
 end
 
