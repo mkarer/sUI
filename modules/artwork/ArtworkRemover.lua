@@ -27,13 +27,36 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	-- Action Bars
-	local tActionBarFrame = Apollo.GetAddon("ActionBarFrame");
-	log:debug(tActionBarFrame);
-	log:debug(tActionBarFrame.wndArt);
-
-	for _, f in pairs(tActionBarFrame.wndArt:GetChildren()) do
+	local tActionBars = Apollo.GetAddon("ActionBarFrame");
+	for _, f in pairs(tActionBars.wndArt:GetChildren()) do
 		self:RemoveArtwork(f);
 	end
+
+	-- Class Resources
+	local tClassResources = Apollo.GetAddon("ClassResources");
+
+	if (S.myClassId == GameLib.CodeEnumClass.Spellslinger) then
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("SlingerBaseFrame_InCombat"));
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("SlingerBaseFrame_OutOfCombat"));
+		self:RawHook(tClassResources, "OnSlingerEnteredCombat", S.Dummy);
+	elseif (S.myClassId == GameLib.CodeEnumClass.Esper) then
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("EsperBaseFrame_InCombat"));
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("EsperBaseFrame_OutOfCombat"));
+		--self:RawHook(tClassResources, "OnEsperEnteredCombat", S.Dummy);
+	elseif (S.myClassId == GameLib.CodeEnumClass.Engineer) then
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("MainResourceFrame"));
+	elseif (S.myClassId == GameLib.CodeEnumClass.Medic) then
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("MedicBaseFrame_InCombat"));
+		self:RemoveArtwork(tClassResources.wndMain:FindChild("MedicBaseFrame_OutOfCombat"));
+--	elseif (S.myClassId == GameLib.CodeEnumClass.Warrior) then
+	end
+
+	-- Experience Bar
+	local tExperienceBar = Apollo.GetAddon("XPBar");
+	for _, f in pairs(tExperienceBar.wndArt:GetChildren()) do
+		self:RemoveArtwork(f);
+	end
+
 end
 
 function M:OnDisable()
@@ -43,8 +66,6 @@ end
 -----------------------------------------------------------------------------
 
 function M:RemoveArtwork(f)
-	log:debug(f:GetName());
-
 	-- Destroy Pixies
 	local i = 1;
 	while (true) do
