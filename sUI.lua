@@ -29,6 +29,29 @@ local GeminiLogging;
 -- Initialization
 -----------------------------------------------------------------------------------------------
 
+local function logDebug(self, ...)
+	if (not S.DB or not S.DB.debug) then
+		self:_debug(...);
+	end
+
+	-- Debugging Filter	
+	local debugInfo = debug.getinfo(2);
+	local caller = string.gsub(debugInfo.short_src, "\\", "/");
+	local pathRootIndex = caller:find("Addons/sUI/") + 11;
+	local dir, file, ext = string.match(caller:sub(pathRootIndex), "(.-)([^/]-([^%.]+))$");
+	dir = dir:sub(1, -2);
+	file = string.gsub(file, "."..ext, "");
+
+	if (not dir or not file) then
+		self:_debug(...);
+	elseif (S.DB.debug[dir] == nil and S.DB.debug[file] == nil) then
+		self:_debug(...);
+	elseif ((S.DB.debug[dir] ~= nil and S.DB.debug[dir] ~= false) and (S.DB.debug[file] ~= nil and S.DB.debug[file] ~= false)) then
+		self:_debug(...);
+	end
+
+end
+
 function S:OnInitialize()
 	-- Libraries
 	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
@@ -38,7 +61,8 @@ function S:OnInitialize()
 		appender = "GeminiConsole"
 	});
 	log = S.Log;
-
+	log._debug = log.debug;
+	log.debug = logDebug;
 	log:debug(kstrAddon.." "..kstrVersion);
 
 	-- Main Form
