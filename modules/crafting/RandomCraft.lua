@@ -14,7 +14,7 @@ require "CraftingLib";
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("RandomCraft", "Gemini:Event-1.0");
+local M = S:NewModule("RandomCraft", "Gemini:Event-1.0", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
@@ -58,17 +58,24 @@ function M:OnEnable()
 		[Unit.CodeEnumProperties.ShieldCapacityMax] 			= true,
 	};
 
-	-- Addon References
+	-- Crafting
 	self.Crafting = Apollo.GetAddon("Crafting");
-
-	-- Event Handlers
-	Apollo.RegisterEventHandler("GenericEvent_StartCircuitCraft", "InitializeCircuitCraft", self);
+	Apollo.RegisterEventHandler("GenericEvent_StartCircuitCraft", "InitializeCircuitCraft", self); -- GeminiEvent doesn't pass idSchematic
 	self:RegisterEvent("GenericEvent_CraftingSummaryIsFinished", "EnableButton");
 	self:RegisterEvent("CraftingInterrupted", "CraftingInterrupted");
 	self:RegisterEvent("GenericEvent_CraftSummaryMsg", "EnableButton");
 	self:RegisterEvent("GenericEvent_StartCraftCastBar", "DisableButton");
 	self:RegisterEvent("GenericEvent_CraftingResume_CloseCraftingWindows", "ClearQueue");
 	self:RegisterEvent("GenericEvent_BotchCraft", "ClearQueue");
+
+	-- Tradeskills
+--	self.wndTradeskillContainer = Apollo.FindWindowByName("TradeskillContainerForm");
+--	if (self.wndTradeskillContainer) then
+--		log:debug(self.wndTradeskillContainer:GetName().." hooked.");
+--		self:PostHook(self.wndTradeskillContainer, "RedrawAll");
+--		self:PostHook(self.wndTradeskillContainer, "OnOpenToSearchSchematic", "Test");
+--		self:RegisterEvent("GenericEvent_InitializeSchematicsTree", "Test");
+	end
 end
 
 function M:OnDisable()
@@ -77,7 +84,15 @@ function M:OnDisable()
 end
 
 -----------------------------------------------------------------------------
--- User Interface
+-- Tradeskills User Interface
+-----------------------------------------------------------------------------
+
+--function M:Test()
+--	log:debug("test");
+--end
+
+-----------------------------------------------------------------------------
+-- Crafting User Interface
 -----------------------------------------------------------------------------
 
 function M:EnableButton()
