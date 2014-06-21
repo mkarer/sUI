@@ -1,10 +1,10 @@
 --[[
 
-	Martin Karer / Sezz, 2014
-	http://www.sezz.at
-
 	s:UI RandomCraft Module
 	Adds a "Random Craft" button to the Crafting UI for daily quests/mass crafting (when the actual result doesn't matter).
+
+	Martin Karer / Sezz, 2014
+	http://www.sezz.at
 
 --]]
 
@@ -117,6 +117,9 @@ end
 
 function M:ClearQueue()
 	iCraftingQueue = 0;
+	if (self.wndRandomCraftAllCheckbox and not self.wndRandomCraftAllCheckbox:IsChecked()) then
+		self.wndRandomCraftAllCheckbox:SetCheck(false);
+	end
 end
 
 function M:InitializeCircuitCraft(nSchematicId)
