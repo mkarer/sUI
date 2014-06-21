@@ -11,10 +11,10 @@
     <Script Name="sUI.lua" />
     <Form Name="sUI.xml" />
 
+    <!-- Modules -->
     <Script Name="core\Modules.lua" />
 
-    <!-- Modules -->
-    <!-- Crafting -->
+    <!-- Module: Crafting -->
     <Script Name="modules\crafting\RandomCraft.lua" />
     <Form Name="modules\crafting\RandomCraft.xml" />
 </Addon>
