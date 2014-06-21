@@ -16,7 +16,8 @@ local ktDependencies = {
 	"GeminiConsole",
 };
 
-local sUI = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, kstrAddon.." "..kstrVersion, ktDependencies);
+local sUI = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, true, ktDependencies);
+local log;
 local GeminiLogging;
 
 -----------------------------------------------------------------------------------------------
@@ -31,36 +32,26 @@ function sUI:OnInitialize()
 		pattern = "%d %n %c %l - %m",
 		appender = "GeminiConsole"
 	});
+	log = sUI.Log;
 
-	sUI.Log:debug("Initializing...");
+	log:debug(kstrAddon.." "..kstrVersion);
 
 	-- Main Form
 	self.xmlDoc = XmlDoc.CreateFromFile("sUI.xml");
 end
 
 function sUI:OnEnable()
-	if (self.xmlDoc ~= nil and self.xmlDoc:IsLoaded()) then
-		self.wndMain = Apollo.LoadForm(self.xmlDoc, "sUIForm", nil, self);
-		if (self.wndMain == nil) then
-			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.");
-			return;
-		end
-		
-		self.wndMain:Show(false, true);
-	end
-
-	sUI.Log:debug("Zug Zug!");
+	self.wndMain = Apollo.LoadForm(self.xmlDoc, "Configure", nil, self);
+	log:debug("Zug Zug!");
 end
 
 -----------------------------------------------------------------------------------------------
 -- Main Form (TEMP)
 -----------------------------------------------------------------------------------------------
-function sUI:OnOK()
-	sUI.Log:debug("MainForm OK");
+function sUI:CloseConfiguration()
 	self.wndMain:Close();
 end
 
-function sUI:OnCancel()
-	sUI.Log:debug("MainForm Cancel");
-	self.wndMain:Close();
+function sUI:OnConfigure()
+	self.wndMain:Show(true);
 end
