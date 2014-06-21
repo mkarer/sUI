@@ -25,7 +25,7 @@ local tCustomizableMicrochipTypes, tCraftingAttributes, iCraftingQueue, nLastSch
 
 function M:OnInitialize()
 	log = S.Log;
-	self:InitializeForms("modules/crafting/");
+	self:InitializeForms();
 end
 
 function M:OnEnable()
