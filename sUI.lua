@@ -1,7 +1,12 @@
------------------------------------------------------------------------------------------------
--- s:UI/SezzUI Minimalistic User Interface
--- Martin Karer, 2014
------------------------------------------------------------------------------------------------
+--[[
+
+	s:UI (SezzUI)
+	Minimalistic User Interface
+
+	Martin Karer / Sezz, 2014
+	http://www.sezz.at
+
+--]]
 
 require "Window";
  
