@@ -1,0 +1,8 @@
+<Fonts>
+    <Font Name="MyriadRegularCondensed11" Face="MyriadRegularCondensed" Size="11" GfxFont_3D="0" GfxFont_Bold="0" GfxFont_Italic="0" GfxFont_Shadow="0" GfxFont_Outline="0"/>
+    <Font Name="MyriadProLightCondensed11_S" Face="Myriad Pro Light Cond" Size="11" GfxFont_3D="0" GfxFont_Bold="0" GfxFont_Italic="0" GfxFont_Shadow="1" GfxFont_Outline="0"/>
+    <Font Name="MyriadProLightCondensed11_O" Face="Myriad Pro Light Cond" Size="11" GfxFont_3D="0" GfxFont_Bold="0" GfxFont_Italic="0" GfxFont_Shadow="0" GfxFont_Outline="1"/>
+    <Font Name="MyriadRegularCondensed11_S" Face="MyriadRegularCondensed" Size="11" GfxFont_3D="0" GfxFont_Bold="0" GfxFont_Italic="0" GfxFont_Shadow="1" GfxFont_Outline="0"/>
+    <Font Name="MyriadRegularCondensed11_O" Face="MyriadRegularCondensed" Size="11" GfxFont_3D="0" GfxFont_Bold="0" GfxFont_Italic="0" GfxFont_Shadow="0" GfxFont_Outline="1"/>
+    <Font Name="MyriadProLightCondensed11" Face="Myriad Pro Light Cond" Size="11" GfxFont_3D="0" GfxFont_Bold="0" GfxFont_Italic="0" GfxFont_Shadow="0" GfxFont_Outline="0"/>
+</Fonts>
