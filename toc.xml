@@ -19,6 +19,8 @@
 	<Script Name="modules\crafting\RandomCraft.lua" />
 	<Form Name="modules\crafting\RandomCraft.xml" />
 	<Script Name="modules\crafting\Unmount.lua" />
+	<Script Name="modules\powerbar\PowerBar.lua" />
+	<Form Name="modules\powerbar\PowerBar.xml" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
