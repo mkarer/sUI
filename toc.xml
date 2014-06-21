@@ -2,20 +2,27 @@
 <Addon Author="Sezz" APIVersion="8" Name="s:UI" Description="Minimalistic User Interface">
 	<!-- Libraries -->
 	<Script Name="libs\CallbackHandler\CallbackHandler-1.0.lua" />
-    <Script Name="libs\GeminiEvent\GeminiEvent-1.0.lua" />
-    <Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
-    <Script Name="libs\GeminiAddon\GeminiAddon.lua" />
-    <Script Name="libs\GeminiLogging\GeminiLogging.lua" />
+	<Script Name="libs\GeminiEvent\GeminiEvent-1.0.lua" />
+	<Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
+	<Script Name="libs\GeminiAddon\GeminiAddon.lua" />
+	<Script Name="libs\GeminiLogging\GeminiLogging.lua" />
 
-    <!-- Core -->
-    <Script Name="sUI.lua" />
-    <Form Name="sUI.xml" />
+	<!-- Core -->
+	<Script Name="sUI.lua" />
+	<Script Name="config\defaults.lua" />
+	<Form Name="sUI.xml" />
 
-    <!-- Modules -->
-    <Script Name="core\Modules.lua" />
-    <Script Name="modules\artwork\ArtworkRemover.lua" />
-    <Script Name="modules\chat\ChannelColors.lua" />
-    <Script Name="modules\crafting\RandomCraft.lua" />
-    <Form Name="modules\crafting\RandomCraft.xml" />
-    <Script Name="modules\crafting\Unmount.lua" />
+	<!-- Modules -->
+	<Script Name="core\Modules.lua" />
+	<Script Name="modules\artwork\ArtworkRemover.lua" />
+	<Script Name="modules\chat\ChannelColors.lua" />
+	<Script Name="modules\crafting\RandomCraft.lua" />
+	<Form Name="modules\crafting\RandomCraft.xml" />
+	<Script Name="modules\crafting\Unmount.lua" />
+
+	<!-- Nonworking ideas (because if the WildStar API or me) -->
+<!--
+	<Script Name="modules\fixes\NoCinematics.lua" />
+	<Script Name="modules\crafting\SlashSalvage.lua" />
+-->
 </Addon>
