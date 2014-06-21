@@ -75,7 +75,7 @@ function M:OnEnable()
 --		self:PostHook(self.wndTradeskillContainer, "RedrawAll");
 --		self:PostHook(self.wndTradeskillContainer, "OnOpenToSearchSchematic", "Test");
 --		self:RegisterEvent("GenericEvent_InitializeSchematicsTree", "Test");
-	end
+--	end
 end
 
 function M:OnDisable()
