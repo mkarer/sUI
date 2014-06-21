@@ -21,7 +21,7 @@ local log;
 -- Initialization
 -----------------------------------------------------------------------------
 
-local tCustomizableMicrochipTypes, tCraftingAttributes;
+local tCustomizableMicrochipTypes, tCraftingAttributes, iCraftingQueue, nLastSchematicId;
 
 function M:OnInitialize()
 	log = S.Log;
@@ -32,6 +32,8 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	-- Initialize Data
+	iCraftingQueue = 0;
+
 	tCustomizableMicrochipTypes = {
 		[Item.CodeEnumMicrochipType.Capacitor]	= true,
 		[Item.CodeEnumMicrochipType.Resistor]	= true,
@@ -60,11 +62,13 @@ function M:OnEnable()
 	self.Crafting = Apollo.GetAddon("Crafting");
 
 	-- Event Handlers
-	self:RegisterEvent("GenericEvent_StartCircuitCraft", "CreateButton");
+	Apollo.RegisterEventHandler("GenericEvent_StartCircuitCraft", "InitializeCircuitCraft", self);
 	self:RegisterEvent("GenericEvent_CraftingSummaryIsFinished", "EnableButton");
-	self:RegisterEvent("CraftingInterrupted", "EnableButton");
+	self:RegisterEvent("CraftingInterrupted", "CraftingInterrupted");
 	self:RegisterEvent("GenericEvent_CraftSummaryMsg", "EnableButton");
 	self:RegisterEvent("GenericEvent_StartCraftCastBar", "DisableButton");
+	self:RegisterEvent("GenericEvent_CraftingResume_CloseCraftingWindows", "ClearQueue");
+	self:RegisterEvent("GenericEvent_BotchCraft", "ClearQueue");
 end
 
 function M:OnDisable()
@@ -83,6 +87,7 @@ function M:EnableButton()
 	
 	self.wndRandomCraftButton:Show(true);
 	self.wndRandomCraftButton:Enable(true);
+	self.wndRandomCraftAllCheckbox:Show(true);
 end
 
 function M:DisableButton()
@@ -92,6 +97,7 @@ function M:DisableButton()
 
 	self.wndRandomCraftButton:Show(true);
 	self.wndRandomCraftButton:Enable(false);
+	self.wndRandomCraftAllCheckbox:Show(true);
 end
 
 function M:HideButton()
@@ -101,15 +107,44 @@ function M:HideButton()
 
 	self.wndRandomCraftButton:Show(false);
 	self.wndRandomCraftButton:Enable(false);
+	self.wndRandomCraftAllCheckbox:Show(false);
+end
+
+function M:CraftingInterrupted()
+	self:ClearQueue();
+	self:EnableButton();
+end
+
+function M:ClearQueue()
+	iCraftingQueue = 0;
+end
+
+function M:InitializeCircuitCraft(nSchematicId)
+	log:debug("Schematic Id: %d", nSchematicId);
+	nLastSchematicId = nSchematicId;
+
+	if (self.wndRandomCraftAllCheckbox and not self.wndRandomCraftAllCheckbox:IsChecked()) then
+		iCraftingQueue = 0;
+	end
+
+	self:CreateButton();
 end
 
 function M:CreateButton()
 	if (self.wndRandomCraftButton) then
 		-- Button already exists - check materials when called by GenericEvent_StartCircuitCraft (Q&D)
-		local wndNoMaterialsBlocker = self.Crafting.wndMain:FindChild("NoMaterialsBlocker");
-		if (wndNoMaterialsBlocker and not wndNoMaterialsBlocker:IsVisible()) then
+		local nNumCraftable = self:GetNumCraftable();
+
+		self.wndRandomCraftAllCheckbox:SetText("USE ALL MATERIALS ["..nNumCraftable.."]");
+		if (nNumCraftable > 0) then
 			self:EnableButton();
+
+			if (iCraftingQueue > 0) then
+				-- Crafting Queue is not empty
+				self:StartRandomCraft();
+			end
 		else
+			self:ClearQueue();
 			self:HideButton();
 		end
 		return;
@@ -123,6 +158,9 @@ function M:CreateButton()
 
 	-- Add Event Handler
 	self.wndRandomCraftButton:AddEventHandler("ButtonSignal", "StartRandomCraft", self);
+
+	-- Add Checkbox
+	self.wndRandomCraftAllCheckbox = Apollo.LoadForm(self.xmlDoc, "RandomCraftAllCheckbox", self.Crafting.wndMain, self);
 
 	-- Check Materials
 	self:CreateButton();
@@ -151,6 +189,25 @@ end
 
 --]]
 
+function M:GetNumCraftable()
+	local bHaveEnoughMats = true;
+	local nNumCraftable = 9000;
+
+	local tCurrentCraft = CraftingLib.GetCurrentCraft();
+	local tSchematicInfo = CraftingLib.GetSchematicInfo(tCurrentCraft and tCurrentCraft.nSchematicId or nLastSchematicId);
+
+	for key, tMaterial in pairs(tSchematicInfo.tMaterials) do
+		if (tMaterial.nAmount > 0) then
+			local nBackpackCount = tMaterial.itemMaterial:GetBackpackCount();
+
+			nNumCraftable = math.min(nNumCraftable, math.floor(nBackpackCount / tMaterial.nAmount))
+			bHaveEnoughMats = (bHaveEnoughMats and nBackpackCount >= tMaterial.nAmount);
+		end
+	end
+
+	return nNumCraftable;
+end
+
 function M:StartRandomCraft()
 	-- Check if user started crafting/clicked on "Start Crafting"
 	local tCurrentCraft = CraftingLib.GetCurrentCraft();
@@ -167,6 +224,13 @@ function M:StartRandomCraft()
 	end
 
 	log:debug("Starting Random Craft...");
+
+	if (self.wndRandomCraftAllCheckbox:IsChecked()) then
+		iCraftingQueue = self:GetNumCraftable();
+		log:info("Items in Queue: %d", iCraftingQueue);
+	else
+		iCraftingQueue = 0;
+	end
 
 	-- Initialize
 	local tAdditives = {}; -- NYI, maybe useful later if we don't want to use the default crafting addon
