@@ -21,7 +21,7 @@ local ktDependencies = {
 	"GeminiConsole",
 };
 
-local sUI = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, true, ktDependencies);
+local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, true, ktDependencies, "Gemini:Hook-1.0");
 local log;
 local GeminiLogging;
 
@@ -29,15 +29,15 @@ local GeminiLogging;
 -- Initialization
 -----------------------------------------------------------------------------------------------
 
-function sUI:OnInitialize()
+function S:OnInitialize()
 	-- Libraries
 	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
-	sUI.Log = GeminiLogging:GetLogger({
+	S.Log = GeminiLogging:GetLogger({
 		level = GeminiLogging.DEBUG,
 		pattern = "%d %n %c %l - %m",
 		appender = "GeminiConsole"
 	});
-	log = sUI.Log;
+	log = S.Log;
 
 	log:debug(kstrAddon.." "..kstrVersion);
 
@@ -45,22 +45,43 @@ function sUI:OnInitialize()
 	self.xmlDoc = XmlDoc.CreateFromFile("sUI.xml");
 end
 
-function sUI:OnEnable()
+function S:OnEnable()
 	self.wndMain = Apollo.LoadForm(self.xmlDoc, "Configure", nil, self);
 	log:debug("Zug Zug!");
+
+	-- Player Information
+	local unitPlayer = GameLib:GetPlayerUnit();
+
+	self.myRealm = GameLib:GetRealmName();
+	self.myClassId = unitPlayer:GetClassId();
+	self.myClass = self:GetClassName(self.myClassId);
+	self.myLevel = unitPlayer:GetLevel();
+	self.myName = unitPlayer:GetName();
+
+	log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
 end
 
-sUI.Dummy = function()
+function S:Dummy()
 	return true;
+end
+
+function S:GetClassName(classId)
+	for k, v in pairs(GameLib.CodeEnumClass) do
+		if (classId == v) then
+			return k;
+		end
+	end
+
+	return "Unknown";
 end
 
 -----------------------------------------------------------------------------------------------
 -- Main Form (TEMP)
 -----------------------------------------------------------------------------------------------
-function sUI:CloseConfiguration()
+function S:CloseConfiguration()
 	self.wndMain:Close();
 end
 
-function sUI:OnConfigure()
+function S:OnConfigure()
 	self.wndMain:Show(true);
 end
