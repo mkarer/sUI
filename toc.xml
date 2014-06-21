@@ -3,9 +3,9 @@
 	<!-- Libraries -->
 	<Script Name="libs\CallbackHandler\CallbackHandler-1.0.lua" />
     <Script Name="libs\GeminiEvent\GeminiEvent-1.0.lua" />
+    <Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
     <Script Name="libs\GeminiAddon\GeminiAddon.lua" />
     <Script Name="libs\GeminiLogging\GeminiLogging.lua" />
-    <Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
 
     <!-- Core -->
     <Script Name="sUI.lua" />
@@ -14,8 +14,8 @@
     <!-- Modules -->
     <Script Name="core\Modules.lua" />
     <Script Name="modules\artwork\ArtworkRemover.lua" />
-
-    <!-- Module: Crafting -->
+    <Script Name="modules\chat\ChannelColors.lua" />
     <Script Name="modules\crafting\RandomCraft.lua" />
     <Form Name="modules\crafting\RandomCraft.xml" />
+    <Script Name="modules\crafting\Unmount.lua" />
 </Addon>
