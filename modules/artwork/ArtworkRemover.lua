@@ -27,7 +27,7 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	-- Simple Artwork Removal
-	self:StyleActionBars();
+--	self:StyleActionBars();
 	self:StyleExtraActionBar();
 	self:StyleClassResources();
 	self:StyleExperienceBar();
@@ -41,6 +41,7 @@ end
 -- Styling Hooks
 -----------------------------------------------------------------------------
 
+--[[
 function M:StyleActionBars()
 	local tActionBars = Apollo.GetAddon("ActionBarFrame");
 	if (not tActionBars) then return; end
@@ -49,13 +50,14 @@ function M:StyleActionBars()
 	if (tActionBars.wndArt) then
 		log:debug("Styling Action Bars");
 		for _, f in pairs(tActionBars.wndArt:GetChildren()) do
-			self:RemoveArtwork(f);
+			S:RemoveArtwork(f);
 		end
 	else
 		log:debug("Action Bars aren't ready yet...");
 		self:PostHook(tActionBars, "OnDocumentReady", "StyleActionBars");
 	end
 end
+--]]
 
 function M:StyleExtraActionBar()
 	local tExtraActionBar = Apollo.GetAddon("ActionBarShortcut");
@@ -66,19 +68,19 @@ function M:StyleExtraActionBar()
 		log:debug("Styling Extra Action Bars");
 		for _, f in pairs(tExtraActionBar.tActionBars) do
 			if (f) then
-				self:RemoveArtwork(f);
+				S:RemoveArtwork(f);
 			end
 		end
 
 		for _, f in pairs(tExtraActionBar.tActionBarsHorz) do
 			if (f) then
-				self:RemoveArtwork(f);
+				S:RemoveArtwork(f);
 			end
 		end
 
 		for _, f in pairs(tExtraActionBar.tActionBarsVert) do
 			if (f) then
-				self:RemoveArtwork(f);
+				S:RemoveArtwork(f);
 			end
 		end
 
@@ -101,18 +103,18 @@ function M:StyleClassResources()
 	if (tClassResources.wndMain) then
 		log:debug("Styling Class Resources");
 		if (S.myClassId == GameLib.CodeEnumClass.Spellslinger) then
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("SlingerBaseFrame_InCombat"));
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("SlingerBaseFrame_OutOfCombat"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("SlingerBaseFrame_InCombat"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("SlingerBaseFrame_OutOfCombat"));
 			self:RawHook(tClassResources, "OnSlingerEnteredCombat", S.Dummy);
 		elseif (S.myClassId == GameLib.CodeEnumClass.Esper) then
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("EsperBaseFrame_InCombat"));
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("EsperBaseFrame_OutOfCombat"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("EsperBaseFrame_InCombat"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("EsperBaseFrame_OutOfCombat"));
 			--self:RawHook(tClassResources, "OnEsperEnteredCombat", S.Dummy);
 		elseif (S.myClassId == GameLib.CodeEnumClass.Engineer) then
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("MainResourceFrame"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("MainResourceFrame"));
 		elseif (S.myClassId == GameLib.CodeEnumClass.Medic) then
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("MedicBaseFrame_InCombat"));
-			self:RemoveArtwork(tClassResources.wndMain:FindChild("MedicBaseFrame_OutOfCombat"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("MedicBaseFrame_InCombat"));
+			S:RemoveArtwork(tClassResources.wndMain:FindChild("MedicBaseFrame_OutOfCombat"));
 	--	elseif (S.myClassId == GameLib.CodeEnumClass.Warrior) then
 		end
 	else
@@ -129,28 +131,10 @@ function M:StyleExperienceBar()
 	if (tExperienceBar.wndArt) then
 		log:debug("Styling Experience Bar");
 		for _, f in pairs(tExperienceBar.wndArt:GetChildren()) do
-			self:RemoveArtwork(f);
+			S:RemoveArtwork(f);
 		end
 	else
 		log:debug("Experience Bar isn't ready yet...");
 		self:PostHook(tExperienceBar, "OnDocumentReady", "StyleExperienceBar");
 	end
-end
-
------------------------------------------------------------------------------
-
-function M:RemoveArtwork(f)
-	-- Destroy Pixies
-	local i = 1;
-	while (true) do
-		local pixie = f:GetPixieInfo(i);
-		if (pixie) then
-			f:DestroyPixie(i);
-			i = i + 1;
-		else
-			break;
-		end
-	end
-
-	f:SetSprite(nil);
 end
