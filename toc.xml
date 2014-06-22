@@ -13,6 +13,7 @@
 	<Script Name="sUI.lua" />
 	<Script Name="config\defaults.lua" />
 	<Form Name="sUI.xml" />
+	<Script Name="core\Media.lua" />
 	<Script Name="core\Modules.lua" />
 	<Script Name="core\Temp.lua" />
 
@@ -26,6 +27,7 @@
 	<Script Name="modules\powerbar\PowerBar.lua" />
 	<Form Name="modules\powerbar\PowerBar.xml" />
 	<Script Name="modules\fixes\NoCinematics.lua" />
+	<Script Name="modules\ActionBars\ActionBars.lua" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
