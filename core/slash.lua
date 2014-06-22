@@ -8,5 +8,5 @@ end
 
 -- Reload UI
 function module:ReloadUI()
-	RequestReloadUI()
+	RequestReloadUI();
 end
