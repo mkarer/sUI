@@ -1,0 +1,36 @@
+--[[
+
+	s:UI Custom Console Variables
+
+	Martin Karer / Sezz, 2014
+	http://www.sezz.at
+
+--]]
+
+require "Window";
+
+-----------------------------------------------------------------------------
+
+local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
+local M = S:NewModule("ConsoleVariables");
+local log;
+
+-----------------------------------------------------------------------------
+-- Initialization
+-----------------------------------------------------------------------------
+
+function M:OnInitialize()
+	log = S.Log;
+end
+
+function M:OnEnable()
+	log:debug("%s enabled.", self:GetName());
+
+	-- Update Console Variables
+	Apollo.SetConsoleVariable("camera.FovY", 65); -- http://www.rjdown.co.uk/projects/bfbc2/fovcalculator.php
+end
+
+function M:OnDisable()
+	log:debug("%s disabled.", self:GetName());
+end
+
