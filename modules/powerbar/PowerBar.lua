@@ -36,9 +36,9 @@ function M:OnEnable()
 
 	-- Load Class Configuration
 	if (GameLib.GetPlayerUnit()) then
-		self:ReloadConfiguration()
+		self:ReloadConfiguration();
 	else
-		Apollo.RegisterEventHandler("CharacterCreated", "ReloadConfiguration", self)
+		Apollo.RegisterEventHandler("CharacterCreated", "ReloadConfiguration", self);
 	end
 end
 
@@ -86,8 +86,11 @@ function M:ReloadConfiguration()
 			["carbineDisablerFunc"] = self.DisableCarbineStalkerResource,
 		},
 		[GameLib.CodeEnumClass.Warrior] = {
-			["numButtons"] = 0,
+			["numButtons"] = 4,
+			["buttonEmpowerFunc"] = GameLib.IsOverdriveActive,
+			["buttonPowerFunc"] = self.GetPowerKineticEnergy,
 			["barEnabled"] = false,
+			["carbineDisablerFunc"] = self.DisableCarbineWarriorResource,
 		},
 	};
 
@@ -152,6 +155,7 @@ end
 -----------------------------------------------------------------------------
 
 function M:UpdatePower()
+--	log:debug("UpdatePower");
 	if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
 	if (not unitPlayer) then return; end
 
@@ -178,10 +182,12 @@ function M:UpdatePower()
 		self.PowerBar:FindChild("Progress"):SetMax(powerMax);
 		self.PowerBar:FindChild("Progress"):SetProgress(powerCurrent);
 	end
+--	log:debug("UpdatePower!");
 end
 
 function M:ToggleVisibility(unit, bInCombat)
-	if (not unitPlayer or unit ~= unitPlayer) then return; end
+	if (not unitPlayer or not unit or unit ~= unitPlayer) then return; end
+	log:debug("ToggleVisibility: %s", bInCombat and "TRUE" or "FALSE")
 	self.wndAnchor:Show(bInCombat, false, bInCombat and 0.2 or 0.5);
 end
 
@@ -217,6 +223,14 @@ function M:GetPowerVolatility()
 	return powerPercent, powerMax;
 end
 
+function M:GetPowerKineticEnergy()
+	local powerMax = unitPlayer:GetMaxResource(1);
+	local powerCurrent = unitPlayer:GetResource(1);
+	local powerDivider = powerMax / cfg.numButtons;
+
+	return math.floor(powerCurrent / powerDivider), math.floor(powerMax / powerDivider);
+end
+
 -----------------------------------------------------------------------------
 -- Carbine Addons
 -----------------------------------------------------------------------------
@@ -245,5 +259,19 @@ function M:DisableCarbineStalkerResource()
 		tStalkerResource.wndResourceBar:Show(false);
 	else
 		self:PostHook(tStalkerResource, "OnCharacterCreated", "DisableCarbineStalkerResource");
+	end
+end
+
+
+function M:DisableCarbineWarriorResource()
+	local tTechWarrior = Apollo.GetAddon("TechWarrior");
+	if (not tTechWarrior) then return; end
+	self:Unhook(tTechWarrior, "OnCharacterCreate");
+
+	if (tTechWarrior.wndResourceBar) then
+		Apollo.RemoveEventHandler("VarChange_FrameCount", tTechWarrior);
+		tTechWarrior.wndResourceBar:Show(false);
+	else
+		self:PostHook(tTechWarrior, "OnCharacterCreate", "DisableCarbineWarriorResource");
 	end
 end
