@@ -1,0 +1,18 @@
+[submodule "libs/LibApolloFixes"]
+	path = libs/LibApolloFixes
+	url = https://github.com/wildstarnasa/LibApolloFixes.git
+[submodule "libs/CallbackHandler"]
+	path = libs/CallbackHandler
+	url = https://github.com/wildstarnasa/CallbackHandler.git
+[submodule "libs/GeminiAddon"]
+	path = libs/GeminiAddon
+	url = https://github.com/wildstarnasa/GeminiAddon.git
+[submodule "libs/GeminiEvent"]
+	path = libs/GeminiEvent
+	url = https://github.com/wildstarnasa/GeminiEvent.git
+[submodule "libs/GeminiHook"]
+	path = libs/GeminiHook
+	url = https://github.com/wildstarnasa/GeminiHook.git
+[submodule "libs/GeminiLogging"]
+	path = libs/GeminiLogging
+	url = https://github.com/wildstarnasa/GeminiLogging.git
