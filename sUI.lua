@@ -65,6 +65,9 @@ function S:OnInitialize()
 	log.debug = logDebug;
 	log:debug(kstrAddon.." "..kstrVersion);
 
+	-- Media
+	Apollo.LoadSprites("media/Sprites.xml");
+
 	-- Main Form
 	self.xmlDoc = XmlDoc.CreateFromFile("sUI.xml");
 end
