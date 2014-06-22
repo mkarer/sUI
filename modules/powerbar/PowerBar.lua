@@ -9,7 +9,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:NewModule("PowerBar", "Gemini:Hook-1.0");
-local log;
+local log, unitPlayer, cfg;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -19,16 +19,15 @@ function M:OnInitialize()
 	log = S.Log;
 	self:InitializeForms();
 	self.PowerButtons = {};
-	self.PowerBars = {};
 	self.DB = {
 		["alwaysVisible"] = false,
-		["buttons"] = 0,
-		["bars"] = 0,
+		["buttonSize"] = 36,
+		["buttonPadding"] = 4,
+		["barHeight"] = 6,
 	};
 end
 
 function M:OnEnable()
-	if (S.myClass ~= "Spellslinger") then return; end
 	log:debug("%s enabled.", self:GetName());
 
 	-- Create Anchor
@@ -36,7 +35,11 @@ function M:OnEnable()
 	self.wndAnchor:Show(false);
 
 	-- Load Class Configuration
-	self:ReloadConfiguration();
+	if (GameLib.GetPlayerUnit()) then
+		self:ReloadConfiguration()
+	else
+		Apollo.RegisterEventHandler("CharacterCreated", "ReloadConfiguration", self)
+	end
 end
 
 function M:OnDisable()
@@ -44,40 +47,80 @@ function M:OnDisable()
 end
 
 function M:ReloadConfiguration()
-	-- Spellslinger Hardcoded
+	-- Class Configuration (TEMP)
+	self.DB.classConfiguration = {
+		[GameLib.CodeEnumClass.Spellslinger] = {
+			["numButtons"] = 4,
+			["buttonEmpowerFunc"] = GameLib.IsSpellSurgeActive,
+			["buttonPowerFunc"] = self.GetPowerSpell,
+			["barEnabled"] = true,
+			["barPowerFunc"] = self.GetPowerMana,
+			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
+		},
+		[GameLib.CodeEnumClass.Esper] = {
+			["numButtons"] = 5,
+			["buttonEmpowerFunc"] = GameLib.IsCurrentInnateAbilityActive,
+			["buttonPowerFunc"] = self.GetPowerActuators,
+			["barEnabled"] = true,
+			["barPowerFunc"] = self.GetPowerMana,
+			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
+		},
+		[GameLib.CodeEnumClass.Medic] = {
+			["numButtons"] = 4,
+			["buttonEmpowerFunc"] = GameLib.IsCurrentInnateAbilityActive,
+			["buttonPowerFunc"] = self.GetPowerActuators,
+			["barEnabled"] = true,
+			["barPowerFunc"] = self.GetPowerMana,
+			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
+		},
+		[GameLib.CodeEnumClass.Engineer] = {
+			["numButtons"] = 0,
+			["barEnabled"] = true,
+			["barPowerFunc"] = self.GetPowerVolatility,
+			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
+		},
+		[GameLib.CodeEnumClass.Stalker] = {
+			["numButtons"] = 0,
+			["barEnabled"] = true,
+			["barPowerFunc"] = self.GetPowerSuit,
+			["carbineDisablerFunc"] = self.DisableCarbineStalkerResource,
+		},
+		[GameLib.CodeEnumClass.Warrior] = {
+			["numButtons"] = 0,
+			["barEnabled"] = false,
+		},
+	};
+
+	cfg = self.DB.classConfiguration[S.myClassId];
+
+	-- Resize Anchor
+	local nBarWidth = cfg.numButtons > 0 and (cfg.numButtons * self.DB.buttonSize + (cfg.numButtons - 1) * self.DB.buttonPadding) or 156;
+	self.wndAnchor:SetAnchorOffsets(-nBarWidth / 2, 100, nBarWidth / 2, 200);
 
 	-- Create Buttons
-	self.DB.buttons = 4;
-	local nButtonSize = 36;
-	local nButtonPadding = 4;
-	local nBarWidth = self.DB.buttons * nButtonSize + (self.DB.buttons - 1) * nButtonPadding;
+	if (cfg.numButtons > 0) then
+		for i = 1, cfg.numButtons do
+			local button = Apollo.LoadForm(self.xmlDoc, "PowerButton", self.wndAnchor, self);
+			button:SetName("PowerButton"..i);
 
-	self.wndAnchor:SetAnchorOffsets(-nBarWidth / 2, 100, nBarWidth / 2, 200); -- Resize Anchor
+			if (i > 1) then
+				local nAnchorOffsetLeft = (i - 1) * (self.DB.buttonSize + self.DB.buttonPadding);
+				button:SetAnchorOffsets(nAnchorOffsetLeft, 0, nAnchorOffsetLeft + self.DB.buttonSize, self.DB.buttonSize);
+			end
 
-	for i = 1, self.DB.buttons do
-		local button = Apollo.LoadForm(self.xmlDoc, "PowerButton", self.wndAnchor, self);
-		button:SetName("PowerButton"..i);
-
-		if (i > 1) then
-			local nAnchorOffsetLeft = (i - 1) * (nButtonSize + nButtonPadding);
-			button:SetAnchorOffsets(nAnchorOffsetLeft, 0, nAnchorOffsetLeft + nButtonSize, nButtonSize);
+			self.PowerButtons[i] = button;
 		end
-
-		self.PowerButtons[i] = button;
 	end
 
-	-- Create Bars
-	self.DB.bars = 1;
-	local nBarHeight = 2 + nButtonPadding;
-
-	for i = 1, self.DB.bars do
+	-- Create Bar
+	if (cfg.barEnabled) then
 		local bar = Apollo.LoadForm(self.xmlDoc, "PowerBar", self.wndAnchor, self);
-		bar:SetName("PowerBar"..i);
+		bar:SetName("PowerBar1");
 
-		local nAnchorOffsetTop = nButtonSize + nButtonPadding;
-		bar:SetAnchorOffsets(0, nAnchorOffsetTop, 0, nAnchorOffsetTop + nBarHeight);
+		local nAnchorOffsetTop = self.DB.buttonSize + self.DB.buttonPadding;
+		bar:SetAnchorOffsets(0, nAnchorOffsetTop, 0, nAnchorOffsetTop + self.DB.barHeight);
 
-		self.PowerBars[i] = bar;
+		self.PowerBar = bar;
 	end
 
 	-- Add Events
@@ -88,7 +131,7 @@ function M:ReloadConfiguration()
 	if (not self.DB.alwaysVisible) then
 		Apollo.RegisterEventHandler("UnitEnteredCombat", "ToggleVisibility", self);
 
-		local unitPlayer = GameLib.GetPlayerUnit();
+		if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
 		if (unitPlayer) then
 			self:ToggleVisibility(unitPlayer, unitPlayer:IsInCombat());
 		end
@@ -96,54 +139,91 @@ function M:ReloadConfiguration()
 		self.wndAnchor:Show(true);
 	end
 
-	-- Disable Class Resources Addon
-	self:DisableCarbineClassResources();
+	-- Disable Carbine Addons
+	if (cfg.carbineDisablerFunc) then
+		cfg.carbineDisablerFunc(self);
+	end
+
+	log:debug("%s ready!", self:GetName());
 end
 
+-----------------------------------------------------------------------------
+-- Bar/Button Updates
+-----------------------------------------------------------------------------
+
 function M:UpdatePower()
-	-- Spellslinger Hardcoded
-	local unitPlayer = GameLib.GetPlayerUnit();
+	if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
 	if (not unitPlayer) then return; end
 
 	local bInCombat = unitPlayer:IsInCombat();
 	if (not bInCombat and not self.DB.alwaysVisible) then return; end
 
 	-- Buttons
-	local nResourceMax = unitPlayer:GetMaxResource(4);
-	local nResourceCurrent = unitPlayer:GetResource(4);
-	local nResourceMaxDiv4 = nResourceMax / 4;
-	local bSurgeActive = GameLib.IsSpellSurgeActive();
+	if (cfg.numButtons > 0) then
+		local powerCurrent, powerMax = cfg.buttonPowerFunc();
+		local bEmpowered = cfg.buttonEmpowerFunc and cfg.buttonEmpowerFunc() or false;
 
-	for i = 1, self.DB.buttons do
-		local button = self.PowerButtons[i];
-		local nPartialProgress = nResourceCurrent - (nResourceMaxDiv4 * (i - 1));
-		local bThisBubbleFilled = nPartialProgress >= nResourceMaxDiv4;
-
-		if (bThisBubbleFilled) then
-			button:FindChild("Icon"):SetSprite("PowerBarButton"..(bSurgeActive and "Surged" or "Filled"));
-		else
-			button:FindChild("Icon"):SetSprite("PowerBarButtonEmpty");
+		for i = 1, cfg.numButtons do
+			if (powerCurrent >= i) then
+				self.PowerButtons[i]:FindChild("Icon"):SetSprite("PowerBarButton"..(bEmpowered and "Surged" or "Filled"));
+			else
+				self.PowerButtons[i]:FindChild("Icon"):SetSprite("PowerBarButtonEmpty");
+			end
 		end
 	end
 
-	-- Bars
-	local nManaMax = math.floor(unitPlayer:GetMaxMana());
-	local nManaCurrent = math.floor(unitPlayer:GetMana());
-
-	local bar = self.PowerBars[1];
-	bar:FindChild("Progress"):SetMax(nManaMax);
-	bar:FindChild("Progress"):SetProgress(nManaCurrent);
+	-- Bar
+	if (cfg.barEnabled) then
+		local powerCurrent, powerMax = cfg.barPowerFunc();
+		self.PowerBar:FindChild("Progress"):SetMax(powerMax);
+		self.PowerBar:FindChild("Progress"):SetProgress(powerCurrent);
+	end
 end
 
 function M:ToggleVisibility(unit, bInCombat)
-	local unitPlayer = GameLib.GetPlayerUnit();
 	if (not unitPlayer or unit ~= unitPlayer) then return; end
-
 	self.wndAnchor:Show(bInCombat, false, bInCombat and 0.2 or 0.5);
 end
 
+-----------------------------------------------------------------------------
+-- Power Functions
+-----------------------------------------------------------------------------
+
+function M:GetPowerMana()
+	return math.floor(unitPlayer:GetMana()), math.floor(unitPlayer:GetMaxMana());
+end
+
+function M:GetPowerSpell()
+	local powerMax = unitPlayer:GetMaxResource(4);
+	local powerCurrent = unitPlayer:GetResource(4);
+	local powerDivider = powerMax / cfg.numButtons;
+
+	return math.floor(powerCurrent / powerDivider), math.floor(powerMax / powerDivider);
+end
+
+function M:GetPowerSuit()
+	return unitPlayer:GetResource(3), unitPlayer:GetMaxResource(3);
+end
+
+function M:GetPowerActuators()
+	return unitPlayer:GetResource(1), unitPlayer:GetMaxResource(1);
+end
+
+function M:GetPowerVolatility()
+	local powerMax = unitPlayer:GetMaxResource(1);
+	local powerCurrent = unitPlayer:GetResource(1);
+	local powerPercent = powerCurrent / powerMax * 100;
+
+	return powerPercent, powerMax;
+end
+
+-----------------------------------------------------------------------------
+-- Carbine Addons
+-----------------------------------------------------------------------------
+
 function M:DisableCarbineClassResources()
 	local tClassResources = Apollo.GetAddon("ClassResources");
+	if (not tClassResources) then return; end
 	self:Unhook(tClassResources, "OnCharacterCreated");
 
 	if (tClassResources.wndMain) then
@@ -152,5 +232,18 @@ function M:DisableCarbineClassResources()
 		tClassResources.wndMain:Show(false);
 	else
 		self:PostHook(tClassResources, "OnCharacterCreated", "DisableCarbineClassResources");
+	end
+end
+
+function M:DisableCarbineStalkerResource()
+	local tStalkerResource = Apollo.GetAddon("StalkerResource");
+	if (not tStalkerResource) then return; end
+	self:Unhook(tStalkerResource, "OnCharacterCreated");
+
+	if (tStalkerResource.wndResourceBar) then
+		Apollo.RemoveEventHandler("VarChange_FrameCount", tStalkerResource);
+		tStalkerResource.wndResourceBar:Show(false);
+	else
+		self:PostHook(tStalkerResource, "OnCharacterCreated", "DisableCarbineStalkerResource");
 	end
 end
