@@ -11,9 +11,11 @@
 	<Script Name="sUI.lua" />
 	<Script Name="config\defaults.lua" />
 	<Form Name="sUI.xml" />
+	<Script Name="core\Modules.lua" />
+	<Script Name="core\Temp.lua" />
 
 	<!-- Modules -->
-	<Script Name="core\Modules.lua" />
+	<Script Name="modules\fixes\ConsoleVariables.lua" />
 	<Script Name="modules\artwork\ArtworkRemover.lua" />
 	<Script Name="modules\chat\ChannelColors.lua" />
 	<Script Name="modules\crafting\RandomCraft.lua" />
@@ -31,4 +33,5 @@
 	<!-- Disable Carbine Addons -->
     <ReplaceAddon Name="ClassResources" />
     <ReplaceAddon Name="StalkerResource" />
+    <ReplaceAddon Name="TechWarrior" />
 </Addon>
