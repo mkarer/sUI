@@ -43,6 +43,7 @@ end
 
 function M:StyleActionBars()
 	local tActionBars = Apollo.GetAddon("ActionBarFrame");
+	if (not tActionBars) then return; end
 	self:Unhook(tActionBars, "OnDocumentReady");
 
 	if (tActionBars.wndArt) then
@@ -58,6 +59,7 @@ end
 
 function M:StyleExtraActionBar()
 	local tExtraActionBar = Apollo.GetAddon("ActionBarShortcut");
+	if (not tExtraActionBar) then return; end
 	self:Unhook(tExtraActionBar, "OnDocumentReady");
 
 	if (tExtraActionBar.tActionBars) then
@@ -93,6 +95,7 @@ end
 
 function M:StyleClassResources()
 	local tClassResources = Apollo.GetAddon("ClassResources");
+	if (not tClassResources) then return; end
 	self:Unhook(tClassResources, "OnCharacterCreated");
 
 	if (tClassResources.wndMain) then
@@ -120,6 +123,7 @@ end
 
 function M:StyleExperienceBar()
 	local tExperienceBar = Apollo.GetAddon("XPBar");
+	if (not tExperienceBar) then return; end
 	self:Unhook(tExperienceBar, "OnDocumentReady");
 
 	if (tExperienceBar.wndArt) then
