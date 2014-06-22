@@ -27,4 +27,8 @@
 	<Script Name="modules\fixes\NoCinematics.lua" />
 	<Script Name="modules\crafting\SlashSalvage.lua" />
 -->
+
+	<!-- Disable Carbine Addons -->
+    <ReplaceAddon Name="ClassResources" />
+    <ReplaceAddon Name="StalkerResource" />
 </Addon>
