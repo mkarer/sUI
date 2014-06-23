@@ -69,7 +69,8 @@ function M:StyleActionBars()
 	-- Move Bar (Center)
 	-- Remove Button Shadows
 	local barMain = ActionBarFrame.wndBar1;
-	
+	barMain:Show(false, true);
+
 	-- Style Buttons
 	for i, button in ipairs(barMain:GetChildren()) do
 		self:StyleButton(button);
@@ -212,9 +213,9 @@ function M:SetupActionBars()
 			f:SetSprite("ActionButton");
 		end
 
-		if (i == 0) then log:debug(button); end
-		if (i == 0) then log:debug(button:GetData()); end
-		if (i == 0) then log:debug(button:GetContent()); end
+--		if (i == 0) then log:debug(button); end
+--		if (i == 0) then log:debug(button:GetData()); end
+--		if (i == 0) then log:debug(button:GetContent()); end
 	end
 end
 
