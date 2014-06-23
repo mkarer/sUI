@@ -21,6 +21,8 @@ local log, ActionBarFrame;
 
 function M:OnInitialize()
 	log = S.Log;
+	self:InitializeForms();
+--	self:RegisterEvent("OnCharacterCreated");
 
 	ActionBarFrame = Apollo.GetAddon("ActionBarFrame");
 	if (ActionBarFrame) then
@@ -34,6 +36,12 @@ end
 
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
+
+	if (S.bCharacterLoaded) then
+		self:SetupActionBars();
+	else
+		self:RegisterMessage("PLAYER_LOGIN", "SetupActionBars");
+	end
 end
 
 -----------------------------------------------------------------------------
@@ -55,7 +63,7 @@ function M:StyleActionBars()
 
 	-----------------------------------------------------------------------------
 	-- Main/LAS Bar
-	-- 8x ActionBarItemBig
+	-- 8x ActionBarItemBig (ID: 1-8)
 	-----------------------------------------------------------------------------
 	--ActionBarFrame.wndBar1:SetScale(0.8); -- Scaling
 	-- Move Bar (Center)
@@ -69,7 +77,7 @@ function M:StyleActionBars()
 
 	-----------------------------------------------------------------------------
 	-- Right Bar
-	-- 12x ActionBarItemSmall
+	-- 12x ActionBarItemSmall (ID: 23-34)
 	-----------------------------------------------------------------------------
 	local barRight = ActionBarFrame.wndBar3;
 	local buttonWidth = 36; --barRight:GetChildren()[1]:GetWidth(); -- 42
@@ -93,12 +101,24 @@ function M:StyleActionBars()
 		button:SetAnchorOffsets(-buttonWidth, buttonPosition, 0, buttonPosition + buttonHeight);
 --		button:SetAnchorOffsets(0, (i - 1) * buttonHeight, buttonWidth, i * buttonHeight);
 	end
+
+	-----------------------------------------------------------------------------
+	-- Left Bar
+	-- 12x ActionBarItemSmall (ID: 11-22)
+	-----------------------------------------------------------------------------
+	local barLeft = ActionBarFrame.wndBar2;
+
+	-- Style Buttons
+	for i, button in ipairs(barLeft:GetChildren()) do
+		self:StyleButton(button);
+	end
 end
 
 function M:StyleButton(button)
 	-- Button Container		
 	S:RemoveArtwork(button);
 	button:SetStyle("Picture", 1);
+--	button:SetSprite("ActionButton");
 	button:SetSprite("PowerBarButtonBG");
 
 	-- Button Control
@@ -145,3 +165,81 @@ function M:StyleActionBarButtons(bar)
 		end
 	end
 end
+
+-----------------------------------------------------------------------------
+-- Custom Action Bar
+-----------------------------------------------------------------------------
+function M:SetupActionBars()
+	log:debug("SetupActionBars");
+
+	local buttonSize = 36;
+	local buttonBorder = 2;
+	local buttonPadding = 2;
+
+	-----------------------------------------------------------------------------
+	-- Main/LAS Bar
+	-- Button IDs: 0 - 7
+	-----------------------------------------------------------------------------
+	-- ActionSetLib.GetCurrentActionSet() -- 1 bis 8
+	-----------------------------------------------------------------------------
+	local barMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBar1ButtonContainer", nil, self);
+	barMain:Show(true, true);
+	barMain:DestroyChildren();
+
+	local barPositionY = -200; -- Calculated from Bottom
+	local barWidth = 8 * buttonSize + 7 * buttonPadding;
+	local barHeight = buttonSize;
+	local barWidthOffset = math.ceil(barWidth / 2);
+
+	barMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
+
+	for i = 0, 7 do
+		-- SezzActionBarButton UseBaseButtonArt=1 would enable our custom Button with Mouseover/Press Sprites, but hides everything else?
+		local f = Apollo.LoadForm(self.xmlDoc, "SezzActionBarItem", barMain, self);
+		f:SetName("SezzActionBar1Button"..(i + 1));
+
+		local button = f:FindChild("SezzActionBarButton");
+		local buttonPosition = i * (buttonSize + buttonPadding);
+
+		button:SetContentId(i);
+		f:SetAnchorOffsets(buttonPosition, 0, buttonPosition + buttonSize, buttonSize);
+
+		-- Temporary Solution to show/hide Button Border
+		-- Should be called whenever the button content changes
+		if (button:GetContent().strIcon == "") then
+			f:SetSprite(nil);
+		else
+			f:SetSprite("ActionButton");
+		end
+
+		if (i == 0) then log:debug(button); end
+		if (i == 0) then log:debug(button:GetData()); end
+		if (i == 0) then log:debug(button:GetContent()); end
+	end
+end
+
+function M:OnGenerateTooltip(wndControl, wndHandler, eType, arg1, arg2)
+	local xml = nil;
+	if (eType == Tooltip.TooltipGenerateType_ItemInstance) then -- Doesn't need to compare to item equipped
+		Tooltip.GetItemTooltipForm(self, wndControl, arg1, {});
+	elseif eType == Tooltip.TooltipGenerateType_ItemData then -- Doesn't need to compare to item equipped
+		Tooltip.GetItemTooltipForm(self, wndControl, arg1, {});
+	elseif (eType == Tooltip.TooltipGenerateType_GameCommand) then
+		xml = XmlDoc.new();
+		xml:AddLine(arg2);
+		wndControl:SetTooltipDoc(xml);
+	elseif (eType == Tooltip.TooltipGenerateType_Macro) then
+		xml = XmlDoc.new();
+		xml:AddLine(arg1);
+		wndControl:SetTooltipDoc(xml);
+	elseif (eType == Tooltip.TooltipGenerateType_Spell) then
+		if (Tooltip ~= nil and Tooltip.GetSpellTooltipForm ~= nil) then
+			Tooltip.GetSpellTooltipForm(self, wndControl, arg1);
+		end
+	elseif (eType == Tooltip.TooltipGenerateType_PetCommand) then
+		xml = XmlDoc.new();
+		xml:AddLine(arg2);
+		wndControl:SetTooltipDoc(xml);
+	end
+end
+
