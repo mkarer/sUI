@@ -8,7 +8,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("PowerBar", "Gemini:Hook-1.0");
+local M = S:NewModule("PowerBar", "Gemini:Hook-1.0", "Gemini:Event-1.0");
 local log, unitPlayer, cfg;
 
 -----------------------------------------------------------------------------
@@ -35,10 +35,10 @@ function M:OnEnable()
 	self.wndAnchor:Show(false);
 
 	-- Load Class Configuration
-	if (GameLib.GetPlayerUnit()) then
+	if (S.bCharacterLoaded) then
 		self:ReloadConfiguration();
 	else
-		Apollo.RegisterEventHandler("CharacterCreated", "ReloadConfiguration", self);
+		self:RegisterMessage("PLAYER_LOGIN", "ReloadConfiguration");
 	end
 end
 
@@ -132,10 +132,13 @@ function M:ReloadConfiguration()
 
 	-- Show/Hide
 	if (not self.DB.alwaysVisible) then
+		log:debug("TV_Reg1");
 		Apollo.RegisterEventHandler("UnitEnteredCombat", "ToggleVisibility", self);
+		log:debug("TV_Reg2");
 
 		if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
 		if (unitPlayer) then
+			log:debug("TV_Call");
 			self:ToggleVisibility(unitPlayer, unitPlayer:IsInCombat());
 		end
 	else
@@ -182,7 +185,7 @@ function M:UpdatePower()
 		self.PowerBar:FindChild("Progress"):SetMax(powerMax);
 		self.PowerBar:FindChild("Progress"):SetProgress(powerCurrent);
 	end
---	log:debug("UpdatePower!");
+	log:debug("UpdatePower!");
 end
 
 function M:ToggleVisibility(unit, bInCombat)
