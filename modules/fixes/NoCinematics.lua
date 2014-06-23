@@ -20,7 +20,7 @@ function M:OnInitialize()
 end
 
 function M:OnEnable()
-	log:debug("%s enabled.", self:GetName());
+--	log:debug("%s enabled.", self:GetName());
 
 	-- Unit.CodeEnumCCState.DisableCinematic
 
@@ -32,13 +32,9 @@ function M:OnEnable()
 --	Apollo.RegisterEventHandler("UnitCreated", function() log:debug("UnitCreated"); end);
 end
 
-function M:OnDisable()
-	log:debug("%s disabled.", self:GetName());
-end
-
 function M:OnApplyCCState(code, userdata)
 	if (unitPlayer == userdata and code == Unit.CodeEnumCCState.DisableCinematic) then
-		log:debug("Skipping Cinematic");
+		log:debug("CC Applied: DisableCinematic");
 		GameLib.UIExitCinematics();
 	end
 end

@@ -73,24 +73,17 @@ function M:OnEnable()
 	if (tChatLog.arChatColor) then
 		self:UpdateChannelColors();
 	else
-		log:debug("ChatLog not yet loaded!");
 		self:PostHook(tChatLog, "OnWindowManagementReady", "UpdateChannelColors");
 	end
-end
-
-function M:OnDisable()
-	log:debug("%s disabled.", self:GetName());
 end
 
 -----------------------------------------------------------------------------
 
 function M:UpdateChannelColors()
-	log:debug("Updating colors...");
+	log:debug("Updating Chat Channel Colors...");
 	self:Unhook(tChatLog, "OnWindowManagementReady");
 
 	for k, v in pairs(arChatColorsBlizzard) do
 		tChatLog.arChatColor[k] = v;
 	end
-
-	log:debug("Done.");
 end

@@ -132,13 +132,10 @@ function M:ReloadConfiguration()
 
 	-- Show/Hide
 	if (not self.DB.alwaysVisible) then
-		log:debug("TV_Reg1");
 		Apollo.RegisterEventHandler("UnitEnteredCombat", "ToggleVisibility", self);
-		log:debug("TV_Reg2");
 
 		if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
 		if (unitPlayer) then
-			log:debug("TV_Call");
 			self:ToggleVisibility(unitPlayer, unitPlayer:IsInCombat());
 		end
 	else
