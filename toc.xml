@@ -11,23 +11,25 @@
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />
-	<Script Name="config\defaults.lua" />
+	<Script Name="config\Defaults.lua" />
 	<Form Name="sUI.xml" />
+	<Script Name="core\Events.lua" />
 	<Script Name="core\Media.lua" />
 	<Script Name="core\Modules.lua" />
 	<Script Name="core\Temp.lua" />
 
 	<!-- Modules -->
-	<Script Name="modules\fixes\ConsoleVariables.lua" />
-	<Script Name="modules\artwork\ArtworkRemover.lua" />
-	<Script Name="modules\chat\ChannelColors.lua" />
-	<Script Name="modules\crafting\RandomCraft.lua" />
-	<Form Name="modules\crafting\RandomCraft.xml" />
-	<Script Name="modules\crafting\Unmount.lua" />
-	<Script Name="modules\powerbar\PowerBar.lua" />
-	<Form Name="modules\powerbar\PowerBar.xml" />
-	<Script Name="modules\fixes\NoCinematics.lua" />
+	<Script Name="modules\Fixes\ConsoleVariables.lua" />
+	<Script Name="modules\Artwork\ArtworkRemover.lua" />
+	<Script Name="modules\Chat\ChannelColors.lua" />
+	<Script Name="modules\Crafting\RandomCraft.lua" />
+	<Form Name="modules\Crafting\RandomCraft.xml" />
+	<Script Name="modules\Crafting\Unmount.lua" />
+	<Script Name="modules\PowerBar\PowerBar.lua" />
+	<Form Name="modules\PowerBar\PowerBar.xml" />
+	<Script Name="modules\Fixes\NoCinematics.lua" />
 	<Script Name="modules\ActionBars\ActionBars.lua" />
+	<Form Name="modules\ActionBars\ActionBars.xml" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
