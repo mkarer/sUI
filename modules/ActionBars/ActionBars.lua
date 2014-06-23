@@ -53,14 +53,23 @@ function M:StyleActionBars()
 		S:RemoveArtwork(f);
 	end
 
-	-- Main (LAS) Bar
+	-----------------------------------------------------------------------------
+	-- Main/LAS Bar
+	-- 8x ActionBarItemBig
+	-----------------------------------------------------------------------------
 	--ActionBarFrame.wndBar1:SetScale(0.8); -- Scaling
 	-- Move Bar (Center)
 	-- Remove Button Shadows
+	local barMain = ActionBarFrame.wndBar1;
+	
+	-- Style Buttons
+	for i, button in ipairs(barMain:GetChildren()) do
+		self:StyleButton(button);
+	end
 
 	-----------------------------------------------------------------------------
 	-- Right Bar
-	-- Contains 12x ActionBarItemSmall
+	-- 12x ActionBarItemSmall
 	-----------------------------------------------------------------------------
 	local barRight = ActionBarFrame.wndBar3;
 	local buttonWidth = 36; --barRight:GetChildren()[1]:GetWidth(); -- 42
@@ -74,28 +83,32 @@ function M:StyleActionBars()
 	barRight:SetAnchorOffsets(-buttonWidth, -barHeightOffset, 0, barHeightOffset); -- TODO: Somehow the bar anchors don't work, the bar width stays at 490px
 	barRight:SetAnchorPoints(1, 0.5, 1, 0.5);
 
-	-- Re-Arrange Buttons
+	-- Style & Re-Arrange Buttons
 	for i, button in ipairs(barRight:GetChildren()) do
+		self:StyleButton(button);
+
 		local buttonPosition = (i - 1) * (buttonHeight + buttonPadding);
 		button:Show(true);
-
-		-- Button Container		
-		S:RemoveArtwork(button);
-		button:SetStyle("Picture", 1);
-		button:SetSprite("PowerBarButtonBG");
-
 		button:SetAnchorPoints(1, 0, 1, 0);
 		button:SetAnchorOffsets(-buttonWidth, buttonPosition, 0, buttonPosition + buttonHeight);
 --		button:SetAnchorOffsets(0, (i - 1) * buttonHeight, buttonWidth, i * buttonHeight);
-
-		-- Button Control
-		local buttonControl = button:FindChild("ActionBarBtn");
-		buttonControl:RemoveStyleEx("DrawShortcutBottom"); -- Shit doesn't work!
-		buttonControl:SetAnchorPoints(0, 0, 1, 1);
-		buttonControl:SetAnchorOffsets(2, 2, -2, -2);
-
---		button:FindChild("ActionBarBtn"):SetScale(0.8)
 	end
+end
+
+function M:StyleButton(button)
+	-- Button Container		
+	S:RemoveArtwork(button);
+	button:SetStyle("Picture", 1);
+	button:SetSprite("PowerBarButtonBG");
+
+	-- Button Control
+	local buttonControl = button:FindChild("ActionBarBtn");
+	buttonControl:RemoveStyleEx("DrawShortcutBottom"); -- Shit doesn't work!
+	buttonControl:SetAnchorPoints(0, 0, 1, 1);
+	buttonControl:SetAnchorOffsets(2, 2, -2, -2);
+
+	-- Done
+	return button;
 end
 
 function M:StyleButtons()
@@ -107,24 +120,22 @@ function M:StyleButtons()
 	self:StyleActionBarButtons(ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer:Buttons"));
 end
 
+local function RemoveButtonSprite(button, sprite)
+	local buttonSprite = button:FindChild(sprite);
+	if (buttonSprite) then
+		buttonSprite:Show(false);
+		buttonSprite:SetSprite(nil);
+	end
+end
+
 function M:StyleActionBarButtons(bar)
 	for _, f in pairs(bar:GetChildren()) do
-
-		local buttonShadow = f:FindChild("Shadow");
-		if (buttonShadow) then
-	--		buttonShadow:Show(false);
-	--		buttonShadow:SetSprite(nil);
-		end
-
-		local buttonCover = f:FindChild("Cover");
-		if (buttonCover) then
-	--		buttonCover:Show(false);
-	--		buttonCover:SetSprite(nil);
-		end
-
+		RemoveButtonSprite(f, "Shadow");
+		RemoveButtonSprite(f, "Cover");
+		RemoveButtonSprite(f, "LockSprite");
+		
 		local buttonInnate = f:FindChild("ActionBarInnate");
 		if (buttonInnate) then
-			log:debug(buttonInnate);
 			buttonInnate:RemoveStyleEx("DrawShortcutBottom");
 		end
 
