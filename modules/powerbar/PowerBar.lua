@@ -38,7 +38,7 @@ function M:OnEnable()
 	if (S.bCharacterLoaded) then
 		self:ReloadConfiguration();
 	else
-		self:RegisterMessage("PLAYER_LOGIN", "ReloadConfiguration");
+		self:RegisterMessage("CHARACTER_LOADED", "ReloadConfiguration");
 	end
 end
 
@@ -47,6 +47,8 @@ function M:OnDisable()
 end
 
 function M:ReloadConfiguration()
+	log:debug("ReloadConfiguration");
+
 	-- Class Configuration (TEMP)
 	self.DB.classConfiguration = {
 		[GameLib.CodeEnumClass.Spellslinger] = {
@@ -155,7 +157,7 @@ end
 -----------------------------------------------------------------------------
 
 function M:UpdatePower()
---	log:debug("UpdatePower");
+	log:debug("UpdatePower");
 	if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
 	if (not unitPlayer) then return; end
 
@@ -165,6 +167,7 @@ function M:UpdatePower()
 	-- Buttons
 	if (cfg.numButtons > 0) then
 		local powerCurrent, powerMax = cfg.buttonPowerFunc();
+		log:debug("Power Buttons: %d/%d", powerCurrent, powerMax);
 		local bEmpowered = cfg.buttonEmpowerFunc and cfg.buttonEmpowerFunc() or false;
 
 		for i = 1, cfg.numButtons do
@@ -179,6 +182,7 @@ function M:UpdatePower()
 	-- Bar
 	if (cfg.barEnabled) then
 		local powerCurrent, powerMax = cfg.barPowerFunc();
+		log:debug("Power Bar: %d/%d", powerCurrent, powerMax);
 		self.PowerBar:FindChild("Progress"):SetMax(powerMax);
 		self.PowerBar:FindChild("Progress"):SetProgress(powerCurrent);
 	end
