@@ -8,6 +8,7 @@
 	<Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
 	<Script Name="libs\GeminiAddon\GeminiAddon.lua" />
 	<Script Name="libs\GeminiLogging\GeminiLogging.lua" />
+	<Script Name="libs\GeminiTimer\GeminiTimer-1.0.lua" />
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />

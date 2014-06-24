@@ -10,6 +10,7 @@ Call :GitUpdate CallbackHandler https://github.com/wildstarnasa/CallbackHandler.
 Call :GitUpdate GeminiEvent https://github.com/wildstarnasa/GeminiEvent.git
 Call :GitUpdate GeminiHook https://github.com/wildstarnasa/GeminiHook.git
 Call :GitUpdate LibError https://github.com/wildstarnasa/LibError.git
+Call :GitUpdate GeminiTimer https://github.com/wildstarnasa/GeminiTimer.git
 
 :: Done... :)
 Goto End
