@@ -9,7 +9,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:NewModule("PowerBar", "Gemini:Hook-1.0", "Gemini:Event-1.0");
-local log, unitPlayer, cfg;
+local log, cfg;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -134,12 +134,9 @@ function M:ReloadConfiguration()
 
 	-- Show/Hide
 	if (not self.DB.alwaysVisible) then
-		Apollo.RegisterEventHandler("UnitEnteredCombat", "ToggleVisibility", self);
-
-		if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
-		if (unitPlayer) then
-			self:ToggleVisibility(unitPlayer, unitPlayer:IsInCombat());
-		end
+		self:RegisterMessage("PLAYER_REGEN_DISABLED", "ChangeVisibility");
+		self:RegisterMessage("PLAYER_REGEN_ENABLED", "ChangeVisibility");
+		self:ChangeVisibility();
 	else
 		self.wndAnchor:Show(true);
 	end
@@ -157,12 +154,8 @@ end
 -----------------------------------------------------------------------------
 
 function M:UpdatePower()
+	if (not S.inCombat and not self.DB.alwaysVisible) then return; end
 	log:debug("UpdatePower");
-	if (not unitPlayer) then unitPlayer = GameLib.GetPlayerUnit(); end
-	if (not unitPlayer) then return; end
-
-	local bInCombat = unitPlayer:IsInCombat();
-	if (not bInCombat and not self.DB.alwaysVisible) then return; end
 
 	-- Buttons
 	if (cfg.numButtons > 0) then
@@ -186,13 +179,13 @@ function M:UpdatePower()
 		self.PowerBar:FindChild("Progress"):SetMax(powerMax);
 		self.PowerBar:FindChild("Progress"):SetProgress(powerCurrent);
 	end
-	log:debug("UpdatePower!");
+
+	log:debug("UpdatePower Done");
 end
 
-function M:ToggleVisibility(unit, bInCombat)
-	if (not unitPlayer or not unit or unit ~= unitPlayer) then return; end
-	log:debug("ToggleVisibility: %s", bInCombat and "TRUE" or "FALSE")
-	self.wndAnchor:Show(bInCombat, false, bInCombat and 0.2 or 0.5);
+function M:ChangeVisibility()
+	log:debug("ChangeVisibility: %s", S.inCombat and "TRUE" or "FALSE")
+	self.wndAnchor:Show(S.inCombat, false, S.inCombat and 0.2 or 0.5);
 end
 
 -----------------------------------------------------------------------------
@@ -200,36 +193,36 @@ end
 -----------------------------------------------------------------------------
 
 function M:GetPowerMana()
-	return math.floor(unitPlayer:GetMana()), math.floor(unitPlayer:GetMaxMana());
+	return math.floor(S.myCharacter:GetMana()), math.floor(S.myCharacter:GetMaxMana());
 end
 
 function M:GetPowerSpell()
-	local powerMax = unitPlayer:GetMaxResource(4);
-	local powerCurrent = unitPlayer:GetResource(4);
+	local powerMax = S.myCharacter:GetMaxResource(4);
+	local powerCurrent = S.myCharacter:GetResource(4);
 	local powerDivider = powerMax / cfg.numButtons;
 
 	return math.floor(powerCurrent / powerDivider), math.floor(powerMax / powerDivider);
 end
 
 function M:GetPowerSuit()
-	return unitPlayer:GetResource(3), unitPlayer:GetMaxResource(3);
+	return S.myCharacter:GetResource(3), S.myCharacter:GetMaxResource(3);
 end
 
 function M:GetPowerActuators()
-	return unitPlayer:GetResource(1), unitPlayer:GetMaxResource(1);
+	return S.myCharacter:GetResource(1), S.myCharacter:GetMaxResource(1);
 end
 
 function M:GetPowerVolatility()
-	local powerMax = unitPlayer:GetMaxResource(1);
-	local powerCurrent = unitPlayer:GetResource(1);
+	local powerMax = S.myCharacter:GetMaxResource(1);
+	local powerCurrent = S.myCharacter:GetResource(1);
 	local powerPercent = powerCurrent / powerMax * 100;
 
 	return powerPercent, powerMax;
 end
 
 function M:GetPowerKineticEnergy()
-	local powerMax = unitPlayer:GetMaxResource(1);
-	local powerCurrent = unitPlayer:GetResource(1);
+	local powerMax = S.myCharacter:GetMaxResource(1);
+	local powerCurrent = S.myCharacter:GetResource(1);
 	local powerDivider = powerMax / cfg.numButtons;
 
 	return math.floor(powerCurrent / powerDivider), math.floor(powerMax / powerDivider);
