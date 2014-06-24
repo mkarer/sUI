@@ -46,7 +46,7 @@ local function logDebug(self, ...)
 		self:_debug(...);
 	elseif (S.DB.debug[dir] == nil and S.DB.debug[file] == nil) then
 		self:_debug(...);
-	elseif ((S.DB.debug[dir] ~= nil and S.DB.debug[dir] ~= false) and (S.DB.debug[file] ~= nil and S.DB.debug[file] ~= false)) then
+	elseif ((S.DB.debug[dir] ~= nil and S.DB.debug[dir] ~= true) and (S.DB.debug[file] ~= nil and S.DB.debug[file] ~= true)) then
 		self:_debug(...);
 	end
 

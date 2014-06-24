@@ -19,7 +19,6 @@ S.DB = {
 	["debug"] = {
 		["RandomCraft"] = false,
 		["ArtworkRemover"] = false,
-		["modules/Chat"] = false,
 		["PowerBar"] = false,
 		["ConsoleVariables"] = false,
 	},
