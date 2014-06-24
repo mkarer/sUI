@@ -1,7 +1,8 @@
 --[[
 
 	s:UI Experience Bars
-	TODO: Just rewrite the whole addon...
+	TODO: Replace XP Bar with Elder Points Bar @ 50 (and hide it when reached maximum), Idea: http://www.curse.com/ws-addons/wildstar/221697-elderbar
+	TODO: Just rewrite the whole Carbine XPBar addon...
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
