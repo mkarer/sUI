@@ -1,11 +1,16 @@
 --[[
 
 	s:UI Experience Bars
+	TODO: Just rewrite the whole addon...
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
 --]]
+
+require "PlayerPathLib";
+
+-----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:NewModule("Experience", "Gemini:Event-1.0", "Gemini:Hook-1.0");
@@ -15,9 +20,11 @@ local log;
 -- Initialization
 -----------------------------------------------------------------------------
 
+local levelMax = 50;
+local levelMaxPath = 30;
+
 function M:OnInitialize()
 	log = S.Log;
-	self:InitializeForms();
 end
 
 function M:OnEnable()
@@ -38,23 +45,28 @@ function M:MoveExperienceBars()
 	if (not tXPBar) then return; end
 	self:Unhook(tXPBar, "OnDocumentReady");
 
-	if (tXPBar.wndMain ) then
+	if (tXPBar.wndMain) then
 		log:debug("Skinning Experience Bars", self:GetName());
+--		S:ApplyDebugBackdrop(tXPBar.wndMain);
 
-		local colorExperience = ApolloColor.new("xkcdDarkSkyBlue"); -- xkcdClearBlue xkcdDarkSkyBlue
-		local colorRested = ApolloColor.new("xkcdDeepLavender"); -- xkcdDarkPeriwinkle xkcdAmethyst
+		local colorExperience = ApolloColor.new("xkcdCarolinaBlue"); -- xkcdClearBlue xkcdDarkSkyBlue
+		local colorRested = ApolloColor.new("xkcdPurply"); -- xkcdDarkPeriwinkle xkcdAmethyst
+		local barHeight = 6; -- 4px is needed for borders (SezzUIBorderDark)
+		local barPadding = 2;
 
-		-- Move Main Frame
+		-- Move Main Frame to Player Unit Frame
 		tXPBar.wndMain:SetAnchorPoints(0.25, 1, 0.25, 1);
-		tXPBar.wndMain:SetAnchorOffsets(0, -200, 300, -120);
+--		tXPBar.wndMain:SetAnchorOffsets(0, -200, 300, -200 + 2 * barHeight + barPadding);
+		tXPBar.wndMain:SetAnchorOffsets(86, -200, 260, -200 + 2 * barHeight + barPadding);
 
-		-- Move XP Button
-		tXPBar.wndMain:FindChild("XPButton"):SetAnchorPoints(0, 0, 0, 0);
-		tXPBar.wndMain:FindChild("XPButton"):SetAnchorOffsets(0, 0, 73, 23);
+		-- Remove Buttons
+		tXPBar.wndMain:FindChild("XPButton"):Show(false, true);
+		tXPBar.wndMain:FindChild("PathButton"):Show(false, true);
+		tXPBar.wndMain:FindChild("PathIcon"):Show(false, true);
 
 		-- Move XP Bar
 		tXPBar.wndMain:FindChild("XPBarContainer"):SetAnchorPoints(0, 0, 1, 0);
-		tXPBar.wndMain:FindChild("XPBarContainer"):SetAnchorOffsets(73, 5, 0, 13);
+		tXPBar.wndMain:FindChild("XPBarContainer"):SetAnchorOffsets(0, 0, 0, barHeight);
 		tXPBar.wndMain:FindChild("XPBarContainer"):SetSprite("SezzUIBorderDark");
 		tXPBar.wndMain:FindChild("XPBarContainer"):FindChild("RestXPBarFill"):SetAnchorPoints(0, 0, 1, 1);
 		tXPBar.wndMain:FindChild("XPBarContainer"):FindChild("RestXPBarFill"):SetAnchorOffsets(2, 2, -2, -2);
@@ -69,33 +81,41 @@ function M:MoveExperienceBars()
 		tXPBar.wndMain:FindChild("XPBarContainer"):FindChild("DailyMaxEPBar"):SetAnchorPoints(0, 0, 1, 1);
 		tXPBar.wndMain:FindChild("XPBarContainer"):FindChild("DailyMaxEPBar"):SetAnchorOffsets(2, 2, -2, -2);
 
-		-- Move Path XP Button
-		tXPBar.wndMain:FindChild("PathButton"):SetAnchorPoints(0, 0, 0, 0);
-		tXPBar.wndMain:FindChild("PathButton"):SetAnchorOffsets(0, 23, 73, 46);
-
 		-- Move Path XP Bar
 		tXPBar.wndMain:FindChild("PathBarContainer"):SetAnchorPoints(0, 0, 1, 0);
-		tXPBar.wndMain:FindChild("PathBarContainer"):SetAnchorOffsets(73, 28, 0, 49);
+		tXPBar.wndMain:FindChild("PathBarContainer"):SetAnchorOffsets(0, barHeight + barPadding, 0, 2 * barHeight + barPadding);
 		tXPBar.wndMain:FindChild("PathBarContainer"):SetSprite("SezzUIBorderDark");
 		tXPBar.wndMain:FindChild("PathBarContainer"):FindChild("PathBarFill"):SetAnchorPoints(0, 0, 1, 1);
 		tXPBar.wndMain:FindChild("PathBarContainer"):FindChild("PathBarFill"):SetAnchorOffsets(2, 2, -2, -2);
 		tXPBar.wndMain:FindChild("PathBarContainer"):FindChild("PathBarFill"):SetFullSprite("ProgressBar");
 		tXPBar.wndMain:FindChild("PathBarContainer"):FindChild("PathBarFill"):SetBarColor(colorExperience);
 
-		-- Move Path Icon
-		tXPBar.wndMain:FindChild("PathIcon"):SetAnchorPoints(0, 0, 0, 0);
-		tXPBar.wndMain:FindChild("PathIcon"):SetAnchorOffsets(8, 30, 26, 48);
-
 		-- Clickable Bars
-		-- Using MouseButtonDown until they add a Click/Signal event...
-		tXPBar.wndMain:FindChild("XPBarContainer"):RemoveStyle("IgnoreMouse");
+		-- Stupid Event Handling, Shit doesn't always work
 		tXPBar.wndMain:FindChild("XPBarContainer"):AddEventHandler("MouseButtonDown", "OnXpClicked", tXPBar);
-		tXPBar.wndMain:FindChild("PathBarContainer"):RemoveStyle("IgnoreMouse");
 		tXPBar.wndMain:FindChild("PathBarContainer"):AddEventHandler("MouseButtonDown", "OnPathClicked", tXPBar);
 
+		-- Disable Color Changes
+		self:PostHook(tXPBar, "RedrawAllPastCooldown", "FixExperienceBarBackground");
 
-		S:ApplyDebugBackdrop(tXPBar.wndMain);
+		-- Hide Path Bar on Max
+		self:RegisterEvent("UI_XPChanged", "OnExperienceChanged");
+		self:OnExperienceChanged();
 	else
 		self:PostHook(tXPBar, "OnDocumentReady", "MoveExperienceBars");
+	end
+end
+
+function M:FixExperienceBarBackground()
+	local tXPBar = Apollo.GetAddon("XPBar");
+	tXPBar.wndMain:FindChild("XPBarContainer"):SetBGColor(ApolloColor.new("white"));
+end
+
+function M:OnExperienceChanged()
+	local tXPBar = Apollo.GetAddon("XPBar");
+	if (PlayerPathLib and PlayerPathLib.GetPathLevel() == levelMaxPath) then
+		tXPBar.wndMain:FindChild("PathBarContainer"):Show(false, true);
+	else
+		tXPBar.wndMain:FindChild("PathBarContainer"):Show(true, true);
 	end
 end
