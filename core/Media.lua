@@ -27,3 +27,8 @@ function S:RemoveArtwork(f)
 	-- Unset Sprite
 	f:SetSprite(nil);
 end
+
+function S:ApplyDebugBackdrop(f)
+	f:SetSprite("UI_BK3_Holo_InsetSimple");
+	f:SetStyle("Picture", 1);
+end
