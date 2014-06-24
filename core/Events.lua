@@ -36,12 +36,18 @@ function S:OnCharacterCreated()
 		self.myClass = self:GetClassName(self.myClassId);
 		self.myLevel = unitPlayer:GetLevel();
 		self.myName = unitPlayer:GetName();
+		self.inCombat = unitPlayer:IsInCombat();
+		self.myCharacter = unitPlayer;
 
 		self:UpdateLimitedActionSetData();
 		self:RegisterEvent("AbilityBookChange", "OnAbilityBookChange");
+		self:RegisterEvent("UnitEnteredCombat", "HandleCombatChanges");
+		self:RegisterEvent("ChangeWorld", "HandleCombatChanges");
+		self:RegisterEvent("ShowResurrectDialog", "HandleCombatChanges");
 
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
 		self:SendMessage("CHARACTER_LOADED");
+		self:FireCombatMessage();
 	else
 		Apollo.StartTimer("SezzUITimer_DelayedInit");
 	end
@@ -133,4 +139,37 @@ end
 
 function S:OnAbilityBookChange()
 	self:UpdateLimitedActionSetData();
+end
+
+-----------------------------------------------------------------------------
+-- Player Combat State
+-----------------------------------------------------------------------------
+
+S.FireCombatMessage = function(self)
+	if (self.inCombat) then
+		self.Log:debug("PLAYER_REGEN_DISABLED");
+		self:SendMessage("PLAYER_REGEN_DISABLED");
+	else
+		self.Log:debug("PLAYER_REGEN_ENABLED");
+		self:SendMessage("PLAYER_REGEN_ENABLED");
+	end
+end
+
+S.HandleCombatChanges = function(self, event, unit, inCombat)
+	if (not self.bCharacterLoaded) then return; end
+	local inCombatState = self.inCombat;
+
+	if (event == "UnitEnteredCombat") then
+		if (unit and unit == self.myCharacter) then
+			inCombatState = inCombat;
+		end
+	elseif (event == "ChangeWorld" or event == "ShowResurrectDialog") then
+		inCombatState = false;
+	end
+
+	if (inCombatState ~= self.inCombat) then
+		self.Log:debug("%s: %s", event, (inCombatState and "True" or "False"));
+		self.inCombat = inCombatState;
+		self:FireCombatMessage();
+	end
 end
