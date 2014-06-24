@@ -22,8 +22,8 @@ function M:OnInitialize()
 	-- Configuration
 	self.DB = {
 		buttonSize = 36,
-		buttonBorder = 2,
 		buttonPadding = 2,
+		barPadding = 2,
 	};
 
 	-- ActionBarFrame Hooks
@@ -40,7 +40,7 @@ function M:OnEnable()
 	if (S.bCharacterLoaded) then
 		self:SetupActionBars();
 	else
-		self:RegisterMessage("PLAYER_LOGIN", "SetupActionBars");
+		self:RegisterMessage("CHARACTER_LOADED", "SetupActionBars");
 	end
 end
 
@@ -59,23 +59,20 @@ function M:HideDefaultActionBars()
 	ActionBarFrame.wndBar2:Show(false, true);
 	ActionBarFrame.wndBar3:Show(false, true);
 end
+
 -----------------------------------------------------------------------------
 -- Custom Action Bar
 -----------------------------------------------------------------------------
 
 function M:SetupActionBars()
-	local buttonSize = 36;
-	local buttonBorder = 2;
-	local buttonPadding = 2;
-
 	-----------------------------------------------------------------------------
 	-- Main/LAS Bar
 	-- Button IDs: 0 - 7
 	-----------------------------------------------------------------------------
-	local barMain, barWidth, barHeight = self:CreateActionBar("SezzActionBarMain", true, 0, 7);
-	local barWidthOffset = math.ceil(barWidth / 2);
+	local barMain = self:CreateActionBar("SezzActionBarMain", true, 0, 7);
+	local barWidthOffset = math.ceil(barMain.Width / 2);
 	local barPositionY = -200; -- Calculated from Bottom
-	barMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
+	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
 
 	-- Update Events
 	self.barMain = barMain;
@@ -83,25 +80,27 @@ function M:SetupActionBars()
 	self:UpdateActionBarButtonBorders();
 
 	-----------------------------------------------------------------------------
-	-- Bottom Bar (was Left Bar)
-	-- ButtonIDs: 12 - 23
+	-- Bottom Bar
+	-- ButtonIDs: 12 - 23 (Left Bar)
 	-----------------------------------------------------------------------------
-	local barBottom, barWidth, barHeight = self:CreateActionBar("SezzActionBarBottom", true, 12, 23);
-	local barWidthOffset = math.ceil(barWidth / 2);
+	local barBottom = self:CreateActionBar("SezzActionBarBottom", true, 12, 23, true);
+	local barWidthOffset = math.ceil(barBottom.Width / 2);
 	local barPositionY = -160; -- Calculated from Bottom
-	barBottom:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
+	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barBottom.Height);
+	self.barBottom = barBottom;
 
 	-----------------------------------------------------------------------------
 	-- Right Bar
 	-- ButtonIDs: 24 - 35
 	-----------------------------------------------------------------------------
-	local barRight, barWidth, barHeight = self:CreateActionBar("SezzActionBarRight", true, 24, 35);
-	local barWidthOffset = math.ceil(barWidth / 2);
-	local barPositionY = -120; -- Calculated from Bottom
-	barRight:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
+	local barRight = self:CreateActionBar("SezzActionBarRight", false, 24, 35, true);
+	local barHeightOffset = math.ceil(barRight.Height / 2);
+	barRight.wndMain:SetAnchorOffsets(-self.DB.buttonSize - self.DB.buttonPadding, -barHeightOffset, -self.DB.buttonPadding, barHeightOffset);
+	barRight.wndMain:SetAnchorPoints(1, 0.5, 1, 0.5);
+	self.barRight = barRight;
 end
 
-function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo)
+function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading)
 	-- Calculate Size
 	local barWidth, barHeight;
 	local buttonNum = buttonIdTo - buttonIdFrom + 1;
@@ -116,45 +115,70 @@ function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo)
 	end
 
 	-- Create Button Container
-	local bar = Apollo.LoadForm(self.xmlDoc, "SezzActionBarContainer", nil, self);
-	bar:SetName(barName);
-	bar:Show(true, true);
+	local barContainer = {};
+	barContainer.Height = barHeight;
+	barContainer.Width = barWidth;
+	barContainer.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBarContainer", nil, barContainer);
+	barContainer.wndMain:SetName(barName);
+	barContainer.wndMain:Show(true, true);
+	barContainer.Buttons = {};
+
+	-- Bar Fading
+	function barContainer:OnMouseEnter()
+		self.wndMain:SetOpacity(1, 4);
+	end
+
+	function barContainer:OnMouseExit()
+		self.wndMain:SetOpacity(0, 2);
+	end
+
+	if (enableFading) then
+		barContainer.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", barContainer);
+		barContainer.wndMain:AddEventHandler("MouseExit", "OnMouseExit", barContainer);
+		barContainer.wndMain:SetOpacity(0, 100);
+	end
 
 	-- Create Action Buttons
 	local buttonIndex = 0;
 	for i = buttonIdFrom, buttonIdTo do
 		-- SezzActionBarButton UseBaseButtonArt would enable our custom Button with Mouseover/Press Sprites, but hides everything else?
-		local f = Apollo.LoadForm(self.xmlDoc, buttonForm, bar, self);
-		f:SetName(string.format("%sButton%d", barName, buttonIndex + 1));
+		local buttonContainer = {};
+		buttonContainer.OnGenerateTooltip = self.OnGenerateTooltip;
+		buttonContainer.wndMain = Apollo.LoadForm(self.xmlDoc, buttonForm, barContainer.wndMain, buttonContainer);
+		buttonContainer.wndMain:SetName(string.format("%sButton%d", barName, buttonIndex + 1));
+		buttonContainer.wndButton = buttonContainer.wndMain:FindChild("SezzActionBarButton");
+		buttonContainer.wndButton:SetContentId(i);
 
-		local button = f:FindChild("SezzActionBarButton");
-		button:SetContentId(i);
+		-- Bar Fading
+		if (enableFading) then
+			buttonContainer.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", barContainer);
+			buttonContainer.wndMain:AddEventHandler("MouseExit", "OnMouseExit", barContainer);
+		end
 
 		-- Update Position
 		local buttonPosition = buttonIndex * (self.DB.buttonSize + self.DB.buttonPadding);
 		if (dirHorizontal) then
-			f:SetAnchorOffsets(buttonPosition, 0, buttonPosition + self.DB.buttonSize, self.DB.buttonSize);
+			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition, 0, buttonPosition + self.DB.buttonSize, self.DB.buttonSize);
 		else
-			f:SetAnchorOffsets(0, buttonPosition, self.DB.buttonSize, buttonPosition + self.DB.buttonSize);
+			buttonContainer.wndMain:SetAnchorOffsets(0, buttonPosition, self.DB.buttonSize, buttonPosition + self.DB.buttonSize);
 		end
 
 		-- Done, Increase Index
 		buttonIndex = buttonIndex + 1;
+		barContainer.Buttons[buttonIndex] = buttonContainer;
 	end
 
 	-- Done
-	return bar, barWidth, barHeight;
+	return barContainer;
 end
 
 function M:UpdateActionBarButtonBorders()
 	-- Update LAS Bar Background Sprite (Workaround)
-	for _, f in pairs(self.barMain:GetChildren()) do
-		local button = f:FindChild("SezzActionBarButton");
-
-		if (button:GetContent().strIcon == "") then
-			f:SetSprite(nil);
+	for i, buttonContainer in ipairs(self.barMain.Buttons) do
+		if (not S.myLAS[i] or S.myLAS[i] == 0) then
+			buttonContainer.wndMain:SetSprite(nil);
 		else
-			f:SetSprite("ActionButton");
+			buttonContainer.wndMain:SetSprite("ActionButton");
 		end
 	end
 end
