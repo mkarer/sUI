@@ -9,6 +9,7 @@
 
 require "GameLib";
 require "Apollo";
+require "ActionSetLib";
 
 -----------------------------------------------------------------------------
 
@@ -44,6 +45,7 @@ function S:OnCharacterCreated()
 		self:RegisterEvent("UnitEnteredCombat", "HandleCombatChanges");
 		self:RegisterEvent("ChangeWorld", "HandleCombatChanges");
 		self:RegisterEvent("ShowResurrectDialog", "HandleCombatChanges");
+		self:RegisterEvent("PlayerChanged", "OnPlayerChanged");
 
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
 		self:SendMessage("CHARACTER_LOADED");
@@ -63,6 +65,10 @@ function S:GetClassName(classId)
 	return "Unknown";
 end
 
+function S:OnPlayerChanged()
+	self.myCharacter = GameLib.GetPlayerUnit();
+end
+
 -----------------------------------------------------------------------------
 -- Limited Action Set Data
 -- Timer workaround, because AbilityBookChange fires too soon.
@@ -77,13 +83,22 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 
 	-- Stop Timer if called by Event while Timer is still active
 	if (not timedUpdate and timerLASUpdate) then
-		S.Log:debug("Stopping LAS Update Timer (should not be running anymore)");
+--		S.Log:debug("Stopping LAS Update Timer (should not be running anymore)");
 		self:CancelTimer(timerLASUpdate);
 		timerLASUpdate = nil;
 	end
 
 	-- Retrieve LAS and compare current set with previous data
 	local currentLAS = ActionSetLib.GetCurrentActionSet();
+	if (not currentLAS) then
+		-- Propably Zoning
+		S.Log:debug("ZONING?");
+		if (timerLASUpdate) then
+			self:CancelTimer(timerLASUpdate);
+			timerLASUpdate = nil;
+		end
+		return;
+	end
 	if (not self.myLAS) then
 		initialUpdate = true;
 		self.myLAS = {};
@@ -100,15 +115,15 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 	end
 
 	-- Start Timer if no change was detected and timer isn't active
-	if (not initialUpdate) then
-		S.Log:debug("LAS Changed: "..(changed and "YES" or "NO"));
-	end
+--	if (not initialUpdate) then
+--		S.Log:debug("LAS Changed: "..(changed and "YES" or "NO"));
+--	end
 
 	if (not changed and not initialUpdate and not timedUpdate) then
-		S.Log:debug("Resetting LAS Update Timer Ticks");
+--		S.Log:debug("Resetting LAS Update Timer Ticks");
 		timerLASUpdateTicks = 0;
 		if (not timerLASUpdate) then
-			S.Log:debug("Starting LAS Update Timer");
+--			S.Log:debug("Starting LAS Update Timer");
 			timerLASUpdate = self:ScheduleRepeatingTimer("LASUpdateTimerTick", 0.1);
 		end
 	end
@@ -117,7 +132,7 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 	if (timedUpdate and timerLASUpdate) then
 		if (changed or timerLASUpdateTicks >= 5) then
 			-- LAS Change detected or Timeout
-			S.Log:debug("Stopping LAS Update Timer, Ticks: "..timerLASUpdateTicks);
+--			S.Log:debug("Stopping LAS Update Timer, Ticks: "..timerLASUpdateTicks);
 			self:CancelTimer(timerLASUpdate);
 			timerLASUpdate = nil;
 		end
@@ -125,6 +140,7 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 
 	-- Send Message
 	if (changed or initialUpdate) then
+		S.Log:debug("LIMITED_ACTION_SET_CHANGED");
 		self:SendMessage("LIMITED_ACTION_SET_CHANGED");
 	end
 
@@ -133,12 +149,18 @@ end
 
 function S:LASUpdateTimerTick()
 	timerLASUpdateTicks = timerLASUpdateTicks + 1;
-	S.Log:debug("Ticks: "..timerLASUpdateTicks);
+--	S.Log:debug("Ticks: "..timerLASUpdateTicks);
 	self:UpdateLimitedActionSetData(true);
 end
 
 function S:OnAbilityBookChange()
-	self:UpdateLimitedActionSetData();
+	-- This Event fires ALL THE F***ING TIME while zoning! TODO: Bug Carbone to events for PlayerLeftWorld/PlayerEnteredWorld
+--	S.Log:debug("OnAbilityBookChange");
+	if (not self.myCharacter or (self.myCharacter and not self.myCharacter:IsValid())) then
+		-- Wait for PlayerChanged
+	else
+		self:UpdateLimitedActionSetData();
+	end
 end
 
 -----------------------------------------------------------------------------
