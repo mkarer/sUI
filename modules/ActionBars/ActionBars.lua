@@ -54,6 +54,10 @@ function M:HideDefaultActionBars()
 		S:RemoveArtwork(f);
 	end
 
+	for _, f in pairs(ActionBarFrame.wndShadow:GetChildren()) do
+		S:RemoveArtwork(f);
+	end
+
 	-- Hide Bars
 	ActionBarFrame.wndBar1:Show(false, true);
 	ActionBarFrame.wndBar2:Show(false, true);
@@ -95,8 +99,8 @@ function M:SetupActionBars()
 	-----------------------------------------------------------------------------
 	local barBottom = self:CreateActionBar("SezzActionBarBottom", true, 12, 23, true);
 	local barWidthOffset = math.ceil(barBottom.Width / 2);
-	local barPositionY = -160; -- Calculated from Bottom
-	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, -barBottom.Height, barWidthOffset, 0);
+	local barPositionOffset = 6;
+	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, -barBottom.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
 	self.barBottom = barBottom;
 
 	-----------------------------------------------------------------------------
