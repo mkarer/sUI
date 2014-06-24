@@ -7,14 +7,14 @@
 
 --]]
 
-require "Window";
 require "ChatSystemLib";
 
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("ChannelColors", "Gemini:Event-1.0", "Gemini:Hook-1.0");
-local tChatLog, log, arChatColorsBlizzard;
+local ChatCore = S:GetModule("ChatCore");
+local M = ChatCore:NewModule("ChannelColors");
+local log;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -37,7 +37,7 @@ function M:OnEnable()
 	local colNpcSay = { a = 1, r = 1, g = 1, b = 0.63 };
 	local colCombat = { a = 1, r = 1, g = 0.74, b = 0.71 };
 
-	arChatColorsBlizzard = { 
+	local arChatColorsBlizzard = { 
 		[ChatSystemLib.ChatChannel_Zone] = colChannel, 
 		[ChatSystemLib.ChatChannel_Command] = colWhite, 
 		[ChatSystemLib.ChatChannel_System] = colYellow,
@@ -69,21 +69,8 @@ function M:OnEnable()
 	 };
 
 	-- Set Colors
-	tChatLog = Apollo.GetAddon("ChatLog");
-	if (tChatLog.arChatColor) then
-		self:UpdateChannelColors();
-	else
-		self:PostHook(tChatLog, "OnWindowManagementReady", "UpdateChannelColors");
-	end
-end
-
------------------------------------------------------------------------------
-
-function M:UpdateChannelColors()
 	log:debug("Updating Chat Channel Colors...");
-	self:Unhook(tChatLog, "OnWindowManagementReady");
-
 	for k, v in pairs(arChatColorsBlizzard) do
-		tChatLog.arChatColor[k] = v;
+		ChatCore.ChatLog.arChatColor[k] = v;
 	end
 end
