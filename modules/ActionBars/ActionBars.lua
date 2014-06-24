@@ -24,11 +24,22 @@ function M:OnInitialize()
 	self:InitializeForms();
 --	self:RegisterEvent("OnCharacterCreated");
 
+	-- Configuration
+	self.DB = {
+		buttonSize = 36,
+		buttonBorder = 2,
+		buttonPadding = 2,
+	};
+
+	-- ActionBarFrame Hooks
+
 	ActionBarFrame = Apollo.GetAddon("ActionBarFrame");
 	if (ActionBarFrame) then
 --		self:RegisterEvent("ActionBarReady");
 --		self:PostHook(ActionBarFrame, "InitializeBars", "StyleButtons");
-		self:PostHook(ActionBarFrame, "InitializeBars", "ActionBarReady");
+--		self:PostHook(ActionBarFrame, "InitializeBars", "ActionBarReady");
+		self:PostHook(ActionBarFrame, "InitializeBars", "HideDefaultActionBars");
+		self:PostHook(ActionBarFrame, "RedrawBarVisibility", "HideDefaultActionBars");
 	else
 		log:debug("Sorry, the default ActionBarFrame addon is disabled!");
 	end
@@ -48,6 +59,19 @@ end
 -- Styling
 -----------------------------------------------------------------------------
 
+function M:HideDefaultActionBars()
+	-- Remove Artwork
+	for _, f in pairs(ActionBarFrame.wndArt:GetChildren()) do
+		S:RemoveArtwork(f);
+	end
+
+	-- Hide Bars
+	ActionBarFrame.wndBar1:Show(false, true);
+	ActionBarFrame.wndBar2:Show(false, true);
+	ActionBarFrame.wndBar3:Show(false, true);
+end
+
+--[[
 function M:ActionBarReady()
 	self:StyleButtons();
 	self:StyleActionBars();
@@ -166,13 +190,13 @@ function M:StyleActionBarButtons(bar)
 		end
 	end
 end
+--]]
 
 -----------------------------------------------------------------------------
 -- Custom Action Bar
 -----------------------------------------------------------------------------
-function M:SetupActionBars()
-	log:debug("SetupActionBars");
 
+function M:SetupActionBars()
 	local buttonSize = 36;
 	local buttonBorder = 2;
 	local buttonPadding = 2;
@@ -181,43 +205,97 @@ function M:SetupActionBars()
 	-- Main/LAS Bar
 	-- Button IDs: 0 - 7
 	-----------------------------------------------------------------------------
-	-- ActionSetLib.GetCurrentActionSet() -- 1 bis 8
-	-----------------------------------------------------------------------------
-	local barMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBar1ButtonContainer", nil, self);
-	barMain:Show(true, true);
-	barMain:DestroyChildren();
-
-	local barPositionY = -200; -- Calculated from Bottom
-	local barWidth = 8 * buttonSize + 7 * buttonPadding;
-	local barHeight = buttonSize;
+	local barMain, barWidth, barHeight = self:CreateActionBar("SezzActionBarMain", true, 0, 7);
 	local barWidthOffset = math.ceil(barWidth / 2);
-
+	local barPositionY = -200; -- Calculated from Bottom
 	barMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
 
-	for i = 0, 7 do
-		-- SezzActionBarButton UseBaseButtonArt=1 would enable our custom Button with Mouseover/Press Sprites, but hides everything else?
-		local f = Apollo.LoadForm(self.xmlDoc, "SezzActionBarItem", barMain, self);
-		f:SetName("SezzActionBar1Button"..(i + 1));
+	-- Update Events
+	self.barMain = barMain;
+	self:RegisterMessage("LIMITED_ACTION_SET_CHANGED", "UpdateActionBarButtonBorders") -- Stupid hack until AbilityBookChange works as expected
+	self:UpdateActionBarButtonBorders();
+
+	-----------------------------------------------------------------------------
+	-- Bottom Bar (was Left Bar)
+	-- ButtonIDs: 12 - 23
+	-----------------------------------------------------------------------------
+	local barBottom, barWidth, barHeight = self:CreateActionBar("SezzActionBarBottom", true, 12, 23);
+	local barWidthOffset = math.ceil(barWidth / 2);
+	local barPositionY = -160; -- Calculated from Bottom
+	barBottom:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
+
+	-----------------------------------------------------------------------------
+	-- Right Bar
+	-- ButtonIDs: 24 - 35
+	-----------------------------------------------------------------------------
+	local barRight, barWidth, barHeight = self:CreateActionBar("SezzActionBarRight", true, 24, 35);
+	local barWidthOffset = math.ceil(barWidth / 2);
+	local barPositionY = -120; -- Calculated from Bottom
+	barRight:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barHeight);
+end
+
+function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo)
+	-- Calculate Size
+	local barWidth, barHeight;
+	local buttonNum = buttonIdTo - buttonIdFrom + 1;
+	local buttonForm = (buttonIdTo < 8 and "SezzActionBarItemLAS" or "SezzActionBarItem");
+log:debug(buttonForm);
+	if (dirHorizontal) then
+		barWidth = buttonNum * self.DB.buttonSize + (buttonNum - 1) * self.DB.buttonPadding;
+		barHeight = self.DB.buttonSize;
+	else
+		barWidth = self.DB.buttonSize;
+		barHeight = buttonNum * self.DB.buttonSize + (buttonNum - 1) * self.DB.buttonPadding;
+	end
+
+	-- Create Button Container
+	local bar = Apollo.LoadForm(self.xmlDoc, "SezzActionBarContainer", nil, self);
+	bar:SetName(barName);
+	bar:Show(true, true);
+
+	-- Create Action Buttons
+	local buttonIndex = 0;
+	for i = buttonIdFrom, buttonIdTo do
+		-- SezzActionBarButton UseBaseButtonArt would enable our custom Button with Mouseover/Press Sprites, but hides everything else?
+		local f = Apollo.LoadForm(self.xmlDoc, buttonForm, bar, self);
+		f:SetName(string.format("%sButton%d", barName, buttonIndex + 1));
 
 		local button = f:FindChild("SezzActionBarButton");
-		local buttonPosition = i * (buttonSize + buttonPadding);
-
 		button:SetContentId(i);
-		f:SetAnchorOffsets(buttonPosition, 0, buttonPosition + buttonSize, buttonSize);
 
-		-- Temporary Solution to show/hide Button Border
-		-- Should be called whenever the button content changes
+		-- Update Position
+		local buttonPosition = buttonIndex * (self.DB.buttonSize + self.DB.buttonPadding);
+		if (dirHorizontal) then
+			f:SetAnchorOffsets(buttonPosition, 0, buttonPosition + self.DB.buttonSize, self.DB.buttonSize);
+		else
+			f:SetAnchorOffsets(0, buttonPosition, self.DB.buttonSize, buttonPosition + self.DB.buttonSize);
+		end
+
+		-- Done, Increase Index
+		buttonIndex = buttonIndex + 1;
+	end
+
+	-- Done
+	return bar, barWidth, barHeight;
+end
+
+function M:UpdateActionBarButtonBorders()
+	-- Update LAS Bar Background Sprite (Workaround)
+	for _, f in pairs(self.barMain:GetChildren()) do
+		local button = f:FindChild("SezzActionBarButton");
+
 		if (button:GetContent().strIcon == "") then
 			f:SetSprite(nil);
 		else
 			f:SetSprite("ActionButton");
 		end
-
---		if (i == 0) then log:debug(button); end
---		if (i == 0) then log:debug(button:GetData()); end
---		if (i == 0) then log:debug(button:GetContent()); end
 	end
 end
+
+-----------------------------------------------------------------------------
+-- Tooltips
+-- Stolen from ActionBarFrame.lua
+-----------------------------------------------------------------------------
 
 function M:OnGenerateTooltip(wndControl, wndHandler, eType, arg1, arg2)
 	local xml = nil;
@@ -243,4 +321,3 @@ function M:OnGenerateTooltip(wndControl, wndHandler, eType, arg1, arg2)
 		wndControl:SetTooltipDoc(xml);
 	end
 end
-
