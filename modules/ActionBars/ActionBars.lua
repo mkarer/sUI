@@ -23,7 +23,7 @@ function M:OnInitialize()
 	self.DB = {
 		buttonSize = 36,
 		buttonPadding = 2,
-		barPadding = 2,
+		barPadding = 4,
 	};
 
 	-- ActionBarFrame Hooks
@@ -58,6 +58,16 @@ function M:HideDefaultActionBars()
 	ActionBarFrame.wndBar1:Show(false, true);
 	ActionBarFrame.wndBar2:Show(false, true);
 	ActionBarFrame.wndBar3:Show(false, true);
+
+	-- Move Bars
+	self:RepositionUnstyledBars();
+end
+
+function M:RepositionUnstyledBars()
+	-- Temporarly move stuff
+	ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer"):SetAnchorPoints(1, 1, 1, 1);
+	ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer"):SetAnchorOffsets(-266, -100, -146, -25);
+	ActionBarFrame.wndMain:FindChild("PotionFlyout"):SetAnchorOffsets(317, -112, 409, 65)
 end
 
 -----------------------------------------------------------------------------
@@ -69,7 +79,7 @@ function M:SetupActionBars()
 	-- Main/LAS Bar
 	-- Button IDs: 0 - 7
 	-----------------------------------------------------------------------------
-	local barMain = self:CreateActionBar("SezzActionBarMain", true, 0, 7);
+	local barMain = self:CreateActionBar("SezzActionBarMain", true, 0, 7, false, 30);
 	local barWidthOffset = math.ceil(barMain.Width / 2);
 	local barPositionY = -200; -- Calculated from Bottom
 	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
@@ -86,7 +96,7 @@ function M:SetupActionBars()
 	local barBottom = self:CreateActionBar("SezzActionBarBottom", true, 12, 23, true);
 	local barWidthOffset = math.ceil(barBottom.Width / 2);
 	local barPositionY = -160; -- Calculated from Bottom
-	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barBottom.Height);
+	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, -barBottom.Height, barWidthOffset, 0);
 	self.barBottom = barBottom;
 
 	-----------------------------------------------------------------------------
@@ -95,23 +105,24 @@ function M:SetupActionBars()
 	-----------------------------------------------------------------------------
 	local barRight = self:CreateActionBar("SezzActionBarRight", false, 24, 35, true);
 	local barHeightOffset = math.ceil(barRight.Height / 2);
-	barRight.wndMain:SetAnchorOffsets(-self.DB.buttonSize - self.DB.buttonPadding, -barHeightOffset, -self.DB.buttonPadding, barHeightOffset);
+	barRight.wndMain:SetAnchorOffsets(-barRight.Width, -barHeightOffset, 0, barHeightOffset);
 	barRight.wndMain:SetAnchorPoints(1, 0.5, 1, 0.5);
 	self.barRight = barRight;
 end
 
-function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading)
+function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
 	-- Calculate Size
+	local buttonSize = buttonSize or self.DB.buttonSize;
 	local barWidth, barHeight;
 	local buttonNum = buttonIdTo - buttonIdFrom + 1;
 	local buttonForm = (buttonIdTo < 8 and "SezzActionBarItemLAS" or "SezzActionBarItem");
 
 	if (dirHorizontal) then
-		barWidth = buttonNum * self.DB.buttonSize + (buttonNum - 1) * self.DB.buttonPadding;
-		barHeight = self.DB.buttonSize;
+		barWidth = buttonNum * buttonSize + (buttonNum - 1) * self.DB.buttonPadding + 2 * self.DB.barPadding;
+		barHeight = buttonSize + 2 * self.DB.barPadding;
 	else
-		barWidth = self.DB.buttonSize;
-		barHeight = buttonNum * self.DB.buttonSize + (buttonNum - 1) * self.DB.buttonPadding;
+		barWidth = buttonSize + 2 * self.DB.barPadding;
+		barHeight = buttonNum * buttonSize + (buttonNum - 1) * self.DB.buttonPadding + 2 * self.DB.barPadding;
 	end
 
 	-- Create Button Container
@@ -156,11 +167,11 @@ function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, ena
 		end
 
 		-- Update Position
-		local buttonPosition = buttonIndex * (self.DB.buttonSize + self.DB.buttonPadding);
+		local buttonPosition = buttonIndex * (buttonSize + self.DB.buttonPadding);
 		if (dirHorizontal) then
-			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition, 0, buttonPosition + self.DB.buttonSize, self.DB.buttonSize);
+			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition + self.DB.barPadding, self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding, buttonSize + self.DB.barPadding);
 		else
-			buttonContainer.wndMain:SetAnchorOffsets(0, buttonPosition, self.DB.buttonSize, buttonPosition + self.DB.buttonSize);
+			buttonContainer.wndMain:SetAnchorOffsets(self.DB.barPadding, buttonPosition + self.DB.barPadding, buttonSize + self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding);
 		end
 
 		-- Done, Increase Index
