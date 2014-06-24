@@ -91,7 +91,10 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 	end
 
 	-- Start Timer if no change was detected and timer isn't active
-	S.Log:debug("LAS Changed: "..(changed and "YES" or "NO"));
+	if (not initialUpdate) then
+		S.Log:debug("LAS Changed: "..(changed and "YES" or "NO"));
+	end
+	
 	if (not changed and not initialUpdate and not timedUpdate) then
 		S.Log:debug("Resetting LAS Update Timer Ticks");
 		timerLASUpdateTicks = 0;
