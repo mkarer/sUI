@@ -34,6 +34,9 @@ function S:OnCharacterCreated()
 		self.myLevel = unitPlayer:GetLevel();
 		self.myName = unitPlayer:GetName();
 
+		self:UpdateLimitedActionSetData();
+		self:RegisterEvent("AbilityBookChange", "OnAbilityBookChange");
+
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
 		self:SendMessage("PLAYER_LOGIN");
 	else
@@ -49,4 +52,79 @@ function S:GetClassName(classId)
 	end
 
 	return "Unknown";
+end
+
+-----------------------------------------------------------------------------
+-- Limited Action Set Data
+-- Timer workaround, because AbilityBookChange fires too soon.
+-----------------------------------------------------------------------------
+
+local timerLASUpdateTicks = 0;
+local timerLASUpdate;
+
+function S:UpdateLimitedActionSetData(timedUpdate)
+	local initialUpdate = false;
+	local changed = false;
+
+	-- Stop Timer if called by Event while Timer is still active
+	if (not timedUpdate and timerLASUpdate) then
+		S.Log:debug("Stopping LAS Update Timer (should not be running anymore)");
+		self:CancelTimer(timerLASUpdate);
+		timerLASUpdate = nil;
+	end
+
+	-- Retrieve LAS and compare current set with previous data
+	local currentLAS = ActionSetLib.GetCurrentActionSet();
+	if (not self.myLAS) then
+		initialUpdate = true;
+		self.myLAS = {};
+	end
+
+	for i = 1, 8 do
+		if (not initialUpdate) then
+			if (not changed and currentLAS[i] ~= self.myLAS[i]) then
+				changed = true;
+			end
+		end
+
+		self.myLAS[i] = currentLAS[i];
+	end
+
+	-- Start Timer if no change was detected and timer isn't active
+	S.Log:debug("LAS Changed: "..(changed and "YES" or "NO"));
+	if (not changed and not initialUpdate and not timedUpdate) then
+		S.Log:debug("Resetting LAS Update Timer Ticks");
+		timerLASUpdateTicks = 0;
+		if (not timerLASUpdate) then
+			S.Log:debug("Starting LAS Update Timer");
+			timerLASUpdate = self:ScheduleRepeatingTimer("LASUpdateTimerTick", 0.1);
+		end
+	end
+
+	-- Stop timer when LAS changed or the timer ticked too often	
+	if (timedUpdate and timerLASUpdate) then
+		if (changed or timerLASUpdateTicks >= 5) then
+			-- LAS Change detected or Timeout
+			S.Log:debug("Stopping LAS Update Timer, Ticks: "..timerLASUpdateTicks);
+			self:CancelTimer(timerLASUpdate);
+			timerLASUpdate = nil;
+		end
+	end
+
+	-- Send Message
+	if (changed) then
+		self:SendMessage("LIMITED_ACTION_SET_CHANGED");
+	end
+
+	return changed;
+end
+
+function S:LASUpdateTimerTick()
+	timerLASUpdateTicks = timerLASUpdateTicks + 1;
+	S.Log:debug("Ticks: "..timerLASUpdateTicks);
+	self:UpdateLimitedActionSetData(true);
+end
+
+function S:OnAbilityBookChange()
+	self:UpdateLimitedActionSetData();
 end
