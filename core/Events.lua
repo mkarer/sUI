@@ -7,6 +7,9 @@
 
 --]]
 
+require "GameLib";
+require "Apollo";
+
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
@@ -38,7 +41,7 @@ function S:OnCharacterCreated()
 		self:RegisterEvent("AbilityBookChange", "OnAbilityBookChange");
 
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
-		self:SendMessage("PLAYER_LOGIN");
+		self:SendMessage("CHARACTER_LOADED");
 	else
 		Apollo.StartTimer("SezzUITimer_DelayedInit");
 	end
@@ -94,7 +97,7 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 	if (not initialUpdate) then
 		S.Log:debug("LAS Changed: "..(changed and "YES" or "NO"));
 	end
-	
+
 	if (not changed and not initialUpdate and not timedUpdate) then
 		S.Log:debug("Resetting LAS Update Timer Ticks");
 		timerLASUpdateTicks = 0;
@@ -115,7 +118,7 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 	end
 
 	-- Send Message
-	if (changed) then
+	if (changed or initialUpdate) then
 		self:SendMessage("LIMITED_ACTION_SET_CHANGED");
 	end
 
