@@ -17,6 +17,7 @@
 	<Script Name="core\Events.lua" />
 	<Script Name="core\Media.lua" />
 	<Script Name="core\Modules.lua" />
+	<Script Name="core\Slash.lua" />
 	<Script Name="core\Temp.lua" />
 
 	<!-- Modules -->
