@@ -2,6 +2,12 @@
 
 	s:UI Action Bars
 
+	Notes:
+
+		Left Bar IDs: 12-23
+		Right Bar IDs: 24-35
+		Additional IDs: 36-47 (unused by Carbine's ActionBarFrame)
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -62,6 +68,7 @@ function M:HideDefaultActionBars()
 	ActionBarFrame.wndBar1:Show(false, true);
 	ActionBarFrame.wndBar2:Show(false, true);
 	ActionBarFrame.wndBar3:Show(false, true);
+	ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer"):Show(false, true);
 
 	-- Move Bars
 	self:RepositionUnstyledBars();
@@ -69,8 +76,6 @@ end
 
 function M:RepositionUnstyledBars()
 	-- Temporarly move stuff
-	ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer"):SetAnchorPoints(1, 1, 1, 1);
-	ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer"):SetAnchorOffsets(-266, -100, -146, -25);
 	ActionBarFrame.wndMain:FindChild("PotionFlyout"):SetAnchorOffsets(317, -112, 409, 65)
 end
 
@@ -83,7 +88,7 @@ function M:SetupActionBars()
 	-- Main/LAS Bar
 	-- Button IDs: 0 - 7
 	-----------------------------------------------------------------------------
-	local barMain = self:CreateActionBar("SezzActionBarMain", true, 0, 7, false, 30);
+	local barMain = self:CreateActionBar("SezzActionBarMain", "LAS", true, 0, 7, false, 30);
 	local barWidthOffset = math.ceil(barMain.Width / 2);
 	local barPositionY = -162; -- Calculated from Bottom
 	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
@@ -97,7 +102,25 @@ function M:SetupActionBars()
 	-- Bottom Bar
 	-- ButtonIDs: 12 - 23 (Left Bar)
 	-----------------------------------------------------------------------------
-	local barBottom = self:CreateActionBar("SezzActionBarBottom", true, 12, 23, true);
+	local barBottomItems = {
+		{ type = "GC", id = 18, menu = "Recall" }, -- Recall
+		{ type = "GC", id = 26, menu = "Mount" }, -- Mount
+		{ type = "A", id = 12 },
+		{ type = "A", id = 13 },
+		{ type = "A", id = 14 },
+		{ type = "A", id = 15 },
+		{ type = "A", id = 16 },
+		{ type = "A", id = 17 },
+		{ type = "A", id = 18 },
+		{ type = "A", id = 19 },
+		{ type = "A", id = 20 },
+		{ type = "A", id = 21 },
+		{ type = "A", id = 22 },
+		{ type = "A", id = 23 },
+		{ type = "GC", id = 27, menu = "Potion" }, -- Potion
+	};
+
+	local barBottom = self:CreateActionBar("SezzActionBarBottom", barBottomItems, true, nil, nil, true);
 	local barWidthOffset = math.ceil(barBottom.Width / 2);
 	local barPositionOffset = 6;
 	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, -barBottom.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
@@ -107,19 +130,45 @@ function M:SetupActionBars()
 	-- Right Bar
 	-- ButtonIDs: 24 - 35
 	-----------------------------------------------------------------------------
-	local barRight = self:CreateActionBar("SezzActionBarRight", false, 24, 35, true);
+	local barRight = self:CreateActionBar("SezzActionBarRight", "A", false, 24, 35, true);
 	local barHeightOffset = math.ceil(barRight.Height / 2);
 	barRight.wndMain:SetAnchorOffsets(-barRight.Width, -barHeightOffset, 0, barHeightOffset);
 	barRight.wndMain:SetAnchorPoints(1, 0.5, 1, 0.5);
 	self.barRight = barRight;
+
+	-----------------------------------------------------------------------------
+	-- Extra Bar
+	-----------------------------------------------------------------------------
+	local barExtraItems = {
+		{ type = "LAS", id = 8 }, -- Gadget
+		{ type = "LAS", id = 9, menu = "Path" }, -- Path Ability
+		{ type = "GC", id = 2, menu = "Stance" }, -- Stance (Innate Ability)
+	};
+
+	local barExtra = self:CreateActionBar("SezzActionBarGadget", barExtraItems, true, nil, nil, false, 30);
+	local barPositionY = -162;
+	barExtra.wndMain:SetAnchorOffsets(-math.ceil(barMain.Width / 2) - barExtra.Width + self.DB.barPadding + self.DB.buttonPadding, barPositionY, -math.ceil(barMain.Width / 2) + self.DB.barPadding + self.DB.buttonPadding, barPositionY + barExtra.Height);
 end
 
-function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
+function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
 	-- Calculate Size
 	local buttonSize = buttonSize or self.DB.buttonSize;
-	local barWidth, barHeight;
-	local buttonNum = buttonIdTo - buttonIdFrom + 1;
-	local buttonForm = (buttonIdTo < 8 and "SezzActionBarItemLAS" or "SezzActionBarItem");
+	local barWidth, barHeight, buttonNum, buttonData;
+
+	if (type(buttonType) == "table") then
+		buttonData = buttonType;
+	else
+		buttonData = {};
+		for i = buttonIdFrom, buttonIdTo do
+			table.insert(buttonData, { type = buttonType, id = i });
+		end
+	end
+	buttonNum = #buttonData;
+
+	-- Orientation
+	if (dirHorizontal == nil) then
+		dirHorizontal = true;
+	end
 
 	if (dirHorizontal) then
 		barWidth = buttonNum * buttonSize + (buttonNum - 1) * self.DB.buttonPadding + 2 * self.DB.barPadding;
@@ -155,14 +204,14 @@ function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, ena
 
 	-- Create Action Buttons
 	local buttonIndex = 0;
-	for i = buttonIdFrom, buttonIdTo do
+	for i, buttonAttributes in ipairs(buttonData) do
 		-- SezzActionBarButton UseBaseButtonArt would enable our custom Button with Mouseover/Press Sprites, but hides everything else?
 		local buttonContainer = {};
 		buttonContainer.OnGenerateTooltip = self.OnGenerateTooltip;
-		buttonContainer.wndMain = Apollo.LoadForm(self.xmlDoc, buttonForm, barContainer.wndMain, buttonContainer);
-		buttonContainer.wndMain:SetName(string.format("%sButton%d", barName, buttonIndex + 1));
+		buttonContainer.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBarItem"..buttonAttributes.type, barContainer.wndMain, buttonContainer);
+		buttonContainer.wndMain:SetName(string.format("%sButton%d", barName, i));
 		buttonContainer.wndButton = buttonContainer.wndMain:FindChild("SezzActionBarButton");
-		buttonContainer.wndButton:SetContentId(i);
+		buttonContainer.wndButton:SetContentId(buttonAttributes.id);
 
 		-- Bar Fading
 		if (enableFading) then
@@ -171,16 +220,15 @@ function M:CreateActionBar(barName, dirHorizontal, buttonIdFrom, buttonIdTo, ena
 		end
 
 		-- Update Position
-		local buttonPosition = buttonIndex * (buttonSize + self.DB.buttonPadding);
+		local buttonPosition = (i - 1) * (buttonSize + self.DB.buttonPadding);
 		if (dirHorizontal) then
 			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition + self.DB.barPadding, self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding, buttonSize + self.DB.barPadding);
 		else
 			buttonContainer.wndMain:SetAnchorOffsets(self.DB.barPadding, buttonPosition + self.DB.barPadding, buttonSize + self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding);
 		end
-
+		
 		-- Done, Increase Index
-		buttonIndex = buttonIndex + 1;
-		barContainer.Buttons[buttonIndex] = buttonContainer;
+		table.insert(barContainer.Buttons, buttonContainer);
 	end
 
 	-- Done
