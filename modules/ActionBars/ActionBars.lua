@@ -85,7 +85,7 @@ function M:SetupActionBars()
 	-----------------------------------------------------------------------------
 	local barMain = self:CreateActionBar("SezzActionBarMain", true, 0, 7, false, 30);
 	local barWidthOffset = math.ceil(barMain.Width / 2);
-	local barPositionY = -200; -- Calculated from Bottom
+	local barPositionY = -162; -- Calculated from Bottom
 	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
 
 	-- Update Events
