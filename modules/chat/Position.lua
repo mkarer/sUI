@@ -71,10 +71,19 @@ function M:UpdateChatChannel(wndChannel, wndChannelHooked)
 	inputCatcher:SetAnchorOffsets(-5, -31, 5, 5);
 
 	local chat = wndChannel:FindChild("Chat");
-	chat:SetAnchorOffsets(-18, 25, -1, -1);
+--	chat:SetAnchorOffsets(-18, 25, -1, -1);
+	chat:SetAnchorOffsets(-18, 2, -1, -1);
 
-	-- Hide Channel Button
-	-- wndChannel:FindChild("InputTypeBtn"):Show(false, true);
+	-- Hide/Move Channel Buttons
+	wndChannel:FindChild("InputTypeBtn"):Show(false, true);
+--	wndChannel:FindChild("Options"):Show(false, true);
+	wndChannel:FindChild("Options"):SetAnchorPoints(1, 0, 1, 0);
+	wndChannel:FindChild("Options"):SetAnchorOffsets(-37, -11, -16, 11); -- Just in case...
+	wndChannel:FindChild("CloseBtn"):Show(false, true);
+	wndChannel:FindChild("AddChatWindow"):Show(false, true);
+
+	-- Bigger Options Form
+	wndChannel:FindChild("OptionsSubForm"):SetAnchorOffsets(-20, 2, 0, 0);
 
 	-- Hide Background
 	wndChannel:FindChild("BGArt"):SetSprite(nil);
