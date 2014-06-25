@@ -26,6 +26,7 @@
 	<Script Name="modules\Chat\Core.lua" />
 	<Script Name="modules\Chat\ChannelColors.lua" />
 	<Script Name="modules\Chat\Position.lua" />
+	<Script Name="modules\Chat\StickyWhisper.lua" />
 	<Script Name="modules\Crafting\RandomCraft.lua" />
 	<Form Name="modules\Crafting\RandomCraft.xml" />
 	<Script Name="modules\Crafting\Unmount.lua" />
