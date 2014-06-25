@@ -20,10 +20,12 @@ local M = {};
 Apollo.RegisterSlashCommand("rl", "RequestReloadUI");
 
 -- Emotes
+-- ChatSystemLib.GetEmotes()
 local emoteShortcuts = {
 	ty = "thanks",
 	thx = "thanks",
 	lol = "laugh",
+	hi = "welcome",
 };
 
 function M:DoEmote(emote, target)
