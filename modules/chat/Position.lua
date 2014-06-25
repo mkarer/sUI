@@ -1,6 +1,7 @@
 --[[
 
 	s:UI Chat Window Position
+	TODO: Input box is still buggy and I also want to hide/change the channel related buttons.
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -9,7 +10,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local ChatCore = S:GetModule("ChatCore");
-local M = ChatCore:NewModule("Position");
+local M = ChatCore:NewModule("Position", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
@@ -24,4 +25,57 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	-- Move Chat Window
+	local wndChat = Apollo.FindWindowByName("ChatWindow");
+	wndChat:SetAnchorPoints(0, 1, 0, 1);
+	wndChat:SetAnchorOffsets(10, -270, 500, -55);
+
+	-- Hook Channel Creation
+	self:PostHook(ChatCore.ChatLog, "OnAddNewTabChat", "UpdateChatChannel");
+	self:PostHook(ChatCore.ChatLog, "OnAddNewTabCombat", "UpdateChatChannel");
+
+	-- Update Channel Windows
+	for _, wndChannel in pairs(ChatCore.ChatLog.tChatWindows) do
+		self:UpdateChatChannel(wndChannel);
+	end
+end
+
+function M:UpdateChatChannel(wndChannel, wndChannelHooked)
+	local wndChannel = wndChannelHooked and ChatCore.ChatLog.tChatWindows[#ChatCore.ChatLog.tChatWindows] or wndChannel;
+
+	-- Move Input Box
+	local artFooter = wndChannel:FindChild("BGArt_Footer");
+	artFooter:SetAnchorPoints(0, 0, 1, 0);
+	artFooter:SetAnchorOffsets(-23, -50, 5, -20);
+
+	local btnBeginChat = wndChannel:FindChild("BeginChat");
+	btnBeginChat:SetAnchorPoints(0, 0, 0, 0);
+	btnBeginChat:SetAnchorOffsets(-16, -43, 2, -25);
+
+	local inputBox = wndChannel:FindChild("Input");
+	inputBox:SetAnchorPoints(0, 0, 1, 0);
+	inputBox:SetAnchorOffsets(0, -45, -20, -25);
+
+	local inputType = wndChannel:FindChild("InputType");
+	inputType:SetAnchorPoints(0, 0, 1, 0);
+	inputType:SetAnchorOffsets(5, -50, -30, -20);
+
+	local emotesButton = wndChannel:FindChild("EmoteBtn");
+	emotesButton:SetAnchorPoints(1, 0, 1, 0);
+	emotesButton:SetAnchorOffsets(-29, -25, -4, -5);
+
+	local emotesMenu = wndChannel:FindChild("EmoteMenu");
+	emotesMenu:SetAnchorPoints(1, 0, 1, 0);
+	emotesMenu:SetAnchorOffsets(-164, -286, 2, -50);
+
+	local inputCatcher = wndChannel:FindChild("MouseCatcher");
+	inputCatcher:SetAnchorOffsets(-5, -31, 5, 5);
+
+	local chat = wndChannel:FindChild("Chat");
+	chat:SetAnchorOffsets(-18, 25, -1, -1);
+
+	-- Hide Channel Button
+	-- wndChannel:FindChild("InputTypeBtn"):Show(false, true);
+
+	-- Hide Background
+	wndChannel:FindChild("BGArt"):SetSprite(nil);
 end
