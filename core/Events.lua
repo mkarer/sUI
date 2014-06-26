@@ -1,9 +1,9 @@
 --[[
 
+	s:UI Core Events & Messages
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
-
-	Core Events & Messages
 
 --]]
 
@@ -270,4 +270,40 @@ function S:IsAddOnLoaded(name)
 		S.Log:warn("Addon %s is not supported by IsAddOnLoaded()", name);
 		return Apollo.GetAddon(name) and true;
 	end
+end
+
+-- Recall
+function S:GetRecallAbilitiesList()
+	local tAbilities = {};
+
+	-- Default Bind Point
+	if (GameLib.HasBindPoint() == true) then
+		table.insert(tAbilities, GameLib.CodeEnumRecallCommand.BindPoint);
+	end
+	
+	-- Housing
+	if (HousingLib.IsResidenceOwner() == true) then
+		table.insert(tAbilities, GameLib.CodeEnumRecallCommand.House);
+	end
+
+	-- WarParty
+	for key, guildCurr in pairs(GuildLib.GetGuilds()) do
+		if (guildCurr:GetType() == GuildLib.GuildType_WarParty) then
+			table.insert(tAbilities, GameLib.CodeEnumRecallCommand.Warplot);
+			break
+		end
+	end
+	
+	-- Capital City
+	for idx, tSpell in pairs(AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Misc) or {}) do
+		if (tSpell.bIsActive and tSpell.nId == GameLib.GetTeleportIlliumSpell():GetBaseSpellId()) then
+			-- Illum
+			table.insert(tAbilities, GameLib.CodeEnumRecallCommand.Illium);
+		elseif (tSpell.bIsActive and tSpell.nId == GameLib.GetTeleportThaydSpell():GetBaseSpellId()) then
+			-- Thayd
+			table.insert(tAbilities, GameLib.CodeEnumRecallCommand.Thayd);
+		end
+	end
+
+	return tAbilities;
 end
