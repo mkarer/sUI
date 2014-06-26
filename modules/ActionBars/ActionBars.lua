@@ -207,6 +207,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 	for i, buttonAttributes in ipairs(buttonData) do
 		-- SezzActionBarButton UseBaseButtonArt would enable our custom Button with Mouseover/Press Sprites, but hides everything else?
 		local buttonContainer = {};
+		buttonContainer.Attributes = buttonAttributes;
 		buttonContainer.OnGenerateTooltip = self.OnGenerateTooltip;
 		buttonContainer.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBarItem"..buttonAttributes.type, barContainer.wndMain, buttonContainer);
 		buttonContainer.wndMain:SetName(string.format("%sButton%d", barName, i));
@@ -219,15 +220,86 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			buttonContainer.wndMenuToggle:Show(true, true);
 
 			buttonContainer.wndMenu = Apollo.LoadForm(self.xmlDoc, "ActionBarFlyout", nil, buttonContainer);
+buttonContainer.wndMenu:SetSprite("UI_BK3_Holo_InsetSimple");
 			buttonContainer.wndMenu:Show(false, true);
 
+			-- Close Menu Function
+			function buttonContainer:CloseMenu()
+				self.wndMenu:Show(false, true); -- Override fading applied by "Escapable"
+
+				if (enableFading) then
+					-- Check if other menus on the same bar are visible
+					local bMenusVisible = false;
+					for _, wndBarButtonContainer in pairs(barContainer.Buttons) do
+						if (wndBarButtonContainer.wndMenu and wndBarButtonContainer.wndMenu:IsVisible()) then
+							bMenusVisible = true;
+							break;
+						end
+					end
+
+					-- Enable fading if the last menu was closed
+					if (not bMenusVisible) then
+						S:EnableMouseOverFade(barContainer.wndMain, barContainer, false, true);
+
+						-- Fade out when cursor is somewhere else (pressed Esc to close close the menus)
+						if (not barContainer.wndMain:ContainsMouse()) then
+							barContainer:_FadeOut(barContainer.wndMain);
+						end
+					end
+				end
+			end
+
+			-- Click Menu Item Function
+			local SelectMenuItemDummy = function()
+				log:debug("SelectMenuItem NOT SPECIFIED");
+			end
+
+			buttonContainer.SelectMenuItem = SelectMenuItemDummy;
+
+			local SelectMenuItemStance = function(self, wndHandler, wndControl)
+				GameLib.SetCurrentClassInnateAbilityIndex(wndHandler:GetData())
+				self:CloseMenu();
+			end
+
+			-- Toggle Menu Function
 			function buttonContainer:ToggleMenu()
-				local bShowMenu = not self.wndMenu:IsVisible();
-				if (bShowMenu) then
+				if (not self.wndMenu:IsVisible()) then
 					-- Generate List
 					local nMenuEntries = 3;
 					local nEntryHeight = 36 * 3;
 					self.wndMenu:DestroyChildren();
+
+					if (self.Attributes.menu == "Stance") then
+						buttonContainer.SelectMenuItem = SelectMenuItemStance;
+						local i = 0;
+						local nCountSkippingTwo = 0
+						for idx, spellObject in pairs(GameLib.GetClassInnateAbilitySpells().tSpells) do
+							if idx % 2 == 1 then
+								nCountSkippingTwo = nCountSkippingTwo + 1
+								local strKeyBinding = GameLib.GetKeyBinding("SetStance"..nCountSkippingTwo) -- hardcoded formatting
+								local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self)
+								-- wndCurr:FindChild("StanceBtnKeyBind"):SetText(strKeyBinding == "<Unbound>" and "" or strKeyBinding)
+								wndCurr:FindChild("Icon"):SetSprite(spellObject:GetIcon())
+								wndCurr:SetData(nCountSkippingTwo)
+
+								if Tooltip and Tooltip.GetSpellTooltipForm then
+									wndCurr:SetTooltipDoc(nil)
+									Tooltip.GetSpellTooltipForm(self, wndCurr, spellObject)
+								end
+
+								local buttonPosition = i * (buttonSize + M.DB.buttonPadding);
+								wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+								i = i + 1;
+
+								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer); -- ButtonUp, because ButtonSignal doesn't work
+							end
+						end
+
+	--					local nLeft, nTop, nRight, nBottom = self.wndStancePopoutFrame:GetAnchorOffsets()
+	--					self.wndStancePopoutFrame:SetAnchorOffsets(nLeft, nBottom - nHeight - 98, nRight, nBottom)
+	--					self.wndMain:FindChild("StancePopoutBtn"):Show(#self.wndMenu:GetChildren() > 0)
+					end
+
 
 					-- Set Position
 					local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
@@ -235,37 +307,24 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 
 					local nWndLeft, nWndTop, nWndRight, nWndBottom = self.wndMenu:GetAnchorOffsets()
 					self.wndMenu:SetAnchorOffsets(nToggleX - 15, nToggleY - nEntryHeight, nToggleX + 15, nToggleY)
-				end
 
-				-- Show Menu
-				self.wndMenu:Show(bShowMenu, true);
-				if (bShowMenu) then
+					-- Show Menu
+					self.wndMenu:Show(true, true);
+
 					-- Disable Bar Fading
 					if (enableFading) then
 						S:DisableMouseOverFade(barContainer.wndMain, barContainer, false, true);
 					end
 					self.wndMenu:ToFront();
 				else
-					if (enableFading) then
-						-- Check if other menus on the same bar are visible
-						-- Enable fading if the last menu was closed
-						local bMenusVisible = false;
-						for _, wndBarButtonContainer in pairs(barContainer.Buttons) do
-							if (wndBarButtonContainer.wndMenu and wndBarButtonContainer.wndMenu:IsVisible()) then
-								bMenusVisible = true;
-								break;
-							end
-						end
-
-						if (not bMenusVisible) then
-							S:EnableMouseOverFade(barContainer.wndMain, barContainer, false, true);
-						end
-					end
+					-- Close Menu
+					self:CloseMenu();
 				end
 			end
 
-			-- Add ButtonUp event, because ButtonSignal doesn't work
-			buttonContainer.wndMenuToggle:AddEventHandler("ButtonUp", "ToggleMenu", buttonContainer);
+			-- Menu events
+			buttonContainer.wndMenuToggle:AddEventHandler("ButtonUp", "ToggleMenu", buttonContainer); -- ButtonUp, because ButtonSignal doesn't work
+			buttonContainer.wndMenu:AddEventHandler("WindowClosed", "CloseMenu", buttonContainer);
 		end
 
 		-- Update Position
@@ -277,7 +336,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			if (buttonAttributes.menu) then
 				--buttonContainer.wndButton:SetAnchorOffsets(2, 4, -2, -4);
 				if (buttonContainer.wndMain:FindChild("ButtonBorder")) then
-					buttonContainer.wndMain:FindChild("ButtonBorder"):SetAnchorOffsets(2, 4, -2, -4);
+					buttonContainer.wndMain:FindChild("ButtonBorder"):SetAnchorOffsets(0, 4, 0, -4);
 				end
 			end
 		else
