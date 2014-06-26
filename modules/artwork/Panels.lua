@@ -50,8 +50,8 @@ end
 -- Panel Creation
 -----------------------------------------------------------------------------
 
-function M:CreatePanel(color, opacity, anchorPoints, anchorOffsets)
-	local form = Apollo.LoadForm(xmlDoc, "SezzUIPanel", "InWorldHudStratum", panels); -- FixedHudStratumLow
+function M:CreatePanel(color, opacity, anchorPoints, anchorOffsets, parent)
+	local form = Apollo.LoadForm(xmlDoc, "SezzUIPanel", "InWorldHudStratum", parent or panels); -- FixedHudStratumLow
 	form:SetName("SezzUIPanel"..(#self.panels + 1));
 	form:SetAnchorPoints(unpack(anchorPoints));
 	form:SetAnchorOffsets(unpack(anchorOffsets));
