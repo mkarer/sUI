@@ -1,6 +1,6 @@
 --[[
 
-	Module Defaults
+	s:UI Module Defaults
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -46,6 +46,28 @@ local tModulePrototype = {
 	CheckAddonLoadedCallback = function(self, message, name)
 		if (self.tAddonLoadedCallbacks[name]) then
 			self:DoAddonLoadedCallback(name);
+		end
+	end,
+	-- Settings
+	EnableProfile = function(self)
+		self:RegisterMessage("VARIABLES_LOADED");
+	end,
+	VARIABLES_LOADED = function(self, message, eLevel)
+		if (eLevel == GameLib.CodeEnumAddonSaveLevel.Character) then
+			-- I ONLY use a limited amount of character based settings!
+			-- Everything else is hardcoded or can be configured by chaning the Default.lua
+			-- TODO: Intelligent metatable like in s:UI in World of Warcraft
+			local strModuleName = self:GetName();
+			if (not S.Profile[eLevel][strModuleName]) then
+				S.Profile[eLevel][strModuleName] = {};
+			end
+
+			self.P = S.Profile[eLevel][strModuleName];
+
+			-- Callback
+			if (self.RestoreProfile) then
+				self:RestoreProfile();
+			end
 		end
 	end,
 };
