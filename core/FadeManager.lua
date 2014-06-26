@@ -36,7 +36,7 @@ local FadeOut = function(self, wndHandler)
 	end
 end
 
-function S:EnableMouseOverFade(wndHandler, tLuaEventHandler, isChild)
+function S:EnableMouseOverFade(wndHandler, tLuaEventHandler, isChild, bDontChangeOpacity)
 	-- AddEventHandler sucks.
 	tLuaEventHandler._FadeIn = FadeIn;
 	tLuaEventHandler._FadeOut = FadeOut;
@@ -45,10 +45,27 @@ function S:EnableMouseOverFade(wndHandler, tLuaEventHandler, isChild)
 	wndHandler:AddEventHandler("MouseExit", "_FadeOut", tLuaEventHandler);
 
 	if (not isChild) then
-		wndHandler:SetOpacity(0, 100);
+		if (not bDontChangeOpacity) then
+			wndHandler:SetOpacity(0, 100);
+		end
 
 		for _, wndChild in pairs(wndHandler:GetChildren()) do
 			self:EnableMouseOverFade(wndChild, tLuaEventHandler, true);
+		end
+	end
+end
+
+function S:DisableMouseOverFade(wndHandler, tLuaEventHandler, isChild, bDontChangeOpacity)
+	wndHandler:RemoveEventHandler("MouseEnter", "_FadeIn", tLuaEventHandler);
+	wndHandler:RemoveEventHandler("MouseExit", "_FadeOut", tLuaEventHandler);
+
+	if (not isChild) then
+		if (not bDontChangeOpacity) then
+			wndHandler:SetOpacity(1, 100);
+		end
+
+		for _, wndChild in pairs(wndHandler:GetChildren()) do
+			self:DisableMouseOverFade(wndChild, tLuaEventHandler, true);
 		end
 	end
 end
