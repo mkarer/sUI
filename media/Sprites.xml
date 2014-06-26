@@ -41,4 +41,5 @@
     </Sprite>
     <AutoButton Name="SezzActionButton" Texture="sUI\media\ActionButtonTemplate.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" StateBits="31" Direction="Down"/>
     <AutoIconButton Name="SezzIconButton" NormalUnderIcon="" NormalIcon="" NormalOverIcon="ActionButton" PressedUnderIcon="" PressedIcon="" PressedOverIcon="ActionButtonChecked" FlybyUnderIcon="" FlybyIcon="" FlybyOverIcon="ActionButtonHover" PressedFlybyUnderIcon="" PressedFlybyIcon="" PressedFlybyOverIcon="ActionButtonPressed" DisabledUnderIcon="" DisabledIcon="" DisabledOverIcon="ActionButtonDisabled"/>
+    <AutoButton Name="SezzActionButtonToggle" Texture="sUI\media\ActionButtonToggle.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="36" y0="0" y1="0" y2="0" y3="0" y4="0" y5="40" Stretchy="1" StateBits="1" Direction="Down"/>
 </Sprites>
