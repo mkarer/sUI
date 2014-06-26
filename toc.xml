@@ -13,9 +13,12 @@
 	<!-- Core -->
 	<Script Name="sUI.lua" />
 	<Script Name="config\Defaults.lua" />
+	<Script Name="config\Profile.lua" />
 	<Form Name="sUI.xml" />
+	<Script Name="core\Core.lua" />
 	<Script Name="core\Windows.lua" />
 	<Script Name="core\Events.lua" />
+	<Script Name="core\Player.lua" />
 	<Script Name="core\FadeManager.lua" />
 	<Script Name="core\Media.lua" />
 	<Script Name="core\Modules.lua" />
@@ -46,7 +49,10 @@
 -->
 
 	<!-- Disable Carbine Addons -->
+    <ReplaceAddon Name="ActionBarFrame" />
+    <ReplaceAddon Name="RecallFrame" />
+    <ReplaceAddon Name="Medic" />
     <ReplaceAddon Name="ClassResources" />
     <ReplaceAddon Name="StalkerResource" />
-    <ReplaceAddon Name="TechWarrior" />
+    <ReplaceAddon Name="WarriorResource" />
 </Addon>
