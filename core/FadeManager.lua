@@ -1,9 +1,9 @@
 --[[
 
+	s:UI Window Fading
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
-
-	Core Animations
 
 --]]
 

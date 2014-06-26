@@ -1,9 +1,9 @@
 --[[
 
+	Module Defaults
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
-
-	Module Defaults
 
 --]]
 
