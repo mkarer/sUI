@@ -33,12 +33,15 @@ function M:OnInitialize()
 		barPadding = 4,
 	};
 
-	-- ActionBarFrame Hooks
+	-- Action Bar Hooks
 	ActionBarFrame = Apollo.GetAddon("ActionBarFrame");
 	if (ActionBarFrame) then
 		self:PostHook(ActionBarFrame, "InitializeBars", "HideDefaultActionBars");
 		self:PostHook(ActionBarFrame, "RedrawBarVisibility", "HideDefaultActionBars");
 	end
+
+	-- System Menu
+	self:RegisterAddonLoadedCallback("InterfaceMenuList", "EnableMainMenuFading");
 end
 
 function M:OnEnable()
@@ -78,6 +81,11 @@ end
 function M:RepositionUnstyledBars()
 	-- Temporarly move stuff
 	ActionBarFrame.wndMain:FindChild("PotionFlyout"):SetAnchorOffsets(317, -112, 409, 65)
+end
+
+function M:EnableMainMenuFading()
+	-- The window is HUGE
+	S:EnableMouseOverFade(Apollo.GetAddon("InterfaceMenuList").wndMain, Apollo.GetAddon("InterfaceMenuList"));
 end
 
 -----------------------------------------------------------------------------
@@ -188,21 +196,6 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 	barContainer.wndMain:Show(true, true);
 	barContainer.Buttons = {};
 
-	-- Bar Fading
-	function barContainer:OnMouseEnter()
-		self.wndMain:SetOpacity(1, 4);
-	end
-
-	function barContainer:OnMouseExit()
-		self.wndMain:SetOpacity(0, 2);
-	end
-
-	if (enableFading) then
-		barContainer.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", barContainer);
-		barContainer.wndMain:AddEventHandler("MouseExit", "OnMouseExit", barContainer);
-		barContainer.wndMain:SetOpacity(0, 100);
-	end
-
 	-- Create Action Buttons
 	local buttonIndex = 0;
 	for i, buttonAttributes in ipairs(buttonData) do
@@ -214,12 +207,6 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		buttonContainer.wndButton = buttonContainer.wndMain:FindChild("SezzActionBarButton");
 		buttonContainer.wndButton:SetContentId(buttonAttributes.id);
 
-		-- Bar Fading
-		if (enableFading) then
-			buttonContainer.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", barContainer);
-			buttonContainer.wndMain:AddEventHandler("MouseExit", "OnMouseExit", barContainer);
-		end
-
 		-- Update Position
 		local buttonPosition = (i - 1) * (buttonSize + self.DB.buttonPadding);
 		if (dirHorizontal) then
@@ -230,6 +217,10 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		
 		-- Done, Increase Index
 		table.insert(barContainer.Buttons, buttonContainer);
+	end
+
+	if (enableFading) then
+		S:EnableMouseOverFade(barContainer.wndMain, barContainer);
 	end
 
 	-- Done
