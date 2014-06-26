@@ -73,6 +73,7 @@ function S:OnInitialize()
 
 	-- Initialization
 	self:InitializePlayer();
+	self:CheckExternalAddons();
 end
 
 function S:OnEnable()
