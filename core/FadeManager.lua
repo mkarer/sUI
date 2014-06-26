@@ -7,27 +7,48 @@
 
 --]]
 
-require "Apollo";
-require "Window";
-
------------------------------------------------------------------------------
-
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
 -----------------------------------------------------------------------------
 
-local FadeManager = {};
+local FadeIn = function(self, wndHandler)
+	local wndParent = wndHandler:GetParent();
 
-function FadeManager:FadeIn(f)
-	f:SetOpacity(1, 4);
+	if (wndParent) then
+		self:_FadeIn(wndParent);
+	else
+		if (wndHandler:IsEnabled()) then
+			wndHandler:SetOpacity(1, 4);
+		end
+	end
 end
 
-function FadeManager:FadeOut(f)
-	f:SetOpacity(0, 2);
+local FadeOut = function(self, wndHandler)
+	if (wndHandler:ContainsMouse()) then return; end
+	local wndParent = wndHandler:GetParent();
+	
+	if (wndParent) then
+		self:_FadeOut(wndParent);
+	else
+		if (wndHandler:IsEnabled()) then
+			wndHandler:SetOpacity(0, 2);
+		end
+	end
 end
 
-function S:Test_EnableMouseOverFade(f)
-	f:AddEventHandler("MouseEnter", "FadeIn", FadeManager);
-	f:AddEventHandler("MouseExit", "FadeOut", FadeManager);
-	f:SetOpacity(0, 100);
+function S:EnableMouseOverFade(wndHandler, tLuaEventHandler, isChild)
+	-- AddEventHandler sucks.
+	tLuaEventHandler._FadeIn = FadeIn;
+	tLuaEventHandler._FadeOut = FadeOut;
+
+	wndHandler:AddEventHandler("MouseEnter", "_FadeIn", tLuaEventHandler);
+	wndHandler:AddEventHandler("MouseExit", "_FadeOut", tLuaEventHandler);
+
+	if (not isChild) then
+		wndHandler:SetOpacity(0, 100);
+
+		for _, wndChild in pairs(wndHandler:GetChildren()) do
+			self:EnableMouseOverFade(wndChild, tLuaEventHandler, true);
+		end
+	end
 end
