@@ -4,9 +4,10 @@
 
 	Notes:
 
-		Left Bar IDs: 12-23
-		Right Bar IDs: 24-35
-		Additional IDs: 36-47 (unused by Carbine's ActionBarFrame)
+		Left Bar IDs: [ABar] 12-23
+		Right Bar IDs: [ABar] 24-35
+		Additional IDs: [ABar] 36-47 (unused by Carbine's ActionBarFrame)
+		Vehicle Bar: [RMSBar] 0-5
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
