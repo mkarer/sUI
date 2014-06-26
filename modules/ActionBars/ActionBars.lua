@@ -306,7 +306,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 						buttonContainer.SelectMenuItem = SelectMenuItemMount;
 
 						local tMountList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
-						for idx, tMountData in pairs(tMountList) do
+						for i, tMountData in pairs(tMountList) do
 							local tSpellObject = tMountData.tTiers[1].splObject;
 							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
 
@@ -323,14 +323,32 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 							end
 
 							-- Position
-							local buttonPosition = (idx - 1) * (buttonSize + M.DB.buttonPadding);
+							local buttonPosition = (i - 1) * (buttonSize + M.DB.buttonPadding);
 							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
 							nMenuHeight = buttonPosition + buttonSize;
 
 							-- Events
 							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 						end
+					elseif (self.Attributes.menu == "Recall") then
+						local tAbilities = S:GetRecallAbilitiesList();
 
+						for i, nAbilityId in pairs(tAbilities) do
+							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutActionButton", self.wndMenu, self);
+
+							-- Content ID
+							wndCurr:FindChild("Button"):SetContentId(nAbilityId);
+
+							-- Position
+							local buttonPosition = (i - 1) * (buttonSize + M.DB.buttonPadding);
+							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+							nMenuHeight = buttonPosition + buttonSize;
+
+							-- Events
+							wndCurr:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", buttonContainer);
+						end
+						
+						buttonContainer.wndMenu:AddEventHandler("ButtonUp", "SelectMenuItem", buttonContainer);
 					end
 
 
