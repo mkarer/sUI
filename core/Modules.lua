@@ -49,7 +49,17 @@ local tModulePrototype = {
 		end
 	end,
 	-- Settings
+	InitializeProfile = function(self)
+		local strModuleName = self:GetName();
+		local eLevel = GameLib.CodeEnumAddonSaveLevel.Character;
+		if (not S.Profile[eLevel][strModuleName]) then
+			S.Profile[eLevel][strModuleName] = {};
+		end
+
+		self.P = S.Profile[eLevel][strModuleName];
+	end,
 	EnableProfile = function(self)
+		self:InitializeProfile();
 		self:RegisterMessage("VARIABLES_LOADED");
 	end,
 	VARIABLES_LOADED = function(self, message, eLevel)
@@ -57,12 +67,7 @@ local tModulePrototype = {
 			-- I ONLY use a limited amount of character based settings!
 			-- Everything else is hardcoded or can be configured by chaning the Default.lua
 			-- TODO: Intelligent metatable like in s:UI in World of Warcraft
-			local strModuleName = self:GetName();
-			if (not S.Profile[eLevel][strModuleName]) then
-				S.Profile[eLevel][strModuleName] = {};
-			end
-
-			self.P = S.Profile[eLevel][strModuleName];
+			self:InitializeProfile();
 
 			-- Callback
 			if (self.RestoreProfile) then
