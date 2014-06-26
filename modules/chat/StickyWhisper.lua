@@ -58,7 +58,7 @@ function M:OnChatInputReturn(luaCaller, wndHandler, wndControl, strText)
 		self.tLastWhisperer = r[2];
 	end
 
-	if (chatChannels[chanCurrent]) then
+	if (chatChannels[chanCurrent] and self.tLastWhisperer) then
 		if (string.sub(strText, 1, 1) ~= "/") then
 			strText = self.tChatPrefix.." "..self.tLastWhisperer.." "..strText;
 		end
