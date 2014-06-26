@@ -1,51 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Addon Author="Sezz" APIVersion="8" Name="s:UI" Description="Minimalistic User Interface">
 	<!-- Libraries -->
-	<Script Name="libs\LibError\LibError-1.0.lua" />
-	<Script Name="libs\LibApolloFixes\LibApolloFixes-1.0.lua" />
-	<Script Name="libs\CallbackHandler\CallbackHandler-1.0.lua" />
-	<Script Name="libs\GeminiEvent\GeminiEvent-1.0.lua" />
-	<Script Name="libs\GeminiHook\GeminiHook-1.0.lua" />
-	<Script Name="libs\GeminiAddon\GeminiAddon.lua" />
-	<Script Name="libs\GeminiLogging\GeminiLogging.lua" />
-	<Script Name="libs\GeminiTimer\GeminiTimer-1.0.lua" />
+	<Script Name="Libs\LibError\LibError-1.0.lua" />
+	<Script Name="Libs\LibApolloFixes\LibApolloFixes-1.0.lua" />
+	<Script Name="Libs\CallbackHandler\CallbackHandler-1.0.lua" />
+	<Script Name="Libs\GeminiEvent\GeminiEvent-1.0.lua" />
+	<Script Name="Libs\GeminiHook\GeminiHook-1.0.lua" />
+	<Script Name="Libs\GeminiAddon\GeminiAddon.lua" />
+	<Script Name="Libs\GeminiLogging\GeminiLogging.lua" />
+	<Script Name="Libs\GeminiTimer\GeminiTimer-1.0.lua" />
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />
-	<Script Name="config\Defaults.lua" />
-	<Script Name="config\Profile.lua" />
+	<Script Name="Config\Defaults.lua" />
+	<Script Name="Config\Profile.lua" />
 	<Form Name="sUI.xml" />
-	<Script Name="core\Core.lua" />
-	<Script Name="core\Windows.lua" />
-	<Script Name="core\Events.lua" />
-	<Script Name="core\Player.lua" />
-	<Script Name="core\FadeManager.lua" />
-	<Script Name="core\Media.lua" />
-	<Script Name="core\Modules.lua" />
-	<Script Name="core\Slash.lua" />
-	<Script Name="core\Temp.lua" />
+	<Script Name="Core\Core.lua" />
+	<Script Name="Core\Windows.lua" />
+	<Script Name="Core\Events.lua" />
+	<Script Name="Core\Player.lua" />
+	<Script Name="Core\FadeManager.lua" />
+	<Script Name="Core\Media.lua" />
+	<Script Name="Core\Modules.lua" />
+	<Script Name="Core\Slash.lua" />
+	<Script Name="Core\Temp.lua" />
 
 	<!-- Modules -->
-	<Script Name="modules\Fixes\ConsoleVariables.lua" />
-	<Script Name="modules\Artwork\ArtworkRemover.lua" />
-	<Script Name="modules\Artwork\Panels.lua" />
-	<Script Name="modules\Chat\Core.lua" />
-	<Script Name="modules\Chat\ChannelColors.lua" />
-	<Script Name="modules\Chat\Position.lua" />
-	<Script Name="modules\Chat\StickyWhisper.lua" />
-	<Script Name="modules\Crafting\RandomCraft.lua" />
-	<Form Name="modules\Crafting\RandomCraft.xml" />
-	<Script Name="modules\Crafting\Unmount.lua" />
-	<Script Name="modules\PowerBar\PowerBar.lua" />
-	<Form Name="modules\PowerBar\PowerBar.xml" />
-	<Script Name="modules\Fixes\NoCinematics.lua" />
-	<Script Name="modules\ActionBars\ActionBars.lua" />
-	<Form Name="modules\ActionBars\ActionBars.xml" />
-	<Script Name="modules\UnitFrames\Experience.lua" />
+	<Script Name="Modules\Fixes\ConsoleVariables.lua" />
+	<Script Name="Modules\Artwork\ArtworkRemover.lua" />
+	<Script Name="Modules\Artwork\Panels.lua" />
+	<Script Name="Modules\Chat\Core.lua" />
+	<Script Name="Modules\Chat\ChannelColors.lua" />
+	<Script Name="Modules\Chat\Position.lua" />
+	<Script Name="Modules\Chat\StickyWhisper.lua" />
+	<Script Name="Modules\Crafting\RandomCraft.lua" />
+	<Form Name="Modules\Crafting\RandomCraft.xml" />
+	<Script Name="Modules\Crafting\Unmount.lua" />
+	<Script Name="Modules\PowerBar\PowerBar.lua" />
+	<Form Name="Modules\PowerBar\PowerBar.xml" />
+	<Script Name="Modules\Fixes\NoCinematics.lua" />
+	<!-- Action Bars -->
+	<Script Name="Modules\ActionBars\ActionBars.lua" />
+	<Form Name="Modules\ActionBars\ActionBars.xml" />
+	<Script Name="Modules\ActionBars\Templates.lua" />
+	<!-- Unit Frames -->
+	<Script Name="Modules\UnitFrames\Experience.lua" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
-	<Script Name="modules\crafting\SlashSalvage.lua" />
+	<Script Name="Modules\crafting\SlashSalvage.lua" />
 -->
 
 	<!-- Disable Carbine Addons -->
