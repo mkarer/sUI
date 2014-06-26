@@ -416,19 +416,22 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 						end
 					end
 
-					-- Set Position
-					local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
-					nToggleX = nToggleX + self.wndMenuToggle:GetWidth() / 2;
-					self.wndMenu:SetAnchorOffsets(nToggleX - buttonSize / 2, nToggleY - nMenuHeight, nToggleX + buttonSize / 2, nToggleY);
+					-- Show menu (if it has items)
+					if (nMenuHeight > 0) then
+						-- Set Position
+						local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
+						nToggleX = nToggleX + self.wndMenuToggle:GetWidth() / 2;
+						self.wndMenu:SetAnchorOffsets(nToggleX - buttonSize / 2, nToggleY - nMenuHeight, nToggleX + buttonSize / 2, nToggleY);
 
-					-- Show Menu
-					self.wndMenu:Show(true, true);
+						-- Show Menu
+						self.wndMenu:Show(true, true);
 
-					-- Disable Bar Fading
-					if (enableFading) then
-						S:DisableMouseOverFade(barContainer.wndMain, barContainer, false, true);
+						-- Disable Bar Fading
+						if (enableFading) then
+							S:DisableMouseOverFade(barContainer.wndMain, barContainer, false, true);
+						end
+						self.wndMenu:ToFront();
 					end
-					self.wndMenu:ToFront();
 				else
 					-- Close Menu
 					self:CloseMenu();
