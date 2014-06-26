@@ -74,6 +74,7 @@ function S:OnInitialize()
 	-- Initialization
 	self:InitializePlayer();
 	self:CheckExternalAddons();
+	-- TODO: Check/Reset Default Recall Command (see RecallFrame.lua, RefreshDefaultCommand/ResetDefaultCommand)
 end
 
 function S:OnEnable()
