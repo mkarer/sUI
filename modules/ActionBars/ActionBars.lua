@@ -30,7 +30,7 @@ function M:OnInitialize()
 	self.DB = {
 		buttonSize = 36,
 		buttonPadding = 2,
-		barPadding = 4,
+		barPadding = 4, -- Menu needs atleast 4!
 	};
 
 	-- Action Bar Hooks
@@ -154,9 +154,15 @@ function M:SetupActionBars()
 		{ type = "GC", id = 2, menu = "Stance" }, -- Stance (Innate Ability)
 	};
 
-	local barExtra = self:CreateActionBar("SezzActionBarGadget", barExtraItems, true, nil, nil, false, 30);
+	local barExtra = self:CreateActionBar("SezzActionBarExtra", barExtraItems, true, nil, nil, false, 30);
 	local barPositionY = -162;
 	barExtra.wndMain:SetAnchorOffsets(-math.ceil(barMain.Width / 2) - barExtra.Width + self.DB.barPadding + self.DB.buttonPadding, barPositionY, -math.ceil(barMain.Width / 2) + self.DB.barPadding + self.DB.buttonPadding, barPositionY + barExtra.Height);
+	
+	for _, b in pairs(barExtra.Buttons) do
+		if b.ToggleMenu then
+			b:ToggleMenu()
+		end
+	end
 end
 
 function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
@@ -207,14 +213,77 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		buttonContainer.wndButton = buttonContainer.wndMain:FindChild("SezzActionBarButton");
 		buttonContainer.wndButton:SetContentId(buttonAttributes.id);
 
+		-- Enable Menu
+		if (buttonAttributes.menu and dirHorizontal) then
+			buttonContainer.wndMenuToggle = buttonContainer.wndMain:FindChild("MenuToggle");
+			buttonContainer.wndMenuToggle:Show(true, true);
+
+			buttonContainer.wndMenu = Apollo.LoadForm(self.xmlDoc, "ActionBarFlyout", nil, buttonContainer);
+			buttonContainer.wndMenu:Show(false, true);
+
+			function buttonContainer:ToggleMenu()
+				local bShowMenu = not self.wndMenu:IsVisible();
+				if (bShowMenu) then
+					-- Generate List
+					local nMenuEntries = 3;
+					local nEntryHeight = 36 * 3;
+					self.wndMenu:DestroyChildren();
+
+					-- Set Position
+					local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
+					nToggleX = nToggleX + self.wndMenuToggle:GetWidth() / 2;
+
+					local nWndLeft, nWndTop, nWndRight, nWndBottom = self.wndMenu:GetAnchorOffsets()
+					self.wndMenu:SetAnchorOffsets(nToggleX - 15, nToggleY - nEntryHeight, nToggleX + 15, nToggleY)
+				end
+
+				-- Show Menu
+				self.wndMenu:Show(bShowMenu, true);
+				if (bShowMenu) then
+					-- Disable Bar Fading
+					if (enableFading) then
+						S:DisableMouseOverFade(barContainer.wndMain, barContainer, false, true);
+					end
+					self.wndMenu:ToFront();
+				else
+					if (enableFading) then
+						-- Check if other menus on the same bar are visible
+						-- Enable fading if the last menu was closed
+						local bMenusVisible = false;
+						for _, wndBarButtonContainer in pairs(barContainer.Buttons) do
+							if (wndBarButtonContainer.wndMenu and wndBarButtonContainer.wndMenu:IsVisible()) then
+								bMenusVisible = true;
+								break;
+							end
+						end
+
+						if (not bMenusVisible) then
+							S:EnableMouseOverFade(barContainer.wndMain, barContainer, false, true);
+						end
+					end
+				end
+			end
+
+			-- Add ButtonUp event, because ButtonSignal doesn't work
+			buttonContainer.wndMenuToggle:AddEventHandler("ButtonUp", "ToggleMenu", buttonContainer);
+		end
+
 		-- Update Position
 		local buttonPosition = (i - 1) * (buttonSize + self.DB.buttonPadding);
 		if (dirHorizontal) then
-			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition + self.DB.barPadding, self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding, buttonSize + self.DB.barPadding);
+			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition + self.DB.barPadding, self.DB.barPadding - (buttonAttributes.menu and 4 or 0), buttonPosition + buttonSize + self.DB.barPadding, buttonSize + self.DB.barPadding + (buttonAttributes.menu and 4 or 0));
+
+			-- Fix Button Offsets
+			if (buttonAttributes.menu) then
+				--buttonContainer.wndButton:SetAnchorOffsets(2, 4, -2, -4);
+				if (buttonContainer.wndMain:FindChild("ButtonBorder")) then
+					buttonContainer.wndMain:FindChild("ButtonBorder"):SetAnchorOffsets(2, 4, -2, -4);
+				end
+			end
 		else
 			buttonContainer.wndMain:SetAnchorOffsets(self.DB.barPadding, buttonPosition + self.DB.barPadding, buttonSize + self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding);
 		end
-		
+
 		-- Done, Increase Index
 		table.insert(barContainer.Buttons, buttonContainer);
 	end
