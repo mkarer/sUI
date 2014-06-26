@@ -32,6 +32,8 @@ function M:OnInitialize()
 		buttonPadding = 2,
 		barPadding = 4, -- Menu needs atleast 4!
 	};
+	self.tBars = {};
+	self:EnableProfile();
 
 	-- Action Bar Hooks
 	ActionBarFrame = Apollo.GetAddon("ActionBarFrame");
@@ -51,6 +53,20 @@ function M:OnEnable()
 		self:SetupActionBars();
 	else
 		self:RegisterMessage("CHARACTER_LOADED", "SetupActionBars");
+	end
+end
+
+-----------------------------------------------------------------------------
+-- Settings
+-----------------------------------------------------------------------------
+
+function M:RestoreProfile()
+	if (S.myCharacter) then
+		GameLib.SetShortcutMount(self.P.SelectedMount or 0);
+		GameLib.SetShortcutPotion(self.P.SelectedPotion or 0);
+		-- self:UnregisterMessage("CHARACTER_LOADED", "RestoreProfile");
+	else
+		-- self:RegisterMessage("CHARACTER_LOADED", "RestoreProfile");
 	end
 end
 
@@ -93,17 +109,19 @@ end
 -----------------------------------------------------------------------------
 
 function M:SetupActionBars()
+	self:RestoreProfile(); -- TODO: RegisterMessage doesn't handle multiple handlers
+
 	-----------------------------------------------------------------------------
 	-- Main/LAS Bar
 	-- Button IDs: 0 - 7
 	-----------------------------------------------------------------------------
-	local barMain = self:CreateActionBar("SezzActionBarMain", "LAS", true, 0, 7, false, 30);
+	local barMain = self:CreateActionBar("Main", "LAS", true, 0, 7, false, 30);
 	local barWidthOffset = math.ceil(barMain.Width / 2);
 	local barPositionY = -162; -- Calculated from Bottom
 	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
+	self.tBars[barMain.strName] = barMain;
 
 	-- Update Events
-	self.barMain = barMain;
 	self:RegisterMessage("LIMITED_ACTION_SET_CHANGED", "UpdateActionBarButtonBorders") -- Stupid hack until AbilityBookChange works as expected
 	self:UpdateActionBarButtonBorders();
 
@@ -129,21 +147,21 @@ function M:SetupActionBars()
 		{ type = "GC", id = 27, menu = "Potion" }, -- Potion
 	};
 
-	local barBottom = self:CreateActionBar("SezzActionBarBottom", barBottomItems, true, nil, nil, true);
+	local barBottom = self:CreateActionBar("Bottom", barBottomItems, true, nil, nil, true);
 	local barWidthOffset = math.ceil(barBottom.Width / 2);
 	local barPositionOffset = 6;
 	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, -barBottom.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
-	self.barBottom = barBottom;
+	self.tBars[barBottom.strName] = barBottom;
 
 	-----------------------------------------------------------------------------
 	-- Right Bar
 	-- ButtonIDs: 24 - 35
 	-----------------------------------------------------------------------------
-	local barRight = self:CreateActionBar("SezzActionBarRight", "A", false, 24, 35, true);
+	local barRight = self:CreateActionBar("Right", "A", false, 24, 35, true);
 	local barHeightOffset = math.ceil(barRight.Height / 2);
 	barRight.wndMain:SetAnchorOffsets(-barRight.Width, -barHeightOffset, 0, barHeightOffset);
 	barRight.wndMain:SetAnchorPoints(1, 0.5, 1, 0.5);
-	self.barRight = barRight;
+	self.tBars[barRight.strName] = barRight;
 
 	-----------------------------------------------------------------------------
 	-- Extra Bar
@@ -154,10 +172,10 @@ function M:SetupActionBars()
 		{ type = "GC", id = 2, menu = "Stance" }, -- Stance (Innate Ability)
 	};
 
-	local barExtra = self:CreateActionBar("SezzActionBarExtra", barExtraItems, true, nil, nil, false, 30);
+	local barExtra = self:CreateActionBar("Extra", barExtraItems, true, nil, nil, false, 30);
 	local barPositionY = -162;
 	barExtra.wndMain:SetAnchorOffsets(-math.ceil(barMain.Width / 2) - barExtra.Width + self.DB.barPadding + self.DB.buttonPadding, barPositionY, -math.ceil(barMain.Width / 2) + self.DB.barPadding + self.DB.buttonPadding, barPositionY + barExtra.Height);
-	self.barExtra = barExtra;
+	self.tBars[barExtra.strName] = barExtra;
 end
 
 function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
@@ -193,8 +211,9 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 	barContainer.Height = barHeight;
 	barContainer.Width = barWidth;
 	barContainer.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBarContainer", nil, barContainer);
-	barContainer.wndMain:SetName(barName);
+	barContainer.wndMain:SetName("SezzActionBar"..barName);
 	barContainer.wndMain:Show(true, true);
+	barContainer.strName = barName;
 	barContainer.Buttons = {};
 
 	-- Create Action Buttons
@@ -205,7 +224,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		buttonContainer.Attributes = buttonAttributes;
 		buttonContainer.OnGenerateTooltip = self.OnGenerateTooltip;
 		buttonContainer.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBarItem"..buttonAttributes.type, barContainer.wndMain, buttonContainer);
-		buttonContainer.wndMain:SetName(string.format("%sButton%d", barName, i));
+		buttonContainer.wndMain:SetName(string.format("SezzActionBar%sButton%d", barName, i));
 		buttonContainer.wndButton = buttonContainer.wndMain:FindChild("SezzActionBarButton");
 		buttonContainer.wndButton:SetContentId(buttonAttributes.id);
 
@@ -216,6 +235,8 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 
 			buttonContainer.wndMenu = Apollo.LoadForm(self.xmlDoc, "ActionBarFlyout", nil, buttonContainer);
 			buttonContainer.wndMenu:Show(false, true);
+
+			buttonContainer.wndMenuToggle:AttachWindow(buttonContainer.wndMenu); -- Fixes CloseOnExternalClick, but introduces other (visual) problems, good for now.
 
 			-- Close Menu Function
 			function buttonContainer:CloseMenu()
@@ -256,7 +277,14 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			end
 
 			local SelectMenuItemMount = function(self, wndHandler, wndControl)
+				M.P["SelectedMount"] = wndHandler:GetData();
 				GameLib.SetShortcutMount(wndHandler:GetData());
+				self:CloseMenu();
+			end
+
+			local SelectMenuItemPotion = function(self, wndHandler, wndControl)
+				M.P["SelectedPotion"] = wndHandler:GetData();
+				GameLib.SetShortcutPotion(wndHandler:GetData());
 				self:CloseMenu();
 			end
 
@@ -348,9 +376,45 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 							wndCurr:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", buttonContainer);
 						end
 						
-						buttonContainer.wndMenu:AddEventHandler("ButtonUp", "SelectMenuItem", buttonContainer);
-					end
+						-- Events (TODO)
+						-- Apollo.RegisterEventHandler("ChangeWorld", 					"_RefreshMenuItemsIfMenuIsVisible", buttonContainer);
+						-- Apollo.RegisterEventHandler("HousingNeighborhoodRecieved", 	"_RefreshMenuItemsIfMenuIsVisible", buttonContainer);
+						-- Apollo.RegisterEventHandler("GuildResult", 					"_RefreshMenuItemsIfMenuIsVisible", buttonContainer);
+						-- Apollo.RegisterEventHandler("AbilityBookChange", 			"_RefreshMenuItemsIfMenuIsVisible", buttonContainer);
+					elseif (self.Attributes.menu == "Potion") then
+						buttonContainer.SelectMenuItem = SelectMenuItemPotion;
+						local tPotions = S:GetInventoryByCategory(48);
 
+						for id, tPotion in pairs(tPotions) do
+							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
+
+							-- Icon
+							wndCurr:FindChild("Icon"):SetSprite(tPotion.tItem:GetIcon());
+
+							-- Count
+							if (tPotion.nCount > 1) then
+								wndCurr:FindChild("Count"):SetText(tPotion.nCount);
+							end
+
+							-- Data
+							wndCurr:SetData(id);
+
+							-- Tooltip
+							if (Tooltip and Tooltip.GetItemTooltipForm) then
+								wndCurr:SetTooltipDoc(nil);
+								Tooltip.GetItemTooltipForm(self, wndCurr, tPotion.tItem, {});
+							end
+
+							-- Position
+							local buttonPosition = nMenuEntries * (buttonSize + M.DB.buttonPadding);
+							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+							nMenuHeight = buttonPosition + buttonSize;
+							nMenuEntries = nMenuEntries + 1;
+
+							-- Events
+							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
+						end
+					end
 
 					-- Set Position
 					local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
@@ -372,7 +436,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			end
 
 			-- Menu events
-			buttonContainer.wndMenuToggle:AddEventHandler("ButtonUp", "ToggleMenu", buttonContainer); -- ButtonUp, because ButtonSignal doesn't work
+			buttonContainer.wndMenuToggle:AddEventHandler("ButtonCheck", "ToggleMenu", buttonContainer); -- ButtonUp, because ButtonSignal doesn't work
 			buttonContainer.wndMenu:AddEventHandler("WindowClosed", "CloseMenu", buttonContainer);
 		end
 
@@ -406,7 +470,7 @@ end
 
 function M:UpdateActionBarButtonBorders()
 	-- Update LAS Bar Background Sprite (Workaround)
-	for i, buttonContainer in ipairs(self.barMain.Buttons) do
+	for i, buttonContainer in ipairs(self.tBars["Main"].Buttons) do
 		if (not S.myLAS[i] or S.myLAS[i] == 0) then
 			buttonContainer.wndMain:SetSprite(nil);
 		else
