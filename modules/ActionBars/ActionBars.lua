@@ -157,12 +157,7 @@ function M:SetupActionBars()
 	local barExtra = self:CreateActionBar("SezzActionBarExtra", barExtraItems, true, nil, nil, false, 30);
 	local barPositionY = -162;
 	barExtra.wndMain:SetAnchorOffsets(-math.ceil(barMain.Width / 2) - barExtra.Width + self.DB.barPadding + self.DB.buttonPadding, barPositionY, -math.ceil(barMain.Width / 2) + self.DB.barPadding + self.DB.buttonPadding, barPositionY + barExtra.Height);
-	
-	for _, b in pairs(barExtra.Buttons) do
-		if b.ToggleMenu then
-			b:ToggleMenu()
-		end
-	end
+	self.barExtra = barExtra;
 end
 
 function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
@@ -220,7 +215,6 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			buttonContainer.wndMenuToggle:Show(true, true);
 
 			buttonContainer.wndMenu = Apollo.LoadForm(self.xmlDoc, "ActionBarFlyout", nil, buttonContainer);
-buttonContainer.wndMenu:SetSprite("UI_BK3_Holo_InsetSimple");
 			buttonContainer.wndMenu:Show(false, true);
 
 			-- Close Menu Function
