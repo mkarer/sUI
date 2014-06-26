@@ -15,6 +15,7 @@
 	<Script Name="config\Defaults.lua" />
 	<Form Name="sUI.xml" />
 	<Script Name="core\Events.lua" />
+	<Script Name="core\FadeManager.lua" />
 	<Script Name="core\Media.lua" />
 	<Script Name="core\Modules.lua" />
 	<Script Name="core\Slash.lua" />
