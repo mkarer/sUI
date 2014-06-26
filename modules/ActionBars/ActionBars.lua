@@ -261,52 +261,89 @@ buttonContainer.wndMenu:SetSprite("UI_BK3_Holo_InsetSimple");
 				self:CloseMenu();
 			end
 
+			local SelectMenuItemMount = function(self, wndHandler, wndControl)
+				GameLib.SetShortcutMount(wndHandler:GetData());
+				self:CloseMenu();
+			end
+
 			-- Toggle Menu Function
 			function buttonContainer:ToggleMenu()
 				if (not self.wndMenu:IsVisible()) then
 					-- Generate List
-					local nMenuEntries = 3;
-					local nEntryHeight = 36 * 3;
+					local nMenuEntries = 0;
+					local nMenuHeight = 0;
 					self.wndMenu:DestroyChildren();
 
 					if (self.Attributes.menu == "Stance") then
 						buttonContainer.SelectMenuItem = SelectMenuItemStance;
-						local i = 0;
-						local nCountSkippingTwo = 0
+
+						local nCountSkippingTwo = 0;
 						for idx, spellObject in pairs(GameLib.GetClassInnateAbilitySpells().tSpells) do
 							if idx % 2 == 1 then
-								nCountSkippingTwo = nCountSkippingTwo + 1
-								local strKeyBinding = GameLib.GetKeyBinding("SetStance"..nCountSkippingTwo) -- hardcoded formatting
-								local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self)
-								-- wndCurr:FindChild("StanceBtnKeyBind"):SetText(strKeyBinding == "<Unbound>" and "" or strKeyBinding)
-								wndCurr:FindChild("Icon"):SetSprite(spellObject:GetIcon())
-								wndCurr:SetData(nCountSkippingTwo)
+								nCountSkippingTwo = nCountSkippingTwo + 1;
+								local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
 
-								if Tooltip and Tooltip.GetSpellTooltipForm then
-									wndCurr:SetTooltipDoc(nil)
-									Tooltip.GetSpellTooltipForm(self, wndCurr, spellObject)
+								-- Icon
+								wndCurr:FindChild("Icon"):SetSprite(spellObject:GetIcon());
+
+								-- Hotkey
+								-- local strKeyBinding = GameLib.GetKeyBinding("SetStance"..nCountSkippingTwo) -- hardcoded formatting
+								-- wndCurr:FindChild("StanceBtnKeyBind"):SetText(strKeyBinding == "<Unbound>" and "" or strKeyBinding)
+
+								-- Data
+								wndCurr:SetData(nCountSkippingTwo);
+
+								-- Tooltip
+								if (Tooltip and Tooltip.GetSpellTooltipForm) then
+									wndCurr:SetTooltipDoc(nil);
+									Tooltip.GetSpellTooltipForm(self, wndCurr, spellObject);
 								end
 
-								local buttonPosition = i * (buttonSize + M.DB.buttonPadding);
+								-- Position
+								local buttonPosition = nMenuEntries * (buttonSize + M.DB.buttonPadding);
 								wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
-								i = i + 1;
+								nMenuHeight = buttonPosition + buttonSize;
+								nMenuEntries = nMenuEntries + 1;
 
-								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer); -- ButtonUp, because ButtonSignal doesn't work
+								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 							end
 						end
+					elseif (self.Attributes.menu == "Mount") then
+						buttonContainer.SelectMenuItem = SelectMenuItemMount;
 
-	--					local nLeft, nTop, nRight, nBottom = self.wndStancePopoutFrame:GetAnchorOffsets()
-	--					self.wndStancePopoutFrame:SetAnchorOffsets(nLeft, nBottom - nHeight - 98, nRight, nBottom)
-	--					self.wndMain:FindChild("StancePopoutBtn"):Show(#self.wndMenu:GetChildren() > 0)
+						local tMountList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
+						for idx, tMountData in pairs(tMountList) do
+							local tSpellObject = tMountData.tTiers[1].splObject;
+							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
+
+							-- Icon
+							wndCurr:FindChild("Icon"):SetSprite(tSpellObject:GetIcon());
+
+							-- Data
+							wndCurr:SetData(tSpellObject:GetId());
+
+							-- Tooltip
+							if (Tooltip and Tooltip.GetSpellTooltipForm) then
+								wndCurr:SetTooltipDoc(nil);
+								Tooltip.GetSpellTooltipForm(self, wndCurr, tSpellObject, {});
+							end
+
+							-- Position
+							local buttonPosition = (idx - 1) * (buttonSize + M.DB.buttonPadding);
+							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+							nMenuHeight = buttonPosition + buttonSize;
+
+							-- Events
+							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
+						end
+
 					end
 
 
 					-- Set Position
 					local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
 					nToggleX = nToggleX + self.wndMenuToggle:GetWidth() / 2;
-
-					local nWndLeft, nWndTop, nWndRight, nWndBottom = self.wndMenu:GetAnchorOffsets()
-					self.wndMenu:SetAnchorOffsets(nToggleX - 15, nToggleY - nEntryHeight, nToggleX + 15, nToggleY)
+					self.wndMenu:SetAnchorOffsets(nToggleX - buttonSize / 2, nToggleY - nMenuHeight, nToggleX + buttonSize / 2, nToggleY);
 
 					-- Show Menu
 					self.wndMenu:Show(true, true);
