@@ -279,3 +279,53 @@ function S:ChangePathAbility(nAbilityId)
 	tActionSet[10] = nAbilityId;
 	return ActionSetLib.RequestActionSetChanges(tActionSet);
 end
+
+-----------------------------------------------------------------------------
+-- Engineer Pets
+-----------------------------------------------------------------------------
+
+function S:GetEngineerPetStance(nPetIndex)
+	local nPetStance = 0;
+
+	if (self.myCharacter and S.myClassId == GameLib.CodeEnumClass.Engineer) then
+		local nCurrentPetIndex = 0;
+
+		for _, tPet in pairs(GameLib:GetPlayerPets()) do
+			if (tPet:IsValid() and tPet:GetUnitRaceId() == 298) then
+				-- Engineer Pet
+				nCurrentPetIndex = nCurrentPetIndex + 1;
+				
+				-- Specific Index
+				if (nPetIndex and nPetIndex == nCurrentPetIndex) then
+					return Pet_GetStance(tPet:GetId());
+				end
+
+				-- All Pets
+				if (nPetStance == 0) then
+					nPetStance = Pet_GetStance(tPet:GetId());
+				elseif (nPetStance ~= Pet_GetStance(tPet:GetId())) then
+					return 0; -- Pets have different stances
+				end
+			end
+		end
+
+		if (nPetIndex) then
+			-- Specified pet not found
+			return 0;
+		end
+	end
+
+	return nPetStance;
+end
+
+function S:PlayerHasEngineerPets()
+	if (self.myCharacter and S.myClassId == GameLib.CodeEnumClass.Engineer) then
+		for _, tPet in pairs(GameLib:GetPlayerPets()) do
+			if (tPet:IsValid() and tPet:GetUnitRaceId() == 298) then
+				return true;
+			end
+		end
+	end
+
+	return false;
+end
