@@ -42,7 +42,6 @@
 	<!-- Action Bars -->
 	<Script Name="Modules\ActionBars\ActionBars.lua" />
 	<Form Name="Modules\ActionBars\ActionBars.xml" />
-	<Script Name="Modules\ActionBars\Templates.lua" />
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
 
