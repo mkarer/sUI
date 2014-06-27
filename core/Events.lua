@@ -19,6 +19,16 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "tMenuAlerts", "tMenuData", "tPinnedAddons" },
 	},
+	XPBar = {
+		window = "wndMain",
+		hook = "OnDocumentReady",
+		properties = { "wndXPLevel", "bOnRedrawCooldown" },
+	},
+	MiniMap = {
+		window = "wndMain",
+		hook = "OnDocumentReady",
+		properties = { "arResourceNodes", "tMinimapMarkerInfo" },
+	},
 };
 
 function S:CheckExternalAddon(name)
@@ -57,7 +67,6 @@ function S:CheckExternalAddon(name)
 			-- Addon available
 			if (addon[config.window]) then
 				-- Main window exists, addon is initialized + enabled!
-				tAddonLoadingInformation[name] = nil;
 				S.Log:debug("ADDON_LOADED "..name);
 				self:SendMessage("ADDON_LOADED", name);
 			else
