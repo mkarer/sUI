@@ -52,6 +52,7 @@
 
 	<!-- Disable Carbine Addons -->
     <ReplaceAddon Name="ActionBarFrame" />
+    <ReplaceAddon Name="ActionBarShortcut" />
     <ReplaceAddon Name="RecallFrame" />
     <ReplaceAddon Name="Medic" />
     <ReplaceAddon Name="ClassResources" />

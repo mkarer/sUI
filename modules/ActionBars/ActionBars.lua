@@ -8,6 +8,8 @@
 		Right Bar IDs: [ABar] 24-35
 		Additional IDs: [ABar] 36-47 (unused by Carbine's ActionBarFrame)
 		Vehicle Bar: [RMSBar] 0-5
+		Shortcut Bar: [SBar] 0-7
+		Pet Bar? Check EngineerResource
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -16,7 +18,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:NewModule("ActionBars", "Gemini:Event-1.0", "Gemini:Hook-1.0");
-local log, ActionBarFrame;
+local log;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -35,15 +37,11 @@ function M:OnInitialize()
 	self.tBars = {};
 	self:EnableProfile();
 
-	-- Action Bar Hooks
-	ActionBarFrame = Apollo.GetAddon("ActionBarFrame");
-	if (ActionBarFrame) then
-		self:PostHook(ActionBarFrame, "InitializeBars", "HideDefaultActionBars");
-		self:PostHook(ActionBarFrame, "RedrawBarVisibility", "HideDefaultActionBars");
-	end
-
 	-- System Menu
 	self:RegisterAddonLoadedCallback("InterfaceMenuList", "EnableMainMenuFading");
+
+	-- Events
+	self:RegisterEvent("ShowActionBarShortcut", "OnShowActionBarShortcut");
 end
 
 function M:OnEnable()
@@ -53,6 +51,71 @@ function M:OnEnable()
 		self:SetupActionBars();
 	else
 		self:RegisterMessage("CHARACTER_LOADED", "SetupActionBars");
+	end
+end
+
+-----------------------------------------------------------------------------
+-- Shortcut Bar
+-----------------------------------------------------------------------------
+
+function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
+	-- This event only fires on login, not on ReloadUI.
+	if (not nBar or nBar < 4) then return; end
+	log:debug("ShowActionBarShortcut: Bar %d %s (%d)", nBar, bIsVisible and "SHOW" or "HIDE", nShortcuts);
+
+	if (self.P.CurrentShortcutBar and not bIsVisible and self.P.CurrentShortcutBar == nBar) then
+		-- Hiding the previously active bar
+		log:debug("Hiding the previously active bar");
+		if (self.tBars["Shortcut"..nBar]) then
+			self.tBars["Shortcut"..nBar].wndMain:Show(false, true);
+		end
+
+		self.P.CurrentShortcutBar = nil;
+	end
+
+	if (bIsVisible) then
+		self.P["CurrentShortcutBar"] = nBar;
+		self:SetActiveShortcutBar(nBar);
+	end
+end
+
+function M:SetActiveShortcutBar(nActiveBarId)
+	for i = 4, ActionSetLib.ShortcutSet.Count do
+		local bShowBar = (nActiveBarId == i);
+		local tBar = self.tBars["Shortcut"..i];
+		if (tBar) then
+			if (bShowBar) then
+				-- Save active bar number
+				self.P["CurrentShortcutBar"] = i;
+
+				-- Resize (show only active buttons)
+				local nActiveButtons = 0;
+
+				for _, tButton in pairs(tBar.Buttons) do
+					if (tButton.wndButton:GetContent()["strIcon"] ~= "") then
+						nActiveButtons = nActiveButtons + 1;
+					end
+				end
+
+				if (nActiveButtons == 0) then
+					-- I don't trust GetContent() ;)
+					log:warn("The active shortcut bar has NO active buttons!");
+					nActiveButtons = 8;
+				end
+
+				local _, nOffsetT, _, nOffsetB = tBar.wndMain:GetAnchorOffsets();
+				local nBarWidth = nActiveButtons * tBar.nButtonSize + (nActiveButtons - 1) * self.DB.buttonPadding + 2 * self.DB.barPadding;
+				if (nActiveButtons < 8 and self.DB.barPadding > self.DB.buttonPadding) then
+					nBarWidth = nBarWidth - self.DB.barPadding + self.DB.buttonPadding;
+				end
+
+				local nBarWidthOffset = math.ceil(nBarWidth / 2);
+				tBar.wndMain:SetAnchorOffsets(-nBarWidthOffset, nOffsetT, nBarWidthOffset, nOffsetB);
+			end
+
+			-- Show/Hide
+			tBar.wndMain:Show(bShowBar, true);
+		end
 	end
 end
 
@@ -71,36 +134,11 @@ function M:RestoreProfile()
 end
 
 -----------------------------------------------------------------------------
--- Carbine Action Bar
+-- Carbine Addons
 -----------------------------------------------------------------------------
 
-function M:HideDefaultActionBars()
-	-- Remove Artwork
-	for _, f in pairs(ActionBarFrame.wndArt:GetChildren()) do
-		S:RemoveArtwork(f);
-	end
-
-	for _, f in pairs(ActionBarFrame.wndShadow:GetChildren()) do
-		S:RemoveArtwork(f);
-	end
-
-	-- Hide Bars
-	ActionBarFrame.wndBar1:Show(false, true);
-	ActionBarFrame.wndBar2:Show(false, true);
-	ActionBarFrame.wndBar3:Show(false, true);
-	ActionBarFrame.wndMain:FindChild("Bar1ButtonSmallContainer"):Show(false, true);
-
-	-- Move Bars
-	self:RepositionUnstyledBars();
-end
-
-function M:RepositionUnstyledBars()
-	-- Temporarly move stuff
-	ActionBarFrame.wndMain:FindChild("PotionFlyout"):SetAnchorOffsets(317, -112, 409, 65)
-end
-
 function M:EnableMainMenuFading()
-	-- The window is HUGE
+	-- Note: The window is HUGE!
 	S:EnableMouseOverFade(Apollo.GetAddon("InterfaceMenuList").wndMain, Apollo.GetAddon("InterfaceMenuList"));
 end
 
@@ -122,7 +160,7 @@ function M:SetupActionBars()
 	self.tBars[barMain.strName] = barMain;
 
 	-- Update Events
-	self:RegisterMessage("LIMITED_ACTION_SET_CHANGED", "UpdateActionBarButtonBorders") -- Stupid hack until AbilityBookChange works as expected
+	self:RegisterMessage("LIMITED_ACTION_SET_CHANGED", "UpdateActionBarButtonBorders"); -- Stupid hack until AbilityBookChange works as expected
 	self:UpdateActionBarButtonBorders();
 
 	-----------------------------------------------------------------------------
@@ -176,6 +214,25 @@ function M:SetupActionBars()
 	local barPositionY = -162;
 	barExtra.wndMain:SetAnchorOffsets(-math.ceil(barMain.Width / 2) - barExtra.Width + self.DB.barPadding + self.DB.buttonPadding, barPositionY, -math.ceil(barMain.Width / 2) + self.DB.barPadding + self.DB.buttonPadding, barPositionY + barExtra.Height);
 	self.tBars[barExtra.strName] = barExtra;
+
+	-----------------------------------------------------------------------------
+	-- Shortcut Bars
+	-----------------------------------------------------------------------------
+	for i = 4, ActionSetLib.ShortcutSet.Count do
+		local barShortcut = self:CreateActionBar("Shortcut"..i, "S", true, i * 12, i * 12 + 7);
+		local barWidthOffset = math.ceil(barShortcut.Width / 2);
+		local barPositionOffset = 300;
+		barShortcut.wndMain:SetAnchorOffsets(-barWidthOffset, -barShortcut.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
+		barShortcut.wndMain:Show(false, true);
+		self.tBars[barShortcut.strName] = barShortcut;
+	end
+
+	if (self.P.CurrentShortcutBar) then
+		-- Show last active bar
+		log:debug("Enabled Shortcut Bar: "..self.P.CurrentShortcutBar);
+		self:SetActiveShortcutBar(self.P.CurrentShortcutBar);
+	end
+
 end
 
 function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
@@ -210,6 +267,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 	local barContainer = {};
 	barContainer.Height = barHeight;
 	barContainer.Width = barWidth;
+	barContainer.nButtonSize = buttonSize;
 	barContainer.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzActionBarContainer", nil, barContainer);
 	barContainer.wndMain:SetName("SezzActionBar"..barName);
 	barContainer.wndMain:Show(true, true);
@@ -482,12 +540,9 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		if (dirHorizontal) then
 			buttonContainer.wndMain:SetAnchorOffsets(buttonPosition + self.DB.barPadding, self.DB.barPadding - (buttonAttributes.menu and 4 or 0), buttonPosition + buttonSize + self.DB.barPadding, buttonSize + self.DB.barPadding + (buttonAttributes.menu and 4 or 0));
 
-			-- Fix Button Offsets
+			-- Fix Button Offsets for Menus
 			if (buttonAttributes.menu) then
-				--buttonContainer.wndButton:SetAnchorOffsets(2, 4, -2, -4);
-				if (buttonContainer.wndMain:FindChild("ButtonBorder")) then
-					buttonContainer.wndMain:FindChild("ButtonBorder"):SetAnchorOffsets(0, 4, 0, -4);
-				end
+				buttonContainer.wndMain:FindChild("ButtonBorder"):SetAnchorOffsets(0, 4, 0, -4);
 			end
 		else
 			buttonContainer.wndMain:SetAnchorOffsets(self.DB.barPadding, buttonPosition + self.DB.barPadding, buttonSize + self.DB.barPadding, buttonPosition + buttonSize + self.DB.barPadding);
@@ -507,11 +562,11 @@ end
 
 function M:UpdateActionBarButtonBorders()
 	-- Update LAS Bar Background Sprite (Workaround)
-	for i, buttonContainer in ipairs(self.tBars["Main"].Buttons) do
+	for i, tButton in ipairs(self.tBars["Main"].Buttons) do
 		if (not S.myLAS[i] or S.myLAS[i] == 0) then
-			buttonContainer.wndMain:SetSprite(nil);
+			tButton.wndMain:FindChild("ButtonBorder"):SetSprite(nil);
 		else
-			buttonContainer.wndMain:SetSprite("ActionButton");
+			tButton.wndMain:FindChild("ButtonBorder"):SetSprite("ActionButton");
 		end
 	end
 end
