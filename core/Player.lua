@@ -253,3 +253,29 @@ function S:GetInventoryByCategory(nCategoryId)
 
 	return tInventoryFiltered;
 end
+
+-----------------------------------------------------------------------------
+-- Path Abilities
+-----------------------------------------------------------------------------
+
+function S:GetPathAbilities()
+	local tPathAbilities = {};
+
+	if (self.myCharacter) then
+		for _, tSpell in pairs(AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Path) or {}) do
+			if (tSpell.bIsActive and tSpell.nCurrentTier > 0) then
+				tPathAbilities[tSpell.nId] = tSpell;
+			end
+		end
+	end
+
+	return tPathAbilities;
+end
+
+function S:ChangePathAbility(nAbilityId)
+	local tActionSet = ActionSetLib.GetCurrentActionSet();
+	if (not tActionSet) then return { eResult = ActionSetLib.CodeEnumLimitedActionSetResult.InvalidUnit }; end
+
+	tActionSet[10] = nAbilityId;
+	return ActionSetLib.RequestActionSetChanges(tActionSet);
+end
