@@ -9,7 +9,6 @@
 		Additional IDs: [ABar] 36-47 (unused by Carbine's ActionBarFrame)
 		Vehicle Bar: [RMSBar] 0-5
 		Shortcut Bar: [SBar] 0-7
-		Pet Bar? Check EngineerResource
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -17,7 +16,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("ActionBars", "Gemini:Event-1.0", "Gemini:Hook-1.0");
+local M = S:NewModule("ActionBars", "Gemini:Event-1.0");
 local log;
 
 -----------------------------------------------------------------------------
