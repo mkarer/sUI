@@ -252,8 +252,11 @@ function M:SetupActionBars()
 		self.tBars[tPetBar.strName] = tPetBar;
 
 		if (not S:PlayerHasEngineerPets()) then
-			tPetBar:Show(false, true);
+			tPetBar.wndMain:Show(false, true);
 		end
+
+		self:RegisterEvent("PetDespawned", "OnPetEvent");
+		self:RegisterEvent("PetSpawned", "OnPetEvent");
 	end
 end
 
@@ -640,6 +643,22 @@ function M:UpdateActionBarButtonBorders()
 			tButton.wndMain:FindChild("ButtonBorder"):SetSprite("ActionButton");
 		end
 	end
+end
+
+-----------------------------------------------------------------------------
+-- Pet Events
+-----------------------------------------------------------------------------
+
+function M:OnPetEvent(strEvent, tPet)
+	local bHasPet = false;
+
+	if (tPet and tPet:IsValid() and tPet:GetUnitOwner() == S.myCharacter and tPet:GetUnitRaceId() == 298) then
+		bHasPet = true;
+	else
+		bHasPet = S:PlayerHasEngineerPets();
+	end
+
+	self.tBars["Pet"].wndMain:Show(bHasPet, true);
 end
 
 -----------------------------------------------------------------------------
