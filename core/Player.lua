@@ -42,6 +42,7 @@ function S:OnCharacterCreated()
 		self:RegisterEvent("ChangeWorld", "HandleCombatChanges");
 		self:RegisterEvent("ShowResurrectDialog", "HandleCombatChanges");
 		self:RegisterEvent("PlayerChanged", "OnPlayerChanged");
+		self:RegisterEvent("PlayerLevelChange", "OnPlayerLevelChange");
 
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
 		S.Log:debug("CHARACTER_LOADED");
@@ -54,6 +55,10 @@ end
 
 function S:OnPlayerChanged()
 	self.myCharacter = GameLib.GetPlayerUnit();
+end
+
+function S:OnPlayerLevelChange()
+	self.myLevel = self.myCharacter:GetLevel();
 end
 
 -----------------------------------------------------------------------------
