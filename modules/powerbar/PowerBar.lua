@@ -57,7 +57,6 @@ function M:ReloadConfiguration()
 			["buttonPowerFunc"] = self.GetPowerSpell,
 			["barEnabled"] = true,
 			["barPowerFunc"] = self.GetPowerMana,
-			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
 		},
 		[GameLib.CodeEnumClass.Esper] = {
 			["numButtons"] = 5,
@@ -65,7 +64,6 @@ function M:ReloadConfiguration()
 			["buttonPowerFunc"] = self.GetPowerActuators,
 			["barEnabled"] = true,
 			["barPowerFunc"] = self.GetPowerMana,
-			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
 		},
 		[GameLib.CodeEnumClass.Medic] = {
 			["numButtons"] = 4,
@@ -73,26 +71,22 @@ function M:ReloadConfiguration()
 			["buttonPowerFunc"] = self.GetPowerActuators,
 			["barEnabled"] = true,
 			["barPowerFunc"] = self.GetPowerMana,
-			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
 		},
 		[GameLib.CodeEnumClass.Engineer] = {
 			["numButtons"] = 0,
 			["barEnabled"] = true,
 			["barPowerFunc"] = self.GetPowerVolatility,
-			["carbineDisablerFunc"] = self.DisableCarbineClassResources,
 		},
 		[GameLib.CodeEnumClass.Stalker] = {
 			["numButtons"] = 0,
 			["barEnabled"] = true,
 			["barPowerFunc"] = self.GetPowerSuit,
-			["carbineDisablerFunc"] = self.DisableCarbineStalkerResource,
 		},
 		[GameLib.CodeEnumClass.Warrior] = {
 			["numButtons"] = 4,
 			["buttonEmpowerFunc"] = GameLib.IsOverdriveActive,
 			["buttonPowerFunc"] = self.GetPowerKineticEnergy,
 			["barEnabled"] = false,
-			["carbineDisablerFunc"] = self.DisableCarbineWarriorResource,
 		},
 	};
 
@@ -141,11 +135,7 @@ function M:ReloadConfiguration()
 		self.wndAnchor:Show(true);
 	end
 
-	-- Disable Carbine Addons
-	if (cfg.carbineDisablerFunc) then
-		cfg.carbineDisablerFunc(self);
-	end
-
+	-- Done
 	log:debug("%s ready!", self:GetName());
 end
 
@@ -226,49 +216,4 @@ function M:GetPowerKineticEnergy()
 	local powerDivider = powerMax / cfg.numButtons;
 
 	return math.floor(powerCurrent / powerDivider), math.floor(powerMax / powerDivider);
-end
-
------------------------------------------------------------------------------
--- Carbine Addons
------------------------------------------------------------------------------
-
-function M:DisableCarbineClassResources()
-	local tClassResources = Apollo.GetAddon("ClassResources");
-	if (not tClassResources) then return; end
-	self:Unhook(tClassResources, "OnCharacterCreated");
-
-	if (tClassResources.wndMain) then
-		Apollo.RemoveEventHandler("VarChange_FrameCount", tClassResources);
-		Apollo.RemoveEventHandler("UnitEnteredCombat", tClassResources);
-		tClassResources.wndMain:Show(false);
-	else
-		self:PostHook(tClassResources, "OnCharacterCreated", "DisableCarbineClassResources");
-	end
-end
-
-function M:DisableCarbineStalkerResource()
-	local tStalkerResource = Apollo.GetAddon("StalkerResource");
-	if (not tStalkerResource) then return; end
-	self:Unhook(tStalkerResource, "OnCharacterCreated");
-
-	if (tStalkerResource.wndResourceBar) then
-		Apollo.RemoveEventHandler("VarChange_FrameCount", tStalkerResource);
-		tStalkerResource.wndResourceBar:Show(false);
-	else
-		self:PostHook(tStalkerResource, "OnCharacterCreated", "DisableCarbineStalkerResource");
-	end
-end
-
-
-function M:DisableCarbineWarriorResource()
-	local tTechWarrior = Apollo.GetAddon("TechWarrior");
-	if (not tTechWarrior) then return; end
-	self:Unhook(tTechWarrior, "OnCharacterCreate");
-
-	if (tTechWarrior.wndResourceBar) then
-		Apollo.RemoveEventHandler("VarChange_FrameCount", tTechWarrior);
-		tTechWarrior.wndResourceBar:Show(false);
-	else
-		self:PostHook(tTechWarrior, "OnCharacterCreate", "DisableCarbineWarriorResource");
-	end
 end
