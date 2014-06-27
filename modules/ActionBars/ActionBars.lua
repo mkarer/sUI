@@ -251,7 +251,7 @@ function M:SetupActionBars()
 		tPetBar.wndMain:SetAnchorOffsets(-barWidthOffset, -tPetBar.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
 		self.tBars[tPetBar.strName] = tPetBar;
 
-		if (not GameLib:GetPlayerPets()) then
+		if (not S:PlayerHasEngineerPets()) then
 			tPetBar:Show(false, true);
 		end
 	end
@@ -550,7 +550,9 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 							{ id = 1, name = "Engineer_PetAggressive", icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Aggressive" },
 						};
 
-					for i, tStance in ipairs(tStances) do
+						local nCurrentStance = S:GetEngineerPetStance();
+
+						for i, tStance in ipairs(tStances) do
 							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
 
 							-- Icon
@@ -558,6 +560,11 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 
 							-- Data
 							wndCurr:SetData(tStance.id);
+
+							-- Highlight current stance
+							if (tStance.id == nCurrentStance) then
+								wndCurr:SetCheck(true);
+							end
 
 							-- Tooltip
 							wndCurr:SetTooltip(Apollo.GetString(tStance.name));
