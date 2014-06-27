@@ -288,6 +288,11 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 				self:CloseMenu();
 			end
 
+			local SelectMenuItemPath = function(self, wndHandler, wndControl)
+				S:ChangePathAbility(wndHandler:GetData());
+				self:CloseMenu();
+			end
+
 			-- Toggle Menu Function
 			function buttonContainer:ToggleMenu()
 				if (not self.wndMenu:IsVisible()) then
@@ -403,6 +408,35 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 							if (Tooltip and Tooltip.GetItemTooltipForm) then
 								wndCurr:SetTooltipDoc(nil);
 								Tooltip.GetItemTooltipForm(self, wndCurr, tPotion.tItem, {});
+							end
+
+							-- Position
+							local buttonPosition = nMenuEntries * (buttonSize + M.DB.buttonPadding);
+							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+							nMenuHeight = buttonPosition + buttonSize;
+							nMenuEntries = nMenuEntries + 1;
+
+							-- Events
+							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
+						end
+					elseif (self.Attributes.menu == "Path") then
+						buttonContainer.SelectMenuItem = SelectMenuItemPath;
+						local tAbilities = S:GetPathAbilities();
+
+						for id, tAbilityData in pairs(tAbilities) do
+							local tSpellObject = tAbilityData.tTiers[tAbilityData.nCurrentTier].splObject;
+							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
+
+							-- Icon
+							wndCurr:FindChild("Icon"):SetSprite(tSpellObject:GetIcon());
+
+							-- Data
+							wndCurr:SetData(id);
+
+							-- Tooltip
+							if (Tooltip and Tooltip.GetSpellTooltipForm) then
+								wndCurr:SetTooltipDoc(nil);
+								Tooltip.GetSpellTooltipForm(self, wndCurr, tSpellObject, {});
 							end
 
 							-- Position
