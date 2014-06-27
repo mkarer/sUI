@@ -39,7 +39,7 @@
 	<Script Name="Modules\PowerBar\PowerBar.lua" />
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
-	<Script Name="Modules\Minimap\Minimap.lua" />
+	<Script Name="Modules\MiniMap\MiniMap.lua" />
 	<!-- Action Bars -->
 	<Script Name="Modules\ActionBars\ActionBars.lua" />
 	<Form Name="Modules\ActionBars\ActionBars.xml" />
