@@ -26,6 +26,7 @@ S.DB = {
 	-- Module Debugging
 	-- Disable to filter the messages in GeminiConsole
 	["debug"] = {
+		["Modules/Chat"] = false,
 		["RandomCraft"] = false,
 		["ArtworkRemover"] = false,
 		["PowerBar"] = false,
