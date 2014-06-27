@@ -233,6 +233,28 @@ function M:SetupActionBars()
 		self:SetActiveShortcutBar(self.P.CurrentShortcutBar);
 	end
 
+	-----------------------------------------------------------------------------
+	-- Pet Bar
+	-----------------------------------------------------------------------------
+	if (S.myClassId == GameLib.CodeEnumClass.Engineer) then
+		local tPetBarItems = {
+			{ type = "S", id = 12, icon = "IconSprites:Icon_SkillPetCommand_Combat_Pet_Attack" }, -- Attack
+			{ type = "S", id = 15 }, -- Go To
+			{ type = "S", id = 13, icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Stop_and_Return", menu = "PetStance" }, -- Stop/Follow
+	--		{ type = "S", id = 14 }, -- Dismiss (or 24?)
+		};
+
+		local tPetBar = self:CreateActionBar("Pet", tPetBarItems);
+		local barWidthOffset = math.ceil(tPetBar.Width / 2);
+		local barPositionOffset = 300;
+		tPetBar.wndMain:SetAnchorPoints(0.25, 1, 0.75, 1);
+		tPetBar.wndMain:SetAnchorOffsets(-barWidthOffset, -tPetBar.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
+		self.tBars[tPetBar.strName] = tPetBar;
+
+		if (not GameLib:GetPlayerPets()) then
+			tPetBar:Show(false, true);
+		end
+	end
 end
 
 function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
@@ -285,6 +307,11 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		buttonContainer.wndMain:SetName(string.format("SezzActionBar%sButton%d", barName, i));
 		buttonContainer.wndButton = buttonContainer.wndMain:FindChild("SezzActionBarButton");
 		buttonContainer.wndButton:SetContentId(buttonAttributes.id);
+
+		-- Custom Icon
+		if (buttonAttributes.icon) then
+			buttonContainer.wndButton:FindChild("Icon"):SetSprite(buttonAttributes.icon);
+		end
 
 		-- Enable Menu
 		if (buttonAttributes.menu and dirHorizontal) then
@@ -348,6 +375,12 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 
 			local SelectMenuItemPath = function(self, wndHandler, wndControl)
 				S:ChangePathAbility(wndHandler:GetData());
+				self:CloseMenu();
+			end
+
+			local SelectMenuItemPetStance = function(self, wndHandler, wndControl)
+				-- I cannot really test this, because stances don't even work with Carbine's ClassResources addon...
+				Pet_SetStance(0, tonumber(wndHandler:GetData()));
 				self:CloseMenu();
 			end
 
@@ -506,6 +539,37 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 							-- Events
 							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 						end
+					elseif (self.Attributes.menu == "PetStance") then
+						buttonContainer.SelectMenuItem = SelectMenuItemPetStance;
+		
+						local tStances = {
+							{ id = 5, name = "EngineerResource_Stay", icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Stay" },
+							{ id = 4, name = "EngineerResource_Assist", icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Assist" },
+							{ id = 3, name = "EngineerResource_Passive", icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Passive" },
+							{ id = 2, name = "Engineer_PetDefensive", icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Defensive" },
+							{ id = 1, name = "Engineer_PetAggressive", icon = "ClientSprites:Icon_SkillPetCommand_Combat_Pet_Aggressive" },
+						};
+
+					for i, tStance in ipairs(tStances) do
+							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
+
+							-- Icon
+							wndCurr:FindChild("Icon"):SetSprite(tStance.icon);
+
+							-- Data
+							wndCurr:SetData(tStance.id);
+
+							-- Tooltip
+							wndCurr:SetTooltip(Apollo.GetString(tStance.name));
+
+							-- Position
+							local buttonPosition = (i - 1) * (buttonSize + M.DB.buttonPadding);
+							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+							nMenuHeight = buttonPosition + buttonSize;
+
+							-- Events
+							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
+						end
 					end
 
 					-- Show menu (if it has items)
@@ -580,7 +644,7 @@ function M:OnGenerateTooltip(wndControl, wndHandler, eType, arg1, arg2)
 	local xml = nil;
 	if (eType == Tooltip.TooltipGenerateType_ItemInstance) then -- Doesn't need to compare to item equipped
 		Tooltip.GetItemTooltipForm(self, wndControl, arg1, {});
-	elseif eType == Tooltip.TooltipGenerateType_ItemData then -- Doesn't need to compare to item equipped
+	elseif (eType == Tooltip.TooltipGenerateType_ItemData) then -- Doesn't need to compare to item equipped
 		Tooltip.GetItemTooltipForm(self, wndControl, arg1, {});
 	elseif (eType == Tooltip.TooltipGenerateType_GameCommand) then
 		xml = XmlDoc.new();
