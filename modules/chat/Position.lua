@@ -30,17 +30,17 @@ function M:OnEnable()
 	wndChat:SetAnchorOffsets(10, -270, 500, -55);
 
 	-- Hook Channel Creation
-	self:PostHook(ChatCore.ChatLog, "OnAddNewTabChat", "UpdateChatChannel");
-	self:PostHook(ChatCore.ChatLog, "OnAddNewTabCombat", "UpdateChatChannel");
+	self:PostHook(ChatCore.tChatLog, "OnAddNewTabChat", "UpdateChatChannel");
+	self:PostHook(ChatCore.tChatLog, "OnAddNewTabCombat", "UpdateChatChannel");
 
 	-- Update Channel Windows
-	for _, wndChannel in pairs(ChatCore.ChatLog.tChatWindows) do
+	for _, wndChannel in pairs(ChatCore.tChatLog.tChatWindows) do
 		self:UpdateChatChannel(wndChannel);
 	end
 end
 
 function M:UpdateChatChannel(wndChannel, wndChannelHooked)
-	local wndChannel = wndChannelHooked and ChatCore.ChatLog.tChatWindows[#ChatCore.ChatLog.tChatWindows] or wndChannel;
+	local wndChannel = wndChannelHooked and ChatCore.tChatLog.tChatWindows[#ChatCore.tChatLog.tChatWindows] or wndChannel;
 
 	-- Move Input Box
 	local artFooter = wndChannel:FindChild("BGArt_Footer");

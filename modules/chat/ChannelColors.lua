@@ -71,6 +71,6 @@ function M:OnEnable()
 	-- Set Colors
 	log:debug("Updating Chat Channel Colors...");
 	for k, v in pairs(arChatColorsBlizzard) do
-		ChatCore.ChatLog.arChatColor[k] = v;
+		ChatCore.tChatLog.arChatColor[k] = v;
 	end
 end

@@ -29,6 +29,11 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "arResourceNodes", "tMinimapMarkerInfo" },
 	},
+	ChatLog = {
+		window = "wndChatOptions",
+		hook = "OnWindowManagementReady",
+		properties = { "arChatColor", "tChatWindows" },
+	},
 };
 
 function S:CheckExternalAddon(name)
@@ -87,9 +92,9 @@ function S:IsAddOnLoaded(name)
 	local config = tAddonLoadingInformation[name];
 	if (config) then
 		local addon = Apollo.GetAddon(name);
-		return addon and addon[config.window];
+		return (addon and addon[config.window]) and true or false;
 	else
 		S.Log:warn("Addon %s is not supported by IsAddOnLoaded()", name);
-		return Apollo.GetAddon(name) and true;
+		return Apollo.GetAddon(name) and true or false;
 	end
 end

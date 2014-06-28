@@ -41,7 +41,7 @@ function M:OnEnable()
 		[ChatSystemLib.ChatChannel_Whisper] = "/w"
 	}
 
-	self:RawHook(ChatCore.ChatLog, "OnChatInputReturn");
+	self:RawHook(ChatCore.tChatLog, "OnChatInputReturn");
 end
 
 function M:OnChatInputReturn(luaCaller, wndHandler, wndControl, strText)
@@ -64,5 +64,5 @@ function M:OnChatInputReturn(luaCaller, wndHandler, wndControl, strText)
 		end
 	end
 
-	self.hooks[ChatCore.ChatLog].OnChatInputReturn(luaCaller, wndHandler, wndControl, strText);
+	self.hooks[ChatCore.tChatLog].OnChatInputReturn(luaCaller, wndHandler, wndControl, strText);
 end
