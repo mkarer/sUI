@@ -10,7 +10,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("MiniMap", "Gemini:Event-1.0", "Gemini:Hook-1.0");
+local M = S:CreateSubmodule("MiniMap", "Gemini:Hook-1.0");
 M:SetDefaultModuleState(false);
 local log, tMiniMap;
 
@@ -43,6 +43,9 @@ function M:OnEnable()
 
 	-- Update MiniMap
 	self:RegisterAddonLoadedCallback("MiniMap", "UpdateMiniMap");
+
+	-- Remove Bag Button
+	self:RegisterAddonLoadedCallback("XPBar", "RemoveBagButton");
 end
 
 function M:OnDisable()
@@ -94,6 +97,15 @@ function M:DisableCustomization()
 	tMiniMap.wndMain:RemoveStyle("Moveable");
 	tMiniMap.wndMain:AddStyle("IgnoreMouse");
 	tMiniMap.wndMiniMap:RemoveStyle("IgnoreMouse");
+end
+
+-----------------------------------------------------------------------------
+-- Bag Button
+-----------------------------------------------------------------------------
+
+function M:RemoveBagButton()
+	-- Who put this in the XPBar addon?
+	Apollo.GetAddon("XPBar").wndInvokeForm:Show(false, true);
 end
 
 -----------------------------------------------------------------------------
