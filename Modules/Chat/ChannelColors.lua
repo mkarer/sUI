@@ -13,7 +13,7 @@ require "ChatSystemLib";
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local ChatCore = S:GetModule("ChatCore");
-local M = ChatCore:NewModule("ChannelColors");
+local M = ChatCore:CreateSubmodule("ChannelColors");
 local log;
 
 -----------------------------------------------------------------------------

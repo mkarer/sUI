@@ -10,7 +10,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local ChatCore = S:GetModule("ChatCore");
-local M = ChatCore:NewModule("Position", "Gemini:Hook-1.0");
+local M = ChatCore:CreateSubmodule("Position", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------

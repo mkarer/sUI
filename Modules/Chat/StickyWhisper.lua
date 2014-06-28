@@ -16,7 +16,7 @@ require "ChatSystemLib";
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local ChatCore = S:GetModule("ChatCore");
-local M = ChatCore:NewModule("StickyWhisper", "Gemini:Hook-1.0");
+local M = ChatCore:CreateSubmodule("StickyWhisper", "Gemini:Hook-1.0");
 local log, chatPrefixes, chatChannels;
 
 -----------------------------------------------------------------------------

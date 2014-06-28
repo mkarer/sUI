@@ -12,7 +12,7 @@ require "Window";
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("ArtworkRemover", "Gemini:Event-1.0", "Gemini:Hook-1.0");
+local M = S:CreateSubmodule("ArtworkRemover", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------

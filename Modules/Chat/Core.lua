@@ -12,7 +12,7 @@ require "ChatSystemLib";
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("ChatCore", "Gemini:Event-1.0", "Gemini:Hook-1.0");
+local M = S:CreateSubmodule("ChatCore");
 M:SetDefaultModuleState(false);
 local log;
 
