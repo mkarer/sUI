@@ -56,7 +56,7 @@ local tAddonLoadingInformation = {
 	Datachron = {
 		window = "wndMinimized",
 		hook = "OnDocumentReady",
-		properties = { "tListOfDeniedCalls" },
+		properties = { "tListOfDeniedCalls", "ProcessDatachronState" },
 	},
 };
 
