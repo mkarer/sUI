@@ -12,8 +12,8 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 -----------------------------------------------------------------------------
 
 S.DB = {
-	colors = {
-		classes = {
+	Colors = {
+		Classes = {
 			[GameLib.CodeEnumClass.Engineer]		= "A41A31",
 			[GameLib.CodeEnumClass.Esper]			= "74DDFF",
 			[GameLib.CodeEnumClass.Medic]			= "FFFFFF",
@@ -23,10 +23,16 @@ S.DB = {
 		},
 	},
 
+	-- Hide Windows from Window Management
+	-- This should disable/override user customization (Interface Options / Window)
+	NoWindowManagement = {
+		[Apollo.GetString("MiniMap_Title")] = true,
+	},
+
 	-- Module Debugging
 	-- Disable to filter the messages in GeminiConsole
 	["debug"] = {
-		["Modules/Chat"] = false,
+		["Modules/CFFhat"] = false,
 		["RandomCraft"] = false,
 		["ArtworkRemover"] = false,
 		["PowerBar"] = false,
