@@ -12,6 +12,8 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
 -----------------------------------------------------------------------------
+-- Main Modules
+-----------------------------------------------------------------------------
 
 local tModulePrototype = {
 	-- Forms
@@ -34,7 +36,7 @@ local tModulePrototype = {
 			self[callback](self);
 		else
 			self.tAddonLoadedCallbacks[name] = callback;
-			self:RegisterMessage("ADDON_LOADED", "CheckAddonLoadedCallback");
+			self:RegisterEvent("Sezz_AddonAvailable", "CheckAddonLoadedCallback");
 		end
 	end,
 	DoAddonLoadedCallback = function(self, name)
@@ -43,7 +45,7 @@ local tModulePrototype = {
 			self.tAddonLoadedCallbacks[name] = nil;
 		end
 	end,
-	CheckAddonLoadedCallback = function(self, message, name)
+	CheckAddonLoadedCallback = function(self, event, name)
 		if (self.tAddonLoadedCallbacks[name]) then
 			self:DoAddonLoadedCallback(name);
 		end
@@ -60,9 +62,9 @@ local tModulePrototype = {
 	end,
 	EnableProfile = function(self)
 		self:InitializeProfile();
-		self:RegisterMessage("VARIABLES_LOADED");
+		self:RegisterEvent("Sezz_VariablesLoaded", "OnVariablesLoaded");
 	end,
-	VARIABLES_LOADED = function(self, message, eLevel)
+	OnVariablesLoaded = function(self, event, eLevel)
 		if (eLevel == GameLib.CodeEnumAddonSaveLevel.Character) then
 			-- I ONLY use a limited amount of character based settings!
 			-- Everything else is hardcoded or can be configured by chaning the Default.lua
@@ -73,6 +75,8 @@ local tModulePrototype = {
 			if (self.RestoreProfile) then
 				self:RestoreProfile();
 			end
+
+			-- TODO: Submodules Callback
 		end
 	end,
 	-- Submodules
@@ -83,6 +87,13 @@ local tModulePrototype = {
 			S.Log:debug("Enabling %s submodule: %s", self:GetName(), name);
 			module:Enable();
 		end
+	end,
+	CreateSubmodule = function(self, name)
+		local module = self:NewModule(name);
+		module.InitializeForms = self.InitializeForms;
+		module.EnableSubmodules = self.EnableSubmodules;
+
+		return module;
 	end,
 };
 

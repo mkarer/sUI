@@ -41,6 +41,8 @@ function M:OnInitialize()
 
 	-- Events
 	self:RegisterEvent("ShowActionBarShortcut", "OnShowActionBarShortcut");
+	self:RegisterEvent("Sezz_VariablesLoaded", "RestoreProfile");
+	
 end
 
 function M:OnEnable()
@@ -49,7 +51,7 @@ function M:OnEnable()
 	if (S.bCharacterLoaded) then
 		self:SetupActionBars();
 	else
-		self:RegisterMessage("CHARACTER_LOADED", "SetupActionBars");
+		self:RegisterEvent("Sezz_CharacterLoaded", "SetupActionBars");
 	end
 end
 
@@ -126,9 +128,6 @@ function M:RestoreProfile()
 	if (S.myCharacter) then
 		GameLib.SetShortcutMount(self.P.SelectedMount or 0);
 		GameLib.SetShortcutPotion(self.P.SelectedPotion or 0);
-		-- self:UnregisterMessage("CHARACTER_LOADED", "RestoreProfile");
-	else
-		-- self:RegisterMessage("CHARACTER_LOADED", "RestoreProfile");
 	end
 end
 
@@ -146,7 +145,7 @@ end
 -----------------------------------------------------------------------------
 
 function M:SetupActionBars()
-	self:RestoreProfile(); -- TODO: RegisterMessage doesn't handle multiple handlers
+	self:RestoreProfile();
 
 	-----------------------------------------------------------------------------
 	-- Main/LAS Bar
@@ -159,7 +158,7 @@ function M:SetupActionBars()
 	self.tBars[barMain.strName] = barMain;
 
 	-- Update Events
-	self:RegisterMessage("LIMITED_ACTION_SET_CHANGED", "UpdateActionBarButtonBorders"); -- Stupid hack until AbilityBookChange works as expected
+	self:RegisterEvent("Sezz_LimitedActionSetChanged", "UpdateActionBarButtonBorders"); -- Stupid hack until AbilityBookChange works as expected
 	self:UpdateActionBarButtonBorders();
 
 	-----------------------------------------------------------------------------

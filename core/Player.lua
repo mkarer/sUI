@@ -45,9 +45,8 @@ function S:OnCharacterCreated()
 		self:RegisterEvent("PlayerLevelChange", "OnPlayerLevelChange");
 
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
-		S.Log:debug("CHARACTER_LOADED");
-		self:SendMessage("CHARACTER_LOADED");
-		self:FireCombatMessage();
+		self:RaiseEvent("Sezz_CharacterLoaded");
+		self:RaiseCombatEvent();
 	else
 		Apollo.StartTimer("SezzUITimer_DelayedInit");
 	end
@@ -130,10 +129,9 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 		end
 	end
 
-	-- Send Message
+	-- Raise Event
 	if (changed or initialUpdate) then
-		S.Log:debug("LIMITED_ACTION_SET_CHANGED");
-		self:SendMessage("LIMITED_ACTION_SET_CHANGED");
+		self:RaiseEvent("Sezz_LimitedActionSetChanged");
 	end
 
 	return changed;
@@ -159,13 +157,11 @@ end
 -- Player Combat State
 -----------------------------------------------------------------------------
 
-S.FireCombatMessage = function(self)
+S.RaiseCombatEvent = function(self)
 	if (self.inCombat) then
-		self.Log:debug("PLAYER_REGEN_DISABLED");
-		self:SendMessage("PLAYER_REGEN_DISABLED");
+		self:RaiseEvent("Sezz_PlayerRegenDisabled");
 	else
-		self.Log:debug("PLAYER_REGEN_ENABLED");
-		self:SendMessage("PLAYER_REGEN_ENABLED");
+		self:RaiseEvent("Sezz_PlayerRegenEnabled");
 	end
 end
 
@@ -184,7 +180,7 @@ S.HandleCombatChanges = function(self, event, unit, inCombat)
 	if (inCombatState ~= self.inCombat) then
 		self.Log:debug("%s: %s", event, (inCombatState and "True" or "False"));
 		self.inCombat = inCombatState;
-		self:FireCombatMessage();
+		self:RaiseCombatEvent();
 	end
 end
 

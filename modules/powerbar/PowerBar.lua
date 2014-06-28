@@ -38,7 +38,7 @@ function M:OnEnable()
 	if (S.bCharacterLoaded) then
 		self:ReloadConfiguration();
 	else
-		self:RegisterMessage("CHARACTER_LOADED", "ReloadConfiguration");
+		self:RegisterEvent("Sezz_CharacterLoaded", "ReloadConfiguration");
 	end
 end
 
@@ -128,8 +128,8 @@ function M:ReloadConfiguration()
 
 	-- Show/Hide
 	if (not self.DB.alwaysVisible) then
-		self:RegisterMessage("PLAYER_REGEN_DISABLED", "ChangeVisibility");
-		self:RegisterMessage("PLAYER_REGEN_ENABLED", "ChangeVisibility");
+		self:RegisterEvent("Sezz_PlayerRegenDisabled", "ChangeVisibility");
+		self:RegisterEvent("Sezz_PlayerRegenEnabled", "ChangeVisibility");
 		self:ChangeVisibility();
 	else
 		self.wndAnchor:Show(true);

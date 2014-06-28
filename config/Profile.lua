@@ -25,8 +25,6 @@ end
 function S:OnRestore(eLevel, tSavedData)
 	if (S.Profile[eLevel]) then
 		S.Profile[eLevel] = tSavedData or {};
-
-		S.Log:debug("VARIABLES_LOADED "..eLevel);
-		self:SendMessage("VARIABLES_LOADED", eLevel);
+		self:RaiseEvent("Sezz_VariablesLoaded", eLevel);
 	end
 end

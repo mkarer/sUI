@@ -24,6 +24,7 @@ function M:OnInitialize()
 	if (tMiniMap) then
 		log:debug("Hooking MiniMap");
 		-- Replace XML Form
+		-- TODO: Load Carbine's XML file and apply changes directly (if possible)
 		tMiniMap.OnLoad = function(self)
 			self.xmlDoc = M.xmlDoc;
 			self.xmlDoc:RegisterCallback("OnDocumentReady", self);

@@ -10,6 +10,25 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
 -----------------------------------------------------------------------------
+
+function S:RaiseEvent(event, ...)
+	local strArguments = "";
+	local tArguments = {...};
+	if (#tArguments > 0) then
+		for _, arg in pairs(tArguments) do
+			local strType = type(arg);
+
+			if (strType == "string" or strType == "number") then
+				strArguments = strArguments.." "..arg;
+			end
+		end
+	end
+
+	S.Log:debug("[Event] %s%s", event, strArguments);
+	Event_FireGenericEvent(event, ...);
+end
+
+-----------------------------------------------------------------------------
 -- External Addon Load Event
 -----------------------------------------------------------------------------
 
@@ -33,6 +52,11 @@ local tAddonLoadingInformation = {
 		window = "wndChatOptions",
 		hook = "OnWindowManagementReady",
 		properties = { "arChatColor", "tChatWindows" },
+	},
+	Datachron = {
+		window = "wndMinimized",
+		hook = "OnDocumentReady",
+		properties = { "tListOfDeniedCalls" },
 	},
 };
 
@@ -72,8 +96,7 @@ function S:CheckExternalAddon(name)
 			-- Addon available
 			if (addon[config.window]) then
 				-- Main window exists, addon is initialized + enabled!
-				S.Log:debug("ADDON_LOADED "..name);
-				self:SendMessage("ADDON_LOADED", name);
+				self:RaiseEvent("Sezz_AddonAvailable", name);
 			else
 				-- Main window doesn't exist yet, hook creation
 				self:PostHook(addon, config.hook, "CheckExternalAddon");

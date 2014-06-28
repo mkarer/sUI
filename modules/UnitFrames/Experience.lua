@@ -101,7 +101,7 @@ function M:MoveExperienceBars()
 
 	-- Hide Path Bar on Max
 	self:RegisterEvent("UI_XPChanged", "OnExperienceChanged");
-	self:RegisterMessage("CHARACTER_LOADED", "OnExperienceChanged");
+	self:RegisterEvent("Sezz_CharacterLoaded", "OnExperienceChanged");
 	self:OnExperienceChanged();
 end
 
