@@ -382,6 +382,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 
 			local SelectMenuItemPetStance = function(self, wndHandler, wndControl)
 				-- I cannot really test this, because stances don't even work with Carbine's ClassResources addon...
+				-- GameLib.CodeEnumPetStance
 				Pet_SetStance(0, tonumber(wndHandler:GetData()));
 				self:CloseMenu();
 			end
