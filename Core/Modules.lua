@@ -88,8 +88,8 @@ local tModulePrototype = {
 			module:Enable();
 		end
 	end,
-	CreateSubmodule = function(self, name)
-		local module = self:NewModule(name);
+	CreateSubmodule = function(self, name, ...)
+		local module = self:NewModule(name, ...);
 		module.InitializeForms = self.InitializeForms;
 		module.EnableSubmodules = self.EnableSubmodules;
 
