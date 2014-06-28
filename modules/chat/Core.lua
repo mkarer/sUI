@@ -29,25 +29,17 @@ function M:OnEnable()
 	self.ChatLog.bProfanityFilter = false;
 	if (self.ChatLog.arChatColor) then
 		-- Enable Submodules
-		self:LoadModules();
+		self:EnableSubmodules();
 
 		-- Disable Profanity Filter
 		for _, channel in ipairs(ChatSystemLib.GetChannels()) do
 			channel:SetProfanity(false);
 		end
 	else
-		self:PostHook(self.ChatLog, "OnWindowManagementReady", "LoadModules");
+		self:PostHook(self.ChatLog, "OnWindowManagementReady", "EnableSubmodules");
 	end
 end
 
 function M:OnDisable()
 	log:debug("%s disabled.", self:GetName());
-end
-
-function M:LoadModules()
-	log:debug("Loading %s submodules...", self:GetName());
-
-	for name, module in self:IterateModules() do
-		module:Enable()
-	end
 end
