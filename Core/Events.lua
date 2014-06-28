@@ -58,6 +58,11 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "tListOfDeniedCalls", "ProcessDatachronState" },
 	},
+	Inventory = {
+		window = "wndMain",
+		hook = "OnDocumentReady",
+		properties = { "tBagCounts", "OnBGBottomCashBtnToggle" },
+	},
 };
 
 function S:CheckExternalAddon(name)
