@@ -101,7 +101,7 @@ end
 
 function M:UpdatePvpFlagHook()
 	local nZoneRules = GameLib.GetCurrentZonePvpRules();
-	local ePlayerFaction = S.myCharacter:GetFaction();
+	local ePlayerFaction = S.myCharacter and S.myCharacter:GetFaction() or 0;
 	local colorZone;
 
 	if (nZoneRules == GameLib.CodeEnumZonePvpRules.Sanctuary) then
