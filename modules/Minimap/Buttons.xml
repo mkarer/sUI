@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<Forms>
+    <Form Class="Window" LAnchorPoint="1" LAnchorOffset="-157" TAnchorPoint="1" TAnchorOffset="-40" RAnchorPoint="1" RAnchorOffset="-8" BAnchorPoint="1" BAnchorOffset="-18" RelativeToClient="1" Font="Default" Text="" Template="Default" Name="SezzMiniMapButtonContainer" BGColor="white" TextColor="white" AutoFadeBG="0" AutoFadeNC="0" AutoFade="0" NewControlDepth="3" TooltipColor="" IgnoreMouse="1" />
+
+    <Form Class="Button" Base="SezzActionButton" Font="DefaultButton" ButtonType="Check" RadioGroup="" LAnchorPoint="0" LAnchorOffset="0" TAnchorPoint="0" TAnchorOffset="0" RAnchorPoint="0" RAnchorOffset="22" BAnchorPoint="1" BAnchorOffset="0" DT_VCENTER="1" DT_CENTER="1" BGColor="UI_BtnBGDefault" TextColor="UI_BtnTextDefault" NormalTextColor="UI_BtnTextDefault" PressedTextColor="UI_BtnTextDefault" FlybyTextColor="UI_BtnTextDefault" PressedFlybyTextColor="UI_BtnTextDefault" DisabledTextColor="white" TooltipType="OnCursor" Name="SezzMiniMapButton" TooltipColor="" WindowSoundTemplate="PushbuttonDigi01" Tooltip="" TooltipId="">
+        <Control Class="Window" LAnchorPoint="0" LAnchorOffset="2" TAnchorPoint="0" TAnchorOffset="2" RAnchorPoint="1" RAnchorOffset="-2" BAnchorPoint="1" BAnchorOffset="-2" RelativeToClient="1" Font="Default" Text="" BGColor="UI_WindowBGDefault" TextColor="UI_WindowTextDefault" Template="Default" TooltipType="OnCursor" Name="Icon" TooltipColor="" Picture="1" IgnoreMouse="1" Sprite=""/>
+        <Control Class="Window" LAnchorPoint="0" LAnchorOffset="2" TAnchorPoint="0" TAnchorOffset="2" RAnchorPoint="1" RAnchorOffset="-2" BAnchorPoint="1" BAnchorOffset="-2" RelativeToClient="1" Font="Default" Text="" BGColor="UI_WindowBGDefault" TextColor="UI_WindowTextDefault" Template="Default" TooltipType="OnCursor" Name="Background" TooltipColor="" Sprite="MiniMapButtonBG" Picture="1" IgnoreMouse="1"/>
+    </Form>
+</Forms>
