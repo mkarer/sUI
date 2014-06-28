@@ -99,6 +99,15 @@ end
 -- Hooked Functions
 -----------------------------------------------------------------------------
 
+local tZoneColors = {
+	Sanctuary	= CColor.new(0.41, 0.8, 0.94),
+	Friendly	= CColor.new(0.1, 1.0, 0.1),
+	Hostile		= CColor.new(1.0, 0.1, 0.1),
+	PVP			= CColor.new(1.0, 0.1, 0.1),
+	Contested	= CColor.new(1.0, 0.7, 0.0),
+	Default		= CColor.new(1.0, 1.0, 1.0),
+};
+
 function M:UpdatePvpFlagHook()
 	local nZoneRules = GameLib.GetCurrentZonePvpRules();
 	local ePlayerFaction = S.myCharacter and S.myCharacter:GetFaction() or 0;
@@ -106,27 +115,27 @@ function M:UpdatePvpFlagHook()
 
 	if (nZoneRules == GameLib.CodeEnumZonePvpRules.Sanctuary) then
 		-- Sanctuary
-		colorZone = CColor.new(0.41, 0.8, 0.94);
+		colorZone = tZoneColors.Sanctuary;
 	elseif ((ePlayerFaction == Unit.CodeEnumFaction.ExilesPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.ExileStronghold) or (ePlayerFaction == Unit.CodeEnumFaction.DominionPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.DominionStronghold)) then
 		-- Player Faction Stronghold
-		colorZone = CColor.new(0.1, 1.0, 0.1);
+		colorZone = tZoneColors.Friendly;
 	elseif ((ePlayerFaction == Unit.CodeEnumFaction.ExilesPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.DominionStronghold) or (ePlayerFaction == Unit.CodeEnumFaction.DominionPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.ExileStronghold)) then
 		-- Opoosite Faction Stronghold
-		colorZone = CColor.new(1.0, 0.1, 0.1);
+		colorZone = tZoneColors.Hostile;
 	elseif (nZoneRules == GameLib.CodeEnumZonePvpRules.Pvp) then
 		-- PVP
-		colorZone = CColor.new(1.0, 0.1, 0.1);
+		colorZone = tZoneColors.PVP;
 	elseif (nZoneRules == GameLib.CodeEnumZonePvpRules.DominionPVPStronghold or nZoneRules == GameLib.CodeEnumZonePvpRules.ExilesPVPStronghold) then
 		-- PVP Stronghold
 		-- Not sure where/when?
 		log:debug("PVP Stronghold: %s", nZoneRules == GameLib.CodeEnumZonePvpRules.DominionPVPStronghold and "Dominion" or "Exiles");
-		colorZone = CColor.new(1.0, 0.7, 0.0);
+		colorZone = tZoneColors.Contested;
 	else
 		-- Default
 		if (GameLib.IsPvpServer()) then
-		colorZone = CColor.new(1.0, 0.7, 0.0);
+			colorZone = tZoneColors.Contested;
 		else
-			colorZone = CColor.new(1.0, 1.0, 1.0);
+			colorZone = tZoneColors.Default;
 		end
 	end
 
