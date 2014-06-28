@@ -75,6 +75,15 @@ local tModulePrototype = {
 			end
 		end
 	end,
+	-- Submodules
+	EnableSubmodules = function(self)
+		S.Log:debug("Enabling %s submodules...", self:GetName());
+
+		for name, module in self:IterateModules() do
+			S.Log:debug("Enabling %s submodule: %s", self:GetName(), name);
+			module:Enable();
+		end
+	end,
 };
 
 S:SetDefaultModulePrototype(tModulePrototype);
