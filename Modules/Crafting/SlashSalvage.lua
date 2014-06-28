@@ -13,7 +13,7 @@ require "GameLib";
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("SlashSalvage");
+local M = S:CreateSubmodule("SlashSalvage");
 local log;
 
 -----------------------------------------------------------------------------

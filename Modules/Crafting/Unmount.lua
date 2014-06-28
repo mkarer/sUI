@@ -8,7 +8,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("UnmountToCraft");
+local M = S:CreateSubmodule("UnmountToCraft");
 local log;
 
 -----------------------------------------------------------------------------

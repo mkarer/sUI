@@ -40,7 +40,7 @@ local tModulePrototype = {
 		end
 	end,
 	DoAddonLoadedCallback = function(self, name)
-		if (self.tAddonLoadedCallbacks[name] and self[self.tAddonLoadedCallbacks[name]]) then
+		if (self.tAddonLoadedCallbacks[name]) then
 			self[self.tAddonLoadedCallbacks[name]](self);
 			self.tAddonLoadedCallbacks[name] = nil;
 		end
@@ -97,4 +97,8 @@ local tModulePrototype = {
 	end,
 };
 
-S:SetDefaultModulePrototype(tModulePrototype);
+function S:CreateSubmodule(name, ...)
+	-- SetDefaultModulePrototype doesn't work as expected or I'm doing it wrong.
+	local module = self:NewModule(name, S:Clone(tModulePrototype), "Gemini:Event-1.0", ...);
+	return module;
+end
