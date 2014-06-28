@@ -18,10 +18,10 @@ local log;
 
 local CreateButtonContainer;
 do
-	local CreateButton = function(self, strName, strIcon, bLastButton)
+	local CreateButton = function(self, strName, strIcon, bLastButton, strTemplate)
 		local tButton = {};
 		tButton.strName = strName;
-		tButton.wndMain = Apollo.LoadForm(self.xmlDoc, "SezzMiniMapButton", self.wndMain, tButton);
+		tButton.wndMain = Apollo.LoadForm(self.xmlDoc, strTemplate or "SezzMiniMapButton", self.wndMain, tButton);
 		tButton.wndMain:SetName(string.format("SezzMiniMapButton%s", strName));
 		tButton.wndMain:FindChild("Icon"):SetSprite(strIcon);
 
@@ -88,8 +88,6 @@ end
 
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
-
-	-- Add Buttons
 	self.tButtonContainer = CreateButtonContainer(self.xmlDoc);
 
 	-----------------------------------------------------------------------------
@@ -129,13 +127,21 @@ function M:OnEnable()
 		self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
 	end
 
+	-----------------------------------------------------------------------------
 	-- Dash Indicator
-	self.tButtonContainer:CreateButton("Dash", "IconDash2");
+	-----------------------------------------------------------------------------
+	local tButtonDash = self.tButtonContainer:CreateButton("Dash", "IconDash2", false, "SezzMiniMapButtonPush");
+	tButtonDash.wndMain:SetTooltip("Dash Indicator (NYI)");
 
+	-----------------------------------------------------------------------------
 	-- Settings
-	self.tButtonContainer:CreateButton("Settings", "IconSettings", true);
+	-----------------------------------------------------------------------------
+	local tButtonSettings = self.tButtonContainer:CreateButton("Settings", "IconSettings", true, "SezzMiniMapButtonPush");
+	tButtonSettings.wndMain:SetTooltip(Apollo.GetString("GuildRegistration_SettingsLabel").." (NYI)");
 
+	-----------------------------------------------------------------------------
 	-- Done
+	-----------------------------------------------------------------------------
 	self.xmlDoc = nil;
 end
 
