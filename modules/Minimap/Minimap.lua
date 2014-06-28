@@ -13,12 +13,6 @@ local log, tMiniMap;
 
 -----------------------------------------------------------------------------
 
-local fnHookedMiniMapOnLoad = function(self)
-	-- Replace MiniMap XML Data
-	self.xmlDoc = M.xmlDoc;
-	self.xmlDoc:RegisterCallback("OnDocumentReady", self);
-end
-
 function M:OnInitialize()
 	log = S.Log;
 	self:InitializeForms();
@@ -31,6 +25,9 @@ function M:OnInitialize()
 			self.xmlDoc = M.xmlDoc;
 			self.xmlDoc:RegisterCallback("OnDocumentReady", self);
 		end
+
+		-- PVP Flag Update
+		tMiniMap.UpdatePvpFlag = M.UpdatePvpFlagHook;
 	else
 		-- MiniMap addon not found, disable me.
 		self:SetEnabledState(false);
@@ -54,23 +51,30 @@ end
 
 function M:UpdateMiniMap()
 	-- Hide Guards
---	self:PostHook(tMiniMap, "BuildCustomMarkerInfo", "HideGuardOverlays");
+	self:PostHook(tMiniMap, "BuildCustomMarkerInfo", "HideGuardOverlays");
 	self:HideGuardOverlays();
 
 	-- Zoom Out
 	tMiniMap.fSavedZoomLevel = 1;
 	tMiniMap.wndMiniMap:SetZoomLevel(1);
 
-	-- Move/Resize Windows
-	local nSize = tMiniMap.wndMain:GetWidth();
-	local nScale = 0.6;
-	local nSizeUpscaled = nSize / nScale;
+	-- Disable Button Fading
+	self:DisableButtonFading();
+	self:DisableButtons();
 
-	tMiniMap.wndMiniMap:SetScale(nScale);
-	tMiniMap.wndMiniMap:SetAnchorOffsets(0, 0, nSizeUpscaled - nSize, nSizeUpscaled - nSize); -- Scaling currently doesn't work very vell
+	-- Disable Resizing/Moving
+	self:DisableCustomization();
+
+	-- Move/Resize Windows
+--	local nSize = tMiniMap.wndMain:GetWidth();
+--	local nScale = 0.6;
+--	local nSizeUpscaled = nSize / nScale;
+
+--	tMiniMap.wndMiniMap:SetScale(nScale);
+--	tMiniMap.wndMiniMap:SetAnchorOffsets(0, 0, nSizeUpscaled - nSize, nSizeUpscaled - nSize); -- Scaling currently doesn't work very vell
 
 --	tMiniMap.wndMain:SetAnchorOffsets(-204, -204, 0, 0);
-log:debug(nSizeUpscaled - nSize)
+--log:debug(nSizeUpscaled - nSize)
 	-- TODO: Set Position in XML File
 end
 
@@ -78,39 +82,60 @@ function M:HideGuardOverlays()
 	tMiniMap.tMinimapMarkerInfo.CityDirections = nil;
 end
 
---[[
-BuildCustomMarkerInfo
+function M:DisableButtonFading()
+	tMiniMap.wndMain:RemoveEventHandler("MouseEnter");
+	tMiniMap.wndMain:RemoveEventHandler("MouseExit");
+end
 
-	tMinimapMarkerInfo.CityDirections.bShown = false
+function M:DisableButtons()
+	tMiniMap.wndMain:FindChild("ZoomInButton"):Enable(false);
+	tMiniMap.wndMain:FindChild("ZoomOutButton"):Enable(false);
+	tMiniMap.wndMain:FindChild("MapToggleBtn"):Enable(false);
+	tMiniMap.wndMain:FindChild("MiniMapResizeArtForPixie"):Enable(false);
+end
 
+function M:DisableCustomization()
+	tMiniMap.wndMain:SetName("SezzMiniMap");
+	tMiniMap.wndMain:RemoveStyle("Sizable");
+	tMiniMap.wndMain:RemoveStyle("Moveable");
+	tMiniMap.wndMain:AddStyle("IgnoreMouse");
+	tMiniMap.wndMiniMap:RemoveStyle("IgnoreMouse");
+end
 
-MiniMap:OnDocumentReady()
+-----------------------------------------------------------------------------
+-- Hooked Functions
+-----------------------------------------------------------------------------
 
-	self.wndMinimapButtons 	= self.wndMain:FindChild("ButtonContainer")
-	if self.fSavedZoomLevel then
-		self.wndMiniMap:SetZoomLevel( self.fSavedZoomLevel)      ---- 1
+function M:UpdatePvpFlagHook()
+	local nZoneRules = GameLib.GetCurrentZonePvpRules();
+	local ePlayerFaction = S.myCharacter:GetFaction();
+	local colorZone;
+
+	if (nZoneRules == GameLib.CodeEnumZonePvpRules.Sanctuary) then
+		-- Sanctuary
+		colorZone = CColor.new(0.41, 0.8, 0.94);
+	elseif ((ePlayerFaction == Unit.CodeEnumFaction.ExilesPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.ExileStronghold) or (ePlayerFaction == Unit.CodeEnumFaction.DominionPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.DominionStronghold)) then
+		-- Player Faction Stronghold
+		colorZone = CColor.new(0.1, 1.0, 0.1);
+	elseif ((ePlayerFaction == Unit.CodeEnumFaction.ExilesPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.DominionStronghold) or (ePlayerFaction == Unit.CodeEnumFaction.DominionPlayer and nZoneRules == GameLib.CodeEnumZonePvpRules.ExileStronghold)) then
+		-- Opoosite Faction Stronghold
+		colorZone = CColor.new(1.0, 0.1, 0.1);
+	elseif (nZoneRules == GameLib.CodeEnumZonePvpRules.Pvp) then
+		-- PVP
+		colorZone = CColor.new(1.0, 0.1, 0.1);
+	elseif (nZoneRules == GameLib.CodeEnumZonePvpRules.DominionPVPStronghold or nZoneRules == GameLib.CodeEnumZonePvpRules.ExilesPVPStronghold) then
+		-- PVP Stronghold
+		-- Not sure where/when?
+		log:debug("PVP Stronghold: %s", nZoneRules == GameLib.CodeEnumZonePvpRules.DominionPVPStronghold and "Dominion" or "Exiles");
+		colorZone = CColor.new(1.0, 0.7, 0.0);
+	else
+		-- Default
+		if (GameLib.IsPvpServer()) then
+		colorZone = CColor.new(1.0, 0.7, 0.0);
+		else
+			colorZone = CColor.new(1.0, 1.0, 1.0);
+		end
 	end
 
-
-self.wndZoneName
-
-function MiniMap:OnRotateMapUncheck()
-	--self.wndMinimapOptions:FindChild("OptionsBtnRotate"):FindChild("Image"):SetSprite("CRB_UIKitSprites:btn_radioSMALLNormal")
-	self.wndMiniMap:SetMapOrientation(0)
+	self.wndZoneName:SetTextColor(colorZone);
 end
-
-options frame = unter map
-
-function MiniMap:GetDefaultUnitInfo()
-	local tInfo =
-	{
-		strIcon = "",
-		strIconEdge = "MiniMapObjectEdge",
-		crObject = CColor.new(1, 1, 1, 1),
-		crEdge = CColor.new(1, 1, 1, 1),
-		bAboveOverlay = false,
-	}
-	return tInfo
-end
-
---]]
