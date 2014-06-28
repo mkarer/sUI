@@ -41,8 +41,6 @@ function M:OnInitialize()
 
 	-- Events
 	self:RegisterEvent("ShowActionBarShortcut", "OnShowActionBarShortcut");
-	self:RegisterEvent("Sezz_VariablesLoaded", "RestoreProfile");
-	
 end
 
 function M:OnEnable()
@@ -145,7 +143,7 @@ end
 -----------------------------------------------------------------------------
 
 function M:SetupActionBars()
-	self:RestoreProfile();
+	self:RestoreProfile(); -- Character isn't available when Sezz_VariablesLoaded fires!
 
 	-----------------------------------------------------------------------------
 	-- Main/LAS Bar
