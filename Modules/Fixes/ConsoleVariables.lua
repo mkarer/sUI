@@ -12,7 +12,7 @@ require "Window";
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("ConsoleVariables");
+local M = S:CreateSubmodule("ConsoleVariables");
 local log;
 
 -----------------------------------------------------------------------------
