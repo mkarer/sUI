@@ -71,9 +71,9 @@ function M:OnEnable()
 
 	-- Datachron
 	local tButtonDatachron = tButtonContainer:CreateButton("Datachron", "IconDatachron");
-	local tDatachron = Apollo.GetAddon("Datachron");
-	tButtonDatachron:AddEventHandler("ButtonCheck", "OnRestoreDatachron", tDatachron);
-	tButtonDatachron:AddEventHandler("ButtonUncheck", "OnMinimizeDatachron", tDatachron);
+--	local tDatachron = Apollo.GetAddon("Datachron");
+--	tButtonDatachron:AddEventHandler("ButtonCheck", "OnRestoreDatachron", tDatachron);
+--	tButtonDatachron:AddEventHandler("ButtonUncheck", "OnMinimizeDatachron", tDatachron);
 
 	-- Dash Indicator
 	tButtonContainer:CreateButton("Dash", "IconDash2");
