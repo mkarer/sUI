@@ -66,6 +66,7 @@ function S:OnInitialize()
 	log:debug(kstrAddon.." "..kstrVersion);
 
 	-- Media
+	Apollo.LoadSprites("Media/Icons.xml");
 	Apollo.LoadSprites("Media/Sprites.xml");
 
 	-- Main Form
