@@ -38,7 +38,7 @@ local tModulePrototype = {
 		end
 	end,
 	DoAddonLoadedCallback = function(self, name)
-		if (self.tAddonLoadedCallbacks[name]) then
+		if (self.tAddonLoadedCallbacks[name] and self[self.tAddonLoadedCallbacks[name]]) then
 			self[self.tAddonLoadedCallbacks[name]](self);
 			self.tAddonLoadedCallbacks[name] = nil;
 		end
