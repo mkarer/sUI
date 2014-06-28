@@ -9,7 +9,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local MiniMap = S:GetModule("MiniMap");
-local M = MiniMap:CreateSubmodule("Buttons", "Gemini:Event-1.0");
+local M = MiniMap:CreateSubmodule("Buttons", "Gemini:Event-1.0", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
@@ -96,16 +96,37 @@ function M:OnEnable()
 	-- Inventory
 	-----------------------------------------------------------------------------
 
-	self.tButtonContainer:CreateButton("Inventory", "IconInventory");
+	local tButtonInventory = self.tButtonContainer:CreateButton("Inventory", "IconInventory");
+	tButtonInventory.wndMain:SetTooltip(Apollo.GetString("InterfaceMenu_Inventory"));
+
+	tButtonInventory.ToggleInventory = function(self, wndHandler)
+		local tInventory = Apollo.GetAddon("Inventory");
+		if (tInventory) then
+			tInventory:OnToggleVisibility();
+		end
+	end
+
+	tButtonInventory.wndMain:AddEventHandler("ButtonCheck", "ToggleInventory", tButtonInventory);
+	tButtonInventory.wndMain:AddEventHandler("ButtonUncheck", "ToggleInventory", tButtonInventory);
+
+	if (S:IsAddOnLoaded("Inventory")) then
+		self:OnAddonAvailable(nil, "Inventory");
+	else
+		self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
+	end
+
+	self:RegisterEvent("ToggleInventory", "OnInventoryToggle");
+	self:RegisterEvent("InterfaceMenu_ToggleInventory", "OnInventoryToggle");
+	self:RegisterEvent("ToggleInventory", "OnInventoryToggle");
 
 	-----------------------------------------------------------------------------
 	-- Datachron
 	-----------------------------------------------------------------------------
 	self.tButtonContainer:CreateButton("Datachron", "IconDatachron");
 	if (g_wndDatachron) then
-		self:UpdateDatachronButton();
+		self:OnAddonAvailable(nil, "Datachron");
 	else
-		self:RegisterEvent("Sezz_AddonAvailable", "UpdateDatachronButton");
+		self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
 	end
 
 	-- Dash Indicator
@@ -118,40 +139,62 @@ function M:OnEnable()
 	self.xmlDoc = nil;
 end
 
-function M:UpdateDatachronButton(strEvent, strAddon)
-	if (not strEvent or strAddon == "Datachron") then
-		local tButtonDatachron = self.tButtonContainer:GetButton("Datachron");
+-----------------------------------------------------------------------------
 
-		tButtonDatachron.UpdateTooltip = function(self)
-			if (self.wndMain:IsChecked()) then
-				self.wndMain:SetTooltip(Apollo.GetString("CRB_Datachron_MinimizeBtn_Desc"));
-			else
-				self.wndMain:SetTooltip(Apollo.GetString("Datachron_Maximize"));
-			end
-		end
+function M:OnAddonAvailable(strEvent, strAddon)
+	if (strAddon == "Datachron") then
+		self:UpdateDatachronButton();
+	elseif (strAddon == "Inventory") then
+		local tInventory = Apollo.GetAddon("Inventory");
+		self:PostHook(tInventory, "OnToggleVisibility", "OnInventoryToggle");
+		self:PostHook(tInventory, "OnInventoryClosed", "OnInventoryToggle");
+	end
+end
 
-		tButtonDatachron.ToggleDatachron = function(self, wndHandler)
-			g_wndDatachron:Show(wndHandler:IsChecked());
-			self:UpdateTooltip();
-		end
+-----------------------------------------------------------------------------
 
-		tButtonDatachron.wndMain:AddEventHandler("ButtonCheck", "ToggleDatachron", tButtonDatachron);
-		tButtonDatachron.wndMain:AddEventHandler("ButtonUncheck", "ToggleDatachron", tButtonDatachron);
-		tButtonDatachron.wndMain:SetCheck(g_wndDatachron:IsVisible());
-		tButtonDatachron:UpdateTooltip();
+function M:UpdateDatachronButton()
+	local tButtonDatachron = self.tButtonContainer:GetButton("Datachron");
 
-		Apollo.GetAddon("Datachron").wndMinimized:Show(false, false);
-
-		g_wndDatachron:SetAnchorOffsets(-549, -322, -160, -18);
-
-		-- Removing Artwork only works while logging in.
-		-- I don't care currently...
---		g_wndDatachron:DestroyAllPixies();
---		g_wndDatachron:FindChild("Framing"):SetSprite("SezzUIBorder");
---		g_wndDatachron:FindChild("Framing"):SetSprite(nil);
-
-		if (strEvent) then
-			self:UnregisterEvent(strEvent);
+	tButtonDatachron.UpdateTooltip = function(self)
+		if (self.wndMain:IsChecked()) then
+			self.wndMain:SetTooltip(Apollo.GetString("CRB_Datachron_MinimizeBtn_Desc"));
+		else
+			self.wndMain:SetTooltip(Apollo.GetString("Datachron_Maximize"));
 		end
 	end
+
+	tButtonDatachron.ToggleDatachron = function(self, wndHandler)
+		g_wndDatachron:Show(wndHandler:IsChecked());
+		self:UpdateTooltip();
+	end
+
+	tButtonDatachron.wndMain:AddEventHandler("ButtonCheck", "ToggleDatachron", tButtonDatachron);
+	tButtonDatachron.wndMain:AddEventHandler("ButtonUncheck", "ToggleDatachron", tButtonDatachron);
+	tButtonDatachron.wndMain:SetCheck(g_wndDatachron:IsVisible());
+	tButtonDatachron:UpdateTooltip();
+
+	Apollo.GetAddon("Datachron").wndMinimized:Show(false, false);
+
+	g_wndDatachron:SetAnchorOffsets(-549, -322, -160, -18);
+
+	-- Removing Artwork only works while logging in.
+	-- I don't care currently...
+--	g_wndDatachron:DestroyAllPixies();
+--	g_wndDatachron:FindChild("Framing"):SetSprite("SezzUIBorder");
+--	g_wndDatachron:FindChild("Framing"):SetSprite(nil);
+end
+
+-----------------------------------------------------------------------------
+
+function M:OnInventoryToggle()
+	local tInventory = Apollo.GetAddon("Inventory");
+	local bInventoryOpen = false;
+
+	if (tInventory) then
+		bInventoryOpen = tInventory.wndMain:IsShown();
+	end
+
+	local tButtonInventory = self.tButtonContainer:GetButton("Inventory");
+	tButtonInventory.wndMain:SetCheck(bInventoryOpen);
 end
