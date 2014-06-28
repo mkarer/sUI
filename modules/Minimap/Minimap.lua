@@ -2,6 +2,8 @@
 
 	s:UI MiniMap Modifications
 
+	TODO: Mail Notification
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -9,6 +11,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:NewModule("MiniMap", "Gemini:Event-1.0", "Gemini:Hook-1.0");
+M:SetDefaultModuleState(false);
 local log, tMiniMap;
 
 -----------------------------------------------------------------------------
@@ -65,17 +68,8 @@ function M:UpdateMiniMap()
 	-- Disable Resizing/Moving
 	self:DisableCustomization();
 
-	-- Move/Resize Windows
---	local nSize = tMiniMap.wndMain:GetWidth();
---	local nScale = 0.6;
---	local nSizeUpscaled = nSize / nScale;
-
---	tMiniMap.wndMiniMap:SetScale(nScale);
---	tMiniMap.wndMiniMap:SetAnchorOffsets(0, 0, nSizeUpscaled - nSize, nSizeUpscaled - nSize); -- Scaling currently doesn't work very vell
-
---	tMiniMap.wndMain:SetAnchorOffsets(-204, -204, 0, 0);
---log:debug(nSizeUpscaled - nSize)
-	-- TODO: Set Position in XML File
+	-- Enable Submodules
+	self:EnableSubmodules();
 end
 
 function M:HideGuardOverlays()
@@ -95,7 +89,6 @@ function M:DisableButtons()
 end
 
 function M:DisableCustomization()
-	tMiniMap.wndMain:SetName("SezzMiniMap");
 	tMiniMap.wndMain:RemoveStyle("Sizable");
 	tMiniMap.wndMain:RemoveStyle("Moveable");
 	tMiniMap.wndMain:AddStyle("IgnoreMouse");
