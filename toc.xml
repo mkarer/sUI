@@ -39,12 +39,14 @@
 	<Script Name="Modules\PowerBar\PowerBar.lua" />
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
-	<Script Name="Modules\MiniMap\MiniMap.lua" />
 	<!-- Action Bars -->
 	<Script Name="Modules\ActionBars\ActionBars.lua" />
 	<Form Name="Modules\ActionBars\ActionBars.xml" />
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
+	<!-- MiniMap -->
+	<Script Name="Modules\MiniMap\MiniMap.lua" />
+	<Script Name="Modules\MiniMap\Buttons.lua" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
