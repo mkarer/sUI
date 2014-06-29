@@ -32,7 +32,9 @@ function M:OnEnable()
 
 	chatPrefixes = {
 		["/w"] = true,
+		["/whisper"] = true,
 		["/t"] = true,
+		["/tell"] = true,
 		["/aw"] = true,
 	};
 
