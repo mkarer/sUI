@@ -131,12 +131,12 @@ function M:OnEnable()
 	-- Dash Indicator
 	-----------------------------------------------------------------------------
 	local tButtonDash = self.tButtonContainer:CreateButton("Dash", "IconDash2");
-	tButtonDash.wndMain:SetTooltip("Dash Indicator (NYI)");
 
 	tButtonDash.ToggleDash = function(self, wndHandler)
 		local bDashEnabled = not wndHandler:IsChecked();
 
 		Apollo.SetConsoleVariable("player.doubleTapToDash", bDashEnabled);
+		self:UpdateTooltip();
 	end
 
 	tButtonDash.UpdateIcon = function(self)
@@ -145,9 +145,9 @@ function M:OnEnable()
 		if (self.wndMain:ContainsMouse()) then
 			-- Show "Disable Touble-Tap Dash" Icon
 			wndIcon:SetSprite("IconBlock");
-		elseif (self.wndMain:IsChecked()) then
-			-- Dash is disabled, show X
-			wndIcon:SetSprite("IconDashDisabled");
+--		elseif (self.wndMain:IsChecked()) then
+--			-- Dash is disabled, show X
+--			wndIcon:SetSprite("IconDashDisabled");
 		else
 			-- Show amount
 			if (self.nDashAmount >= 0 and self.nDashAmount <= 2) then
@@ -159,9 +159,18 @@ function M:OnEnable()
 		end
 	end
 
-	tButtonDash.SetAmount = function(self, nAmount)
+	tButtonDash.SetAmount = function(self, nAmount, nAmountMax)
 		self.nDashAmount = nAmount;
+		self.nDashAmountMax = nAmountMax;
 		self:UpdateIcon();
+		self:UpdateTooltip();
+	end
+
+	tButtonDash.UpdateTooltip = function(self)
+		-- Stolen from HealthShieldBar.lua
+		local strEvadeTooltop = Apollo.GetString(not self.wndMain:IsChecked() and "HealthBar_EvadeDoubleTapTooltip" or "HealthBar_EvadeKeyTooltip");
+		local strDisplayTooltip = String_GetWeaselString(strEvadeTooltop, self.nDashAmount, self.nDashAmountMax);
+		self.wndMain:SetTooltip(strDisplayTooltip);
 	end
 
 	-- Set Current State/Amount
@@ -259,5 +268,5 @@ end
 
 function M:OnDashChanged(event, nCurrent, nMax)
 	local tButtonDash = self.tButtonContainer:GetButton("Dash");
-	tButtonDash:SetAmount(nCurrent);
+	tButtonDash:SetAmount(nCurrent, nMax);
 end
