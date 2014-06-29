@@ -50,6 +50,8 @@
 	<!-- MiniMap -->
 	<Script Name="Modules\MiniMap\MiniMap.lua" />
 	<Script Name="Modules\MiniMap\Buttons.lua" />
+	<!-- Misc -->
+	<Script Name="Modules\DataText\DataText.lua" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
