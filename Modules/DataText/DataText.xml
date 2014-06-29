@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <Forms>
-    <Form Class="Window" LAnchorPoint="0" LAnchorOffset="208" TAnchorPoint="0" TAnchorOffset="684" RAnchorPoint="0" RAnchorOffset="419" BAnchorPoint="0" BAnchorOffset="720" RelativeToClient="1" Font="Default" Text="" Template="Default" Name="DataText" Border="0" Picture="1" SwallowMouseClicks="1" Moveable="0" Escapable="0" Overlapped="1" BGColor="ffffffff" TextColor="ffffffff" TextId="" TooltipColor="" Tooltip="" Sprite="">
+    <Form Class="Window" LAnchorPoint="0.5" LAnchorOffset="-346" TAnchorPoint="1" TAnchorOffset="-118" RAnchorPoint="0.5" RAnchorOffset="-134" BAnchorPoint="1" BAnchorOffset="-82" RelativeToClient="1" Font="Default" Text="" Template="Default" Name="DataText" Border="0" Picture="1" SwallowMouseClicks="1" Moveable="0" Escapable="0" Overlapped="1" BGColor="ffffffff" TextColor="ffffffff" TextId="" TooltipColor="" Tooltip="" Sprite="" IgnoreMouse="1">
         <Control Class="Window" LAnchorPoint="0" LAnchorOffset="0" TAnchorPoint="0" TAnchorOffset="3" RAnchorPoint="1" RAnchorOffset="0" BAnchorPoint="1" BAnchorOffset="0" RelativeToClient="1" Font="Default" Text="" BGColor="UI_WindowBGDefault" TextColor="UI_WindowTextDefault" Template="Default" TooltipType="OnCursor" Name="Clock" TooltipColor="" Border="0" IgnoreMouse="1" Picture="1" Sprite=""/>
         <Control Class="Window" LAnchorPoint="0" LAnchorOffset="0" TAnchorPoint="0" TAnchorOffset="0" RAnchorPoint="1" RAnchorOffset="-5" BAnchorPoint="0" BAnchorOffset="20" RelativeToClient="1" Font="Default" Text="" BGColor="UI_WindowBGDefault" TextColor="UI_WindowTextDefault" Template="Default" TooltipType="OnCursor" Name="Stats" TooltipColor="" Sprite="" Picture="1" IgnoreMouse="1"/>
     </Form>
-    <SpriteFile Name="PixelFont.xml"/>
 </Forms>
