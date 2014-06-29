@@ -137,8 +137,14 @@ function M:OnEnable()
 	-- Settings
 	-----------------------------------------------------------------------------
 	local tButtonSettings = self.tButtonContainer:CreateButton("Settings", "IconSettings", true, "SezzMiniMapButtonPush");
-	tButtonSettings.wndMain:SetTooltip(Apollo.GetString("GuildRegistration_SettingsLabel").." (NYI)");
+	tButtonSettings.wndMain:SetTooltip("s:UI "..Apollo.GetString("GuildRegistration_SettingsLabel"));
 
+	tButtonSettings.ToggleConfiguration = function(self)
+		S:ToggleConfiguration();
+	end
+
+	tButtonSettings.wndMain:AddEventHandler("ButtonSignal", "ToggleConfiguration", tButtonSettings);
+	
 	-----------------------------------------------------------------------------
 	-- Done
 	-----------------------------------------------------------------------------
