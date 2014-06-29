@@ -24,6 +24,7 @@
 	<Script Name="Core\Modules.lua" />
 	<Script Name="Core\Slash.lua" />
 	<Script Name="Core\Temp.lua" />
+	<Script Name="Core\Debug.lua" />
 
 	<!-- Modules -->
 	<Script Name="Modules\Fixes\ConsoleVariables.lua" />
@@ -47,6 +48,7 @@
 	<!-- MiniMap -->
 	<Script Name="Modules\MiniMap\MiniMap.lua" />
 	<Script Name="Modules\MiniMap\Buttons.lua" />
+	<Script Name="Modules\Tooltips\Tooltips.lua" />
 
 	<!-- Nonworking ideas (because if the WildStar API or me) -->
 <!--
