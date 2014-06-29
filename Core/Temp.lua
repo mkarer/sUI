@@ -29,10 +29,19 @@ function M:OnEnable()
 	else
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
+
+	self:RegisterEvent("ChallengeReward_SpinBegin", "EventHandler");
 end
 
 function M:EventHandler(event, ...)
-	local x = AbilityBook.GetAbilitiesList();
+	tRewardPanel = Apollo.FindWindowByName("ChallengeRewardPanelForm");
+	if (tRewardPanel) then
+		tRewardPanel:Close();
+	end
+
+--	ChallengeRewardPanel:OnWindowCloseDelay();
+
+--[[	local x = AbilityBook.GetAbilitiesList();
 	for _, spl in pairs(x) do
 		if (spl.strName == "Impale") then
 			log:debug(spl.nId);
@@ -74,7 +83,7 @@ function M:EventHandler(event, ...)
 			GameLib.SetWorldTooltipContainer(self.wndContainer);
 		end
 
---[[
+
 		-- Apollo.LoadForm Hook
 		-- Why is everything in ToolTips.lua hardcoded?!
 		Apollo._LoadForm = Apollo.LoadForm;
