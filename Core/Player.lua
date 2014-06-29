@@ -17,6 +17,8 @@ function S:InitializePlayer()
 	self:RegisterEvent("CharacterCreated", "OnCharacterCreated");
 	Apollo.RegisterTimerHandler("SezzUITimer_DelayedInit", "OnCharacterCreated", self);
 	Apollo.CreateTimer("SezzUITimer_DelayedInit", 0.10, false);
+	Apollo.RegisterTimerHandler("SezzUITimer_DashUpdate", "DashUpdateTimerTick", self);
+	Apollo.CreateTimer("SezzUITimer_DashUpdate", 0.20, false);
 	self:OnCharacterCreated();
 end
 
@@ -47,6 +49,7 @@ function S:OnCharacterCreated()
 		S.Log:debug("%s@%s (Level %d %s)", self.myName, self.myRealm, self.myLevel, self.myClass);
 		self:RaiseEvent("Sezz_CharacterLoaded");
 		self:RaiseCombatEvent();
+		self:DashUpdateTimerTick();
 	else
 		Apollo.StartTimer("SezzUITimer_DelayedInit");
 	end
@@ -329,4 +332,40 @@ function S:PlayerHasEngineerPets()
 	end
 
 	return false;
+end
+
+-----------------------------------------------------------------------------
+-- Dash
+-----------------------------------------------------------------------------
+
+local nDashResource = 0;
+local nDashResourceMax = 0;
+
+function S:DashUpdateTimerTick()
+	if (self.bCharacterLoaded and self.myCharacter:IsValid()) then
+		local nCurrent, nMax = self:GetDashAmount(true);
+
+		if (nCurrent ~= nDashResource or nMax ~= nDashResourceMax) then
+			nDashResource = nCurrent;
+			nDashResourceMax = nMax;
+			self:RaiseEvent("Sezz_PlayerDashChanged", nCurrent, nMax);
+		end
+	end
+
+	Apollo.StartTimer("SezzUITimer_DashUpdate");
+end
+
+function S:GetDashAmount(bShort)
+	if (self.bCharacterLoaded and self.myCharacter:IsValid()) then
+		local nCurrent = self.myCharacter:GetResource(7);
+		local nMax = self.myCharacter:GetMaxResource(7);
+
+		if (bShort) then
+			return math.floor(nCurrent / 100), math.floor(nMax / 100);
+		else
+			return nCurrent, nMax;
+		end
+	else
+		return 0, 0;
+	end
 end
