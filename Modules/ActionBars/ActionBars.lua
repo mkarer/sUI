@@ -74,11 +74,11 @@ function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
 
 	if (bIsVisible) then
 		self.P["CurrentShortcutBar"] = nBar;
-		self:SetActiveShortcutBar(nBar);
+		self:SetActiveShortcutBar(nBar, nShortcuts);
 	end
 end
 
-function M:SetActiveShortcutBar(nActiveBarId)
+function M:SetActiveShortcutBar(nActiveBarId, nShortcuts)
 	for i = 4, ActionSetLib.ShortcutSet.Count do
 		local bShowBar = (nActiveBarId == i);
 		local tBar = self.tBars["Shortcut"..i];
@@ -88,18 +88,20 @@ function M:SetActiveShortcutBar(nActiveBarId)
 				self.P["CurrentShortcutBar"] = i;
 
 				-- Resize (show only active buttons)
-				local nActiveButtons = 0;
-
-				for _, tButton in pairs(tBar.Buttons) do
-					if (tButton.wndButton:GetContent()["strIcon"] ~= "") then
-						nActiveButtons = nActiveButtons + 1;
-					end
-				end
+				local nActiveButtons = nShortcuts or 0;
 
 				if (nActiveButtons == 0) then
-					-- I don't trust GetContent() ;)
-					log:warn("The active shortcut bar has NO active buttons!");
-					nActiveButtons = 8;
+					for _, tButton in pairs(tBar.Buttons) do
+						if (tButton.wndButton:GetContent()["strIcon"] ~= "") then
+							nActiveButtons = nActiveButtons + 1;
+						end
+					end
+
+					if (nActiveButtons == 0) then
+						-- I don't trust GetContent() ;)
+						log:warn("The active shortcut bar has NO visible icons!");
+						nActiveButtons = 8;
+					end
 				end
 
 				local _, nOffsetT, _, nOffsetB = tBar.wndMain:GetAnchorOffsets();
