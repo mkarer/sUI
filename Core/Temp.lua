@@ -24,10 +24,19 @@ function M:OnInitialize()
 end
 
 function M:OnEnable()
---	self:RegisterEvent("RefreshHealthShieldBar", "EventHandler");
+	if (S.bCharacterLoaded) then
+--		self:EventHandler();
+	else
+--		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
+	end
 end
 
 function M:EventHandler(event, ...)
-	log:debug(event);
-	log:debug({S:GetDashAmount()});
+	local x = AbilityBook.GetAbilitiesList();
+	for _, spl in pairs(x) do
+		if (spl.strName == "Impale") then
+			log:debug(spl.nId);
+			log:debug(spl.tTiers[1].splObject:GetIcon());
+		end
+	end
 end
