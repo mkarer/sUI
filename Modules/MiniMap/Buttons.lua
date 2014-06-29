@@ -130,8 +130,51 @@ function M:OnEnable()
 	-----------------------------------------------------------------------------
 	-- Dash Indicator
 	-----------------------------------------------------------------------------
-	local tButtonDash = self.tButtonContainer:CreateButton("Dash", "IconDash2", false, "SezzMiniMapButtonPush");
+	local tButtonDash = self.tButtonContainer:CreateButton("Dash", "IconDash2");
 	tButtonDash.wndMain:SetTooltip("Dash Indicator (NYI)");
+
+	tButtonDash.ToggleDash = function(self, wndHandler)
+		local bDashEnabled = not wndHandler:IsChecked();
+
+		Apollo.SetConsoleVariable("player.doubleTapToDash", bDashEnabled);
+	end
+
+	tButtonDash.UpdateIcon = function(self)
+		local wndIcon = self.wndMain:FindChild("Icon");
+
+		if (self.wndMain:ContainsMouse()) then
+			-- Show "Disable Touble-Tap Dash" Icon
+			wndIcon:SetSprite("IconBlock");
+		elseif (self.wndMain:IsChecked()) then
+			-- Dash is disabled, show X
+			wndIcon:SetSprite("IconDashDisabled");
+		else
+			-- Show amount
+			if (self.nDashAmount >= 0 and self.nDashAmount <= 2) then
+				wndIcon:SetSprite("IconDash"..self.nDashAmount);
+			else
+				log:warn("Player can dash %d times - why?", self.nDashAmount);
+				wndIcon:SetSprite("CRB_NameplateSprites:sprNp_Health_FillPurple");
+			end
+		end
+	end
+
+	tButtonDash.SetAmount = function(self, nAmount)
+		self.nDashAmount = nAmount;
+		self:UpdateIcon();
+	end
+
+	-- Set Current State/Amount
+	local bDashEnabled = Apollo.GetConsoleVariable("player.doubleTapToDash");
+	tButtonDash.wndMain:SetCheck(not bDashEnabled);
+	tButtonDash:SetAmount(S:GetDashAmount(true));
+	self:RegisterEvent("Sezz_PlayerDashChanged", "OnDashChanged");
+
+	-- Events
+	tButtonDash.wndMain:AddEventHandler("ButtonCheck", "ToggleDash", tButtonDash);
+	tButtonDash.wndMain:AddEventHandler("ButtonUncheck", "ToggleDash", tButtonDash);
+	tButtonDash.wndMain:AddEventHandler("MouseEnter", "UpdateIcon", tButtonDash);
+	tButtonDash.wndMain:AddEventHandler("MouseExit", "UpdateIcon", tButtonDash);
 
 	-----------------------------------------------------------------------------
 	-- Settings
@@ -209,4 +252,12 @@ function M:OnInventoryToggle()
 
 	local tButtonInventory = self.tButtonContainer:GetButton("Inventory");
 	tButtonInventory.wndMain:SetCheck(bInventoryOpen);
+end
+
+-----------------------------------------------------------------------------
+
+
+function M:OnDashChanged(event, nCurrent, nMax)
+	local tButtonDash = self.tButtonContainer:GetButton("Dash");
+	tButtonDash:SetAmount(nCurrent);
 end
