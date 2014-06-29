@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sprites>
+    <Sprite Name="04b_11_8_1" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="40" x1="40" x2="40" x3="40" x4="40" x5="44" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_2" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="45" x1="45" x2="45" x3="45" x4="45" x5="52" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_3" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="53" x1="53" x2="53" x3="53" x4="53" x5="60" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_4" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="61" x1="61" x2="61" x3="61" x4="61" x5="68" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_5" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="69" x1="69" x2="69" x3="69" x4="69" x5="76" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_6" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="77" x1="77" x2="77" x3="77" x4="77" x5="84" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_7" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="85" x1="85" x2="85" x3="85" x4="85" x5="92" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_8" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="93" x1="93" x2="93" x3="93" x4="93" x5="100" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_9" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="101" x1="101" x2="101" x3="101" x4="101" x5="108" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_0" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="109" x1="109" x2="109" x3="109" x4="109" x5="116" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_Dot" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="117" x1="117" x2="117" x3="117" x4="117" x5="120" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_F" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="121" x1="121" x2="121" x3="121" x4="121" x5="128" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_P" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="129" x1="129" x2="129" x3="129" x4="129" x5="136" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_S" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="154" x1="154" x2="154" x3="154" x4="154" x5="161" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_M" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="145" x1="145" x2="145" x3="145" x4="145" x5="153" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_B" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="171" x1="171" x2="171" x3="171" x4="171" x5="178" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_8_Percent" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="179" x1="179" x2="179" x3="179" x4="179" x5="186" y0="0" y1="0" y2="0" y3="0" y4="0" y5="6" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_1" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="6" x1="6" x2="6" x3="6" x4="6" x5="24" y0="14" y1="14" y2="14" y3="14" y4="14" y5="44" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_2" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="30" x1="30" x2="30" x3="30" x4="30" x5="66" y0="14" y1="15" y2="15" y3="15" y4="15" y5="44" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_3" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="72" x1="72" x2="72" x3="72" x4="72" x5="108" y0="14" y1="14" y2="14" y3="14" y4="14" y5="44" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_4" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="114" x1="114" x2="114" x3="114" x4="114" x5="150" y0="14" y1="14" y2="14" y3="14" y4="14" y5="44" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_5" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="156" x1="156" x2="156" x3="156" x4="156" x5="192" y0="14" y1="14" y2="14" y3="14" y4="14" y5="44" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_6" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="198" x1="198" x2="198" x3="198" x4="198" x5="234" y0="14" y1="14" y2="14" y3="14" y4="14" y5="44" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_7" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="30" x1="30" x2="30" x3="30" x4="30" x5="66" y0="60" y1="60" y2="60" y3="60" y4="60" y5="90" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_8" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="72" x1="72" x2="72" x3="72" x4="72" x5="108" y0="60" y1="60" y2="60" y3="60" y4="60" y5="90" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_9" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="114" x1="114" x2="114" x3="114" x4="114" x5="150" y0="60" y1="60" y2="60" y3="60" y4="60" y5="90" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_0" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="156" x1="156" x2="156" x3="156" x4="156" x5="192" y0="60" y1="60" y2="60" y3="60" y4="60" y5="90" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_48_DoubleDot" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="198" x1="198" x2="198" x3="198" x4="198" x5="210" y0="59" y1="59" y2="59" y3="59" y4="59" y5="90" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_1" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="21" x1="21" x2="21" x3="21" x4="21" x5="37" y0="102" y1="102" y2="102" y3="102" y4="102" y5="129" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_2" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="42" x1="42" x2="42" x3="42" x4="42" x5="74" y0="102" y1="102" y2="102" y3="102" y4="102" y5="129" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_3" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="80" x1="80" x2="80" x3="80" x4="80" x5="112" y0="102" y1="102" y2="102" y3="102" y4="102" y5="129" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_4" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="118" x1="118" x2="118" x3="118" x4="118" x5="150" y0="102" y1="102" y2="102" y3="102" y4="102" y5="129" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_5" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="156" x1="156" x2="156" x3="156" x4="156" x5="188" y0="102" y1="102" y2="102" y3="102" y4="102" y5="129" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_6" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="194" x1="194" x2="194" x3="194" x4="194" x5="226" y0="102" y1="102" y2="102" y3="102" y4="102" y5="129" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_7" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="42" x1="42" x2="42" x3="42" x4="42" x5="74" y0="138" y1="138" y2="138" y3="138" y4="138" y5="165" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_8" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="80" x1="80" x2="80" x3="80" x4="80" x5="112" y0="138" y1="138" y2="138" y3="138" y4="138" y5="165" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_9" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="118" x1="118" x2="118" x3="118" x4="118" x5="150" y0="138" y1="138" y2="138" y3="138" y4="138" y5="165" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_0" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="156" x1="156" x2="156" x3="156" x4="156" x5="188" y0="138" y1="138" y2="138" y3="138" y4="138" y5="165" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_32_DoubleDot" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="194" x1="194" x2="194" x3="194" x4="194" x5="205" y0="138" y1="138" y2="138" y3="138" y4="138" y5="165" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_1" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="46" x1="46" x2="46" x3="46" x4="46" x5="58" y0="170" y1="170" y2="170" y3="170" y4="170" y5="190" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_2" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="63" x1="63" x2="63" x3="63" x4="63" x5="87" y0="170" y1="170" y2="170" y3="170" y4="170" y5="190" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_3" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="92" x1="92" x2="92" x3="92" x4="92" x5="116" y0="170" y1="170" y2="170" y3="170" y4="170" y5="190" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_4" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="121" x1="121" x2="121" x3="121" x4="121" x5="145" y0="170" y1="170" y2="170" y3="170" y4="170" y5="190" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_5" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="150" x1="150" x2="150" x3="150" x4="150" x5="174" y0="170" y1="170" y2="170" y3="170" y4="170" y5="190" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_6" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="179" x1="179" x2="179" x3="179" x4="179" x5="203" y0="170" y1="170" y2="170" y3="170" y4="170" y5="190" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_7" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="63" x1="63" x2="63" x3="63" x4="63" x5="87" y0="194" y1="194" y2="194" y3="194" y4="194" y5="214" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_8" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="92" x1="92" x2="92" x3="92" x4="92" x5="116" y0="194" y1="194" y2="194" y3="194" y4="194" y5="214" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_9" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="121" x1="121" x2="121" x3="121" x4="121" x5="145" y0="194" y1="194" y2="194" y3="194" y4="194" y5="214" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_0" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="150" x1="150" x2="150" x3="150" x4="150" x5="174" y0="194" y1="194" y2="194" y3="194" y4="194" y5="214" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+    <Sprite Name="04b_11_24_DoubleDot" Cycle="1">
+        <Frame Texture="sUI\Media\Fonts\04b_11.tga" x0="179" x1="179" x2="179" x3="179" x4="179" x5="187" y0="194" y1="194" y2="194" y3="194" y4="194" y5="214" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
+</Sprites>

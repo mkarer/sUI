@@ -68,6 +68,7 @@ function S:OnInitialize()
 	-- Media
 	Apollo.LoadSprites("Media/Icons.xml");
 	Apollo.LoadSprites("Media/Sprites.xml");
+	Apollo.LoadSprites("Media/Fonts/04b_11.xml");
 
 	-- Main Form
 	self.xmlDoc = XmlDoc.CreateFromFile("sUI.xml");

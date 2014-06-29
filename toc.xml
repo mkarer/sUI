@@ -21,6 +21,7 @@
 	<Script Name="Core\Player.lua" />
 	<Script Name="Core\FadeManager.lua" />
 	<Script Name="Core\Media.lua" />
+	<Script Name="Core\Fonts.lua" />
 	<Script Name="Core\Modules.lua" />
 	<Script Name="Core\Slash.lua" />
 	<Script Name="Core\Temp.lua" />
