@@ -12,7 +12,7 @@ require "Window";
 -----------------------------------------------------------------------------
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:NewModule("Temp", "Gemini:Event-1.0", "Gemini:Hook-1.0");
+local M = S:CreateSubmodule("Temp", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
@@ -21,25 +21,13 @@ local log;
 
 function M:OnInitialize()
 	log = S.Log;
---	self:Hook(Apollo, "LoadForm", "OnLoadForm");
 end
 
 function M:OnEnable()
---	Apollo.RegisterEventHandler("ToggleTradeskills", "OnToggleTradeskills", self); 
+--	self:RegisterEvent("RefreshHealthShieldBar", "EventHandler");
 end
 
-function M:OnLoadForm(strFile, strForm, wndParent, tLuaEventHandler)
-	if (strForm and strForm == "TradeskillContainerForm") then
-		self:Hook(tLuaEventHandler, "OnClose", "OnCloseTradeskillContainer");
-		self:Unhook(Apollo, "LoadForm");
-	end
-end
-
-function M:OnToggleTradeskills()
-	log:debug("ToggleTradeskills");
-	log:debug("Tradeskills window is %s", Apollo.FindWindowByName("TradeskillContainerForm"):IsShown() and "visible" or "hidden");
-end
-
-function M:OnCloseTradeskillContainer()
-	log:debug("CloseTradeskillContainer");
+function M:EventHandler(event, ...)
+	log:debug(event);
+	log:debug({S:GetDashAmount()});
 end
