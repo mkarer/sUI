@@ -98,6 +98,10 @@ function S:OnConfigure()
 	self.wndMain:Show(true);
 end
 
+function S:ToggleConfiguration()
+	self.wndMain:Show(not self.wndMain:IsShown());
+end
+
 -----------------------------------------------------------------------------------------------
 -- Global (TEMP, for debugging)
 -----------------------------------------------------------------------------------------------
