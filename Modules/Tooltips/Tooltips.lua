@@ -45,6 +45,19 @@ function M:OnInitialize()
 			-- Apply WorldTooltipContainer 
 			GameLib.SetWorldTooltipContainer(self.wndContainer);
 		end
+
+--[[
+		-- Apollo.LoadForm Hook
+		-- Why is everything in ToolTips.lua hardcoded?!
+		Apollo._LoadForm = Apollo.LoadForm;
+		Apollo.LoadForm = function(strFile, ...)
+			if (type(strFile) == "string" and (strFile == "TooltipsForms.xml" or strFile == "ui\\Tooltips\\TooltipsForms.xml")) then
+				strFile = tTooltips.xmlDoc;
+			end
+
+			return Apollo._LoadForm(strFile, ...);
+		end
+]]
 	else
 		self:SetEnabledState(false);
 	end
