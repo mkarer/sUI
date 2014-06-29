@@ -37,3 +37,10 @@ end
 for emote, v in pairs(emoteShortcuts) do
 	Apollo.RegisterSlashCommand(emote, "DoEmote", M);
 end
+
+-- Window Wire Frames
+function M:ToggleWindowWireFrames()
+	Apollo.SetConsoleVariable("ui.WindowWireFrame", not Apollo.GetConsoleVariable("ui.WindowWireFrame"));
+end
+
+Apollo.RegisterSlashCommand("fstack", "ToggleWindowWireFrames", M);
