@@ -36,8 +36,16 @@ function M:OnEnable()
 	self.timerMemory = ApolloTimer.Create(300, true, "UpdateAddondMemory", self); -- LAAAAG
 	self.timerStats = ApolloTimer.Create(3, true, "UpdateLatency", self);
 
+	-- Update Memory/Stats
 	self:UpdateAddondMemory();
 	self:UpdateLatency();
+
+	-- Update Durability
+	self:RegisterEvent("ItemDurabilityUpdate", "UpdateDurability");
+	self:RegisterEvent("Sezz_CharacterLoaded", "UpdateDurability");
+	self:UpdateDurability();
+
+	-- Show Text
 	self:UpdateText();
 end
 
@@ -55,7 +63,7 @@ function M:UpdateText(a)
 	local strTime = strformat("%02d:%02d", tostring(tTime.nHour), tostring(tTime.nMinute));
 
 	-- Update Text
-	local strStats = strformat("%dFPS %.1fMB %dMS 100%%", self.nFPS, self.nAddonMemory, self.nLatency);
+	local strStats = strformat("%dFPS %.1fMB %dMS %d%%", self.nFPS, self.nAddonMemory, self.nLatency, self.nDurability);
 
 	self.tFontLarge:Draw(self.wndMain:FindChild("Clock"), strTime, true, self.tColorClock);
 	self.tFontSmall:Draw(self.wndMain:FindChild("Stats"), strStats, true);
@@ -69,6 +77,33 @@ end
 function M:UpdateLatency()
 	self.nLatency = GameLib.GetLatency();
 	self.nFPS = GameLib.GetFrameRate();
+end
+
+-----------------------------------------------------------------------------
+-- Durability
+-----------------------------------------------------------------------------
+
+function M:UpdateDurability()
+	local nDurabilityLowest = 100;
+
+	if (S.bCharacterLoaded) then
+		local tItems = S.myCharacter:GetEquippedItems();
+
+		for _, tItem in ipairs(tItems) do
+			local nDurabilityMax = tItem:GetMaxDurability();
+			local nDurabilityCurrent = tItem:GetDurability();
+
+			if (nDurabilityMax > 0) then
+				local nDurabilityPercent = math.floor(nDurabilityCurrent / (nDurabilityMax / 100));
+
+				if (nDurabilityPercent < nDurabilityLowest) then
+					nDurabilityLowest = nDurabilityPercent;
+				end
+			end
+		end
+	end
+
+	self.nDurability = nDurabilityLowest;
 end
 
 -----------------------------------------------------------------------------
