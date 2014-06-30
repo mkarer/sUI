@@ -14,6 +14,22 @@ if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 local UnitFrame = APkg and APkg.tPackage or {};
 local log;
 
+-- Lua APIs
+local strformat = string.format;
+
+-----------------------------------------------------------------------------
+-- Helper Functions
+-----------------------------------------------------------------------------
+
+local Round = function(nNumber)
+	return math.floor(nNumber + 0.5);
+end
+
+local ColorArrayToHex = function(arColor)
+	-- We only use indexed arrays here!
+	return strformat("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
+end
+
 -----------------------------------------------------------------------------
 -- XML Elements
 -----------------------------------------------------------------------------
@@ -55,7 +71,7 @@ local AddHealthBar = function(self)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = "ff262626",
+		BarColor = ColorArrayToHex(self.tColors.Health),
 	});
 
 	self.tXmlData["HealthBarBackground"]:AddChild(self.tXmlData["HealthBar"]);
@@ -109,6 +125,15 @@ local OnMouseExit = function(self, wndHandler)
 end
 
 -----------------------------------------------------------------------------
+-- Value Updating
+-----------------------------------------------------------------------------
+
+local SetHealth = function(self, nCurrent, nMax)
+	self.wndHealth:SetMax(nMax);
+	self.wndHealth:SetProgress(nCurrent);
+end
+
+-----------------------------------------------------------------------------
 -- Forms
 -----------------------------------------------------------------------------
 
@@ -127,6 +152,12 @@ local LoadForm = function(self)
 	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
 	self.wndMain:SetBGOpacity(0.2, 5e+20);
 
+	-- Add Properties for our Elements
+	self.wndHealth = self.wndMain:FindChild("HealthBar");
+
+	-- Expose more Methods
+	self.SetHealth = SetHealth;
+
 	-- Return
 	return self.wndMain;
 end
@@ -143,7 +174,7 @@ local Hide = function(self)
 	self.wndMain:Hide(true, true);
 end
 
-CreateUnitFrame = function(self)
+local CreateUnitFrame = function(self)
 	-- Initialize Unit Frame Table
 	self.strName = "SezzUnitFrames_"..self.strUnit;
 
@@ -187,7 +218,9 @@ function UnitFrame:New(o, tUnitFrameController, tSettings)
 		end
 	end
 
+	-- Reference Unit Frame Controller
 	self.xmlDoc = tUnitFrameController.xmlDoc;
+	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors });
 	
 	-- Expose Methods
 	self.LoadForm = LoadForm;
