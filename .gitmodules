@@ -22,3 +22,6 @@
 [submodule "libs/GeminiTimer"]
 	path = libs/GeminiTimer
 	url = https://github.com/wildstarnasa/GeminiTimer.git
+[submodule "Libs/XmlDocument"]
+	path = Libs/XmlDocument
+	url = https://github.com/wildstarnasa/XmlDocument.git
