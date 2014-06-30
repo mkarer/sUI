@@ -31,10 +31,6 @@
 	<Script Name="Modules\Fixes\ConsoleVariables.lua" />
 	<Script Name="Modules\Artwork\ArtworkRemover.lua" />
 	<Script Name="Modules\Artwork\Panels.lua" />
-	<Script Name="Modules\Chat\Core.lua" />
-	<Script Name="Modules\Chat\ChannelColors.lua" />
-	<Script Name="Modules\Chat\Position.lua" />
-	<Script Name="Modules\Chat\StickyWhisper.lua" />
 	<Script Name="Modules\Crafting\RandomCraft.lua" />
 	<Form Name="Modules\Crafting\RandomCraft.xml" />
 	<Script Name="Modules\Crafting\Unmount.lua" />
@@ -42,6 +38,11 @@
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
+	<!-- Chat -->
+	<Script Name="Modules\Chat\Core.lua" />
+	<Script Name="Modules\Chat\ChannelColors.lua" />
+	<Script Name="Modules\Chat\Position.lua" />
+	<Script Name="Modules\Chat\StickyWhisper.lua" />
 	<!-- Action Bars -->
 	<Script Name="Modules\ActionBars\ActionBars.lua" />
 	<Form Name="Modules\ActionBars\ActionBars.xml" />
@@ -50,6 +51,10 @@
 	<!-- MiniMap -->
 	<Script Name="Modules\MiniMap\MiniMap.lua" />
 	<Script Name="Modules\MiniMap\Buttons.lua" />
+	<Script Name="Modules\MiniMap\InlineButtons.lua" />
+	<!-- Automation -->
+	<Script Name="Modules\Automation\Core.lua" />
+	<Script Name="Modules\Automation\ChallengeReward.lua" />
 	<!-- Misc -->
 	<Script Name="Modules\DataText\DataText.lua" />
 
