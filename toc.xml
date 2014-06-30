@@ -38,6 +38,9 @@
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
+	<!-- Unit Frames Library -->
+	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrame.lua" />
+	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrameController.lua" />
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<Script Name="Modules\UnitFrames\Core.lua" />
