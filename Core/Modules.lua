@@ -89,7 +89,7 @@ local tModulePrototype = {
 		end
 	end,
 	CreateSubmodule = function(self, name, ...)
-		local module = self:NewModule(name, ...);
+		local module = self:NewModule(name, "Gemini:Event-1.0", ...);
 		module.InitializeForms = self.InitializeForms;
 		module.EnableSubmodules = self.EnableSubmodules;
 
