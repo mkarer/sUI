@@ -15,19 +15,54 @@ local UnitFrame = APkg and APkg.tPackage or {};
 local log;
 
 -- Lua APIs
-local strformat = string.format;
+local strformat, modf, select, floor = string.format, math.modf, select, math.floor;
 
 -----------------------------------------------------------------------------
 -- Helper Functions
 -----------------------------------------------------------------------------
 
 local Round = function(nNumber)
-	return math.floor(nNumber + 0.5);
+	return floor(nNumber + 0.5);
 end
+
+-----------------------------------------------------------------------------
+-- Colors
+-----------------------------------------------------------------------------
 
 local ColorArrayToHex = function(arColor)
 	-- We only use indexed arrays here!
 	return strformat("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
+end
+
+local RGBColorToHex = function(r, g, b)
+	-- We only use indexed arrays here!
+	return strformat("%02x%02x%02x%02x", 255, Round(255 * r), Round(255 * g), Round(255 * b))
+end
+
+-----------------------------------------------------------------------------
+-- Color Gradient
+-- http://www.wowwiki.com/ColorGradient
+-----------------------------------------------------------------------------
+
+local ColorsAndPercent = function(a, b, ...)
+	if (a <= 0 or b == 0) then
+		return nil, ...;
+	elseif (a >= b) then
+		return nil, select(select('#', ...) - 2, ...);
+	end
+
+	local num = select('#', ...) / 3;
+	local segment, relperc = modf((a / b) * (num - 1));
+	return relperc, select((segment * 3) + 1, ...);
+end
+
+local RGBColorGradient = function(...)
+	local relperc, r1, g1, b1, r2, g2, b2 = ColorsAndPercent(...);
+	if (relperc) then
+		return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc;
+	else
+		return r1, g1, b1;
+	end
 end
 
 -----------------------------------------------------------------------------
@@ -131,6 +166,56 @@ end
 local SetHealth = function(self, nCurrent, nMax)
 	self.wndHealth:SetMax(nMax);
 	self.wndHealth:SetProgress(nCurrent);
+
+	if (self.tColors.Smooth) then
+		self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.Smooth))));
+	end
+end
+
+local SetUnit = function(self, unitBase, strUnitGetter)
+	if (not unitBase or (strUnitGetter and not unitBase[strUnitGetter])) then
+		-- Bullshit, disable.
+		log:debug("[%s] Bullshit call!", self.strUnit);
+		return false;
+	end
+
+	-- Base Unit
+	local bUpdatedBase = false;
+	if (not self.unitBase or (self.unitBase and self.unitBase:GetId() ~= unitBase:GetId())) then
+		log:debug("[%s] Updated Base Unit", self.strUnit);
+		self.unitBase = unitBase;
+		bUpdatedBase = true;
+	end
+
+	-- Unit Getter Method (for everything but the player)
+	-- Nevery changes (only on initialization of course)
+	local bUpdatedGetter = false;
+	if (self.strUnitGetter ~= strUnitGetter) then
+		log:debug("[%s] Updated Unit Getter Method", self.strUnit);
+		self.strUnitGetter = strUnitGetter;
+		bUpdatedGetter = true;
+	end
+
+	-- Update Unit
+	if (bUpdatedBase and not self.strUnitGetter) then
+		log:debug("[%s] Updated Unit", self.strUnit);
+		self.unitCurrent = self.unitBase;
+	end
+
+	if (self.strUnitGetter) then
+		local unitCurrent = self.unitBase[self.strUnitGetter]();
+
+		if (not self.unitCurrent or (self.unitCurrent and (not self.unitCurrent:IsValid() or self.unitCurrent:GetId() ~= unitCurrent:GetId()))) then
+			log:debug("[%s] Updated Unit", self.strUnit);
+			self.unitCurrent = unitCurrent;
+		end
+	end
+
+	if (not self.unitCurrent or (self.unitCurrent and not self.unitCurrent:IsValid())) then
+		log:debug("[%s] Invalid Unit -> Disable", self.strUnit);
+	else
+		log:debug("[%s] Unit Name: %s", self.strUnit, self.unitCurrent:GetName());
+	end
 end
 
 -----------------------------------------------------------------------------
@@ -163,10 +248,11 @@ local LoadForm = function(self)
 end
 
 local Show = function(self)
-	ApolloTimer.Create(0, false, "ShowDelayed", self);
+	Apollo.RegisterEventHandler("VarChange_FrameCount", "ShowDelayed", self); -- We need this because SetBGOpacity apparently needs 1 frame....
 end
 
 local ShowDelayed = function(self)
+	Apollo.RemoveEventHandler("VarChange_FrameCount", self);
 	self.wndMain:Show(true, true);
 end
 
@@ -199,6 +285,7 @@ local CreateUnitFrame = function(self)
 	self.OnMouseExit = OnMouseExit;
 	self.Show = Show;
 	self.ShowDelayed = ShowDelayed;
+	self.SetUnit = SetUnit;
 
 	-- Return Unit Frame Object
 	return self;
@@ -220,8 +307,8 @@ function UnitFrame:New(o, tUnitFrameController, tSettings)
 
 	-- Reference Unit Frame Controller
 	self.xmlDoc = tUnitFrameController.xmlDoc;
-	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors });
-	
+	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors })
+
 	-- Expose Methods
 	self.LoadForm = LoadForm;
 
