@@ -41,6 +41,44 @@ function UnitFrameController:New(o)
 	-- Properties
 	self.tUnitFrames = {};
 
+	-- Default Colors
+	-- Copied from my World of Warcraft Unit Frames
+	self.tColors = {
+		Power = {
+			["MANA"]					= { 45/255, 82/255, 137/255 },
+			["RAGE"]					= { 226/255, 45/255, 75/255 },
+			["FOCUS"]					= { 1, 210/255, 0 },
+			["ENERGY"]					= { 1, 220/255, 25/255 },
+			["RUNIC_POWER"]				= { 1, 210/255, 0 },
+			["POWER_TYPE_STEAM"]		= { 0.55, 0.57, 0.61 },
+			["POWER_TYPE_PYRITE"]		= { 0.60, 0.09, 0.17 },
+			["POWER_TYPE_FEL_ENERGY"]	= { 1, 1, 0.3 },
+			["AMMOSLOT"]				= { 0.8, 0.6, 0 },
+		},
+		Reaction = {
+			[2] = {1, 0, 0},
+			[4] = {1, 1, 0},
+			[5] = {0, 1, 0}
+		},
+		Runes = {
+			[1] = {0.8, 0, 0},
+			[3] = {0, 0.4, 0.7},
+			[4] = {0.8, 0.8, 0.8}
+		},
+		Health = {38/255, 38/255, 38/255},
+		Smooth = {255/255, 38/255, 38/255, 255/255, 38/255, 38/255, 38/255, 38/255, 38/255},
+		Tapped = {153/255, 153/255, 153/255},
+		Experience = {
+			Normal = {45/255 - 0.1, 85/255 + 0.2, 137/255},
+			Rested = {45/255 + 0.2, 85/255 - 0.1, 137/255 - 0.1},
+		},
+		Castbar = {
+			Normal = { 0.43, 0.75, 0.44 },
+			Uninterruptable = { 1.00, 0.75, 0.44 },
+			Warning = { 1, 0, 0 },
+		},
+	};
+
 	-- Create a new XML Document
 	self.xmlDoc = XmlDocument.NewForm();
 	
