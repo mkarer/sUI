@@ -33,6 +33,13 @@ end
 function M:CloseChallengeRewardPanel(event, ...)
 	tRewardPanel = Apollo.FindWindowByName("ChallengeRewardPanelForm");
 	if (tRewardPanel) then
+		-- Close Reward Panel
 		tRewardPanel:Close();
+
+		-- Close Challenge Tracker
+		tChallenges = Apollo.GetAddon("Challenges");
+		if (tChallenges) then
+			tChallenges:OnTrackerMinimizeButton();
+		end
 	end
 end
