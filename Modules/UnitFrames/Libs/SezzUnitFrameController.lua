@@ -2,6 +2,9 @@
 
 	s:UI Unit Frame Controller
 
+	Should handle most of the updating, because in WildStar we have to use
+	OnUpdate (aka VarChange_FrameCount) for nearly everything (PLEASE GIVE US MORE EVENTS).
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -15,6 +18,8 @@ local UnitFrameController = APkg and APkg.tPackage or {};
 local XmlDocument, UnitFrame, GeminiLogging, log;
 
 -----------------------------------------------------------------------------
+-- Frame Creation
+-----------------------------------------------------------------------------
 
 local CreateUnitFrame = function(self, tSettings)
 	log:debug("Creating Unit Frame for: %s", tSettings.strUnit)
@@ -25,13 +30,66 @@ local CreateUnitFrame = function(self, tSettings)
 end
 
 local LoadForm = function(self)
-	-- Add all Unit Frames' XML Data as Root Element
+	-- Add all Unit Frames' XML and load them with Apollo
 	for _, tUnitFrame in pairs(self.tUnitFrames) do
 		log:debug("Loading Unit Frame: %s", tUnitFrame.strUnit);
 		tUnitFrame:LoadForm();
 	end
 end
 
+-----------------------------------------------------------------------------
+-- Events
+-----------------------------------------------------------------------------
+
+local UpdateUnits = function(self)
+	local bCharacterLoaded = false;
+
+	if (GameLib and GameLib.IsCharacterLoaded()) then
+		local unitPlayer = GameLib.GetPlayerUnit();
+
+		if (unitPlayer and unitPlayer:IsValid()) then
+			-- Update Unit Frames
+--			log:debug("Updating Units...");
+			bCharacterLoaded = true;
+
+			if (self.tUnitFrames["Player"]) then
+				self.tUnitFrames["Player"]:SetUnit(unitPlayer);
+			end
+
+			if (self.tUnitFrames["Target"]) then
+				self.tUnitFrames["Target"]:SetUnit(unitPlayer, "GetTarget");
+			end
+
+			if (self.tUnitFrames["Focus"]) then
+				self.tUnitFrames["Focus"]:SetUnit(unitPlayer, "GetAlternateTarget");
+			end
+		end
+	end
+
+	if (not bCharacterLoaded) then
+		-- Delay
+		log:debug("Delaying OnCharacterCreated")
+		ApolloTimer.Create(0.1, false, "OnCharacterCreated", self);
+	end
+end
+
+-----------------------------------------------------------------------------
+
+local Enable = function(self)
+	self.UpdateUnits = UpdateUnits;
+
+	if (GameLib and GameLib.IsCharacterLoaded()) then
+		self:UpdateUnits();
+	end
+
+	Apollo.RegisterEventHandler("CharacterCreated", "UpdateUnits", self);
+	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnits", self);
+	Apollo.RegisterEventHandler("TargetUnitChanged", "UpdateUnits", self);
+	Apollo.RegisterEventHandler("AlternateTargetUnitChanged", "UpdateUnits", self);
+end
+
+-----------------------------------------------------------------------------
+-- Constructor
 -----------------------------------------------------------------------------
 
 function UnitFrameController:New(o)
@@ -56,26 +114,29 @@ function UnitFrameController:New(o)
 			["AMMOSLOT"]				= { 0.8, 0.6, 0 },
 		},
 		Reaction = {
-			[2] = {1, 0, 0},
-			[4] = {1, 1, 0},
-			[5] = {0, 1, 0}
+			[2] = { 1, 0, 0 },
+			[4] = { 1, 1, 0 },
+			[5] = { 0, 1, 0 },
 		},
-		Runes = {
-			[1] = {0.8, 0, 0},
-			[3] = {0, 0.4, 0.7},
-			[4] = {0.8, 0.8, 0.8}
-		},
-		Health = {38/255, 38/255, 38/255},
-		Smooth = {255/255, 38/255, 38/255, 255/255, 38/255, 38/255, 38/255, 38/255, 38/255},
-		Tapped = {153/255, 153/255, 153/255},
+		Health = { 38/255, 38/255, 38/255 },
+		Smooth = { 255/255, 38/255, 38/255, 255/255, 38/255, 38/255, 38/255, 38/255, 38/255 },
+		Tapped = { 153/255, 153/255, 153/255 },
 		Experience = {
-			Normal = {45/255 - 0.1, 85/255 + 0.2, 137/255},
-			Rested = {45/255 + 0.2, 85/255 - 0.1, 137/255 - 0.1},
+			Normal = { 45/255 - 0.1, 85/255 + 0.2, 137/255 },
+			Rested = { 45/255 + 0.2, 85/255 - 0.1, 137/255 - 0.1 },
 		},
 		Castbar = {
 			Normal = { 0.43, 0.75, 0.44 },
 			Uninterruptable = { 1.00, 0.75, 0.44 },
 			Warning = { 1, 0, 0 },
+		},
+		Class = {
+			[GameLib.CodeEnumClass.Engineer]		= { 164, 26, 49 },
+			[GameLib.CodeEnumClass.Esper]			= { 116, 221, 255 },
+			[GameLib.CodeEnumClass.Medic]			= { 255, 255, 255 },
+			[GameLib.CodeEnumClass.Stalker]			= { 221, 212, 95 },
+			[GameLib.CodeEnumClass.Spellslinger]	= { 130, 111, 172 },
+			[GameLib.CodeEnumClass.Warrior]			= { 171, 133, 94 },
 		},
 	};
 
@@ -85,6 +146,7 @@ function UnitFrameController:New(o)
 	-- Expose Methods
 	self.CreateUnitFrame = CreateUnitFrame;
 	self.LoadForm = LoadForm;
+	self.Enable = Enable;
 
 	return self;
 end
