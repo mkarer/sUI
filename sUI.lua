@@ -97,10 +97,14 @@ end
 
 function S:OnConfigure()
 	self.wndMain:Show(true);
+	self.wndMain:ToFront();
 end
 
 function S:ToggleConfiguration()
 	self.wndMain:Show(not self.wndMain:IsShown());
+	if (self.wndMain:IsShown()) then
+		self.wndMain:ToFront();
+	end
 end
 
 -----------------------------------------------------------------------------------------------
