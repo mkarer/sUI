@@ -30,14 +30,32 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
-	self:RegisterEvent("ChallengeReward_SpinBegin", "EventHandler");
+	self:RegisterEvent("InterfaceMenuList_AlertAddOn", "EventHandler"); -- Calculate
 end
 
 function M:EventHandler(event, ...)
-	tRewardPanel = Apollo.FindWindowByName("ChallengeRewardPanelForm");
-	if (tRewardPanel) then
-		tRewardPanel:Close();
+--	log:debug(event);
+
+	if (true) then return; end
+
+	if (event == "InterfaceMenuList_AlertAddOn") then
+		local strAddon, tAlertInfo = ...;
+
+		if (strAddon == Apollo.GetString("InterfaceMenu_Mail")) then
+			log:debug("[InterfaceMenuList_AlertAddOn] Show Mail Alert: "..(tAlertInfo[1] and "YES" or "NO"));
+		end
 	end
+
+	local nUnreadMessages = 0;
+	for idx, tMessage in pairs(MailSystemLib.GetInbox()) do
+		local tMessageInfo = tMessage:GetMessageInfo();
+		
+		if (tMessageInfo and not tMessageInfo.bIsRead) then
+			nUnreadMessages = nUnreadMessages + 1;
+		end
+	end
+
+	log:debug("[Unread] Show Mail Alert: "..(nUnreadMessages > 0 and "YES" or "NO"));
 
 --	ChallengeRewardPanel:OnWindowCloseDelay();
 
