@@ -38,6 +38,7 @@ function S:OnCharacterCreated()
 		self.inCombat = unitPlayer:IsInCombat();
 		self.myCharacter = unitPlayer;
 
+		-- Events (Combat, Action Sets, Player)
 		self:UpdateLimitedActionSetData();
 		self:RegisterEvent("AbilityBookChange", "OnAbilityBookChange");
 		self:RegisterEvent("UnitEnteredCombat", "HandleCombatChanges");
@@ -50,6 +51,18 @@ function S:OnCharacterCreated()
 		self:RaiseEvent("Sezz_CharacterLoaded");
 		self:RaiseCombatEvent();
 		self:DashUpdateTimerTick();
+
+		-- Events (Mail)
+		self:CheckMailEvent();
+		self:RegisterEvent("AvailableMail", "CheckMailEvent");
+		self:RegisterEvent("UnavailableMail", "CheckMailEvent");
+		self:RegisterEvent("RefreshMail", "CheckMailEvent");
+		self:RegisterEvent("MailResult", "CheckMailEvent");
+		self:RegisterEvent("SubZoneChanged", "CheckMailEvent");
+		self:RegisterEvent("ToggleMailWindow", "CheckMailEvent");
+		self:RegisterEvent("MailBoxActivate", "CheckMailEvent");
+		self:RegisterEvent("MailBoxDeactivate", "CheckMailEvent");
+		self:RegisterEvent("MailWindowHasBeenClosed", "CheckMailEvent");
 	else
 		Apollo.StartTimer("SezzUITimer_DelayedInit");
 	end
@@ -367,5 +380,50 @@ function S:GetDashAmount(bShort)
 		end
 	else
 		return 0, 0;
+	end
+end
+
+-----------------------------------------------------------------------------
+-- Mail
+-----------------------------------------------------------------------------
+
+local strLastMailEvent = "";
+
+function S:GetMailAmount()
+	local nUnreadMessages = 0;
+	local nReadMessages = 0;
+
+	if (MailSystemLib) then
+		for _, tMessage in pairs(MailSystemLib.GetInbox()) do
+			local tMessageInfo = tMessage:GetMessageInfo();
+			
+			if (tMessageInfo) then
+				if (not tMessageInfo.bIsRead) then
+					nUnreadMessages = nUnreadMessages + 1;
+				else
+					nReadMessages = nReadMessages + 1;
+				end
+			end
+		end
+	end
+
+	return nUnreadMessages, nReadMessages;
+end
+
+function S:CheckMailEvent()
+	local nUnreadMessages, nReadMessages = self:GetMailAmount();
+	local strEvent = strLastMailEvent;
+
+	if (nUnreadMessages > 0) then
+		strEvent = "Sezz_NewMailAvailable";
+	elseif (nReadMessages > 0) then
+		strEvent = "Sezz_MailAvailable";
+	else
+		strEvent = "Sezz_NoMailAvailable";
+	end
+
+	if (strLastMailEvent ~= strEvent) then
+		strLastMailEvent = strEvent;
+		self:RaiseEvent(strEvent);
 	end
 end
