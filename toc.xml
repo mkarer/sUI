@@ -38,6 +38,10 @@
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
+	<!-- Unit Frames -->
+	<Script Name="Modules\UnitFrames\Experience.lua" />
+	<Script Name="Modules\UnitFrames\Core.lua" />
+	<Script Name="Modules\UnitFrames\Units\Player.lua" />
 	<!-- Chat -->
 	<Script Name="Modules\Chat\Core.lua" />
 	<Script Name="Modules\Chat\ChannelColors.lua" />
@@ -46,8 +50,6 @@
 	<!-- Action Bars -->
 	<Script Name="Modules\ActionBars\ActionBars.lua" />
 	<Form Name="Modules\ActionBars\ActionBars.xml" />
-	<!-- Unit Frames -->
-	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<!-- MiniMap -->
 	<Script Name="Modules\MiniMap\MiniMap.lua" />
 	<Script Name="Modules\MiniMap\Buttons.lua" />
