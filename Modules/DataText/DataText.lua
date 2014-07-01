@@ -33,7 +33,7 @@ function M:OnEnable()
 
 	-- Start Clock Timer + Update Time
 	self.timerClock = ApolloTimer.Create(2, true, "UpdateText", self);
-	self.timerMemory = ApolloTimer.Create(300, true, "UpdateAddondMemory", self); -- LAAAAG
+	self.timerMemory = ApolloTimer.Create(1, true, "UpdateAddondMemory", self);
 	self.timerStats = ApolloTimer.Create(3, true, "UpdateLatency", self);
 
 	-- Update Memory/Stats
@@ -110,148 +110,59 @@ end
 -- Addon Memory
 -----------------------------------------------------------------------------
 
-local tAddonsCarbine = {
-	["Abilities"] = true,
-	["AbilityAMPs"] = true,
-	["AbilityVendor"] = true,
-	["AccountInventory"] = true,
-	["Achievements"] = true,
-	["ActionBarFrame"] = true,
-	["ActionBarShortcut"] = true,
-	["AdventureClueTracker"] = true,
-	["AdventureMalgrave"] = true,
-	["AdventureNorthernWilds"] = true,
-	["AdventureWhitevale"] = true,
-	["ArenaTeam"] = true,
-	["BankViewer"] = true,
-	["BuildMap"] = true,
-	["CastBar"] = true,
-	["Challenges"] = true,
-	["Character"] = true,
-	["ChatLog"] = true,
-	["Cinematics"] = true,
-	["Circles"] = true,
-	["ClassResources"] = true,
-	["CombatLog"] = true,
-	["CommDisplay"] = true,
-	["ContextMenuPlayer"] = true,
-	["Costumes"] = true,
-	["Crafting"] = true,
-	["CraftingGrid"] = true,
-	["CraftingResume"] = true,
-	["CraftingSummaryScreen"] = true,
-	["CrowdControlGameplay"] = true,
-	["CSI"] = true,
-	["CustomerSurvey"] = true,
-	["Datachron"] = true,
-	["Death"] = true,
-	["Dialog"] = true,
-	["ErrorDialog"] = true,
-	["FloatText"] = true,
-	["FriendsList"] = true,
-	["GalacticArchive"] = true,
-	["GameExit"] = true,
-	["GroupFrame"] = true,
-	["Guild"] = true,
-	["GuildAlerts"] = true,
-	["GuildBank"] = true,
-	["GuildContentInfo"] = true,
-	["GuildContentPerks"] = true,
-	["GuildContentRoster"] = true,
-	["GuildDesigner"] = true,
-	["GuildRegistration"] = true,
-	["Hazards"] = true,
-	["HealthShieldBar"] = true,
-	["Housing"] = true,
-	["HousingAlerts"] = true,
-	["HUD"] = true,
-	["HUDAlerts"] = true,
-	["Inspect"] = true,
-	["InstanceSettings"] = true,
-	["InterfaceMenuList"] = true,
-	["Inventory"] = true,
-	["Keybinding"] = true,
-	["LevelUpUnlocks"] = true,
-	["LootNotificationWindow"] = true,
-	["LoreWindow"] = true,
-	["Macros"] = true,
-	["Mail"] = true,
-	["MarketplaceAuction"] = true,
-	["MarketplaceCommodity"] = true,
-	["MarketplaceCREDD"] = true,
-	["MarketplaceListings"] = true,
-	["MasterLoot"] = true,
-	["MatchMaker"] = true,
-	["MatchTracker"] = true,
-	["Medic"] = true,
-	["MessageManager"] = true,
-	["MiniMap"] = true,
-	["MountCustomization"] = true,
-	["Nameplates"] = true,
-	["NCCB"] = true,
-	["NeedVsGreed"] = true,
-	["NeighborList"] = true,
-	["NonCombatSpellbook"] = true,
-	["Options"] = true,
-	["OptionsInterface"] = true,
-	["PathExplorerContent"] = true,
-	["PathScientistContent"] = true,
-	["PathSettlerContent"] = true,
-	["PathSoldierContent"] = true,
-	["PlayerPath"] = true,
-	["PlayerTicket"] = true,
-	["PopupText"] = true,
-	["ProgressLog"] = true,
-	["PublicEventStats"] = true,
-	["PublicEventVote"] = true,
-	["PvPKillBoard"] = true,
-	["QuestLog"] = true,
-	["QuestTracker"] = true,
-	["RaidFrameBase"] = true,
-	["RaidFrameLeaderOptions"] = true,
-	["RaidFrameMasterLoot"] = true,
-	["RaidFrameTearOff"] = true,
-	["RecallFrame"] = true,
-	["ReportPlayer"] = true,
-	["Reputation"] = true,
-	["ResourceConversion"] = true,
-	["RewardIcons"] = true,
-	["Runecrafting"] = true,
-	["RuneSets"] = true,
-	["Sabotage"] = true,
-	["SocialPanel"] = true,
-	["SprintMeter"] = true,
-	["StalkerResource"] = true,
-	["StoryPanel"] = true,
-	["Stuck"] = true,
-	["SupplySatchel"] = true,
-	["TargetFrame"] = true,
-	["TaxiMap"] = true,
-	["TechWarrior"] = true,
-	["ToolTips"] = true,
-	["Tradeskills"] = true,
-	["TradeskillTrainer"] = true,
-	["Trading"] = true,
-	["Tutorial"] = true,
-	["Util"] = true,
-	["Vendor"] = true,
-	["Warparty"] = true,
-	["WarpartyBank"] = true,
-	["Warplots"] = true,
-	["Who"] = true,
-	["XPBar"] = true,
-	["ZoneCompletion"] = true,
-	["ZoneMap"] = true,
-};
+local tAddonMemory = {};
+local tAddonList;
+local iCurrentAddon = 1;
+local nTotalAddons = 0;
+
+local UpdateAddonMemory = function(strAddon)
+	local tAddon = Apollo.GetAddonInfo(strAddon);
+	if (tAddon and tAddon.nMemoryUsage) then
+		tAddonMemory[strAddon] = tonumber(tAddon.nMemoryUsage);
+	else
+		tAddonMemory[strAddon] = 0;
+	end
+end
 
 function M:UpdateAddondMemory()
-	if (S.inCombat) then
-		-- Update later
-		return;
+	if (S.inCombat) then return; end
+	local bInitialRun = false;
+
+	-- Initial Run
+	if (not tAddonList) then
+		bInitialRun = true;
+		tAddonList = Apollo.GetAddons();
+		for _, strAddon in ipairs(tAddonList) do
+			UpdateAddonMemory(strAddon);
+		end
+
+		nTotalAddons = #tAddonList;
 	end
 
-	log:debug("++++++++++++ Updating Addon Memory");
+	-- Update only one addon every tick
+	if (not bInitialRun) then
+		if (iCurrentAddon > nTotalAddons or not tAddonList[iCurrentAddon]) then
+			iCurrentAddon = 1;
+		end
 
+		if (tAddonList[iCurrentAddon]) then
+--			log:debug(" +++ UPDATE: %s", tAddonList[iCurrentAddon]);
+			UpdateAddonMemory(tAddonList[iCurrentAddon]);
+			iCurrentAddon = iCurrentAddon + 1;
+		end
+	end
+
+	-- Calculate total used memory
+	local nAddonMemory = 0;
+
+	for i = 1, nTotalAddons do
+		nAddonMemory = nAddonMemory + tAddonMemory[tAddonList[i]];
+	end
+
+	self.nAddonMemory = nAddonMemory / 1024 / 1024;
+--	log:debug(self.nAddonMemory);
+
+--[[
 	local nAddonMemory = 0;
 	local tAddons = Apollo:GetAddons();
 
@@ -265,4 +176,5 @@ function M:UpdateAddondMemory()
 	end
 
 	self.nAddonMemory = nAddonMemory / 1024 / 1024;
+]]
 end
