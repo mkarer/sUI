@@ -46,6 +46,9 @@ function S:Clone(t)
 end
 
 function S:Combine(t1, t2)
+	if (not t1 or type(t1) ~= "table") then t1 = {}; end
+	if (not t2 or type(t2) ~= "table") then t2 = {}; end
+
 	for k, v in pairs(t2) do
 		t1[k] = v;
 	end
