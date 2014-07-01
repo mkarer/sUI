@@ -30,11 +30,11 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
-	self:RegisterEvent("InterfaceMenuList_AlertAddOn", "EventHandler"); -- Calculate
+--	self:RegisterEvent("InterfaceMenuList_AlertAddOn", "EventHandler"); -- Calculate
 end
 
 function M:EventHandler(event, ...)
---	log:debug(event);
+	log:debug(event);
 
 	if (true) then return; end
 
