@@ -18,6 +18,12 @@ local UnitFrameController = APkg and APkg.tPackage or {};
 local XmlDocument, UnitFrame, GeminiLogging, log;
 
 -----------------------------------------------------------------------------
+-- Child Libraries
+-----------------------------------------------------------------------------
+
+local tRegisteredElements = {};
+
+-----------------------------------------------------------------------------
 -- Frame Creation
 -----------------------------------------------------------------------------
 
@@ -54,6 +60,11 @@ end
 local UpdateUnits = function(self)
 	local bCharacterLoaded = false;
 
+	-- Reduce Updates/Second
+	local nTicks = GameLib.GetTickCount();
+	if (nTicks - self.nUpdated < 100) then return; end
+
+	-- Check Character
 	if (GameLib and GameLib.IsCharacterLoaded()) then
 		local unitPlayer = GameLib.GetPlayerUnit();
 
@@ -93,6 +104,18 @@ local Enable = function(self)
 end
 
 -----------------------------------------------------------------------------
+-- Elements
+-----------------------------------------------------------------------------
+
+function UnitFrameController:RegisterElement(strPackageName)
+	local strElementName = string.match("Sezz:UnitFrameElement:CastBar-0.1", ":(%a+)\-");
+	if (type(strElementName) == "string" and string.len(strElementName) > 0) then
+		log:debug("Registered Element: %s (Package: %s)", strElementName, strPackageName);
+		tRegisteredElements[strName] = strPackageName;
+	end
+end
+
+-----------------------------------------------------------------------------
 -- Constructor
 -----------------------------------------------------------------------------
 
@@ -102,6 +125,7 @@ function UnitFrameController:New(o)
 
 	-- Properties
 	self.tUnitFrames = {};
+	self.nUpdated = 0;
 
 	-- Default Colors
 	-- Copied from my World of Warcraft Unit Frames
