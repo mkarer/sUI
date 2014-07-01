@@ -39,6 +39,10 @@ function M:OnAddonAvailable(strEvent, strAddon)
 end
 
 -----------------------------------------------------------------------------
+-- Name Plates
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
 -- Quest Tracker
 -----------------------------------------------------------------------------
 
@@ -51,20 +55,8 @@ function M:UpdateQuestTrackerForms()
 			self:_OnLoad();
 
 			local tXml = self.xmlDoc:ToTable();
-			for _, tNode in pairs(tXml) do
-				if (tNode.Name and tNode.Name == "QuestTrackerForm") then
-					tNode.LAnchorPoint = 1;
-					tNode.LAnchorOffset = -325;
-					tNode.TAnchorPoint = 0;
-					tNode.TAnchorOffset = 0;
-					tNode.RAnchorPoint = 1;
-					tNode.RAnchorOffset = 0;
-					tNode.BAnchorPoint = 1;
-					tNode.BAnchorOffset = -271;
-					break;
-				end
-			end
-
+			S:UpdateElementInXml(tXml, "QuestTrackerForm", { LAnchorPoint = 1, LAnchorOffset = -325, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = -271 });
+			S:UpdateElementInXml(tXml, "QuestTrackerScroll", { VScroll = 0 });
 			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
 		end
 	end
