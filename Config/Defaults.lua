@@ -27,6 +27,7 @@ S.DB = {
 	-- This should disable/override user customization (Interface Options / Window)
 	NoWindowManagement = {
 		[Apollo.GetString("MiniMap_Title")] = true,
+		[Apollo.GetString("CRB_QuestTracker")] = true,
 	},
 
 	-- Module Debugging
