@@ -8,6 +8,7 @@
 		Shield Bar
 		Power Bar
 		Experience Bar
+		Health Bar Color when stunned
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -283,8 +284,12 @@ local SetHealth = function(self, nCurrent, nMax)
 	self.wndHealth:SetMax(nMax);
 	self.wndHealth:SetProgress(nCurrent);
 
-	if (self.tColors.Smooth) then
+	if (self.strUnit ~= "Player" and (self.unit:IsTagged() and not self.unit:IsTaggedByMe())) then
+		self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Tagged));
+	elseif (self.tColors.Smooth) then
 		self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.Smooth))));
+	else
+		self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Health));
 	end
 end
 
@@ -342,7 +347,7 @@ end
 local SetUnit = function(self, unit)
 	if (not unit or (unit and not unit:IsValid())) then
 		-- Disable
-		log:debug("[%s] Unit Invalid!", self.strUnit);
+--		log:debug("[%s] Unit Invalid!", self.strUnit);
 		self:Disable();
 		return false;
 	end
