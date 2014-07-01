@@ -27,14 +27,39 @@ function M:OnEnable()
 
 	-- Events
 	self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
+	if (S:IsAddOnLoaded("QuestTracker")) then
+		self:OnAddonAvailable(nil, "QuestTracker", Apollo.GetAddon("QuestTracker"));
+	end
 
 	-- Quest Tracker
 	self:UpdateQuestTrackerForms();
 	self:UpdateQuestTrackerSorting();
 end
 
-function M:OnAddonAvailable(strEvent, strAddon)
+-----------------------------------------------------------------------------
+-- Events
+-----------------------------------------------------------------------------
+
+function M:OnAddonAvailable(strEvent, strAddon, tAddon)
 	if (strAddon == "QuestTracker") then
+		-- Enable Mousewheel Scrolling
+		--[[
+		tAddon.OnMouseWheel = function(self, wndHandler, wndControl, nLastRelativeMouseX, nLastRelativeMouseY, fScrollAmount, bConsumeMouseWheel)
+			local nScrollHeight = (fScrollAmount > 0 and -10 or 10);
+			local wndQuestTrackerScroll = self.wndMain:FindChild("QuestTrackerScroll");
+	
+			local tAnchorOffsets = { wndQuestTrackerScroll:GetAnchorOffsets() };
+			tAnchorOffsets[2] = tAnchorOffsets[2] - nScrollHeight;
+			if (tAnchorOffsets[2] > 12) then
+				tAnchorOffsets[2] = 12;
+			end
+
+			wndQuestTrackerScroll:SetAnchorOffsets(unpack(tAnchorOffsets));
+			bConsumeMouseWheel = true;
+		end
+
+		tAddon.wndMain:FindChild("QuestTrackerScroll"):AddEventHandler("MouseWheel", "OnMouseWheel", tAddon);
+		--]]
 	end
 end
 
