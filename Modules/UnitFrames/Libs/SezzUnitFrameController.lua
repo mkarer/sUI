@@ -41,6 +41,16 @@ end
 -- Events
 -----------------------------------------------------------------------------
 
+local UpdateUnit = function(self, strName, unit)
+	if (self.tUnitFrames[strName]) then
+		self.tUnitFrames[strName]:SetUnit(unit);
+		self.tUnitFrames[strName]:Update();
+		return true;
+	end
+
+	return false;
+end
+
 local UpdateUnits = function(self)
 	local bCharacterLoaded = false;
 
@@ -51,21 +61,11 @@ local UpdateUnits = function(self)
 			-- Update Unit Frames
 --			log:debug("Updating Units...");
 			bCharacterLoaded = true;
-
-			if (self.tUnitFrames["Player"]) then
-				self.tUnitFrames["Player"]:SetUnit(unitPlayer);
-				self.tUnitFrames["Player"]:Update();
-			end
-
-			if (self.tUnitFrames["Target"]) then
-				self.tUnitFrames["Target"]:SetUnit(unitPlayer:GetTarget());
-				self.tUnitFrames["Target"]:Update();
-			end
-
-			if (self.tUnitFrames["Focus"]) then
-				self.tUnitFrames["Focus"]:SetUnit(unitPlayer:GetAlternateTarget());
-				self.tUnitFrames["Focus"]:Update();
-			end
+			UpdateUnit(self, "Player", unitPlayer);
+			UpdateUnit(self, "Target", unitPlayer:GetTarget());
+			UpdateUnit(self, "TargetOfTarget", unitPlayer:GetTargetOfTarget());
+			UpdateUnit(self, "TargetOfTargetOfTarget", unitPlayer:GetTargetOfTarget() and unitPlayer:GetTargetOfTarget():GetTarget() or nil);
+			UpdateUnit(self, "Focus", unitPlayer:GetAlternateTarget());
 		end
 	end
 
@@ -138,6 +138,7 @@ function UnitFrameController:New(o)
 		},
 		Class = setmetatable({
 			["Default"]								= { 255/255, 255/255, 255/255 },
+			["Object"]								= { 0, 1, 0 },
 			[GameLib.CodeEnumClass.Engineer]		= { 164/255,  26/255,  49/255 },
 			[GameLib.CodeEnumClass.Esper]			= { 116/255, 221/255, 255/255 },
 			[GameLib.CodeEnumClass.Medic]			= { 255/255, 255/255, 255/255 },
