@@ -43,6 +43,7 @@
 	<!-- Unit Frames Library -->
 	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrame.lua" />
 	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrameController.lua" />
+	<Script Name="Modules\UnitFrames\Libs\Elements\CastBar.lua" />
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<Script Name="Modules\UnitFrames\Core.lua" />
