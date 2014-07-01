@@ -20,6 +20,7 @@ function M:OnInitialize()
 
 	self:UpdateQuestTrackerForms();
 	self:UpdateQuestTrackerSorting();
+	self:OverrideNameplatesSettings();
 end
 
 function M:OnEnable()
@@ -53,6 +54,38 @@ end
 -- Name Plates
 -----------------------------------------------------------------------------
 
+function M:OverrideNameplatesSettings()
+	local tNameplates = Apollo.GetAddon("Nameplates");
+
+	if (tNameplates) then
+		-- Default Settings
+		tNameplates._OnRestore = tNameplates.OnRestore;
+		tNameplates.OnRestore = function(self, eType, tSavedData)
+			if (eType == GameLib.CodeEnumAddonSaveLevel.Character) then
+				S:Combine(tSavedData, {
+					bHideInCombat = false,
+					bShowCastBarMain = true,
+					bShowCastBarTarget = true,
+					bShowCertainDeathMain = true,
+					bShowDispositionFriendly = true,
+					bShowDispositionFriendlyPlayer = true,
+					bShowDispositionHostile = true,
+					bShowDispositionNeutral = true,
+					nMaxRange = 100,
+				});
+
+				tNameplates:_OnRestore(eType, tSavedData); -- Can't use self, because OnRestore needs karSavedProperties
+			end
+		end
+
+		-- Speech Bubble Fix
+		tNameplates._OnUnitTextBubbleToggled = tNameplates.OnUnitTextBubbleToggled;
+		tNameplates.OnUnitTextBubbleToggled = function(self, tUnitArg, strText, nRange)
+			self:_OnUnitTextBubbleToggled(tUnitArg, nil, nRange);
+		end		
+	end
+end
+
 -----------------------------------------------------------------------------
 -- Quest Tracker
 -----------------------------------------------------------------------------
@@ -61,6 +94,8 @@ function M:UpdateQuestTrackerForms()
 	local tQuestTracker = Apollo.GetAddon("QuestTracker");
 
 	if (tQuestTracker and not tQuestTracker._OnLoad) then
+		tQuestTracker.bHasMoved = true; -- Fix Position Change on starting a Challenge
+
 		tQuestTracker._OnLoad = tQuestTracker.OnLoad;
 		tQuestTracker.OnLoad = function(self)
 			self:_OnLoad();
