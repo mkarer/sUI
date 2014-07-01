@@ -29,6 +29,7 @@
 
 	<!-- Modules -->
 	<Script Name="Modules\Fixes\ConsoleVariables.lua" />
+	<Script Name="Modules\Fixes\AddonSettings.lua" />
 	<Script Name="Modules\Artwork\ArtworkRemover.lua" />
 	<Script Name="Modules\Artwork\Panels.lua" />
 	<Script Name="Modules\Crafting\RandomCraft.lua" />
