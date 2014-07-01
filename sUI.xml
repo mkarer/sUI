@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <Forms>
+	<TemplateFile Name="sUI\Media\Templates.xml" />
+
 	<!-- Main Form (TEMP) -->
 	<Form Class="Window" LAnchorPoint="0" LAnchorOffset="264" TAnchorPoint="0" TAnchorOffset="122" RAnchorPoint="0" RAnchorOffset="596" BAnchorPoint="0" BAnchorOffset="307" RelativeToClient="1" Font="Default" Text="" Template="Default" Name="Configure" Border="0" Picture="1" SwallowMouseClicks="1" Moveable="1" Escapable="1" Overlapped="1" BGColor="ffffffff" TextColor="ffffffff" IgnoreMouse="0" Sprite="" Visible="0" NewWindowDepth="0" Tooltip="" TooltipColor="">
 		<Event Name="WindowClosed" Function="CloseConfiguration"/>

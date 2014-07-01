@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WindowTemplates>
+    <WindowTemplate Name="ScrollableWindowHiddenScrollbars" UseMargins="0" TopMargin="0" LeftMargin="0" RightMargin="0" BottomMargin="0">
+        <VScroll Internal="">
+            <DecButton Auto=""/>
+            <IncButton Auto=""/>
+            <Thumb Auto=""/>
+        </VScroll>
+    </WindowTemplate>
+</WindowTemplates>

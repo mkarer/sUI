@@ -25,11 +25,13 @@ end
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
+--[[
 	-- Events
 	self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
 	if (S:IsAddOnLoaded("QuestTracker")) then
 		self:OnAddonAvailable(nil, "QuestTracker", Apollo.GetAddon("QuestTracker"));
 	end
+--]]
 
 	-- Quest Tracker
 	self:UpdateQuestTrackerForms();
@@ -40,28 +42,12 @@ end
 -- Events
 -----------------------------------------------------------------------------
 
+--[[
 function M:OnAddonAvailable(strEvent, strAddon, tAddon)
 	if (strAddon == "QuestTracker") then
-		-- Enable Mousewheel Scrolling
-		--[[
-		tAddon.OnMouseWheel = function(self, wndHandler, wndControl, nLastRelativeMouseX, nLastRelativeMouseY, fScrollAmount, bConsumeMouseWheel)
-			local nScrollHeight = (fScrollAmount > 0 and -10 or 10);
-			local wndQuestTrackerScroll = self.wndMain:FindChild("QuestTrackerScroll");
-	
-			local tAnchorOffsets = { wndQuestTrackerScroll:GetAnchorOffsets() };
-			tAnchorOffsets[2] = tAnchorOffsets[2] - nScrollHeight;
-			if (tAnchorOffsets[2] > 12) then
-				tAnchorOffsets[2] = 12;
-			end
-
-			wndQuestTrackerScroll:SetAnchorOffsets(unpack(tAnchorOffsets));
-			bConsumeMouseWheel = true;
-		end
-
-		tAddon.wndMain:FindChild("QuestTrackerScroll"):AddEventHandler("MouseWheel", "OnMouseWheel", tAddon);
-		--]]
 	end
 end
+--]]
 
 -----------------------------------------------------------------------------
 -- Name Plates
@@ -81,7 +67,7 @@ function M:UpdateQuestTrackerForms()
 
 			local tXml = self.xmlDoc:ToTable();
 			S:UpdateElementInXml(tXml, "QuestTrackerForm", { LAnchorPoint = 1, LAnchorOffset = -325, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = -271 });
-			S:UpdateElementInXml(tXml, "QuestTrackerScroll", { VScroll = 0 });
+			S:UpdateElementInXml(tXml, "QuestTrackerScroll", { Template = "ScrollableWindowHiddenScrollbars" });
 			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
 		end
 	end
