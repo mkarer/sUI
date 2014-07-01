@@ -9,6 +9,19 @@
 		Power Bar
 		Experience Bar
 		Health Bar Color when stunned
+		
+		Events:
+
+			UnitNameChanged(unitUpdated, strNewName)
+			TargetUnitChanged(unitOwner)
+			UnitLevelChanged(unitUpdating)
+			local tRewardUpdateEvents = {
+				"QuestObjectiveUpdated", "QuestStateChanged", "ChallengeAbandon", "ChallengeLeftArea",
+				"ChallengeFailTime", "ChallengeFailArea", "ChallengeActivate", "ChallengeCompleted",
+				"ChallengeFailGeneric", "PublicEventObjectiveUpdate", "PublicEventUnitUpdate",
+				"PlayerPathMissionUpdate", "FriendshipAdd", "FriendshipPostRemove", "FriendshipUpdate" 
+			}
+		local nVulnerabilityTime = unitOwner:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability)
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -284,12 +297,25 @@ local SetHealth = function(self, nCurrent, nMax)
 	self.wndHealth:SetMax(nMax);
 	self.wndHealth:SetProgress(nCurrent);
 
-	if (self.strUnit ~= "Player" and (self.unit:IsTagged() and not self.unit:IsTaggedByMe())) then
+	local nVulnerabilityTime = self.unit:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability);
+
+	if (self.strUnit ~= "Player" and (self.unit:IsTagged() and not self.unit:IsTaggedByMe() and not self.unit:IsSoftKill())) then
+		-- Tagged
 		self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Tagged));
-	elseif (self.tColors.Smooth) then
-		self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.Smooth))));
+	elseif (nVulnerabilityTime and nVulnerabilityTime > 0) then
+		-- Vulnerable
+		if (self.tColors.VulnerableSmooth) then
+			self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.VulnerableSmooth))));
+		else
+			self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Vulnerable));
+		end
 	else
-		self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Health));
+		-- Default
+		if (self.tColors.HealthSmooth) then
+			self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.HealthSmooth))));
+		else
+			self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Health));
+		end
 	end
 end
 
