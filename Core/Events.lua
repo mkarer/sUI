@@ -106,7 +106,7 @@ function S:CheckExternalAddon(name)
 			-- Addon available
 			if (addon[config.window]) then
 				-- Main window exists, addon is initialized + enabled!
-				self:RaiseEvent("Sezz_AddonAvailable", name);
+				self:RaiseEvent("Sezz_AddonAvailable", name, addon);
 			else
 				-- Main window doesn't exist yet, hook creation
 				self:PostHook(addon, config.hook, "CheckExternalAddon");
