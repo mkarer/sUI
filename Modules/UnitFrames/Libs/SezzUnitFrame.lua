@@ -2,6 +2,13 @@
 
 	s:UI Unit Frame
 
+	TODO:
+
+		Interrupt Armor
+		Shield Bar
+		Power Bar
+		Experience Bar
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -40,7 +47,7 @@ local UnitIsFriend = function(unit)
 end
 
 local WrapAML = function(strTag, strText, strColor, strAlign)
-	return format('<%s Font="CRB_Header9_O" Align="%s" TextColor="%s">%s</%s>', strTag, strAlign or "Left", strColor or "ffffffff", strText, strTag);
+	return format('<%s Font="CRB_Pixel_O" Align="%s" TextColor="%s">%s</%s>', strTag, strAlign or "Left", strColor or "ffffffff", strText, strTag);
 end
 
 -----------------------------------------------------------------------------
@@ -194,7 +201,7 @@ local AddTextLeft = function(self)
 --		DT_VCENTER = true,
 --		Text = "Elke",
 --		IgnoreMouse = "true",
---		Font = "CRB_Header9_O",
+--		Font = "CRB_Pixel_O",
 --	});
 
 	-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
@@ -204,7 +211,7 @@ local AddTextLeft = function(self)
 		TextColor = "white",
 		Text = "{Unit}",
 		IgnoreMouse = "true",
-		Font = "CRB_Header9_O",
+		Font = "CRB_Pixel_O",
 	});
 
 	self.tXmlData["HealthBar"]:AddChild(self.tXmlData["TextLeft"]);
@@ -220,7 +227,7 @@ local AddTextRight = function(self)
 --		DT_RIGHT = true,
 --		Text = "28.6k",
 --		IgnoreMouse = "true",
---		Font = "CRB_Header9_O",
+--		Font = "CRB_Pixel_O",
 --	});
 
 	-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
@@ -230,7 +237,7 @@ local AddTextRight = function(self)
 		TextColor = "white",
 		Text = "{Right}",
 		IgnoreMouse = "true",
-		Font = "CRB_Header9_O",
+		Font = "CRB_Pixel_O",
 	});
 
 	self.tXmlData["HealthBar"]:AddChild(self.tXmlData["TextRight"]);
