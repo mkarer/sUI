@@ -245,6 +245,13 @@ local tAddonsCarbine = {
 };
 
 function M:UpdateAddondMemory()
+	if (S.inCombat) then
+		-- Update later
+		return;
+	end
+
+	log:debug("++++++++++++ Updating Addon Memory");
+
 	local nAddonMemory = 0;
 	local tAddons = Apollo:GetAddons();
 
