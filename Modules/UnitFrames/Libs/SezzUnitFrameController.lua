@@ -54,14 +54,17 @@ local UpdateUnits = function(self)
 
 			if (self.tUnitFrames["Player"]) then
 				self.tUnitFrames["Player"]:SetUnit(unitPlayer);
+				self.tUnitFrames["Player"]:Update();
 			end
 
 			if (self.tUnitFrames["Target"]) then
-				self.tUnitFrames["Target"]:SetUnit(unitPlayer, "GetTarget");
+				self.tUnitFrames["Target"]:SetUnit(unitPlayer:GetTarget());
+				self.tUnitFrames["Target"]:Update();
 			end
 
 			if (self.tUnitFrames["Focus"]) then
-				self.tUnitFrames["Focus"]:SetUnit(unitPlayer, "GetAlternateTarget");
+				self.tUnitFrames["Focus"]:SetUnit(unitPlayer:GetAlternateTarget());
+				self.tUnitFrames["Focus"]:Update();
 			end
 		end
 	end
@@ -86,6 +89,7 @@ local Enable = function(self)
 	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnits", self);
 	Apollo.RegisterEventHandler("TargetUnitChanged", "UpdateUnits", self);
 	Apollo.RegisterEventHandler("AlternateTargetUnitChanged", "UpdateUnits", self);
+	Apollo.RegisterEventHandler("VarChange_FrameCount", "UpdateUnits", self);
 end
 
 -----------------------------------------------------------------------------
@@ -130,19 +134,20 @@ function UnitFrameController:New(o)
 			Uninterruptable = { 1.00, 0.75, 0.44 },
 			Warning = { 1, 0, 0 },
 		},
-		Class = {
-			[GameLib.CodeEnumClass.Engineer]		= { 164, 26, 49 },
-			[GameLib.CodeEnumClass.Esper]			= { 116, 221, 255 },
-			[GameLib.CodeEnumClass.Medic]			= { 255, 255, 255 },
-			[GameLib.CodeEnumClass.Stalker]			= { 221, 212, 95 },
-			[GameLib.CodeEnumClass.Spellslinger]	= { 130, 111, 172 },
-			[GameLib.CodeEnumClass.Warrior]			= { 171, 133, 94 },
-		},
+		Class = setmetatable({
+			["Default"]								= { 255/255, 255/255, 255/255 },
+			[GameLib.CodeEnumClass.Engineer]		= { 164/255,  26/255,  49/255 },
+			[GameLib.CodeEnumClass.Esper]			= { 116/255, 221/255, 255/255 },
+			[GameLib.CodeEnumClass.Medic]			= { 255/255, 255/255, 255/255 },
+			[GameLib.CodeEnumClass.Stalker]			= { 221/255, 212/255,  95/255 },
+			[GameLib.CodeEnumClass.Spellslinger]	= { 130/255, 111/255, 172/255 },
+			[GameLib.CodeEnumClass.Warrior]			= { 171/255, 133/255,  94/255 },
+		}, { __index = function(t, k) return rawget(t, k) or rawget(t, "Default"); end }),
 	};
 
 	-- Create a new XML Document
 	self.xmlDoc = XmlDocument.NewForm();
-	
+
 	-- Expose Methods
 	self.CreateUnitFrame = CreateUnitFrame;
 	self.LoadForm = LoadForm;

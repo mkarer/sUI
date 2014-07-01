@@ -51,12 +51,6 @@ function M:OnEnable()
 	-- Enable Unit Frames
 	tUnitFrameController:LoadForm();
 	tUnitFrameController:Enable();
-
-	tUnitFramePlayer:Show();
-	tUnitFramePlayer:SetHealth(70, 100);
-
-	tUnitFrameTarget:Show();
-	tUnitFrameTarget:SetHealth(100, 100);
 end
 
 function M:OnDisable()

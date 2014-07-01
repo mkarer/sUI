@@ -15,14 +15,87 @@ local UnitFrame = APkg and APkg.tPackage or {};
 local log;
 
 -- Lua APIs
-local strformat, modf, select, floor = string.format, math.modf, select, math.floor;
+local format, modf, select, floor, upper, gsub, ceil = string.format, math.modf, select, math.floor, string.upper, string.gsub, math.ceil;
 
 -----------------------------------------------------------------------------
 -- Helper Functions
 -----------------------------------------------------------------------------
 
-local Round = function(nNumber)
-	return floor(nNumber + 0.5);
+local Round = function(nValue)
+	return floor(nValue + 0.5);
+end
+
+local ShortNumber = function(nValue)
+	if (nValue >= 1e6) then
+		return (gsub(format("%.2fm", nValue / 1e6), "%.?0+([km])$", "%1"));
+	elseif (nValue >= 1e4) then
+		return (gsub(format("%.1fk", nValue / 1e3), "%.?0+([km])$", "%1"));
+	else
+		return nValue;
+	end
+end
+
+local UnitIsFriend = function(unit)
+	return (unit:IsThePlayer() or unit:GetDispositionTo(GameLib.GetPlayerUnit()) == Unit.CodeEnumDisposition.Friendly);
+end
+
+local WrapAML = function(strTag, strText, strColor, strAlign)
+	return format('<%s Font="CRB_Header9_O" Align="%s" TextColor="%s">%s</%s>', strTag, strAlign or "Left", strColor or "ffffffff", strText, strTag);
+end
+
+-----------------------------------------------------------------------------
+-- Tags
+-- But not now...
+-- MLWindow is so fucked up, I want to test performance first.
+-----------------------------------------------------------------------------
+
+local tTags = {};
+
+local UnitStatus = function(unit)
+--	if (UnitIsUnconscious(unit)) then
+--		return "|cffff7f7fUnconscious|r";
+	if (unit:IsDead()) then
+		return WrapAML("P", "DEAD", "ffff7f7f", "Right");
+--	elseif (UnitIsGhost(unit)) then
+--		return "Ghost";
+--	elseif (not UnitIsConnected(unit)) then
+--			Offline only works in groups
+--		Unit:IsInYourGroup()
+-- 		GroupLib.GetGroupMember(i).bDisconnected
+--		return "Offline";
+	end
+	
+	return nil;
+end
+
+tTags["sezz:hp"] = function(unit)
+	-- Default HP
+	local strStatus = UnitStatus(unit);
+	if (strStatus) then
+		return strStatus;
+	else
+		local nCurrentHealth, nMaxHealth = unit:GetHealth(), unit:GetMaxHealth();
+		if (not nCurrentHealth or not nMaxHealth) then return; end
+
+		-- ? UnitCanAttack//not UnitIsFriend
+		if (UnitIsFriend(unit) and unit:IsACharacter(unit)) then
+			-- Unit is friendly and a Player
+			-- HP Style: [CURHP]-[LOSTHP]
+			if (nCurrentHealth ~= nMaxHealth) then
+				return WrapAML("P", ShortNumber(nCurrentHealth)..WrapAML("T", "-"..ShortNumber(nMaxHealth - nCurrentHealth), "ffff7f7f", "Right"), "ffffffff", "Right");
+			else
+				return WrapAML("P", ShortNumber(nMaxHealth), nil, "Right");
+			end
+		else
+			-- Unit is no player or an enemy
+			-- HP Style: [CURHP]/[MAXHP] [HP%]
+			if (nCurrentHealth ~= nMaxHealth) then
+				return WrapAML("P", WrapAML("T", ShortNumber(nCurrentHealth), "ffff9000", "Right").."/"..ShortNumber(nMaxHealth)..WrapAML("T", " "..ceil(nCurrentHealth / (nMaxHealth * 0.01)).."%", "ffff9000", "Right"), nil, "Right");
+			else
+				return WrapAML("P", ShortNumber(nCurrentHealth)..WrapAML("T", " "..ceil(nCurrentHealth / (nMaxHealth * 0.01)).."%", "ffff9000", "Right"), nil, "Right");
+			end
+		end
+	end
 end
 
 -----------------------------------------------------------------------------
@@ -31,12 +104,12 @@ end
 
 local ColorArrayToHex = function(arColor)
 	-- We only use indexed arrays here!
-	return strformat("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
+	return format("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
 end
 
 local RGBColorToHex = function(r, g, b)
 	-- We only use indexed arrays here!
-	return strformat("%02x%02x%02x%02x", 255, Round(255 * r), Round(255 * g), Round(255 * b))
+	return format("%02x%02x%02x%02x", 255, Round(255 * r), Round(255 * g), Round(255 * b))
 end
 
 -----------------------------------------------------------------------------
@@ -114,12 +187,22 @@ end
 
 -- Left Text Element (Optional)
 local AddTextLeft = function(self)
-	self.tXmlData["TextLeft"] = self.xmlDoc:NewControlNode("TextLeft", "Window", {
-		AnchorPoints = { 0, 0, 0.5, 1 },
-		AnchorOffsets = { 4, 0, 0, 0 },
+--	self.tXmlData["TextLeft"] = self.xmlDoc:NewControlNode("TextLeft", "Window", {
+--		AnchorPoints = { 0, 0, 0.5, 1 },
+--		AnchorOffsets = { 4, 0, 0, 0 },
+--		TextColor = "white",
+--		DT_VCENTER = true,
+--		Text = "Elke",
+--		IgnoreMouse = "true",
+--		Font = "CRB_Header9_O",
+--	});
+
+	-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
+	self.tXmlData["TextLeft"] = self.xmlDoc:NewControlNode("TextLeft", "MLWindow", {
+		AnchorPoints = { 0, 0.5, 0.5, 0.5 },
+		AnchorOffsets = { 4, -7, 0, 7 },
 		TextColor = "white",
-		DT_VCENTER = true,
-		Text = "Elke",
+		Text = "{Unit}",
 		IgnoreMouse = "true",
 		Font = "CRB_Header9_O",
 	});
@@ -129,13 +212,23 @@ end
 
 -- Right Text Element (Optional)
 local AddTextRight = function(self)
-	self.tXmlData["TextRight"] = self.xmlDoc:NewControlNode("TextRight", "Window", {
-		AnchorPoints = { 0.5, 0, 1, 1 },
-		AnchorOffsets = { 0, 0, -4, 0 },
+--	self.tXmlData["TextRight"] = self.xmlDoc:NewControlNode("TextRight", "MLWindow", {
+--		AnchorPoints = { 0.5, 0, 1, 1 },
+--		AnchorOffsets = { 0, 0, -4, 0 },
+--		TextColor = "white",
+--		DT_VCENTER = true,
+--		DT_RIGHT = true,
+--		Text = "28.6k",
+--		IgnoreMouse = "true",
+--		Font = "CRB_Header9_O",
+--	});
+
+	-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
+	self.tXmlData["TextRight"] = self.xmlDoc:NewControlNode("TextRight", "MLWindow", {
+		AnchorPoints = { 0.5, 0.5, 1, 0.5 },
+		AnchorOffsets = { 0, -7, -4, 7 },
 		TextColor = "white",
-		DT_VCENTER = true,
-		DT_RIGHT = true,
-		Text = "28.6k",
+		Text = "{Right}",
 		IgnoreMouse = "true",
 		Font = "CRB_Header9_O",
 	});
@@ -160,7 +253,23 @@ local OnMouseExit = function(self, wndHandler)
 end
 
 -----------------------------------------------------------------------------
--- Value Updating
+-- Handle Mouse Clicks
+-----------------------------------------------------------------------------
+
+local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
+	if (eMouseButton == GameLib.CodeEnumInputMouse.Left) then
+		GameLib.SetTargetUnit(self.unit);
+		return false
+	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit);
+		return true
+	end
+
+	return false;
+end
+
+-----------------------------------------------------------------------------
+-- Health
 -----------------------------------------------------------------------------
 
 local SetHealth = function(self, nCurrent, nMax)
@@ -172,49 +281,70 @@ local SetHealth = function(self, nCurrent, nMax)
 	end
 end
 
-local SetUnit = function(self, unitBase, strUnitGetter)
-	if (not unitBase or (strUnitGetter and not unitBase[strUnitGetter])) then
-		-- Bullshit, disable.
-		log:debug("[%s] Bullshit call!", self.strUnit);
+local SetHealthText = function(self, nCurrent, nMax)
+	-- TODO: Tags
+	if (self.wndTextRight) then
+		self.wndTextRight:SetText(tTags["sezz:hp"](self.unit));
+	end
+end
+
+local UpdateHealth = function(self)
+	-- Objects and some NPCs don't have any health
+	local nCurrent = self.unit:GetHealth() or 1;
+	local nMax = self.unit:GetMaxHealth() or nCurrent;
+
+--	log:debug({nCurrent, nMax})
+	SetHealth(self, nCurrent, nMax);
+	SetHealthText(self, nCurrent, nMax);
+end
+
+------------------------------------------------------------------------------
+-- Text
+-- TODO: Tags
+-----------------------------------------------------------------------------
+
+local UpdateName = function(self)
+	if (self.wndTextLeft) then
+		self.wndTextLeft:SetText(WrapAML("P", self.unit:GetName(), ColorArrayToHex(self.tColors.Class[self.unit:GetClassId()]), "Left"));
+	end
+end
+
+----------------------------------------------------------------------------
+-- Units
+-----------------------------------------------------------------------------
+
+local Update = function(self)
+	if (self.bEnabled) then
+		UpdateHealth(self);
+		UpdateName(self);
+	end
+end
+
+local Disable = function(self)
+	self.bEnabled = false;
+	self.unit = nil;
+	self:Hide();
+end
+
+local Enable = function(self)
+	self.bEnabled = true;
+	self:Update();
+	self:Show();
+end
+
+local SetUnit = function(self, unit)
+	if (not unit or (unit and not unit:IsValid())) then
+		-- Disable
+		log:debug("[%s] Unit Invalid!", self.strUnit);
+		self:Disable();
 		return false;
 	end
 
 	-- Base Unit
-	local bUpdatedBase = false;
-	if (not self.unitBase or (self.unitBase and self.unitBase:GetId() ~= unitBase:GetId())) then
-		log:debug("[%s] Updated Base Unit", self.strUnit);
-		self.unitBase = unitBase;
-		bUpdatedBase = true;
-	end
-
-	-- Unit Getter Method (for everything but the player)
-	-- Nevery changes (only on initialization of course)
-	local bUpdatedGetter = false;
-	if (self.strUnitGetter ~= strUnitGetter) then
-		log:debug("[%s] Updated Unit Getter Method", self.strUnit);
-		self.strUnitGetter = strUnitGetter;
-		bUpdatedGetter = true;
-	end
-
-	-- Update Unit
-	if (bUpdatedBase and not self.strUnitGetter) then
-		log:debug("[%s] Updated Unit", self.strUnit);
-		self.unitCurrent = self.unitBase;
-	end
-
-	if (self.strUnitGetter) then
-		local unitCurrent = self.unitBase[self.strUnitGetter]();
-
-		if (not self.unitCurrent or (self.unitCurrent and (not self.unitCurrent:IsValid() or self.unitCurrent:GetId() ~= unitCurrent:GetId()))) then
-			log:debug("[%s] Updated Unit", self.strUnit);
-			self.unitCurrent = unitCurrent;
-		end
-	end
-
-	if (not self.unitCurrent or (self.unitCurrent and not self.unitCurrent:IsValid())) then
-		log:debug("[%s] Invalid Unit -> Disable", self.strUnit);
-	else
-		log:debug("[%s] Unit Name: %s", self.strUnit, self.unitCurrent:GetName());
+	if (not self.unit or (self.unit and self.unit:GetId() ~= unit:GetId())) then
+		log:debug("[%s] Updated Unit: %s", self.strUnit, unit:GetName());
+		self.unit = unit;
+		self:Enable();
 	end
 end
 
@@ -237,8 +367,13 @@ local LoadForm = function(self)
 	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
 	self.wndMain:SetBGOpacity(0.2, 5e+20);
 
+	-- Enable Target
+	self.wndMain:AddEventHandler("MouseButtonDown", "OnMouseClick", self);
+
 	-- Add Properties for our Elements
 	self.wndHealth = self.wndMain:FindChild("HealthBar");
+	self.wndTextLeft = self.wndMain:FindChild("TextLeft");
+	self.wndTextRight = self.wndMain:FindChild("TextRight");
 
 	-- Expose more Methods
 	self.SetHealth = SetHealth;
@@ -257,12 +392,13 @@ local ShowDelayed = function(self)
 end
 
 local Hide = function(self)
-	self.wndMain:Hide(true, true);
+	self.wndMain:Show(false, true);
 end
 
 local CreateUnitFrame = function(self)
 	-- Initialize Unit Frame Table
 	self.strName = "SezzUnitFrames_"..self.strUnit;
+	self.bEnabled = false;
 
 	-- Calculate Anchor Offets
 	-- Currently only supports CENTERED unit frames
@@ -283,9 +419,14 @@ local CreateUnitFrame = function(self)
 	self.LoadForm = LoadForm;
 	self.OnMouseEnter = OnMouseEnter;
 	self.OnMouseExit = OnMouseExit;
+	self.OnMouseClick = OnMouseClick;
 	self.Show = Show;
+	self.Hide = Hide;
 	self.ShowDelayed = ShowDelayed;
 	self.SetUnit = SetUnit;
+	self.Enable = Enable;
+	self.Disable = Disable;
+	self.Update = Update;
 
 	-- Return Unit Frame Object
 	return self;
