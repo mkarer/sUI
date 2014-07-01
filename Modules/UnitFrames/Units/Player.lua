@@ -48,6 +48,28 @@ function M:OnEnable()
 
 	local tUnitFrameTarget = tUnitFrameController:CreateUnitFrame(tSettings);
 
+	-- Create Target Of Target
+	local tSettings = {
+		strUnit = "TargetOfTarget",
+		nWidth = 146,
+		nHeight = 22,
+		tAnchorPoints = { 0.75, 1, 0.75, 1 },
+		tAnchorOffsets = { 54, -190, 54, -190 },
+	};
+
+	local tUnitFrameTargetOfTarget = tUnitFrameController:CreateUnitFrame(tSettings);
+
+	-- Create Target Of Target Of Target
+	local tSettings = {
+		strUnit = "TargetOfTargetOfTarget",
+		nWidth = 102,
+		nHeight = 22,
+		tAnchorPoints = { 0.75, 1, 0.75, 1 },
+		tAnchorOffsets = { -76, -190, -74, -190 },
+	};
+
+	local tUnitFrameTargetOfTargetOfTarget = tUnitFrameController:CreateUnitFrame(tSettings);
+
 	-- Enable Unit Frames
 	tUnitFrameController:LoadForm();
 	tUnitFrameController:Enable();
