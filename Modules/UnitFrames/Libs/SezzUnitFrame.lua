@@ -96,7 +96,7 @@ tTags["sezz:hp"] = function(unit)
 		return strStatus;
 	else
 		local nCurrentHealth, nMaxHealth = unit:GetHealth(), unit:GetMaxHealth();
-		if (not nCurrentHealth or not nMaxHealth) then return; end
+		if (not nCurrentHealth or not nMaxHealth or (nCurrentHealth == 0 and nMaxHealth == 0)) then return; end
 
 		-- ? UnitCanAttack//not UnitIsFriend
 		if (UnitIsFriend(unit) and unit:IsACharacter(unit)) then
@@ -173,6 +173,7 @@ local AddBackground = function(self)
 		Sprite = "WhiteFill",
 		BGColor = "ffffffff",
 		Moveable = true,
+		TooltipType = "OnCursor",
 	});
 end
 
@@ -290,6 +291,13 @@ local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
 end
 
 -----------------------------------------------------------------------------
+-- Tooltips
+-----------------------------------------------------------------------------
+
+-- local OnGenerateTooltip = function(self, wndControl, wndHandler, eType, arg1, arg2)
+-- end
+
+-----------------------------------------------------------------------------
 -- Health
 -----------------------------------------------------------------------------
 
@@ -328,8 +336,13 @@ end
 
 local UpdateHealth = function(self)
 	-- Objects and some NPCs don't have any health
-	local nCurrent = self.unit:GetHealth() or 1;
-	local nMax = self.unit:GetMaxHealth() or nCurrent;
+	local nCurrent = self.unit:GetHealth();
+	local nMax = self.unit:GetMaxHealth();
+
+	if (not nCurrent or not nMax or (nCurrent == 0 and nMax == 0)) then
+		nCurrent = 1;
+		nMax = 1;
+	end
 
 --	log:debug({nCurrent, nMax})
 	SetHealth(self, nCurrent, nMax);
@@ -342,14 +355,22 @@ end
 -----------------------------------------------------------------------------
 
 local UpdateName = function(self)
+	self.wndMain:SetTooltip(self.unit:GetName()); -- Current Workaround
 	if (self.wndTextLeft) then
-		self.wndTextLeft:SetText(WrapAML("P", self.unit:GetName(), ColorArrayToHex(self.tColors.Class[self.unit:GetClassId()]), "Left"));
+		self.wndTextLeft:SetText(WrapAML("P", self.unit:GetName(), ColorArrayToHex(self.tColors.Class[self.bIsObject and "Object" or self.unit:GetClassId()]), "Left"));
 	end
 end
 
 ----------------------------------------------------------------------------
 -- Units
 -----------------------------------------------------------------------------
+
+local UnitIsObject = function(unit)
+	local nCurrent = unit:GetHealth();
+	local nMax = unit:GetMaxHealth();
+
+	return (not nCurrent or not nMax or (nCurrent == 0 and nMax == 0));
+end
 
 local Update = function(self)
 	if (self.bEnabled) then
@@ -382,6 +403,7 @@ local SetUnit = function(self, unit)
 	if (not self.unit or (self.unit and self.unit:GetId() ~= unit:GetId())) then
 		log:debug("[%s] Updated Unit: %s", self.strUnit, unit:GetName());
 		self.unit = unit;
+		self.bIsObject = UnitIsObject(unit);
 		self:Enable();
 	end
 end
@@ -405,8 +427,11 @@ local LoadForm = function(self)
 	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
 	self.wndMain:SetBGOpacity(0.2, 5e+20);
 
-	-- Enable Target
+	-- Enable Targetting
 	self.wndMain:AddEventHandler("MouseButtonDown", "OnMouseClick", self);
+
+--	-- Enable Tooltips
+--	self.wndMain:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", self);
 
 	-- Add Properties for our Elements
 	self.wndHealth = self.wndMain:FindChild("HealthBar");
@@ -465,6 +490,7 @@ local CreateUnitFrame = function(self)
 	self.Enable = Enable;
 	self.Disable = Disable;
 	self.Update = Update;
+--	self.OnGenerateTooltip = OnGenerateTooltip;
 
 	-- Return Unit Frame Object
 	return self;
