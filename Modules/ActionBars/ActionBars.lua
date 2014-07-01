@@ -59,7 +59,7 @@ end
 
 function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
 	-- This event only fires on login, not on ReloadUI.
-	if (not nBar or nBar < 4) then return; end
+	if (nBar == nil or not self.tBars["Shortcut"..nBar]) then return; end
 	log:debug("ShowActionBarShortcut: Bar %d %s (%d)", nBar, bIsVisible and "SHOW" or "HIDE", nShortcuts);
 
 	if (self.P.CurrentShortcutBar and not bIsVisible and self.P.CurrentShortcutBar == nBar) then
@@ -79,7 +79,7 @@ function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
 end
 
 function M:SetActiveShortcutBar(nActiveBarId, nShortcuts)
-	for i = 4, ActionSetLib.ShortcutSet.Count do
+	for i = 0, ActionSetLib.ShortcutSet.Count do
 		local bShowBar = (nActiveBarId == i);
 		local tBar = self.tBars["Shortcut"..i];
 		if (tBar) then
@@ -230,6 +230,16 @@ function M:SetupActionBars()
 		log:debug("Enabled Shortcut Bar: "..self.P.CurrentShortcutBar);
 		self:SetActiveShortcutBar(self.P.CurrentShortcutBar);
 	end
+
+	-----------------------------------------------------------------------------
+	-- Vehicle Bar
+	-----------------------------------------------------------------------------
+	local barVehicle = self:CreateActionBar("Vehicle", "RMS", true, 0, 6);
+	local barWidthOffset = math.ceil(barVehicle.Width / 2);
+	local barPositionOffset = 300;
+	barVehicle.wndMain:SetAnchorOffsets(-barWidthOffset, -barVehicle.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
+	barVehicle.wndMain:Show(false, true);
+	self.tBars["Shortcut0"] = barVehicle;
 
 	-----------------------------------------------------------------------------
 	-- Pet Bar
