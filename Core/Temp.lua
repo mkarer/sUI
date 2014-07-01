@@ -30,7 +30,7 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
---	self:RegisterEvent("InterfaceMenuList_AlertAddOn", "EventHandler"); -- Calculate
+	self:RegisterEvent("StanceChanged", "EventHandler");
 end
 
 function M:EventHandler(event, ...)
