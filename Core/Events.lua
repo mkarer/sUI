@@ -63,6 +63,11 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "tBagCounts", "OnBGBottomCashBtnToggle" },
 	},
+	QuestTracker = {
+		window = "wndMain",
+		hook = "OnDocumentReady",
+		properties = { "bQuestTrackerByDistance", "tQuestsQueuedForDestroy" },
+	},
 };
 
 function S:CheckExternalAddon(name)
