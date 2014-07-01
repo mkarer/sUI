@@ -31,7 +31,7 @@ function M:OnEnable()
 		strUnit = "Player",
 		nWidth = 254,
 		nHeight = 34,
-		tAnchorPoints = { 0.75, 1, 0.75, 1 },
+		tAnchorPoints = { 0.5, 1, 0.5, 1 },
 		tAnchorOffsets = { 0, -126, 0, -126 },
 	};
 
@@ -42,8 +42,8 @@ function M:OnEnable()
 		strUnit = "Target",
 		nWidth = 254,
 		nHeight = 34,
-		tAnchorPoints = { 0.75, 1, 0.75, 1 },
-		tAnchorOffsets = { 0, -164, 0, -164 },
+		tAnchorPoints = { 0.50, 1, 0.50, 1 },
+		tAnchorOffsets = { 0, -214, 0, -214 },
 	};
 
 	local tUnitFrameTarget = tUnitFrameController:CreateUnitFrame(tSettings);
@@ -53,8 +53,8 @@ function M:OnEnable()
 		strUnit = "TargetOfTarget",
 		nWidth = 146,
 		nHeight = 22,
-		tAnchorPoints = { 0.75, 1, 0.75, 1 },
-		tAnchorOffsets = { 54, -190, 54, -190 },
+		tAnchorPoints = { 0.50, 1, 0.50, 1 },
+		tAnchorOffsets = { 54, -240, 54, -240 },
 	};
 
 	local tUnitFrameTargetOfTarget = tUnitFrameController:CreateUnitFrame(tSettings);
@@ -64,8 +64,8 @@ function M:OnEnable()
 		strUnit = "TargetOfTargetOfTarget",
 		nWidth = 102,
 		nHeight = 22,
-		tAnchorPoints = { 0.75, 1, 0.75, 1 },
-		tAnchorOffsets = { -76, -190, -74, -190 },
+		tAnchorPoints = { 0.50, 1, 0.50, 1 },
+		tAnchorOffsets = { -76, -240, -74, -240 },
 	};
 
 	local tUnitFrameTargetOfTargetOfTarget = tUnitFrameController:CreateUnitFrame(tSettings);
