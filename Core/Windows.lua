@@ -65,3 +65,43 @@ if (tOptionsInterface) then
 		end
 	end
 end
+
+-----------------------------------------------------------------------------
+-- Window Form XML Manipulation
+-----------------------------------------------------------------------------
+
+function S:FindElementInXml(tXml, strElementName)
+	-- Check tXml Type
+	if (type(tXml) ~= "table") then return nil; end
+
+	-- Check tXml Elements
+	if (tXml.Name and tXml.Name == strElementName) then
+		return tXml;
+	end
+
+	-- Check Children
+	for _, tNode in ipairs(tXml) do
+		if (type(tNode) == "table") then
+			local tChildNode = self:FindElementInXml(tNode, strElementName);
+			if (tChildNode and tChildNode.Name and tChildNode.Name == strElementName) then
+				return tChildNode;
+			end
+		end
+	end
+
+	return nil;
+end
+
+function S:UpdateElementInXml(tXml, strElementName, tData)
+	local tElement = self:FindElementInXml(tXml, strElementName);
+	if (tElement) then
+		for k, v in pairs(tData) do
+			tElement[k] = v;
+		end
+
+		return true;
+	end
+
+	return false;
+end
+
