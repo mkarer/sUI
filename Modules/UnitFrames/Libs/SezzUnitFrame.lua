@@ -261,16 +261,23 @@ end
 
 -- Cast Bar
 local AddCastBar = function(self)
-	local tCastBarOffsets = S:Clone(self.tAnchorOffsets);
-	tCastBarOffsets[2] = tCastBarOffsets[2] + 40;
-	tCastBarOffsets[4] = tCastBarOffsets[4] + 26;
+	local tAnchorPoints = S:Clone(self.tAnchorPoints);
+	local tAnchorOffsets = S:Clone(self.tAnchorOffsets);
+	tAnchorOffsets[2] = tAnchorOffsets[2] + 40;
+	tAnchorOffsets[4] = tAnchorOffsets[4] + 26;
 
-	local nHeight = tCastBarOffsets[4] - tCastBarOffsets[2];
+
+	if (self.strUnit == "Target") then
+		tAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
+		tAnchorOffsets = { -200, 0, 200, 36 };
+	end
+
+	local nHeight = tAnchorOffsets[4] - tAnchorOffsets[2];
 
 	-- Container (White BG)
-	self.tXmlData["CastBarContainer"] = self.xmlDoc:NewFormNode("SezzUnitFramePlayerCastBar", {
-		AnchorPoints = self.tAnchorPoints,
-		AnchorOffsets = tCastBarOffsets,
+	self.tXmlData["CastBarContainer"] = self.xmlDoc:NewFormNode("SezzUnitFrame"..self.strUnit.."CastBar", {
+		AnchorPoints = tAnchorPoints,
+		AnchorOffsets = tAnchorOffsets,
 		Picture = true,
 		Sprite = "WhiteFill",
 		BGColor = "33ffffff",
@@ -484,7 +491,7 @@ local Update = function(self)
 		UpdateName(self);
 
 		for _, tElement in ipairs(self.tElements) do
-			if (tElement.bUpdateAlways) then
+			if (tElement.bUpdateOnUnitFrameFrameCount) then
 				tElement:Update();
 			end
 		end
@@ -542,7 +549,7 @@ local LoadForm = function(self)
 	self.wndMain = self.xmlDoc:LoadForm(self.strName, nil, self);
 	self.wndMain:Show(false, true);
 
-	if (self.strUnit == "Player") then
+	if (self.strUnit == "Player" or self.strUnit == "Target") then
 		self.wndCastBar = self.xmlDoc:LoadForm(self.strName.."CastBar", nil, self);
 	end
 
@@ -618,7 +625,7 @@ local CreateUnitFrame = function(self)
 	AddTextLeft(self);
 	AddTextRight(self);
 
-	if (self.strUnit == "Player") then
+	if (self.strUnit == "Player" or self.strUnit == "Target") then
 		-- Add CastBar
 		AddCastBar(self);
 	end
