@@ -9,6 +9,7 @@
 		Power Bar
 		Experience Bar
 		Health Bar Color when stunned
+		Remove the layout code
 		
 		Events:
 
@@ -258,6 +259,100 @@ local AddTextRight = function(self)
 	self.tXmlData["HealthBar"]:AddChild(self.tXmlData["TextRight"]);
 end
 
+-- Cast Bar
+local AddCastBar = function(self)
+	local tCastBarOffsets = S:Clone(self.tAnchorOffsets);
+	tCastBarOffsets[2] = tCastBarOffsets[2] + 40;
+	tCastBarOffsets[4] = tCastBarOffsets[4] + 30;
+
+	local nHeight = tCastBarOffsets[4] - tCastBarOffsets[2];
+
+	-- Container (White BG)
+	self.tXmlData["CastBarContainer"] = self.xmlDoc:NewFormNode("SezzUnitFramePlayerCastBar", {
+		AnchorPoints = self.tAnchorPoints,
+		AnchorOffsets = tCastBarOffsets,
+		Picture = true,
+		Sprite = "WhiteFill",
+		BGColor = "33ffffff",
+		Moveable = true,
+		TooltipType = "OnCursor",
+	});
+
+	-- Icon + Container (Black BG)
+	self.tXmlData["CastBarIconBG"] = self.xmlDoc:NewControlNode("IconBackground", "Window", {
+		AnchorPoints = { 0, 0, 0, 1 },
+		AnchorOffsets = { 2, 2, nHeight, -2 },
+		Picture = true,
+		Sprite = "WhiteFill",
+		BGColor = "ff000000",
+		IgnoreMouse = "true",
+	});
+
+	self.tXmlData["CastBarIcon"] = self.xmlDoc:NewControlNode("Icon", "Window", {
+		AnchorPoints = { 0, 0, 1, 1 },
+		AnchorOffsets = { 0, 0, 0, 0 },
+		Picture = true,
+		Sprite = "IconSprites:Icon_SkillStalker_Neutralize",
+		IgnoreMouse = "true",
+	});
+
+	self.tXmlData["CastBarContainer"]:AddChild(self.tXmlData["CastBarIconBG"]);
+	self.tXmlData["CastBarIconBG"]:AddChild(self.tXmlData["CastBarIcon"]);
+
+	-- Bar + Container (Black BG)
+	self.tXmlData["CastBarBG"] = self.xmlDoc:NewControlNode("Background", "Window", {
+		AnchorPoints = { 0, 0, 1, 1 },
+		AnchorOffsets = { nHeight + 2, 2, -2, -2 },
+		Picture = true,
+		Sprite = "WhiteFill",
+		BGColor = "ff000000",
+		IgnoreMouse = "true",
+	});
+
+
+	self.tXmlData["CastBar"] = self.xmlDoc:NewControlNode("CastBar", "ProgressBar", {
+		AnchorPoints = { 0, 0, 1, 1 },
+		AnchorOffsets = { 0, 0, 0, 0 },
+		AutoSetText = false,
+		UseValues = true,
+		SetTextToProgress = false,
+		ProgressFull = "sUI:ProgressBar",
+		IgnoreMouse = "true",
+		BarColor = ColorArrayToHex(self.tColors.Castbar.Normal),
+	});
+
+	self.tXmlData["CastBarContainer"]:AddChild(self.tXmlData["CastBarBG"]);
+	self.tXmlData["CastBarBG"]:AddChild(self.tXmlData["CastBar"]);
+
+	-- Text Elements
+	self.tXmlData["CastBarTextLeft"] = self.xmlDoc:NewControlNode("Text", "Window", {
+		AnchorPoints = { 0, 0, 0.75, 1 },
+		AnchorOffsets = { 4, -2, 0, 0 },
+		TextColor = "white",
+		DT_VCENTER = true,
+		Text = "Caste ARMAGEDDON!1",
+		IgnoreMouse = "true",
+		Font = "CRB_Pixel_O",
+	});
+
+	self.tXmlData["CastBarTextRight"] = self.xmlDoc:NewControlNode("Time", "Window", {
+		AnchorPoints = { 0.75, 0, 1, 1 },
+		AnchorOffsets = { 0, -2, -4, 0 },
+		TextColor = "white",
+		DT_VCENTER = true,
+		DT_RIGHT = true,
+		Text = "23s",
+		IgnoreMouse = "true",
+		Font = "CRB_Pixel_O",
+	});
+
+	self.tXmlData["CastBar"]:AddChild(self.tXmlData["CastBarTextLeft"]);
+	self.tXmlData["CastBar"]:AddChild(self.tXmlData["CastBarTextRight"]);
+
+	-- Add Root Element
+	self.xmlDoc:GetRoot():AddChild(self.tXmlData["CastBarContainer"]);
+end
+
 -----------------------------------------------------------------------------
 -- Highlight on Mouseover
 -----------------------------------------------------------------------------
@@ -422,6 +517,14 @@ local LoadForm = function(self)
 	self.wndMain = self.xmlDoc:LoadForm(self.strName, nil, self);
 	self.wndMain:Show(false, true);
 
+	if (self.strUnit == "Player") then
+		self.wndCastBar = self.xmlDoc:LoadForm(self.strName.."CastBar", nil, self);
+	end
+
+--	for _, tNode in pairs(self.xmlDoc:GetRoot():GetChildren()) do
+--		log:debug(tNode:Attribute("Name"));
+--	end
+
 	-- Enable Mouseover Highlight
 	self.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", self);
 	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
@@ -441,6 +544,8 @@ local LoadForm = function(self)
 	-- Expose more Methods
 	self.SetHealth = SetHealth;
 
+	-- Enable Elements
+
 	-- Return
 	return self.wndMain;
 end
@@ -459,8 +564,16 @@ local Hide = function(self)
 end
 
 local CreateUnitFrame = function(self)
+	local strLayoutName = "SezzUnitFrame";
+	-- TODO: This should accept XML Data and a custom prefix?
+	-- Prefix: SezzUnitFrame
+	-- Generated Window Names: SezzUnitFramePlayerCastBar
+	-- Or Dont care about names?
+	-- So we know what window gets assigned to a propety
+	-- Maybe let the user name everything with a pretty name, just "CastBar" for example and add the prefix before loading the form?
+
 	-- Initialize Unit Frame Table
-	self.strName = "SezzUnitFrames_"..self.strUnit;
+	self.strName = "SezzUnitFrame"..self.strUnit;
 	self.bEnabled = false;
 
 	-- Calculate Anchor Offets
@@ -477,6 +590,11 @@ local CreateUnitFrame = function(self)
 	AddHealthBar(self);
 	AddTextLeft(self);
 	AddTextRight(self);
+
+	if (self.strUnit == "Player") then
+		-- Add CastBar
+		AddCastBar(self);
+	end
 
 	-- Expose Methods
 	self.LoadForm = LoadForm;
