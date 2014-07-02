@@ -30,7 +30,7 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
-	self:RegisterEvent("StanceChanged", "EventHandler");
+--	self:RegisterEvent("UnitCreated", "EventHandler");
 end
 
 function M:EventHandler(event, ...)
