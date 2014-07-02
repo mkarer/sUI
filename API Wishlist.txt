@@ -1,0 +1,5 @@
+
+FIX MouseButtonUp // self.wndMain:AddEventHandler("MouseButtonUp", "OnMouseClick", self);
+ADD MouseButtonClick
+
+
