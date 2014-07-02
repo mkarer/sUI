@@ -2,6 +2,8 @@
 
 	s:UI Data Text
 
+	TODO: Custom Tooltip Form
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -10,7 +12,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("DataText");
 local log;
-local strformat, tostring = string.format, tostring;
+local format, tostring, strlen, sort = string.format, tostring, string.len, table.sort;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -30,6 +32,7 @@ function M:OnEnable()
 
 	self.wndMain = Apollo.LoadForm(self.xmlDoc, "DataText", nil, self);
 	self.wndMain:Show(true, true);
+	self.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", self);
 
 	-- Start Clock Timer + Update Time
 	self.timerClock = ApolloTimer.Create(2, true, "UpdateText", self);
@@ -60,10 +63,10 @@ end
 function M:UpdateText(a)
 	-- Get Time
 	local tTime = GameLib.GetLocalTime();
-	local strTime = strformat("%02d:%02d", tostring(tTime.nHour), tostring(tTime.nMinute));
+	local strTime = format("%02d:%02d", tostring(tTime.nHour), tostring(tTime.nMinute));
 
 	-- Update Text
-	local strStats = strformat("%dFPS %.1fMB %dMS %d%%", self.nFPS, self.nAddonMemory, self.nLatency, self.nDurability);
+	local strStats = format("%dFPS %.1fMB %dMS %d%%", self.nFPS, self.nAddonMemory, self.nLatency, self.nDurability);
 
 	self.tFontLarge:Draw(self.wndMain:FindChild("Clock"), strTime, true, self.tColorClock);
 	self.tFontSmall:Draw(self.wndMain:FindChild("Stats"), strStats, true);
@@ -111,6 +114,7 @@ end
 -----------------------------------------------------------------------------
 
 local tAddonMemory = {};
+local tAddonCarbine = {};
 local tAddonList;
 local iCurrentAddon = 1;
 local nTotalAddons = 0;
@@ -118,7 +122,10 @@ local nTotalAddons = 0;
 local UpdateAddonMemory = function(strAddon)
 	local tAddon = Apollo.GetAddonInfo(strAddon);
 	if (tAddon and tAddon.nMemoryUsage) then
-		tAddonMemory[strAddon] = tonumber(tAddon.nMemoryUsage);
+		tAddonMemory[strAddon] = tonumber(tAddon.nMemoryUsage or 0);
+		if (tAddon.strAuthor == "Carbine") then
+			tAddonCarbine[strAddon] = true;
+		end
 	else
 		tAddonMemory[strAddon] = 0;
 	end
@@ -182,4 +189,57 @@ function M:UpdateAddondMemory()
 
 	self.nAddonMemory = nAddonMemory / 1024 / 1024;
 ]]
+end
+
+-----------------------------------------------------------------------------
+-- Tooltip
+-----------------------------------------------------------------------------
+
+local TableSortDescending = function(a, b)
+	return (a[1] > b[1]);
+end
+
+function M:OnMouseEnter()
+	local strTooltip = "";
+
+	if (not S.inCombat) then
+		local nMemoryCarbine = 0;
+
+		-- Sort by Memory Usage
+		local tAddonMemorySorted = {};
+		for strAddon, iMemory in pairs(tAddonMemory) do
+			if (iMemory > 0) then
+				table.insert(tAddonMemorySorted, { iMemory, strAddon });
+			end
+		end
+
+		sort(tAddonMemorySorted, TableSortDescending);
+
+		-- Loop
+		for i = 1, #tAddonMemorySorted do
+			local iMemory, strAddon = tAddonMemorySorted[i][1], tAddonMemorySorted[i][2];
+
+			if (tAddonCarbine[strAddon]) then
+				-- Don't list Carbine Addons, summerize them afterwards!
+				nMemoryCarbine = nMemoryCarbine + iMemory;
+			elseif (iMemory > 0) then
+				-- 3rd Party Addon
+				if (strlen(strTooltip) > 0) then
+					strTooltip = strTooltip.."\n";
+				end
+
+				strTooltip = strTooltip..format("%s: %.1fMB", strAddon, iMemory / 1024 / 1024);
+			end
+		end
+
+		-- Add Carbine
+		if (strlen(strTooltip) > 0) then
+			strTooltip = strTooltip.."\n \n";
+		end
+
+		strTooltip = strTooltip..format("Carbine: %dMB", nMemoryCarbine / 1024 / 1024);
+	end
+
+	-- Update Tooltip
+	self.wndMain:SetTooltip(strTooltip)
 end
