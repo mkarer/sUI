@@ -61,22 +61,18 @@ end
 
 local Enable = function(self)
 	-- Register Events
-	-- CastBar doesn't have any, we need to use OnUpdate...
 	if (self.bEnabled) then return; end
 
 	self.bEnabled = true;
-
-	if (self.bUpdateAlways) then
-		self:Update();
-	end
+	Apollo.RegisterEventHandler("VarChange_FrameCount", "Update", self);
 end
 
-local Disable = function(self)
+local Disable = function(self, bForce)
 	-- Unregister Events
-	-- CastBar doesn't have any, we need to use OnUpdate...
-	if (not self.bEnabled) then return; end
+	if (not self.bEnabled and not bForce) then return; end
 
 	self.bEnabled = false;
+	Apollo.RemoveEventHandler("VarChange_FrameCount", self);
 	self.tUnitFrame.wndCastBar:Show(false, true);
 end
 
@@ -98,8 +94,7 @@ function Element:New(tUnitFrame)
 	self.__index = self;
 
 	-- Properties
-	self.bEnabled = false;
-	self.bUpdateAlways = true; -- VarChange_FrameCount
+	self.bUpdateOnUnitFrameFrameCount = false;
 
 	-- Reference Unit Frame
 	self.tUnitFrame = tUnitFrame;
@@ -110,6 +105,8 @@ function Element:New(tUnitFrame)
 	self.Update = Update;
 
 	-- Done
+	self:Disable(true);
+
 	return self;
 end
 
