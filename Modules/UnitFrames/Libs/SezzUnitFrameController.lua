@@ -40,6 +40,11 @@ local LoadForm = function(self)
 	for _, tUnitFrame in pairs(self.tUnitFrames) do
 		log:debug("Loading Unit Frame: %s", tUnitFrame.strUnit);
 		tUnitFrame:LoadForm();
+
+		-- Add Elements
+		for _, tElement in pairs(tRegisteredElements) do
+			tUnitFrame:RegisterElement(tElement);
+		end
 	end
 end
 
@@ -108,10 +113,10 @@ end
 -----------------------------------------------------------------------------
 
 function UnitFrameController:RegisterElement(strPackageName)
-	local strElementName = string.match("Sezz:UnitFrameElement:CastBar-0.1", ":(%a+)\-");
+	local strElementName = string.match(strPackageName, ":(%a+)\-");
 	if (type(strElementName) == "string" and string.len(strElementName) > 0) then
 		log:debug("Registered Element: %s (Package: %s)", strElementName, strPackageName);
-		tRegisteredElements[strName] = strPackageName;
+		tRegisteredElements[strPackageName] = false;
 	end
 end
 
@@ -174,6 +179,13 @@ function UnitFrameController:New(o)
 
 	-- Create a new XML Document
 	self.xmlDoc = XmlDocument.NewForm();
+
+	-- Load Element Packages
+	for strPackageName, tElement in pairs(tRegisteredElements) do
+		if (type(tElement) ~= "table") then
+			tRegisteredElements[strPackageName] = Apollo.GetPackage(strPackageName).tPackage;
+		end
+	end
 
 	-- Expose Methods
 	self.CreateUnitFrame = CreateUnitFrame;
