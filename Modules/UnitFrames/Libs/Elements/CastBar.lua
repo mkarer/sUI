@@ -64,7 +64,7 @@ local Enable = function(self)
 	if (self.bEnabled) then return; end
 
 	self.bEnabled = true;
-	Apollo.RegisterEventHandler("VarChange_FrameCount", "Update", self);
+	Apollo.RegisterEventHandler("NextFrame", "Update", self);
 end
 
 local Disable = function(self, bForce)
@@ -72,7 +72,7 @@ local Disable = function(self, bForce)
 	if (not self.bEnabled and not bForce) then return; end
 
 	self.bEnabled = false;
-	Apollo.RemoveEventHandler("VarChange_FrameCount", self);
+	Apollo.RemoveEventHandler("NextFrame", self);
 	self.tUnitFrame.wndCastBar:Show(false, true);
 end
 
