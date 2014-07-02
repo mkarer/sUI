@@ -11,3 +11,5 @@ Unit
 	ADD GetCastingSpellId
 	ADD GetCastingSpellIcon
 
+Others
+	Slash /CoMMandS should be case insensitive!
