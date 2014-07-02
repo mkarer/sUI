@@ -1,5 +1,13 @@
+Game Events
+	...
 
-FIX MouseButtonUp // self.wndMain:AddEventHandler("MouseButtonUp", "OnMouseClick", self);
-ADD MouseButtonClick
+Control Events
+	FIX MouseButtonUp // self.wndMain:AddEventHandler("MouseButtonUp", "OnMouseClick", self);
+	ADD MouseButtonClick
+	FIX MouseWheel // Camera shouldn't change zoom level when using the mousewheel on a window that also has a MouseWheel event handler
 
+Unit
+	ADD GetCastingSpell
+	ADD GetCastingSpellId
+	ADD GetCastingSpellIcon
 
