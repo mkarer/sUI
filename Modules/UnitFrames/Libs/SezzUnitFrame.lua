@@ -8,7 +8,6 @@
 		Shield Bar
 		Power Bar
 		Experience Bar
-		Health Bar Color when stunned
 		Remove the layout code
 		
 		Events:
