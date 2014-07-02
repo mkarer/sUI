@@ -263,7 +263,7 @@ end
 local AddCastBar = function(self)
 	local tCastBarOffsets = S:Clone(self.tAnchorOffsets);
 	tCastBarOffsets[2] = tCastBarOffsets[2] + 40;
-	tCastBarOffsets[4] = tCastBarOffsets[4] + 30;
+	tCastBarOffsets[4] = tCastBarOffsets[4] + 26;
 
 	local nHeight = tCastBarOffsets[4] - tCastBarOffsets[2];
 
@@ -310,7 +310,7 @@ local AddCastBar = function(self)
 	});
 
 
-	self.tXmlData["CastBar"] = self.xmlDoc:NewControlNode("CastBar", "ProgressBar", {
+	self.tXmlData["CastBar"] = self.xmlDoc:NewControlNode("Progress", "ProgressBar", {
 		AnchorPoints = { 0, 0, 1, 1 },
 		AnchorOffsets = { 0, 0, 0, 0 },
 		AutoSetText = false,
@@ -456,6 +456,17 @@ local UpdateName = function(self)
 	end
 end
 
+-----------------------------------------------------------------------------
+-- Elements
+-----------------------------------------------------------------------------
+
+local RegisterElement = function(self, tElement)
+	local tElement = tElement:New(self);
+	if (tElement) then
+		table.insert(self.tElements, tElement);
+	end
+end
+
 ----------------------------------------------------------------------------
 -- Units
 -----------------------------------------------------------------------------
@@ -471,17 +482,31 @@ local Update = function(self)
 	if (self.bEnabled) then
 		UpdateHealth(self);
 		UpdateName(self);
+
+		for _, tElement in ipairs(self.tElements) do
+			if (tElement.bUpdateAlways) then
+				tElement:Update();
+			end
+		end
 	end
 end
 
 local Disable = function(self)
 	self.bEnabled = false;
+	for _, tElement in ipairs(self.tElements) do
+		tElement:Disable();
+	end
+
 	self.unit = nil;
 	self:Hide();
 end
 
 local Enable = function(self)
 	self.bEnabled = true;
+	for _, tElement in ipairs(self.tElements) do
+		tElement:Enable();
+	end
+
 	self:Update();
 	self:Show();
 end
@@ -545,6 +570,8 @@ local LoadForm = function(self)
 	self.SetHealth = SetHealth;
 
 	-- Enable Elements
+	self.RegisterElement = RegisterElement;
+	self.tElements = {};
 
 	-- Return
 	return self.wndMain;
