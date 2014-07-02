@@ -146,8 +146,13 @@ function M:UpdateAddondMemory()
 		end
 
 		if (tAddonList[iCurrentAddon]) then
---			log:debug(" +++ UPDATE: %s", tAddonList[iCurrentAddon]);
+			local nNow = GameLib.GetTickCount();
 			UpdateAddonMemory(tAddonList[iCurrentAddon]);
+			local nUpdateTime = GameLib.GetTickCount() - nNow;
+			if (nUpdateTime > 0) then
+				log:debug(" +++ Updated: %s (%sms)", tAddonList[iCurrentAddon], nUpdateTime);
+			end
+
 			iCurrentAddon = iCurrentAddon + 1;
 		end
 	end
