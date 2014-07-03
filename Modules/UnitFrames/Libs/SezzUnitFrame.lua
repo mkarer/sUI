@@ -289,14 +289,6 @@ local LoadForm = function(self)
 	self.wndMain = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit, nil, self);
 	self.wndMain:Show(false, true);
 
-	if (self.strUnit == "Player" or self.strUnit == "Target") then
-		self.wndCastBar = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."CastBar", nil, self);
-	end
-
---	for _, tNode in pairs(self.xmlDoc:GetRoot():GetChildren()) do
---		log:debug(tNode:Attribute("Name"));
---	end
-
 	-- Enable Mouseover Highlight
 	self.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", self);
 	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
@@ -309,6 +301,8 @@ local LoadForm = function(self)
 --	self.wndMain:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", self);
 
 	-- Add Properties for our Elements
+	self.wndCastBar = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."CastBar", nil, self) or self.wndMain:FindChild("CastBar");
+	self.wndExperience = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."Experience", nil, self) or self.wndMain:FindChild("Experience");
 	self.wndHealth = self.wndMain:FindChild("Health:Progress");
 	self.wndTextLeft = self.wndMain:FindChild("TextLeft");
 	self.wndTextRight = self.wndMain:FindChild("TextRight");
