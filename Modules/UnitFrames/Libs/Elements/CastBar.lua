@@ -13,7 +13,7 @@ if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local NAME = string.match(MAJOR, ":(%a+)\-");
 local Element = APkg and APkg.tPackage or {};
-local UnitFrameController, log;
+local log;
 
 -- Lua API
 local format = string.format;
@@ -137,8 +137,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
-	UnitFrameController:RegisterElement(MAJOR);
+	Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage:RegisterElement(MAJOR);
 
 	-- Spell Icons
 	Apollo.RegisterEventHandler("CombatLogDamage", "CacheSpellIcon", self);
