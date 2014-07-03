@@ -42,10 +42,6 @@ local format, modf, select, floor, upper, gsub, ceil = string.format, math.modf,
 -- Helper Functions
 -----------------------------------------------------------------------------
 
-local Round = function(nValue)
-	return floor(nValue + 0.5);
-end
-
 local ShortNumber = function(nValue)
 	if (nValue >= 1e6) then
 		return (gsub(format("%.2fm", nValue / 1e6), "%.?0+([km])$", "%1"));
@@ -123,40 +119,13 @@ end
 -- Colors
 -----------------------------------------------------------------------------
 
+local Round = function(nValue)
+	return floor(nValue + 0.5);
+end
+
 local ColorArrayToHex = function(arColor)
 	-- We only use indexed arrays here!
 	return format("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
-end
-
-local RGBColorToHex = function(r, g, b)
-	-- We only use indexed arrays here!
-	return format("%02x%02x%02x%02x", 255, Round(255 * r), Round(255 * g), Round(255 * b))
-end
-
------------------------------------------------------------------------------
--- Color Gradient
--- http://www.wowwiki.com/ColorGradient
------------------------------------------------------------------------------
-
-local ColorsAndPercent = function(a, b, ...)
-	if (a <= 0 or b == 0) then
-		return nil, ...;
-	elseif (a >= b) then
-		return nil, select(select('#', ...) - 2, ...);
-	end
-
-	local num = select('#', ...) / 3;
-	local segment, relperc = modf((a / b) * (num - 1));
-	return relperc, select((segment * 3) + 1, ...);
-end
-
-local RGBColorGradient = function(...)
-	local relperc, r1, g1, b1, r2, g2, b2 = ColorsAndPercent(...);
-	if (relperc) then
-		return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc;
-	else
-		return r1, g1, b1;
-	end
 end
 
 -----------------------------------------------------------------------------
@@ -202,32 +171,6 @@ end
 -- Health
 -----------------------------------------------------------------------------
 
-local SetHealth = function(self, nCurrent, nMax)
-	self.wndHealth:SetMax(nMax);
-	self.wndHealth:SetProgress(nCurrent);
-
-	local nVulnerabilityTime = self.unit:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability);
-
-	if (self.strUnit ~= "Player" and (self.unit:IsTagged() and not self.unit:IsTaggedByMe() and not self.unit:IsSoftKill())) then
-		-- Tagged
-		self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Tagged));
-	elseif (nVulnerabilityTime and nVulnerabilityTime > 0) then
-		-- Vulnerable
-		if (self.tColors.VulnerableSmooth) then
-			self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.VulnerableSmooth))));
-		else
-			self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Vulnerable));
-		end
-	else
-		-- Default
-		if (self.tColors.HealthSmooth) then
-			self.wndHealth:SetBarColor(RGBColorToHex(RGBColorGradient(nCurrent, nMax, unpack(self.tColors.HealthSmooth))));
-		else
-			self.wndHealth:SetBarColor(ColorArrayToHex(self.tColors.Health));
-		end
-	end
-end
-
 local SetHealthText = function(self, nCurrent, nMax)
 	-- TODO: Tags
 	if (self.wndTextRight) then
@@ -245,7 +188,6 @@ local UpdateHealth = function(self)
 		nMax = 1;
 	end
 
-	SetHealth(self, nCurrent, nMax);
 	SetHealthText(self, nCurrent, nMax);
 end
 
