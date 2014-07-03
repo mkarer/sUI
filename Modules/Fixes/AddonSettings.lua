@@ -21,6 +21,10 @@ function M:OnInitialize()
 	self:UpdateQuestTrackerForms();
 	self:UpdateQuestTrackerSorting();
 	self:OverrideNameplatesSettings();
+	self:UpdateDatachronForms();
+	self:HideAythQuestTracker();
+	self:HideTrackMaster();
+	self:EnableJunkIt();
 end
 
 function M:OnEnable()
@@ -86,6 +90,46 @@ function M:OverrideNameplatesSettings()
 		tNameplates.OnUnitTextBubbleToggled = function(self, tUnitArg, strText, nRange)
 			self:_OnUnitTextBubbleToggled(tUnitArg, nil, nRange);
 		end		
+	end
+end
+
+-----------------------------------------------------------------------------
+-- Datachron
+-----------------------------------------------------------------------------
+
+function M:UpdateDatachronForms()
+	local tDatachron = Apollo.GetAddon("Datachron");
+
+	if (tDatachron and not tDatachron._OnLoad) then
+		tDatachron._OnLoad = tDatachron.OnLoad;
+		tDatachron.OnLoad = function(self)
+			self:_OnLoad();
+
+			local tXml = self.xmlDoc:ToTable();
+			S:UpdateElementInXml(tXml, "Framing", { Sprite = "" });
+			S:UpdateElementInXml(tXml, "Datachron", { Sprite = "" });
+			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
+		end
+	end
+
+	local tDatachronScientist = Apollo.GetAddon("PathScientistContent");
+
+	if (tDatachronScientist and not tDatachronScientist._OnLoad) then
+		tDatachronScientist._OnLoad = tDatachronScientist.OnLoad;
+		tDatachronScientist.OnLoad = function(self)
+			self:_OnLoad();
+
+			local tXml = self.xmlDoc:ToTable();
+			S:UpdateElementInXml(tXml, "ScientistDatachron", { Template = "Default" });
+			S:UpdateElementInXml(tXml, "DatachronScientistBottom", { Sprite = "" });
+			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
+		end
+
+		tDatachronScientist._OnLoadFromDatachron = tDatachronScientist.OnLoadFromDatachron;
+		tDatachronScientist.OnLoadFromDatachron = function(self)
+			tDatachronScientist:_OnLoadFromDatachron();
+			self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+		end
 	end
 end
 
@@ -158,3 +202,69 @@ function M:UpdateQuestTrackerSorting()
 		end
 	end
 end
+
+-----------------------------------------------------------------------------
+-- Ayth_Quest
+-----------------------------------------------------------------------------
+
+function M:HideAythQuestTracker()
+	local tAyth = Apollo.GetAddon("Ayth_Quest");
+	if (tAyth) then
+		if (tAyth.tUserSettings) then
+			tAyth.tUserSettings.showAythTracker = false;
+		end
+
+		if (not tAyth._OnRestore) then
+			tAyth._OnRestore = tAyth.OnRestore;
+			tAyth.OnRestore = function(self, eType, tSavedData)
+				self:_OnRestore(eType, tSavedData);
+				self.tUserSettings.showAythTracker = false;
+			end
+		end
+	end
+end
+
+-----------------------------------------------------------------------------
+-- TrackMaster
+-----------------------------------------------------------------------------
+
+function M:HideTrackMaster()
+	local tTrackMaster = Apollo.GetAddon("TrackMaster");
+	if (tTrackMaster and not tTrackMaster._OnRestore) then
+		tTrackMaster.pinned = false;
+
+		tTrackMaster._OnRestore = tTrackMaster.OnRestore;
+		tTrackMaster.OnRestore = function(self, eType, tSavedData)
+			if (eType == GameLib.CodeEnumAddonSaveLevel.Character) then
+				if (type(tSavedData) ~= "table") then
+					tSavedData = {};
+				end
+
+				tSavedData.Pinned = false;
+			end
+
+			self:_OnRestore(eType, tSavedData);
+		end
+	end
+end
+
+-----------------------------------------------------------------------------
+-- JunkIt
+-----------------------------------------------------------------------------
+
+function M:EnableJunkIt()
+	local tJunkIt = Apollo.GetAddon("JunkIt");
+	if (tJunkIt and not tJunkIt._OnRestore) then
+		tJunkIt.config.autoSell = true;
+		tJunkIt.config.autoRepair = true;
+
+		tJunkIt._OnRestore = tJunkIt.OnRestore;
+		tJunkIt.OnRestore = function(self, eType, tSavedData)
+			self:_OnRestore(eType, tSavedData);
+			self.config.autoSell = true;
+			self.config.autoRepair = true;
+		end
+	end
+end
+
+
