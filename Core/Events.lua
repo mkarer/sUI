@@ -68,6 +68,11 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "bQuestTrackerByDistance", "tQuestsQueuedForDestroy" },
 	},
+	FloatTextPanel = {
+		window = "wndHintArrowDistance",
+		hook = "OnHintArrowDistanceUpdate", -- Can't use OnDocumentReady because of LibApolloFixes
+		properties = { "OnHintArrowDistanceUpdate", "OnAdvanceErrorTimer" },
+	},
 };
 
 function S:CheckExternalAddon(name)
@@ -97,8 +102,8 @@ function S:CheckExternalAddon(name)
 	if (config) then
 		local addon = Apollo.GetAddon(name);
 		if (not addon) then
-			-- Addon won't be loaded, remove from list
-			tAddonLoadingInformation[name] = nil;
+			-- Uknown Addon
+--			tAddonLoadingInformation[name] = nil;
 		else
 			-- Unhook
 			self:Unhook(addon, config.hook);
@@ -116,6 +121,8 @@ function S:CheckExternalAddon(name)
 end
 
 function S:CheckExternalAddons()
+	Apollo.RegisterEventHandler("ObscuredAddonVisible", "CheckExternalAddon", self);
+
 	for name in pairs(tAddonLoadingInformation) do
 		self:CheckExternalAddon(name);
 	end

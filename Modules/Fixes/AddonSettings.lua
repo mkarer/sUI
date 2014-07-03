@@ -26,13 +26,11 @@ end
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
---[[
 	-- Events
 	self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
-	if (S:IsAddOnLoaded("QuestTracker")) then
-		self:OnAddonAvailable(nil, "QuestTracker", Apollo.GetAddon("QuestTracker"));
+	if (S:IsAddOnLoaded("FloatTextPanel")) then
+		self:OnAddonAvailable(nil, "FloatTextPanel", Apollo.GetAddon("FloatTextPanel"));
 	end
---]]
 
 	-- Quest Tracker
 	self:UpdateQuestTrackerForms();
@@ -43,12 +41,17 @@ end
 -- Events
 -----------------------------------------------------------------------------
 
---[[
 function M:OnAddonAvailable(strEvent, strAddon, tAddon)
-	if (strAddon == "QuestTracker") then
+	if (strAddon == "FloatTextPanel") then
+		local wndHintArrow = tAddon.wndHintArrowDistance;
+		if (wndHintArrow) then
+			local tAnchors = { wndHintArrow:GetAnchorOffsets() };
+			tAnchors[2] = tAnchors[2] + 100;
+			tAnchors[4] = tAnchors[4] + 100;
+			wndHintArrow:SetAnchorOffsets(unpack(tAnchors));
+		end
 	end
 end
---]]
 
 -----------------------------------------------------------------------------
 -- Name Plates
