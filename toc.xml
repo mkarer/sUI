@@ -45,13 +45,15 @@
 	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrameController.lua" />
 	<Script Name="Modules\UnitFrames\Libs\Elements\HealthBar.lua" />
 	<Script Name="Modules\UnitFrames\Libs\Elements\CastBar.lua" />
+	<Script Name="Modules\UnitFrames\Libs\Elements\ExperienceBar.lua" />
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<Script Name="Modules\UnitFrames\Core.lua" />
 	<Script Name="Modules\UnitFrames\Layout.lua" />
 	<Script Name="Modules\UnitFrames\Defaults.lua" />
-	<Script Name="Modules\UnitFrames\Elements\Health.lua" />
+	<Script Name="Modules\UnitFrames\Elements\HealthBar.lua" />
 	<Script Name="Modules\UnitFrames\Elements\CastBar.lua" />
+	<Script Name="Modules\UnitFrames\Elements\ExperienceBar.lua" />
 	<Script Name="Modules\UnitFrames\Units\Player.lua" />
 	<Script Name="Modules\UnitFrames\Units\Target.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />
