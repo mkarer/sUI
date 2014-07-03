@@ -23,4 +23,6 @@ UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 	bCastBarEnabled = true,
 	tCastBarAnchorPoints = { 0.5, 1, 0.5, 1 };
 	tCastBarAnchorOffsets = { -127, -86, 127, -66 };
+	-- Experience Bar
+	bExperienceBarEnabled = true,
 });
