@@ -32,6 +32,10 @@ UnitFramesLayout.tDefaults = {
 --	tCastBarAnchorPoints = {},
 --	tCastBarAnchorOffsets = {},
 	-------------------------------------------------------------------------
+	-- Experience Bar
+--	bExperienceBarEnabled = true,
+	nExperienceBarHeight = 2,
+	-------------------------------------------------------------------------
 
 
 --	rangeCheck = { insideAlpha = 1, outsideAlpha = 0.5 },
@@ -72,6 +76,10 @@ UnitFramesLayout.tColors = {
 	HealthSmooth = { 255/255, 38/255, 38/255, 255/255, 38/255, 38/255, 38/255, 38/255, 38/255 },
 	VulnerabilitySmooth = { 255/255, 38/255, 255/255, 255/255, 38/255, 255/255, 38/255, 38/255, 38/255 },
 	Tagged = { 153/255, 153/255, 153/255 },
+	Experience = {
+		Normal = { 45/255 - 0.1, 85/255 + 0.2, 137/255 },
+		Rested = { 45/255 + 0.2, 85/255 - 0.1, 137/255 - 0.1 },
+	},
 	Castbar = {
 		Normal = { 0.43, 0.75, 0.44 },
 	},
