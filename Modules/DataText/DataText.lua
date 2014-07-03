@@ -199,6 +199,22 @@ local TableSortDescending = function(a, b)
 	return (a[1] > b[1]);
 end
 
+local GetMemoryColor = function(iMemory)
+	if (iMemory < 50 * 1024) then
+		-- < 50KB
+		return "FFA0A0A0";
+	elseif (iMemory > 50000 * 1024) then
+		-- > 50MB
+		return "FFFF0000";
+	elseif (iMemory > 1000 * 1024) then
+		-- > 1MB
+		return "FF4CFF00";
+	else
+		-- > 50KB < 1MB
+		return "FF7FC9FF";
+	end
+end
+
 function M:OnMouseEnter()
 	local strTooltip = "";
 
@@ -228,7 +244,7 @@ function M:OnMouseEnter()
 					strTooltip = strTooltip.."\n";
 				end
 
-				strTooltip = strTooltip..format("%s: %.1fMB", strAddon, iMemory / 1024 / 1024);
+				strTooltip = strTooltip..format('<P>%s: <T TextColor="%s">%.1fMB</T></P>', strAddon, GetMemoryColor(iMemory), iMemory / 1024 / 1024);
 			end
 		end
 
@@ -237,7 +253,7 @@ function M:OnMouseEnter()
 			strTooltip = strTooltip.."\n \n";
 		end
 
-		strTooltip = strTooltip..format("Carbine: %dMB", nMemoryCarbine / 1024 / 1024);
+		strTooltip = strTooltip..format('<P> </P><P>Carbine: <T TextColor="%s">%dMB</T></P>', GetMemoryColor(nMemoryCarbine), nMemoryCarbine / 1024 / 1024);
 	end
 
 	-- Update Tooltip
