@@ -32,4 +32,5 @@ function M:OnEnable()
 	Apollo.SetConsoleVariable("hud.healthTextDisplay", 2);	-- Show Health Text
 	Apollo.SetConsoleVariable("hud.timeDisplay", 1); 		-- Show Clock
 	Apollo.SetConsoleVariable("ui.TooltipDelay", 0);		-- Disable Tooltip Delay
+	Apollo.SetConsoleVariable("camera.shake", 0);			-- Disable Camera Shake (it's buggy!)
 end
