@@ -160,206 +160,6 @@ local RGBColorGradient = function(...)
 end
 
 -----------------------------------------------------------------------------
--- XML Elements
------------------------------------------------------------------------------
-
--- Add Background (Required)
--- Acts as root element
-local AddBackground = function(self)
-	self.tXmlData["Background"] = self.xmlDoc:NewFormNode(self.strName, {
-		AnchorPoints = self.tAnchorPoints,
-		AnchorOffsets = self.tAnchorOffsets,
-		Picture = true,
-		Sprite = "WhiteFill",
-		BGColor = "ffffffff",
-		Moveable = true,
-		TooltipType = "OnCursor",
-	});
-end
-
--- Add Health Bar (Required)
-local AddHealthBar = function(self)
-	-- Health Bar Background
-	-- We should calculate the required height before creating this (Power/XP/Reputation Bar + Padding)
-	self.tXmlData["HealthBarBackground"] = self.xmlDoc:NewControlNode("HealthBarBackground", "Window", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { 2, 2, -2, -2 },
-		Picture = true,
-		Sprite = "WhiteFill",
-		BGColor = "ff000000",
-		IgnoreMouse = "true",
-	});
-
-	self.tXmlData["Background"]:AddChild(self.tXmlData["HealthBarBackground"]);
-
-	-- Health Bar
-	self.tXmlData["HealthBar"] = self.xmlDoc:NewControlNode("HealthBar", "ProgressBar", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { 0, 0, 0, 0 },
-		AutoSetText = false,
-		UseValues = true,
-		SetTextToProgress = false,
-		ProgressFull = "sUI:ProgressBar",
-		IgnoreMouse = "true",
-		BarColor = ColorArrayToHex(self.tColors.Health),
-	});
-
-	self.tXmlData["HealthBarBackground"]:AddChild(self.tXmlData["HealthBar"]);
-end
-
--- Left Text Element (Optional)
-local AddTextLeft = function(self)
---	self.tXmlData["TextLeft"] = self.xmlDoc:NewControlNode("TextLeft", "Window", {
---		AnchorPoints = { 0, 0, 0.5, 1 },
---		AnchorOffsets = { 4, 0, 0, 0 },
---		TextColor = "white",
---		DT_VCENTER = true,
---		Text = "Elke",
---		IgnoreMouse = "true",
---		Font = "CRB_Pixel_O",
---	});
-
-	-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
-	self.tXmlData["TextLeft"] = self.xmlDoc:NewControlNode("TextLeft", "MLWindow", {
-		AnchorPoints = { 0, 0.5, 0.5, 0.5 },
-		AnchorOffsets = { 4, -7, 0, 7 },
-		TextColor = "white",
-		Text = "{Unit}",
-		IgnoreMouse = "true",
-		Font = "CRB_Pixel_O",
-	});
-
-	self.tXmlData["HealthBar"]:AddChild(self.tXmlData["TextLeft"]);
-end
-
--- Right Text Element (Optional)
-local AddTextRight = function(self)
---	self.tXmlData["TextRight"] = self.xmlDoc:NewControlNode("TextRight", "MLWindow", {
---		AnchorPoints = { 0.5, 0, 1, 1 },
---		AnchorOffsets = { 0, 0, -4, 0 },
---		TextColor = "white",
---		DT_VCENTER = true,
---		DT_RIGHT = true,
---		Text = "28.6k",
---		IgnoreMouse = "true",
---		Font = "CRB_Pixel_O",
---	});
-
-	-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
-	self.tXmlData["TextRight"] = self.xmlDoc:NewControlNode("TextRight", "MLWindow", {
-		AnchorPoints = { 0.5, 0.5, 1, 0.5 },
-		AnchorOffsets = { 0, -7, -4, 7 },
-		TextColor = "white",
-		Text = "{Right}",
-		IgnoreMouse = "true",
-		Font = "CRB_Pixel_O",
-	});
-
-	self.tXmlData["HealthBar"]:AddChild(self.tXmlData["TextRight"]);
-end
-
--- Cast Bar
-local AddCastBar = function(self)
-	local tAnchorPoints = S:Clone(self.tAnchorPoints);
-	local tAnchorOffsets = S:Clone(self.tAnchorOffsets);
-	tAnchorOffsets[2] = tAnchorOffsets[2] + 40;
-	tAnchorOffsets[4] = tAnchorOffsets[4] + 26;
-
-
-	if (self.strUnit == "Target") then
-		tAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
-		tAnchorOffsets = { -200, 0, 200, 36 };
-	end
-
-	local nHeight = tAnchorOffsets[4] - tAnchorOffsets[2];
-
-	-- Container (White BG)
-	self.tXmlData["CastBarContainer"] = self.xmlDoc:NewFormNode("SezzUnitFrame"..self.strUnit.."CastBar", {
-		AnchorPoints = tAnchorPoints,
-		AnchorOffsets = tAnchorOffsets,
-		Picture = true,
-		Sprite = "WhiteFill",
-		BGColor = "33ffffff",
-		Moveable = true,
-		TooltipType = "OnCursor",
-	});
-
-	-- Icon + Container (Black BG)
-	self.tXmlData["CastBarIconBG"] = self.xmlDoc:NewControlNode("IconBackground", "Window", {
-		AnchorPoints = { 0, 0, 0, 1 },
-		AnchorOffsets = { 2, 2, nHeight, -2 },
-		Picture = true,
-		Sprite = "WhiteFill",
-		BGColor = "ff000000",
-		IgnoreMouse = "true",
-	});
-
-	self.tXmlData["CastBarIcon"] = self.xmlDoc:NewControlNode("Icon", "Window", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { 0, 0, 0, 0 },
-		Picture = true,
-		Sprite = "IconSprites:Icon_SkillStalker_Neutralize",
-		IgnoreMouse = "true",
-	});
-
-	self.tXmlData["CastBarContainer"]:AddChild(self.tXmlData["CastBarIconBG"]);
-	self.tXmlData["CastBarIconBG"]:AddChild(self.tXmlData["CastBarIcon"]);
-
-	-- Bar + Container (Black BG)
-	self.tXmlData["CastBarBG"] = self.xmlDoc:NewControlNode("Background", "Window", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { nHeight + 2, 2, -2, -2 },
-		Picture = true,
-		Sprite = "WhiteFill",
-		BGColor = "ff000000",
-		IgnoreMouse = "true",
-	});
-
-
-	self.tXmlData["CastBar"] = self.xmlDoc:NewControlNode("Progress", "ProgressBar", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { 0, 0, 0, 0 },
-		AutoSetText = false,
-		UseValues = true,
-		SetTextToProgress = false,
-		ProgressFull = "sUI:ProgressBar",
-		IgnoreMouse = "true",
-		BarColor = ColorArrayToHex(self.tColors.Castbar.Normal),
-	});
-
-	self.tXmlData["CastBarContainer"]:AddChild(self.tXmlData["CastBarBG"]);
-	self.tXmlData["CastBarBG"]:AddChild(self.tXmlData["CastBar"]);
-
-	-- Text Elements
-	self.tXmlData["CastBarTextLeft"] = self.xmlDoc:NewControlNode("Text", "Window", {
-		AnchorPoints = { 0, 0, 0.75, 1 },
-		AnchorOffsets = { 4, -2, 0, 0 },
-		TextColor = "white",
-		DT_VCENTER = true,
-		Text = "Caste ARMAGEDDON!1",
-		IgnoreMouse = "true",
-		Font = "CRB_Pixel_O",
-	});
-
-	self.tXmlData["CastBarTextRight"] = self.xmlDoc:NewControlNode("Time", "Window", {
-		AnchorPoints = { 0.75, 0, 1, 1 },
-		AnchorOffsets = { 0, -2, -4, 0 },
-		TextColor = "white",
-		DT_VCENTER = true,
-		DT_RIGHT = true,
-		Text = "23s",
-		IgnoreMouse = "true",
-		Font = "CRB_Pixel_O",
-	});
-
-	self.tXmlData["CastBar"]:AddChild(self.tXmlData["CastBarTextLeft"]);
-	self.tXmlData["CastBar"]:AddChild(self.tXmlData["CastBarTextRight"]);
-
-	-- Add Root Element
-	self.xmlDoc:GetRoot():AddChild(self.tXmlData["CastBarContainer"]);
-end
-
------------------------------------------------------------------------------
 -- Highlight on Mouseover
 -----------------------------------------------------------------------------
 
@@ -445,7 +245,6 @@ local UpdateHealth = function(self)
 		nMax = 1;
 	end
 
---	log:debug({nCurrent, nMax})
 	SetHealth(self, nCurrent, nMax);
 	SetHealthText(self, nCurrent, nMax);
 end
@@ -518,14 +317,14 @@ local Enable = function(self)
 end
 
 local SetUnit = function(self, unit)
+	-- Invalid Unit
 	if (not unit or (unit and not unit:IsValid())) then
-		-- Disable
 --		log:debug("[%s] Unit Invalid!", self.strUnit);
 		self:Disable();
 		return false;
 	end
 
-	-- Base Unit
+	-- Update Unit
 	if (not self.unit or (self.unit and self.unit:GetId() ~= unit:GetId())) then
 		log:debug("[%s] Updated Unit: %s", self.strUnit, unit:GetName());
 		self.unit = unit;
@@ -542,14 +341,14 @@ end
 -- Adds the Unit Frame to the UI
 local LoadForm = function(self)
 	-- Add XML Data as Root Element
-	self.xmlDoc:GetRoot():AddChild(self.tXmlData["Background"]);
+	self.xmlDoc:GetRoot():AddChild(self.tXmlData["Root"]);
 
 	-- Load Form
-	self.wndMain = self.xmlDoc:LoadForm(self.strName, nil, self);
+	self.wndMain = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit, nil, self);
 	self.wndMain:Show(false, true);
 
 	if (self.strUnit == "Player" or self.strUnit == "Target") then
-		self.wndCastBar = self.xmlDoc:LoadForm(self.strName.."CastBar", nil, self);
+		self.wndCastBar = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."CastBar", nil, self);
 	end
 
 --	for _, tNode in pairs(self.xmlDoc:GetRoot():GetChildren()) do
@@ -568,7 +367,7 @@ local LoadForm = function(self)
 --	self.wndMain:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", self);
 
 	-- Add Properties for our Elements
-	self.wndHealth = self.wndMain:FindChild("HealthBar");
+	self.wndHealth = self.wndMain:FindChild("Health:Progress");
 	self.wndTextLeft = self.wndMain:FindChild("TextLeft");
 	self.wndTextRight = self.wndMain:FindChild("TextRight");
 
@@ -596,38 +395,23 @@ local Hide = function(self)
 	self.wndMain:Show(false, true);
 end
 
-local CreateUnitFrame = function(self)
-	local strLayoutName = "SezzUnitFrame";
-	-- TODO: This should accept XML Data and a custom prefix?
-	-- Prefix: SezzUnitFrame
-	-- Generated Window Names: SezzUnitFramePlayerCastBar
-	-- Or Dont care about names?
-	-- So we know what window gets assigned to a propety
-	-- Maybe let the user name everything with a pretty name, just "CastBar" for example and add the prefix before loading the form?
+-----------------------------------------------------------------------------
+-- Constructor
+-----------------------------------------------------------------------------
 
-	-- Initialize Unit Frame Table
-	self.strName = "SezzUnitFrame"..self.strUnit;
+function UnitFrame:New(o, tUnitFrameController, strLayoutName, strUnit, tXmlData)
+	self = setmetatable(o or {}, self);
+	self.__index = self;
+
+	-- Properties
+	self.tXmlData = tXmlData;
+	self.strUnit = strUnit;
+	self.strLayoutName = strLayoutName;
 	self.bEnabled = false;
 
-	-- Calculate Anchor Offets
-	-- Currently only supports CENTERED unit frames
-	self.tAnchorOffsets[1] = self.tAnchorOffsets[1] - math.floor(self.nWidth / 2);
-	self.tAnchorOffsets[3] = self.tAnchorOffsets[3] + math.floor(self.nWidth / 2);
-	self.tAnchorOffsets[4] = self.tAnchorOffsets[4] + self.nHeight;
-
-	-- Initialize XML Data
-	self.tXmlData = {};
-
-	-- Add Elements to XML Data
-	AddBackground(self);
-	AddHealthBar(self);
-	AddTextLeft(self);
-	AddTextRight(self);
-
-	if (self.strUnit == "Player" or self.strUnit == "Target") then
-		-- Add CastBar
-		AddCastBar(self);
-	end
+	-- Reference Unit Frame Controller
+	self.xmlDoc = tUnitFrameController.xmlDoc;
+	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors })
 
 	-- Expose Methods
 	self.LoadForm = LoadForm;
@@ -641,35 +425,9 @@ local CreateUnitFrame = function(self)
 	self.Enable = Enable;
 	self.Disable = Disable;
 	self.Update = Update;
---	self.OnGenerateTooltip = OnGenerateTooltip;
 
-	-- Return Unit Frame Object
+	-- Done
 	return self;
-end
-
------------------------------------------------------------------------------
--- Constructor
------------------------------------------------------------------------------
-
-function UnitFrame:New(o, tUnitFrameController, tSettings)
-	self = setmetatable(o or {}, self);
-	self.__index = self;
-
-	if (tSettings) then
-		for k, v in pairs(tSettings) do
-			self[k] = v;
-		end
-	end
-
-	-- Reference Unit Frame Controller
-	self.xmlDoc = tUnitFrameController.xmlDoc;
-	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors })
-
-	-- Expose Methods
-	self.LoadForm = LoadForm;
-
-	-- Create and return Unit Frame
-	return CreateUnitFrame(self);
 end
 
 -----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 --[[
 
-	s:UI Unit Frame Layout Settings: Player
+	s:UI Unit Frame Layout Settings: Target
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -12,15 +12,15 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 -----------------------------------------------------------------------------
 
-UnitFramesLayout:SetUnitFrameConfiguration("Player", {
+UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	-- Base
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
-	tAnchorOffsets = { -127, -126, 127, -92 },
+	tAnchorOffsets = { -127, -214, 127, -180 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:ClassColor][Name][ >Sezz:Role][ >Sezz:RaidGroup]",
+	strTagsTextLeft = "[Sezz:Difficulty][Sezz:Level< ][Sezz:ClassColor][Name][ >Sezz:Role][ >Sezz:RaidGroup][ >Sezz:ComboPoints]",
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
-	tCastBarAnchorPoints = { 0.5, 1, 0.5, 1 };
-	tCastBarAnchorOffsets = { -127, -86, 127, -66 };
+	tCastBarAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
+	tCastBarAnchorOffsets = { -200, 0, 200, 36 };
 });

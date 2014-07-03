@@ -47,7 +47,14 @@
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<Script Name="Modules\UnitFrames\Core.lua" />
+	<Script Name="Modules\UnitFrames\Layout.lua" />
+	<Script Name="Modules\UnitFrames\Defaults.lua" />
+	<Script Name="Modules\UnitFrames\Elements\Health.lua" />
+	<Script Name="Modules\UnitFrames\Elements\CastBar.lua" />
 	<Script Name="Modules\UnitFrames\Units\Player.lua" />
+	<Script Name="Modules\UnitFrames\Units\Target.lua" />
+	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />
+	<Script Name="Modules\UnitFrames\Units\TargetOfTargetOfTarget.lua" />
 	<!-- Chat -->
 	<Script Name="Modules\Chat\Core.lua" />
 	<Script Name="Modules\Chat\ChannelColors.lua" />

@@ -1,0 +1,26 @@
+XML Structure
+
++ Root [wndMain]
+
+This element MUST BE EXACTLY LIKE THIS: {LayoutName}{UnitName}
+Example: My layout is named "SezzUnitFrames", so my root element for the player unit will be named "SezzUnitFramesPlayer".
+This is currently needed when loading the form, so you can create a cast bar that is anywhere on the screen (in this example the cast bar would be named "SezzUnitFramesPlayerCastBar").
+
+All the unit frame elements can be anywhere as a child of the root element when using their short name (like "Health", but then you'll need to structurize them like explained below or :GetChild("Name") wouldn't find them) or can even be a root element when using their full name (like "SezzUnitFramesPlayerHealth")!
+
+Supported elements:
+
+	+ Health
+		+ Progress [wndHealth]
+		+ TextLeft [wndTextLeft] (see below)
+		+ TextRight [wndTextRight] (see below)
+		
+		The tag system isn't implemented yet, so the text windows will have the following content:
+		TextLeft: Unit name
+		TextRight: HP
+
+	+ CastBar [wndCastBar]
+		+ Progress
+		+ Icon (WildStar does not provide spell icons, I'm currently using the combat log to remember icons for every spell, but must spells don't even have an icon!)
+		+ Text
+		+ Time
