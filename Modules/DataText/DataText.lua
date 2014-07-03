@@ -208,7 +208,7 @@ function M:OnMouseEnter()
 		-- Sort by Memory Usage
 		local tAddonMemorySorted = {};
 		for strAddon, iMemory in pairs(tAddonMemory) do
-			if (iMemory > 0) then
+			if (iMemory > 1024) then
 				table.insert(tAddonMemorySorted, { iMemory, strAddon });
 			end
 		end
