@@ -26,11 +26,13 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
---	self:RegisterEvent("UnitCreated", "EventHandler");
+--	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
+--	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
 end
 
 function M:EventHandler(event, ...)
 	log:debug(event);
+	log:debug({...});
 
 	if (true) then return; end
 
