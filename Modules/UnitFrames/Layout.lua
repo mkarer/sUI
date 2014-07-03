@@ -36,11 +36,13 @@ function M:OnEnable()
 	-- Create XML Forms for our Unit Frames
 	for strUnit, tSettings in pairs(self.tSettings) do
 		self:InitializeUnitFrameXML(strUnit);
-		self:CreateHealthElement(strUnit);
+		self:CreateHealthBarElement(strUnit);
 		self:CreateCastBarElement(strUnit);
+		self:CreateExperienceBarElement(strUnit);
 
 		self.tUnitFrameController:CreateUnitFrame(self.strLayoutName, strUnit, tSettings.tXmlData);
 	end
+
 
 	-- Enable Unit Frames
 	self.tUnitFrameController:LoadForm();
