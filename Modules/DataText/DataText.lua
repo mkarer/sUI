@@ -12,7 +12,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("DataText");
 local log;
-local format, tostring, strlen, sort = string.format, tostring, string.len, table.sort;
+local format, tostring, strlen, sort, gsub = string.format, tostring, string.len, table.sort, string.gsub;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -120,7 +120,7 @@ local iCurrentAddon = 1;
 local nTotalAddons = 0;
 
 local UpdateAddonMemory = function(strAddon)
-	local tAddon = Apollo.GetAddonInfo(strAddon);
+	local tAddon = Apollo.GetAddonInfo(gsub(strAddon, ":", ""));
 	if (tAddon and tAddon.nMemoryUsage) then
 		tAddonMemory[strAddon] = tonumber(tAddon.nMemoryUsage or 0);
 		if (tAddon.strAuthor == "Carbine") then
