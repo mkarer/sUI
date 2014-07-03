@@ -1,6 +1,6 @@
 --[[
 
-	s:UI Unit Frame Layout Generation: Health Element
+	s:UI Unit Frame Layout Generation: Health Bar/Text Element
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -12,7 +12,7 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateHealthElement(strUnit)
+function UnitFramesLayout:CreateHealthBarElement(strUnit)
 	local tSettings = self.tSettings[strUnit];
 	local tXmlData = self.tSettings[strUnit].tXmlData;
 
