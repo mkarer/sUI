@@ -16,11 +16,7 @@ function S:RaiseEvent(event, ...)
 	local tArguments = {...};
 	if (#tArguments > 0) then
 		for _, arg in pairs(tArguments) do
-			local strType = type(arg);
-
-			if (strType == "string" or strType == "number") then
-				strArguments = strArguments.." "..arg;
-			end
+			strArguments = strArguments.." "..tostring(arg);
 		end
 	end
 
