@@ -24,6 +24,7 @@ function M:OnInitialize()
 	self:UpdateDatachronForms();
 	self:HideAythQuestTracker();
 	self:HideTrackMaster();
+	self:UpdateHarvester();
 	self:EnableJunkIt();
 end
 
@@ -268,3 +269,23 @@ function M:EnableJunkIt()
 end
 
 
+-----------------------------------------------------------------------------
+-- Harvester
+-----------------------------------------------------------------------------
+
+function M:UpdateHarvester()
+	local tHarvester = Apollo.GetAddon("Harvester");
+
+	-- Enable TrackMaster
+	if (tHarvester and not tHarvester._OnRestore) then
+		if (tHarvester.settings) then
+			tHarvester.settings.Options.TrackMaster = (Apollo.GetAddon("TrackMaster") ~= nil);
+		end
+
+		tHarvester._OnRestore = tHarvester.OnRestore;
+		tHarvester.OnRestore = function(self, eType, tSavedData)
+			self:_OnRestore(eType, tSavedData);
+		    self.settings.Options.TrackMaster = (Apollo.GetAddon("TrackMaster") ~= nil);
+		end
+	end
+end
