@@ -39,6 +39,7 @@ function M:OnEnable()
 		self:CreateHealthBarElement(strUnit);
 		self:CreateCastBarElement(strUnit);
 		self:CreateExperienceBarElement(strUnit);
+		self:CreateAurasElement(strUnit);
 
 		self.tUnitFrameController:CreateUnitFrame(self.strLayoutName, strUnit, tSettings.tXmlData);
 	end

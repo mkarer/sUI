@@ -167,6 +167,14 @@ end
 -- local OnGenerateTooltip = function(self, wndControl, wndHandler, eType, arg1, arg2)
 -- end
 
+local OnGenerateBuffTooltip = function(self, wndHandler, wndControl, tType, splBuff)
+	if (wndHandler == wndControl) then
+		return;
+	end
+
+	Tooltip.GetBuffTooltipForm(self, wndControl, splBuff, {bFutureSpell = false});
+end
+
 -----------------------------------------------------------------------------
 -- Health
 -----------------------------------------------------------------------------
@@ -244,6 +252,10 @@ local Disable = function(self)
 		tElement:Disable();
 	end
 
+	if (self.wndAuras) then self.wndAuras:SetUnit(nil); end
+	if (self.wndBuffs) then self.wndBuffs:SetUnit(nil); end
+	if (self.wndDebuffs) then self.wndDebuffs:SetUnit(nil); end
+
 	self.unit = nil;
 	self:Hide();
 end
@@ -253,6 +265,10 @@ local Enable = function(self)
 	for _, tElement in ipairs(self.tElements) do
 		tElement:Enable();
 	end
+
+	if (self.wndAuras) then self.wndAuras:SetUnit(self.unit); end
+	if (self.wndBuffs) then self.wndBuffs:SetUnit(self.unit); end
+	if (self.wndDebuffs) then self.wndDebuffs:SetUnit(self.unit); end
 
 	self:Update();
 	self:Show();
@@ -304,8 +320,19 @@ local LoadForm = function(self)
 	self.wndCastBar = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."CastBar", nil, self) or self.wndMain:FindChild("CastBar");
 	self.wndExperience = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."Experience", nil, self) or self.wndMain:FindChild("Experience");
 	self.wndHealth = self.wndMain:FindChild("Health:Progress");
+	-- Temporary Elements
 	self.wndTextLeft = self.wndMain:FindChild("TextLeft");
 	self.wndTextRight = self.wndMain:FindChild("TextRight");
+	-- Auras (HACKY, BOOM)
+	self.wndAuras = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."Auras", nil, self);
+	self.wndBuffs = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."Buffs", nil, self);
+	self.wndDebuffs = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."Debuffs", nil, self);
+	self.wndAuras = self.wndAuras and self.wndAuras:FindChild("Auras") or self.wndMain:FindChild("Auras");
+	self.wndBuffs = self.wndBuffs and self.wndBuffs:FindChild("Buffs") or self.wndMain:FindChild("Buffs");
+	self.wndDebuffs = self.wndDebuffs and self.wndDebuffs:FindChild("Debuffs") or self.wndMain:FindChild("Debuffs");
+	if (self.wndAuras) then self.OnGenerateBuffTooltip = OnGenerateBuffTooltip; self.wndAuras:AddEventHandler("GenerateTooltip", "OnGenerateBuffTooltip", self); end
+	if (self.wndBuffs) then self.OnGenerateBuffTooltip = OnGenerateBuffTooltip; self.wndBuffs:AddEventHandler("GenerateTooltip", "OnGenerateBuffTooltip", self); end
+	if (self.wndDebuffs) then self.OnGenerateBuffTooltip = OnGenerateBuffTooltip; self.wndDebuffs:AddEventHandler("GenerateTooltip", "OnGenerateBuffTooltip", self); end
 
 	-- Expose more Methods
 	self.SetHealth = SetHealth;

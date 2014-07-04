@@ -54,6 +54,7 @@
 	<Script Name="Modules\UnitFrames\Elements\HealthBar.lua" />
 	<Script Name="Modules\UnitFrames\Elements\CastBar.lua" />
 	<Script Name="Modules\UnitFrames\Elements\ExperienceBar.lua" />
+	<Script Name="Modules\UnitFrames\Elements\Auras.lua" />
 	<Script Name="Modules\UnitFrames\Units\Player.lua" />
 	<Script Name="Modules\UnitFrames\Units\Target.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />
@@ -90,4 +91,5 @@
     <ReplaceAddon Name="StalkerResource" />
     <ReplaceAddon Name="WarriorResource" />
     <ReplaceAddon Name="XPBar" />
+    <ReplaceAddon Name="TargetFrame" />
 </Addon>

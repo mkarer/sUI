@@ -33,9 +33,30 @@ UnitFramesLayout.tDefaults = {
 --	tCastBarAnchorOffsets = {},
 	-------------------------------------------------------------------------
 	-- Experience Bar
+	-------------------------------------------------------------------------
 --	bExperienceBarEnabled = true,
 	nExperienceBarHeight = 2,
 	-------------------------------------------------------------------------
+	-- Auras (Combined Buffs + Debuffs)
+	-------------------------------------------------------------------------
+--	bAurasEnabled = true,
+--	tAurasAnchorPoints = { 0, 0, 0, 0 },
+--	tAurasAnchorOffsets = { 0, 0, 200, 30 },
+--	tAurasStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
+	-------------------------------------------------------------------------
+	-- Buffs
+	-------------------------------------------------------------------------
+--	bBuffsEnabled = true,
+--	tBuffsAnchorPoints = { 0, 0, 0, 0 },
+--	tBuffsAnchorOffsets = { 0, 0, 200, 30 },
+--	tBuffsStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
+	-------------------------------------------------------------------------
+	-- Buffs
+	-------------------------------------------------------------------------
+--	bDebuffsEnabled = true,
+--	tDebuffsAnchorPoints = { 0, 0, 0, 0 },
+--	tDebuffsAnchorOffsets = { 0, 0, 200, 30 },
+--	tDebuffsStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
 
 
 --	rangeCheck = { insideAlpha = 1, outsideAlpha = 0.5 },

@@ -23,4 +23,9 @@ UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	bCastBarEnabled = true,
 	tCastBarAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
 	tCastBarAnchorOffsets = { -200, 0, 200, 36 };
+	-- Auras
+	bAurasEnabled = true,
+	tAurasAnchorPoints = { 0.5, 1, 0.5, 1 },
+	tAurasAnchorOffsets = { -127 - 200, -214, -127, -180 },
+	tAurasStyles = { "AutoAddAuras", "AlignAurasRight", "PulseWhenExpiring", "ShowMS" },
 });
