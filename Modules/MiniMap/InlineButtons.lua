@@ -2,6 +2,8 @@
 
 	s:UI MiniMap Inline Buttons
 
+	TODO: Maybe they would be better on the left side of the MiniMap?
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 

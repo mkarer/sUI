@@ -2,7 +2,7 @@
 
 	s:UI MiniMap Modifications
 
-	TODO: Mail Notification
+	TODO: Don't replace the full MiniMap.xml file, only the needed pars.
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
