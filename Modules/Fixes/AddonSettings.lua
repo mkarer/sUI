@@ -151,7 +151,7 @@ function M:UpdateQuestTrackerForms()
 			self:_OnLoad();
 
 			local tXml = self.xmlDoc:ToTable();
-			S:UpdateElementInXml(tXml, "QuestTrackerForm", { LAnchorPoint = 1, LAnchorOffset = -325, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = -271 });
+			S:UpdateElementInXml(tXml, "QuestTrackerForm", { LAnchorPoint = 1, LAnchorOffset = -345, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = -20, BAnchorPoint = 1, BAnchorOffset = -271 });
 			S:UpdateElementInXml(tXml, "QuestTrackerScroll", { Template = "ScrollableWindowHiddenScrollbars" });
 			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
 		end
