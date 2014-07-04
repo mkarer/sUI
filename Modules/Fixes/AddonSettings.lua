@@ -86,11 +86,13 @@ function M:OverrideNameplatesSettings()
 			end
 		end
 
-		-- Speech Bubble Fix
-		tNameplates._OnUnitTextBubbleToggled = tNameplates.OnUnitTextBubbleToggled;
-		tNameplates.OnUnitTextBubbleToggled = function(self, tUnitArg, strText, nRange)
-			self:_OnUnitTextBubbleToggled(tUnitArg, nil, nRange);
-		end		
+		-- Speech Bubble + Gibbed Units Fix
+		tNameplates._UpdateNameplateVisibility = tNameplates.UpdateNameplateVisibility;
+		tNameplates.UpdateNameplateVisibility = function(self, tNameplate)
+			tNameplate.bGibbed = false;
+			tNameplate.bSpeechBubble = false;
+			self:_UpdateNameplateVisibility(tNameplate);
+		end
 	end
 end
 
