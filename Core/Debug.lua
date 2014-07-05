@@ -24,6 +24,8 @@ function S:DumpAbility(strName, bCompleteDump)
 			if (bCompleteDump) then
 				S.Log:debug(tAbility);
 			end
+
+			return tAbility;
 		end
 	end
 end
