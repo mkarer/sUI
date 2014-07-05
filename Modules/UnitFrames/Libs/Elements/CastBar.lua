@@ -29,7 +29,7 @@ local Update = function(self)
 	local unit = self.tUnitFrame.unit;
 	local wndCastBar = self.tUnitFrame.wndCastBar;
 
-	if (unit:IsCasting()) then
+	if (unit:ShouldShowCastBar()) then
 		local wndProgress = wndCastBar:FindChild("Progress");
 		local wndIcon = wndCastBar:FindChild("Icon");
 		local wndText = wndCastBar:FindChild("Text");
