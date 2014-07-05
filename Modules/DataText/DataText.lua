@@ -40,6 +40,9 @@ function M:OnEnable()
 	self.timerStats = ApolloTimer.Create(3, true, "UpdateLatency", self);
 
 	-- Update Memory/Stats
+	self.nLatency = 0;
+	self.nFPS = 0;
+	self.nAddonMemory = 0;
 	self:UpdateAddondMemory();
 	self:UpdateLatency();
 
@@ -49,6 +52,7 @@ function M:OnEnable()
 	self:UpdateDurability();
 
 	-- Show Text
+	self.nDurability = 100;
 	self:UpdateText();
 end
 
