@@ -78,7 +78,7 @@
 	<Script Name="Modules\Automation\ChallengeReward.lua" />
 	<Script Name="Modules\Automation\OpenBags.lua" />
 	<Script Name="Modules\Automation\AutoRepair.lua" />
-	<Script Name="Modules\Automation\JunkSeller.lua" />
+	<Script Name="Modules\Automation\VendorTrash.lua" />
 	<!-- Misc -->
 	<Script Name="Modules\DataText\DataText.lua" />
 
