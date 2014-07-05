@@ -104,11 +104,3 @@ function S:UpdateElementInXml(tXml, strElementName, tData)
 
 	return false;
 end
-
------------------------------------------------------------------------------
--- AML Tags
------------------------------------------------------------------------------
-
-function S:WrapAML(strTag, strText, strColor, strAlign)
-	return format('<%s Font="CRB_Pixel_O" Align="%s" TextColor="%s">%s</%s>', strTag, strAlign or "Left", strColor or "ffffffff", strText, strTag);
-end
