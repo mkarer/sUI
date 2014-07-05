@@ -180,10 +180,17 @@ tTags["Sezz:Level"] = function(tUnitFrame)
 		local bIsScaled = unit:IsScaled();
 
 		if (not (tUnitFrame.strUnit == "Player" and nLevel == knMaxLevel and not bIsScaled)) then
+			-- Level
 			strContent = nLevel;
 
+			-- Scale Indicator
 			if (bIsScaled) then
-				strContent = strContent.."~";
+				strContent = "~"..strContent;
+			end
+
+			-- Elite Indicator
+			if (unit:GetRank() == Unit.CodeEnumRank.Elite) then
+				strContent = strContent.."+";
 			end
 
 			-- Space
