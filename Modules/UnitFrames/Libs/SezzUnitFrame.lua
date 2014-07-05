@@ -177,15 +177,17 @@ tTags["Sezz:Level"] = function(tUnitFrame)
 	local strContent = "";
 
 	if (nLevel) then
-		local bIsScaled = unit:IsScaled();
+--		local bIsScaled = unit:IsScaled();
+		local tUnitStats = unit:GetBasicStats()
+		local bIsMentoring = (tUnitStats and tUnitStats.nEffectiveLevel > 0);
 
-		if (not (tUnitFrame.strUnit == "Player" and not bIsScaled)) then
+		if (not (tUnitFrame.strUnit == "Player" and not bIsMentoring)) then
 			-- Level
 			strContent = nLevel;
 
 			-- Scale Indicator
-			if (bIsScaled) then
-				strContent = "~"..strContent;
+			if (bIsMentoring) then
+				strContent = strContent.."~";
 			end
 
 			-- Elite Indicator
