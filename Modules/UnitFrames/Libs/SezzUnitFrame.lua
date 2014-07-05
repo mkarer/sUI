@@ -36,7 +36,21 @@ local UnitFrame = APkg and APkg.tPackage or {};
 local log;
 
 -- Lua APIs
-local format, modf, select, floor, upper, gsub, ceil = string.format, math.modf, select, math.floor, string.upper, string.gsub, math.ceil;
+local format, modf, select, floor, upper, gsub, ceil, len = string.format, math.modf, select, math.floor, string.upper, string.gsub, math.ceil, string.len;
+
+-- Constants
+local knMaxLevel = 50;
+local ktDifficultyColors = {
+	{-4, "ff7d7d7d"}, -- Trivial
+	{-3, "ff01ff07"}, -- Inferior
+	{-2, "ff01fcff"}, -- Minor
+	{-1, "ff597cff"}, -- Easy
+	{ 0, "ffffffff"}, -- Average
+	{ 1, "ffffff00"}, -- Moderate
+	{ 2, "ffff8000"}, -- Tough
+	{ 3, "ffff0000"}, -- Hard
+	{ 4, "ffff00ff"} -- Impossible
+};
 
 -----------------------------------------------------------------------------
 -- Helper Functions
@@ -58,6 +72,38 @@ end
 
 local WrapAML = function(strTag, strText, strColor, strAlign)
 	return format('<%s Font="CRB_Pixel_O" Align="%s" TextColor="%s">%s</%s>', strTag, strAlign or "Left", strColor or "ffffffff", strText, strTag);
+end
+
+local GetDifficultyColor = function(unitComparison)
+	local nUnitCon = GameLib.GetPlayerUnit():GetLevelDifferential(unitComparison) + unitComparison:GetGroupValue();
+	local nCon = 1; --default setting
+
+	if (nUnitCon <= ktDifficultyColors[1][1]) then -- lower bound
+		nCon = 1;
+	elseif (nUnitCon >= ktDifficultyColors[#ktDifficultyColors][1]) then -- upper bound
+		nCon = #ktDifficultyColors;
+	else
+		for idx = 2, (#ktDifficultyColors-1) do -- everything in between
+			if (nUnitCon == ktDifficultyColors[idx][1]) then
+				nCon = idx;
+			end
+		end
+	end
+
+	return ktDifficultyColors[nCon][2];
+end
+
+-----------------------------------------------------------------------------
+-- Colors
+-----------------------------------------------------------------------------
+
+local Round = function(nValue)
+	return floor(nValue + 0.5);
+end
+
+local ColorArrayToHex = function(arColor)
+	-- We only use indexed arrays here!
+	return format("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
 end
 
 -----------------------------------------------------------------------------
@@ -85,14 +131,14 @@ local UnitStatus = function(unit)
 	return nil;
 end
 
-tTags["sezz:hp"] = function(unit)
+tTags["Sezz:HP"] = function(unit)
 	-- Default HP
 	local strStatus = UnitStatus(unit);
 	if (strStatus) then
 		return strStatus;
 	else
 		local nCurrentHealth, nMaxHealth = unit:GetHealth(), unit:GetMaxHealth();
-		if (not nCurrentHealth or not nMaxHealth or (nCurrentHealth == 0 and nMaxHealth == 0)) then return; end
+		if (not nCurrentHealth or not nMaxHealth or (nCurrentHealth == 0 and nMaxHealth == 0)) then return ""; end
 
 		-- ? UnitCanAttack//not UnitIsFriend
 		if (UnitIsFriend(unit) and unit:IsACharacter(unit)) then
@@ -115,17 +161,45 @@ tTags["sezz:hp"] = function(unit)
 	end
 end
 
------------------------------------------------------------------------------
--- Colors
------------------------------------------------------------------------------
-
-local Round = function(nValue)
-	return floor(nValue + 0.5);
+tTags["Sezz:ClassColor"] = function(tUnitFrame, strContent)
+	if (len(strContent) > 0) then
+		return WrapAML("T", strContent, ColorArrayToHex(tUnitFrame.tColors.Class[tUnitFrame.bIsObject and "Object" or tUnitFrame.unit:GetClassId()]));
+	else
+		return strContent;
+	end
 end
 
-local ColorArrayToHex = function(arColor)
-	-- We only use indexed arrays here!
-	return format("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
+tTags["Sezz:Level"] = function(tUnitFrame)
+	-- Only show level on player frame when it is scaled!
+	-- Everything else should show the level
+	local unit = tUnitFrame.unit;
+	local nLevel = unit:GetLevel();
+	local strContent = "";
+
+	if (nLevel) then
+		local bIsScaled = unit:IsScaled();
+
+		if (not (tUnitFrame.strUnit == "Player" and nLevel == knMaxLevel and not bIsScaled)) then
+			strContent = nLevel;
+
+			if (bIsScaled) then
+				strContent = strContent.."~";
+			end
+
+			-- Space
+			strContent = strContent.." ";
+		end
+	end
+
+	return strContent;
+end
+
+tTags["Sezz:DifficultyColor"] = function(tUnitFrame, strContent)
+	if (len(strContent) > 0) then
+		return WrapAML("T", strContent, GetDifficultyColor(tUnitFrame.unit));
+	else
+		return strContent;
+	end
 end
 
 -----------------------------------------------------------------------------
@@ -182,7 +256,7 @@ end
 local SetHealthText = function(self, nCurrent, nMax)
 	-- TODO: Tags
 	if (self.wndTextRight) then
-		self.wndTextRight:SetText(tTags["sezz:hp"](self.unit));
+		self.wndTextRight:SetText(tTags["Sezz:HP"](self.unit));
 	end
 end
 
@@ -204,10 +278,26 @@ end
 -- TODO: Tags
 -----------------------------------------------------------------------------
 
+local UpdateTooltip = function(self)
+	local strTooltip = self.unit:GetName();
+
+	if (self.unit:GetGroupValue() > 0) then
+		strTooltip = strTooltip.."\n"..String_GetWeaselString(Apollo.GetString("TargetFrame_GroupSize"), self.unit:GetGroupValue());
+	end
+
+	self.wndMain:SetTooltip(strTooltip);
+end
+
 local UpdateName = function(self)
-	self.wndMain:SetTooltip(self.unit:GetName()); -- Current Workaround
+	UpdateTooltip(self); -- Current Workaround
+
 	if (self.wndTextLeft) then
-		self.wndTextLeft:SetText(WrapAML("P", self.unit:GetName(), ColorArrayToHex(self.tColors.Class[self.bIsObject and "Object" or self.unit:GetClassId()]), "Left"));
+		local strText = tTags["Sezz:DifficultyColor"](self, tTags["Sezz:Level"](self));
+		strText = strText..tTags["Sezz:ClassColor"](self, self.unit:GetName());
+
+		strText = WrapAML("P", strText);
+
+		self.wndTextLeft:SetText(strText);
 	end
 end
 
