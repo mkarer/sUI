@@ -179,7 +179,7 @@ tTags["Sezz:Level"] = function(tUnitFrame)
 	if (nLevel) then
 		local bIsScaled = unit:IsScaled();
 
-		if (not (tUnitFrame.strUnit == "Player" and nLevel == knMaxLevel and not bIsScaled)) then
+		if (not (tUnitFrame.strUnit == "Player" and not bIsScaled)) then
 			-- Level
 			strContent = nLevel;
 
