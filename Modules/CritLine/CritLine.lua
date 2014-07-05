@@ -54,11 +54,13 @@ function M:OnDisable()
 
 	self:UnregisterEvent("CombatLogDamage");
 	self:UnregisterEvent("CombatLogHeal");
+	self:UnregisterEvent("CombatLogPet");
 end
 
 function M:OnCharacterLoaded()
 	self:RegisterEvent("CombatLogDamage", "OnCombatLog");
 	self:RegisterEvent("CombatLogHeal", "OnCombatLog");
+	self:RegisterEvent("CombatLogPet", "OnCombatLog");
 end
 
 function M:RestoreProfile()
