@@ -16,10 +16,23 @@ local Element = APkg and APkg.tPackage or {};
 local log;
 
 -- Lua API
-local format = string.format;
+local format, floor, modf = string.format, math.floor, math.modf;
 
 -- Spell Icons
 local tSpellIcons = {};
+
+-----------------------------------------------------------------------------
+-- Color Conversion
+-----------------------------------------------------------------------------
+
+local Round = function(nValue)
+	return floor(nValue + 0.5);
+end
+
+local ColorArrayToHex = function(arColor)
+	-- We only use indexed arrays here!
+	return format("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
+end
 
 -----------------------------------------------------------------------------
 
@@ -28,15 +41,39 @@ local Update = function(self)
 
 	local unit = self.tUnitFrame.unit;
 	local wndCastBar = self.tUnitFrame.wndCastBar;
+	local nVulnerabilityTime = unit:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability) or 0;
 
-	if (unit:ShouldShowCastBar()) then
+	if (nVulnerabilityTime > 0 or unit:ShouldShowCastBar()) then
 		local wndProgress = wndCastBar:FindChild("Progress");
 		local wndIcon = wndCastBar:FindChild("Icon");
 		local wndText = wndCastBar:FindChild("Text");
 		local wndTime = wndCastBar:FindChild("Time");
 
-		local nDuration, nElapsed = unit:GetCastDuration(), unit:GetCastElapsed();
-		local strSpellName = unit:GetCastName();
+		local nDuration, nElapsed, strSpellName, strSpellIcon;
+
+		if (nVulnerabilityTime > 0) then
+			-- Vulnerability
+			if (nVulnerabilityTime > self.nVulnerabilityTime) then
+				-- New Vulnerability Effect
+				nDuration = nVulnerabilityTime;
+				self.nVulnerabilityStart = nVulnerabilityTime;
+			else
+				nDuration = self.nVulnerabilityStart;
+			end
+
+			strSpellName = "Vulnerability";
+			nElapsed = nVulnerabilityTime;
+			strSpellIcon = "CRB_ActionBarIconSprites:sprAS_TestIcon";
+
+			self.nVulnerabilityTime = nVulnerabilityTime;
+			wndProgress:SetBarColor(ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Vulnerability));
+		else
+			-- Cast
+			nDuration, nElapsed = unit:GetCastDuration(), unit:GetCastElapsed();
+			strSpellName = unit:GetCastName();
+			strSpellIcon = tSpellIcons[strSpellName];
+			wndProgress:SetBarColor(ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Normal));
+		end
 
 		wndProgress:SetMax(nDuration);
 		wndProgress:SetProgress(nElapsed);
@@ -46,15 +83,21 @@ local Update = function(self)
 		end
 		
 		if (wndTime) then
-			wndTime:SetText(format("%00.01f", (nDuration - nElapsed) / 1000));
+			if (nVulnerabilityTime > 0) then
+				wndTime:SetText(format("%00.01f", nElapsed));
+			else
+				wndTime:SetText(format("%00.01f", (nDuration - nElapsed) / 1000));
+			end
 		end
 
 		if (wndIcon) then
-			wndIcon:SetSprite(tSpellIcons[strSpellName]);
+			wndIcon:SetSprite(strSpellIcon);
 		end
 		
 		wndCastBar:Show(true, true);
 	else
+		self.nVulnerabilityTime = 0;
+		self.nVulnerabilityStart = 0;
 		wndCastBar:Show(false, true);
 	end
 end
@@ -64,6 +107,8 @@ local Enable = function(self)
 	if (self.bEnabled) then return; end
 
 	self.bEnabled = true;
+	self.nVulnerabilityTime = 0;
+	self.nVulnerabilityStart = 0;
 	Apollo.RegisterEventHandler("NextFrame", "Update", self);
 end
 

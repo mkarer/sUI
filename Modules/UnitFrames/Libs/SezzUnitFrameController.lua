@@ -54,9 +54,10 @@ UnitFrameController.tColors = {
 		Normal = { 45/255 - 0.1, 85/255 + 0.2, 137/255 },
 		Rested = { 45/255 + 0.2, 85/255 - 0.1, 137/255 - 0.1 },
 	},
-	Castbar = {
+	CastBar = {
 		Normal = { 0.43, 0.75, 0.44 },
 		Uninterruptable = { 1.00, 0.75, 0.44 },
+		Vulnerability = { 127/255, 38/255, 127/255 },
 		Warning = { 1, 0, 0 },
 	},
 	Class = setmetatable({

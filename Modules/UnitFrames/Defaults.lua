@@ -101,8 +101,9 @@ UnitFramesLayout.tColors = {
 		Normal = { 45/255 - 0.1, 85/255 + 0.2, 137/255 },
 		Rested = { 45/255 + 0.2, 85/255 - 0.1, 137/255 - 0.1 },
 	},
-	Castbar = {
+	CastBar = {
 		Normal = { 0.43, 0.75, 0.44 },
+		Vulnerability = { 0.5, 0.15, 0.5 },
 	},
 	Class = setmetatable({
 		["Default"]								= { 255/255, 255/255, 255/255 },

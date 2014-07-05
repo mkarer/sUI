@@ -82,7 +82,7 @@ function UnitFramesLayout:CreateCastBarElement(strUnit)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = self.tUnitFrameController:ColorArrayToHex(self.tColors.Castbar.Normal),
+		BarColor = self.tUnitFrameController:ColorArrayToHex(self.tColors.CastBar.Normal),
 	});
 
 	tXmlData["CastBarContainer"]:AddChild(tXmlData["CastBarBG"]);
