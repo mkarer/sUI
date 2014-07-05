@@ -17,6 +17,7 @@
 	<Script Name="Config\Profile.lua" />
 	<Form Name="sUI.xml" />
 	<Script Name="Core\Core.lua" />
+	<Script Name="Core\Utils.lua" />
 	<Script Name="Core\Windows.lua" />
 	<Script Name="Core\Events.lua" />
 	<Script Name="Core\Player.lua" />
@@ -75,6 +76,9 @@
 	<!-- Automation -->
 	<Script Name="Modules\Automation\Core.lua" />
 	<Script Name="Modules\Automation\ChallengeReward.lua" />
+	<Script Name="Modules\Automation\OpenBags.lua" />
+	<Script Name="Modules\Automation\AutoRepair.lua" />
+	<Script Name="Modules\Automation\JunkSeller.lua" />
 	<!-- Misc -->
 	<Script Name="Modules\DataText\DataText.lua" />
 
