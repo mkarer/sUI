@@ -27,8 +27,12 @@ function M:OnEnable()
 	end
 
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
+	self:RegisterEvent("CombatLogPet", "EventHandler");
 --	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
+
 end
+
+local pets = {};
 
 function M:EventHandler(event, ...)
 	log:debug(event);
