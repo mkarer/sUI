@@ -247,23 +247,27 @@ function S:GetInventory()
 	return self.myCharacter:GetInventoryItems() or {};
 end
 
-function S:GetInventoryByCategory(nCategoryId)
+function S:GetInventoryByCategory(nCategoryId, bRaw)
 	-- 48: Consumable
 	local tInventoryFiltered = {};
 	local tInventory = self:GetInventory();
 
 	for _, tItemData in pairs(tInventory) do
 		if (tItemData and tItemData.itemInBag and tItemData.itemInBag:GetItemCategory() == nCategoryId) then
-			local tItem = tItemData.itemInBag;
-			local nItemId = tItem:GetItemId();
-
-			if (tInventoryFiltered[nItemId] == nil) then
-				tInventoryFiltered[nItemId] = {
-					tItem = tItem,
-					nCount = tItem:GetStackCount(),
-				};
+			if (bRaw) then
+				table.insert(tInventoryFiltered, tItemData);
 			else
-				tInventoryFiltered[nItemId].nCount = tInventoryFiltered[nItemId].nCount + tItem:GetStackCount();
+				local tItem = tItemData.itemInBag;
+				local nItemId = tItem:GetItemId();
+
+				if (tInventoryFiltered[nItemId] == nil) then
+					tInventoryFiltered[nItemId] = {
+						tItem = tItem,
+						nCount = tItem:GetStackCount(),
+					};
+				else
+					tInventoryFiltered[nItemId].nCount = tInventoryFiltered[nItemId].nCount + tItem:GetStackCount();
+				end
 			end
 		end
 	end
