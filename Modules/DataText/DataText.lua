@@ -157,13 +157,7 @@ function M:UpdateAddondMemory()
 		end
 
 		if (tAddonList[iCurrentAddon]) then
-			local nNow = GameLib.GetTickCount();
 			UpdateAddonMemory(tAddonList[iCurrentAddon]);
-			local nUpdateTime = GameLib.GetTickCount() - nNow;
-			if (nUpdateTime > 0) then
-				log:debug(" +++ Updated: %s (%sms)", tAddonList[iCurrentAddon], nUpdateTime);
-			end
-
 			iCurrentAddon = iCurrentAddon + 1;
 		end
 	end
@@ -176,23 +170,6 @@ function M:UpdateAddondMemory()
 	end
 
 	self.nAddonMemory = nAddonMemory / 1024 / 1024;
---	log:debug(self.nAddonMemory);
-
---[[
-	local nAddonMemory = 0;
-	local tAddons = Apollo:GetAddons();
-
-	for _, strName in pairs(tAddons) do
-		if (not tAddonsCarbine[strName]) then
-			local tAddon = Apollo.GetAddonInfo(strName);
-			if (tAddon and tAddon.nMemoryUsage) then
-				nAddonMemory = nAddonMemory + tAddon.nMemoryUsage;
-			end
-		end
-	end
-
-	self.nAddonMemory = nAddonMemory / 1024 / 1024;
-]]
 end
 
 -----------------------------------------------------------------------------
