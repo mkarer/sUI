@@ -46,4 +46,7 @@ function M:UpdateChat()
 	for _, channel in ipairs(ChatSystemLib.GetChannels()) do
 		channel:SetProfanity(false);
 	end
+
+	-- Disable Alien Font (enabled cross-faction chat)
+	self.tChatLog.strAlienFontOption = self.tChatLog.strFontOption;
 end
