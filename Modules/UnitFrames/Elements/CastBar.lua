@@ -14,11 +14,10 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 function UnitFramesLayout:CreateCastBarElement(strUnit)
 	local tSettings = self.tSettings[strUnit];
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+	if (not tSettings.bCastBarEnabled) then return; end
 
-	if (not tSettings.bCastBarEnabled) then
-		return;
-	end
+	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------
 
@@ -82,7 +81,7 @@ function UnitFramesLayout:CreateCastBarElement(strUnit)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = self.tUnitFrameController:ColorArrayToHex(self.tColors.CastBar.Normal),
+		BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.CastBar.Normal),
 	});
 
 	tXmlData["CastBarContainer"]:AddChild(tXmlData["CastBarBG"]);

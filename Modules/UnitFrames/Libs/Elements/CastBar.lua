@@ -13,26 +13,13 @@ if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local NAME = string.match(MAJOR, ":(%a+)\-");
 local Element = APkg and APkg.tPackage or {};
-local log;
+local log, UnitFrameController;
 
 -- Lua API
-local format, floor, modf = string.format, math.floor, math.modf;
+local format = string.format;
 
 -- Spell Icons
 local tSpellIcons = {};
-
------------------------------------------------------------------------------
--- Color Conversion
------------------------------------------------------------------------------
-
-local Round = function(nValue)
-	return floor(nValue + 0.5);
-end
-
-local ColorArrayToHex = function(arColor)
-	-- We only use indexed arrays here!
-	return format("%02x%02x%02x%02x", 255, Round(255 * arColor[1]), Round(255 * arColor[2]), Round(255 * arColor[3]))
-end
 
 -----------------------------------------------------------------------------
 
@@ -66,13 +53,13 @@ local Update = function(self)
 			strSpellIcon = "CRB_ActionBarIconSprites:sprAS_TestIcon";
 
 			self.nVulnerabilityTime = nVulnerabilityTime;
-			wndProgress:SetBarColor(ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Vulnerability));
+			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Vulnerability));
 		else
 			-- Cast
 			nDuration, nElapsed = unit:GetCastDuration(), unit:GetCastElapsed();
 			strSpellName = unit:GetCastName();
 			strSpellIcon = tSpellIcons[strSpellName];
-			wndProgress:SetBarColor(ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Normal));
+			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Normal));
 		end
 
 		wndProgress:SetMax(nDuration);
@@ -182,7 +169,8 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage:RegisterElement(MAJOR);
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController:RegisterElement(MAJOR);
 
 	-- Spell Icons
 	Apollo.RegisterEventHandler("CombatLogDamage", "CacheSpellIcon", self);

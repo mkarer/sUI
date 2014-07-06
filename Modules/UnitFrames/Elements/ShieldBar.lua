@@ -14,11 +14,10 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 function UnitFramesLayout:CreateShieldBarElement(strUnit)
 	local tSettings = self.tSettings[strUnit];
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+	if (not tSettings.bShieldBarEnabled) then return; end
 
-	if (not tSettings.bShieldBarEnabled) then
-		return;
-	end
+	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------
 	-- Shield Bar
@@ -32,7 +31,7 @@ function UnitFramesLayout:CreateShieldBarElement(strUnit)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = "77ffffff",
+		BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Shield),
 	});
 
 	tXmlData["HealthBar"]:AddChild(tXmlData["ShieldBar"]);

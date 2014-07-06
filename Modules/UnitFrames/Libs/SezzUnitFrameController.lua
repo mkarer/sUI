@@ -18,7 +18,7 @@ local UnitFrameController = APkg and APkg.tPackage or {};
 local XmlDocument, UnitFrame, GeminiLogging, log;
 
 -- Lua APIs
-local format, floor = string.format, math.floor;
+local format, floor, modf = string.format, math.floor, math.modf;
 
 -----------------------------------------------------------------------------
 -- Child Libraries + Settings
@@ -28,7 +28,7 @@ local tRegisteredElements = {};
 
 -- Default Colors
 -- Copied from my World of Warcraft Unit Frames
-UnitFrameController.tColors = {
+local tColors = {
 	Power = {
 		["MANA"]					= { 45/255, 82/255, 137/255 },
 		["RAGE"]					= { 226/255, 45/255, 75/255 },
@@ -45,6 +45,7 @@ UnitFrameController.tColors = {
 		[4] = { 1, 1, 0 },
 		[5] = { 0, 1, 0 },
 	},
+	Shield = { 1, 1, 1, 0.47 },
 	Health = { 38/255, 38/255, 38/255 },
 	HealthSmooth = { 255/255, 38/255, 38/255, 255/255, 38/255, 38/255, 38/255, 38/255, 38/255 },
 	Vulnerability = { 127/255, 38/255, 127/255 },
@@ -182,23 +183,54 @@ end
 
 function UnitFrameController:ColorArrayToHex(arColor)
 	-- We only use indexed arrays here!
-	return format("%02x%02x%02x%02x", 255, self:Round(255 * arColor[1]), self:Round(255 * arColor[2]), self:Round(255 * arColor[3]));
+	return format("%02x%02x%02x%02x", self:Round(255 * (arColor[4] or 1)), self:Round(255 * arColor[1]), self:Round(255 * arColor[2]), self:Round(255 * arColor[3]));
 end
 
 function UnitFrameController:RGBColorToHex(r, g, b)
 	return format("%02x%02x%02x%02x", 255, self:Round(255 * r), self:Round(255 * g), self:Round(255 * b));
 end
 
+function UnitFrameController:SetColors(tCustomColors)
+	self.tColors = setmetatable(tCustomColors, { __index = tColors });
+end
+
+-----------------------------------------------------------------------------
+-- Color Gradient
+-- http://www.wowwiki.com/ColorGradient
+-----------------------------------------------------------------------------
+
+local ColorsAndPercent = function(a, b, ...)
+	if (a <= 0 or b == 0) then
+		return nil, ...;
+	elseif (a >= b) then
+		return nil, select(select('#', ...) - 2, ...);
+	end
+
+	local num = select('#', ...) / 3;
+	local segment, relperc = modf((a / b) * (num - 1));
+	return relperc, select((segment * 3) + 1, ...);
+end
+
+function UnitFrameController:RGBColorGradient(...)
+	local relperc, r1, g1, b1, r2, g2, b2 = ColorsAndPercent(...);
+	if (relperc) then
+		return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc;
+	else
+		return r1, g1, b1;
+	end
+end
+
 -----------------------------------------------------------------------------
 -- Constructor
 -----------------------------------------------------------------------------
 
-function UnitFrameController:New(xmlDoc)
+function UnitFrameController:New(xmlDoc, tCustomColors)
 	self = setmetatable({}, { __index = UnitFrameController });
 
 	-- Properties
 	self.tUnitFrames = {};
 	self.nUpdated = 0;
+	self.tColors = (tCustomColors and setmetatable(tCustomColors, { __index = tColors }) or tColors);
 
 	-- Create a new XML Document
 	self.xmlDoc = xmlDoc or XmlDocument.NewForm();

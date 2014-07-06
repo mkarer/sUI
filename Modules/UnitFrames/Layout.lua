@@ -31,6 +31,7 @@ function M:OnEnable()
 
 	-- Create Unit Frame Controller
 	self.tUnitFrameController = UnitFrameController:New();
+	self.tUnitFrameController:SetColors(self.tColors);
 	self.xmlDoc = self.tUnitFrameController.xmlDoc;
 
 	-- Create XML Forms for our Unit Frames

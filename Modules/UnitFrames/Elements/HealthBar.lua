@@ -15,6 +15,7 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 function UnitFramesLayout:CreateHealthBarElement(strUnit)
 	local tSettings = self.tSettings[strUnit];
 	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------
 	-- Health Bar Background
@@ -43,7 +44,7 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = self.tUnitFrameController:RGBColorToHex(self.tColors.HealthSmooth[1], self.tColors.HealthSmooth[2], self.tColors.HealthSmooth[3]),
+		BarColor = self.tUnitFrameController:RGBColorToHex(tColors.HealthSmooth[1], tColors.HealthSmooth[2], tColors.HealthSmooth[3]),
 	});
 
 	tXmlData["HealthBarBG"]:AddChild(tXmlData["HealthBar"]);

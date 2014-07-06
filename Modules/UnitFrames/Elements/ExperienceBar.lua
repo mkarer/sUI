@@ -14,11 +14,10 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 function UnitFramesLayout:CreateExperienceBarElement(strUnit)
 	local tSettings = self.tSettings[strUnit];
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+	if (strUnit ~= "Player" or not tSettings.bExperienceBarEnabled) then return; end
 
-	if (strUnit ~= "Player" or not tSettings.bExperienceBarEnabled) then
-		return;
-	end
+	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------
 	-- Bar Background
@@ -53,7 +52,7 @@ function UnitFramesLayout:CreateExperienceBarElement(strUnit)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = self.tUnitFrameController:ColorArrayToHex(self.tColors.Experience.Rested),
+		BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Experience.Rested),
 	});
 
 	tXmlData["ExperienceBarBG"]:AddChild(tXmlData["RestedExperienceBar"]);
@@ -70,7 +69,7 @@ function UnitFramesLayout:CreateExperienceBarElement(strUnit)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-		BarColor = self.tUnitFrameController:ColorArrayToHex(self.tColors.Experience.Normal),
+		BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Experience.Normal),
 	});
 
 	tXmlData["ExperienceBarBG"]:AddChild(tXmlData["ExperienceBar"]);
