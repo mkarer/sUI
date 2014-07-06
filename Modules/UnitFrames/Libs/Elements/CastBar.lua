@@ -60,7 +60,7 @@ local Update = function(self)
 			strSpellName = unit:GetCastName();
 			strSpellIcon = tSpellIcons[strSpellName];
 
-			local arColor = (unit:GetInterruptArmorValue() > 0 and self.tUnitFrame.tColors.CastBar.Uninterruptable or self.tUnitFrame.tColors.CastBar.Normal);
+			local arColor = (unit:GetInterruptArmorValue() ~= 0 and self.tUnitFrame.tColors.CastBar.Uninterruptable or self.tUnitFrame.tColors.CastBar.Normal);
 			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(arColor));
 		end
 
