@@ -36,4 +36,6 @@ UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 --	tDebuffsAnchorOffsets = { 0, -383, -9, -349 },
 	tDebuffsAnchorOffsets = { 0, -363, -9, -329 },
 	tDebuffsStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
+	-- Shield Bar
+	bShieldBarEnabled = true,
 });

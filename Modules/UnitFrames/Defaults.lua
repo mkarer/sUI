@@ -51,12 +51,18 @@ UnitFramesLayout.tDefaults = {
 --	tBuffsAnchorOffsets = { 0, 0, 200, 30 },
 --	tBuffsStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
 	-------------------------------------------------------------------------
-	-- Buffs
+	-- Debuffs
 	-------------------------------------------------------------------------
 --	bDebuffsEnabled = true,
 --	tDebuffsAnchorPoints = { 0, 0, 0, 0 },
 --	tDebuffsAnchorOffsets = { 0, 0, 200, 30 },
 --	tDebuffsStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
+	-------------------------------------------------------------------------
+	-- Shield Bar
+	-------------------------------------------------------------------------
+--	bShieldBarEnabled = true,
+	nShieldBarHeight = 1,
+
 
 
 --	rangeCheck = { insideAlpha = 1, outsideAlpha = 0.5 },

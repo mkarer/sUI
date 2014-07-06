@@ -37,6 +37,7 @@ function M:OnEnable()
 	for strUnit, tSettings in pairs(self.tSettings) do
 		self:InitializeUnitFrameXML(strUnit);
 		self:CreateHealthBarElement(strUnit);
+		self:CreateShieldBarElement(strUnit);
 		self:CreateCastBarElement(strUnit);
 		self:CreateExperienceBarElement(strUnit);
 		self:CreateAurasElement(strUnit);

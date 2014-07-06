@@ -18,7 +18,6 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit)
 
 	-------------------------------------------------------------------------
 	-- Health Bar Background
-	-- We should calculate the required height before creating this (Power/XP/Reputation Bar + Padding)
 	-------------------------------------------------------------------------
 
 	tXmlData["HealthBarBG"] = self.xmlDoc:NewControlNode("Health", "Window", {

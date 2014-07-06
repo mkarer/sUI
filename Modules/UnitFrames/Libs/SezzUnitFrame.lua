@@ -419,6 +419,7 @@ local LoadForm = function(self)
 	self.wndCastBar = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."CastBar", nil, self) or self.wndMain:FindChild("CastBar");
 	self.wndExperience = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit.."Experience", nil, self) or self.wndMain:FindChild("Experience");
 	self.wndHealth = self.wndMain:FindChild("Health:Progress");
+	self.wndShield = self.wndMain:FindChild("Shield");
 	-- Temporary Elements
 	self.wndTextLeft = self.wndMain:FindChild("TextLeft");
 	self.wndTextRight = self.wndMain:FindChild("TextRight");
