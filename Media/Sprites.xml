@@ -1,57 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Sprites>
-    <Sprite Name="PowerBarButtonBG" Cycle="1">
-        <Frame Texture="sUI\media\PowerButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	<Sprite Name="PowerBarButtonBG" Cycle="1">
+		<Frame Texture="sUI\media\PowerButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="SezzUIBorderDark" Cycle="1">
+		<Frame Texture="sUI\media\PowerButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="SezzUIBorder" Cycle="1">
+		<Frame Texture="sUI\media\ActionButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="PowerBarButtonFilled" Cycle="1">
+		<Frame Texture="sUI\media\PowerButtonFilled.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="PowerBarButtonSurged" Cycle="1">
+		<Frame Texture="sUI\media\PowerButtonSurged.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="PowerBarButtonEmpty" Cycle="1">
+		<Frame Texture="sUI\media\PowerButtonEmpty.png" x0="0" x1="0" x2="0" x3="0" x4="1" x5="1" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="PowerBarButtonGray" Cycle="1">
+		<Frame Texture="sUI\media\PowerButtonGray.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="ProgressBar" Cycle="1">
+		<Frame Texture="sUI\media\PowerButtonGray.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="ActionButton" Cycle="1">
+		<Frame Texture="sUI\media\ActionButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="ActionButtonHover" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="ActionButtonPressed" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="xkcdBabyBlue" EndColor="xkcdBabyBlue"/>
+	</Sprite>
+	<Sprite Name="ActionButtonDisabled" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="red" EndColor="red"/>
+	</Sprite>
+	<Sprite Name="ActionButtonChecked" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="xkcdAvocado" EndColor="xkcdAvocado"/>
+	</Sprite>
+	<Sprite Name="ActionButtonCheckedHover" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="xkcdAcidGreen" EndColor="xkcdAcidGreen"/>
+	</Sprite>
+	<Sprite Name="MiniMapCompassOverlay" Cycle="1">
+		<Frame Texture="" x0="0" x1="0" x2="0" x3="0" x4="0" x5="0" y0="0" y1="0" y2="0" y3="0" y4="0" y5="0" Stretchy="1" HotspotX="100" HotspotY="100" Duration="1.000" StartColor="ffffffff" EndColor="ffffffff"/>
+	</Sprite>
+	<AutoButton Name="SezzActionButton" Texture="sUI\media\ActionButtonTemplate.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" StateBits="31" Direction="Down"/>
+	<AutoButton Name="SezzActionButtonToggle" Texture="sUI\media\ActionButtonToggle.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="36" y0="0" y1="0" y2="0" y3="0" y4="0" y5="40" Stretchy="1" StateBits="1" Direction="Down"/>
+	<AutoIconButton Name="SezzIconButton" NormalUnderIcon="" NormalIcon="" NormalOverIcon="ActionButton" PressedUnderIcon="" PressedIcon="" PressedOverIcon="ActionButtonChecked" FlybyUnderIcon="" FlybyIcon="" FlybyOverIcon="ActionButtonHover" PressedFlybyUnderIcon="" PressedFlybyIcon="" PressedFlybyOverIcon="ActionButtonPressed" DisabledUnderIcon="" DisabledIcon="" DisabledOverIcon="ActionButtonDisabled"/>
+	<Sprite Name="MiniMapButtonBG" Cycle="1">
+		<Frame Texture="sUI\Media\MiniMap\ButtonBG.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="18" y0="0" y1="0" y2="0" y3="0" y4="0" y5="18" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<Sprite Name="MiniMapButtonBGDark" Cycle="1">
+		<Frame Texture="sUI\Media\MiniMap\ButtonBGDark.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="18" y0="0" y1="0" y2="0" y3="0" y4="0" y5="18" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+	</Sprite>
+	<!-- Unit Tooltips -->
+	<Sprite Name="sprTooltip_Base" Cycle="1">
+		<Frame Texture="UI\Assets\Textures\UI_WhiteBG.bmp" x0="0" x1="0" x2="64" x3="64" x4="64" x5="64" y0="0" y1="0" y2="64" y3="64" y4="64" y5="64" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="BB000000" EndColor="BB000000"/>
+	</Sprite>
+    <Sprite Name="sprTooltip_SquareFrame_UnitRed" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ffff0000" EndColor="ffff0000"/>
     </Sprite>
-    <Sprite Name="SezzUIBorderDark" Cycle="1">
-        <Frame Texture="sUI\media\PowerButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_UnitYellow" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="fffffd01" EndColor="fffffd01"/>
     </Sprite>
-    <Sprite Name="SezzUIBorder" Cycle="1">
-        <Frame Texture="sUI\media\ActionButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_UnitGreen" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ff00ff00" EndColor="ff00ff00"/>
     </Sprite>
-    <Sprite Name="PowerBarButtonFilled" Cycle="1">
-        <Frame Texture="sUI\media\PowerButtonFilled.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_UnitTeal" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="UI_TextHoloBodyCyan" EndColor="UI_TextHoloBodyCyan"/>
     </Sprite>
-    <Sprite Name="PowerBarButtonSurged" Cycle="1">
-        <Frame Texture="sUI\media\PowerButtonSurged.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_DarkModded" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="darkgray" EndColor="darkgray"/>
     </Sprite>
-    <Sprite Name="PowerBarButtonEmpty" Cycle="1">
-        <Frame Texture="sUI\media\PowerButtonEmpty.png" x0="0" x1="0" x2="0" x3="0" x4="1" x5="1" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <!-- Item Tooltips -->
+
+    <Sprite Name="sprTooltip_SquareFrame_Purple" Cycle="1">
+    	
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ff7133FF" EndColor="ff7133FF"/>
     </Sprite>
-    <Sprite Name="PowerBarButtonGray" Cycle="1">
-        <Frame Texture="sUI\media\PowerButtonGray.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_Pink" Cycle="1">
+    	
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ffE167A8" EndColor="ffE167A8"/>
     </Sprite>
-    <Sprite Name="ProgressBar" Cycle="1">
-        <Frame Texture="sUI\media\PowerButtonGray.png" x0="0" x1="0" x2="0" x3="0" x4="4" x5="4" y0="0" y1="0" y2="0" y3="0" y4="0" y5="32" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_Blue" Cycle="1">
+    	
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ff67A8E1" EndColor="ff67A8E1"/>
     </Sprite>
-    <Sprite Name="ActionButton" Cycle="1">
-        <Frame Texture="sUI\media\ActionButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_Orange" Cycle="1">
+    	
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ffFFAD5C" EndColor="ffFFAD5C"/>
     </Sprite>
-    <Sprite Name="ActionButtonHover" Cycle="1">
-        <Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    <Sprite Name="sprTooltip_SquareFrame_Green" Cycle="1">
+    	
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ffA7E065" EndColor="ffA7E065"/>
     </Sprite>
-    <Sprite Name="ActionButtonPressed" Cycle="1">
-        <Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="xkcdBabyBlue" EndColor="xkcdBabyBlue"/>
+    <Sprite Name="sprTooltip_SquareFrame_White" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ffffffff" EndColor="ffffffff"/>
     </Sprite>
-    <Sprite Name="ActionButtonDisabled" Cycle="1">
-        <Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="red" EndColor="red"/>
+    <Sprite Name="sprTooltip_SquareFrame_Silver" Cycle="1">
+		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ff7d7d7d" EndColor="ff7d7d7d"/>
     </Sprite>
-    <Sprite Name="ActionButtonChecked" Cycle="1">
-        <Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="xkcdAvocado" EndColor="xkcdAvocado"/>
-    </Sprite>
-    <Sprite Name="ActionButtonCheckedHover" Cycle="1">
-        <Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="xkcdAcidGreen" EndColor="xkcdAcidGreen"/>
-    </Sprite>
-    <Sprite Name="MiniMapCompassOverlay" Cycle="1">
-        <Frame Texture="" x0="0" x1="0" x2="0" x3="0" x4="0" x5="0" y0="0" y1="0" y2="0" y3="0" y4="0" y5="0" Stretchy="1" HotspotX="100" HotspotY="100" Duration="1.000" StartColor="ffffffff" EndColor="ffffffff"/>
-    </Sprite>
-    <AutoButton Name="SezzActionButton" Texture="sUI\media\ActionButtonTemplate.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" StateBits="31" Direction="Down"/>
-    <AutoButton Name="SezzActionButtonToggle" Texture="sUI\media\ActionButtonToggle.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="36" y0="0" y1="0" y2="0" y3="0" y4="0" y5="40" Stretchy="1" StateBits="1" Direction="Down"/>
-    <AutoIconButton Name="SezzIconButton" NormalUnderIcon="" NormalIcon="" NormalOverIcon="ActionButton" PressedUnderIcon="" PressedIcon="" PressedOverIcon="ActionButtonChecked" FlybyUnderIcon="" FlybyIcon="" FlybyOverIcon="ActionButtonHover" PressedFlybyUnderIcon="" PressedFlybyIcon="" PressedFlybyOverIcon="ActionButtonPressed" DisabledUnderIcon="" DisabledIcon="" DisabledOverIcon="ActionButtonDisabled"/>
-    <Sprite Name="MiniMapButtonBG" Cycle="1">
-        <Frame Texture="sUI\Media\MiniMap\ButtonBG.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="18" y0="0" y1="0" y2="0" y3="0" y4="0" y5="18" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
-    </Sprite>
-    <Sprite Name="MiniMapButtonBGDark" Cycle="1">
-        <Frame Texture="sUI\Media\MiniMap\ButtonBGDark.png" x0="0" x1="0" x2="0" x3="0" x4="0" x5="18" y0="0" y1="0" y2="0" y3="0" y4="0" y5="18" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
-    </Sprite>
+
 </Sprites>
