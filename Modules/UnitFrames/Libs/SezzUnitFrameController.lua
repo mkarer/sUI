@@ -132,6 +132,8 @@ local UpdateUnits = function(self)
 			UpdateUnit(self, "TargetOfTarget", unitPlayer:GetTargetOfTarget());
 			UpdateUnit(self, "TargetOfTargetOfTarget", unitPlayer:GetTargetOfTarget() and unitPlayer:GetTargetOfTarget():GetTarget() or nil);
 			UpdateUnit(self, "Focus", unitPlayer:GetAlternateTarget());
+			UpdateUnit(self, "FocusTarget", unitPlayer:GetAlternateTarget() and unitPlayer:GetAlternateTarget():GetTarget() or nil);
+			UpdateUnit(self, "FocusTargetOfTarget", unitPlayer:GetAlternateTarget() and unitPlayer:GetAlternateTarget():GetTargetOfTarget() or nil);
 		end
 	end
 
@@ -174,16 +176,16 @@ end
 -- Helper Functions
 -----------------------------------------------------------------------------
 
-local Round = function(self, nValue)
+function UnitFrameController:Round(nValue)
 	return floor(nValue + 0.5);
 end
 
-local ColorArrayToHex = function(self, arColor)
+function UnitFrameController:ColorArrayToHex(arColor)
 	-- We only use indexed arrays here!
 	return format("%02x%02x%02x%02x", 255, self:Round(255 * arColor[1]), self:Round(255 * arColor[2]), self:Round(255 * arColor[3]));
 end
 
-local RGBColorToHex = function(self, r, g, b)
+function UnitFrameController:RGBColorToHex(r, g, b)
 	return format("%02x%02x%02x%02x", 255, self:Round(255 * r), self:Round(255 * g), self:Round(255 * b));
 end
 
@@ -212,10 +214,6 @@ function UnitFrameController:New(xmlDoc)
 	self.CreateUnitFrame = CreateUnitFrame;
 	self.LoadForm = LoadForm;
 	self.Enable = Enable;
-
-	self.Round = Round;
-	self.ColorArrayToHex = ColorArrayToHex;
-	self.RGBColorToHex = RGBColorToHex;
 
 	-- Done
 	return self;
