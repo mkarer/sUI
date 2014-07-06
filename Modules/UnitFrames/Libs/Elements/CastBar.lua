@@ -59,7 +59,9 @@ local Update = function(self)
 			nDuration, nElapsed = unit:GetCastDuration(), unit:GetCastElapsed();
 			strSpellName = unit:GetCastName();
 			strSpellIcon = tSpellIcons[strSpellName];
-			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Normal));
+
+			local arColor = (unit:GetInterruptArmorValue() > 0 and self.tUnitFrame.tColors.CastBar.Uninterruptable or self.tUnitFrame.tColors.CastBar.Normal);
+			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(arColor));
 		end
 
 		wndProgress:SetMax(nDuration);
