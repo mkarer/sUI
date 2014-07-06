@@ -10,6 +10,7 @@
 	<Script Name="Libs\GeminiLogging\GeminiLogging.lua" />
 	<Script Name="Libs\GeminiTimer\GeminiTimer-1.0.lua" />
 	<Script Name="Libs\XmlDocument\XmlDocument.lua" />
+	<Script Name="Libs\GeminiGUI\GeminiGUI.lua" />
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />
@@ -42,6 +43,7 @@
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
 	<Script Name="Modules\CritLine\CritLine.lua" />
+	<Script Name="Modules\Buffs\Core.lua" />
 	<!-- Unit Frames Library -->
 	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrame.lua" />
 	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrameController.lua" />
