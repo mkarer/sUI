@@ -462,9 +462,8 @@ end
 -- Constructor
 -----------------------------------------------------------------------------
 
-function UnitFrame:New(o, tUnitFrameController, strLayoutName, strUnit, tXmlData)
-	self = setmetatable(o or {}, self);
-	self.__index = self;
+function UnitFrame:New(tUnitFrameController, strLayoutName, strUnit, tXmlData)
+	self = setmetatable({}, { __index = UnitFrame });
 
 	-- Properties
 	self.tXmlData = tXmlData;

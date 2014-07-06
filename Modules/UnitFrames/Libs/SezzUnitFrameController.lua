@@ -78,7 +78,7 @@ UnitFrameController.tColors = {
 
 local CreateUnitFrame = function(self, strLayoutName, strUnit, tXmlData)
 	log:debug("Creating Unit Frame for: %s", strUnit)
-	local tUnitFrame = UnitFrame:New(nil, self, strLayoutName, strUnit, tXmlData);
+	local tUnitFrame = UnitFrame:New(self, strLayoutName, strUnit, tXmlData);
 
 	self.tUnitFrames[strUnit] = tUnitFrame;
 	return tUnitFrame;
@@ -192,13 +192,11 @@ end
 -----------------------------------------------------------------------------
 
 function UnitFrameController:New(xmlDoc)
-	self = setmetatable({}, self);
-	self.__index = self;
+	self = setmetatable({}, { __index = UnitFrameController });
 
 	-- Properties
 	self.tUnitFrames = {};
 	self.nUpdated = 0;
-	self.tColors = UnitFrameController.tColors; -- I really need to figure out how those metatable'd classes work :(
 
 	-- Create a new XML Document
 	self.xmlDoc = xmlDoc or XmlDocument.NewForm();

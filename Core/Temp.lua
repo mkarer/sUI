@@ -12,6 +12,30 @@ local M = S:CreateSubmodule("Temp", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
+
+local TestClass = {};
+
+TestClass.strName = "Base";
+TestClass.tNames = {};
+
+function TestClass:Hi()
+	log:debug(self.strName);
+	for _, v in ipairs(self.tNames) do
+		log:debug(v);
+	end
+end
+
+function TestClass:New(strName)
+	self = setmetatable({}, { __index = TestClass });
+--	self.__index = TestClass;
+--	self.__newindex = self;
+
+	self.strName = strName;
+
+	return self;
+end
+
+-----------------------------------------------------------------------------
 -- Initialization
 -----------------------------------------------------------------------------
 
@@ -29,7 +53,29 @@ function M:OnEnable()
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
 	self:RegisterEvent("CombatLogPet", "EventHandler");
 --	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
+end
 
+function S:Test()
+	log:debug("--1");
+	local t1 = TestClass:New("test1")
+	t1:Hi();
+	TestClass.gusti = "sex";
+	log:debug(t1.gusti)
+
+	log:debug("--2");
+	local t2 = TestClass:New("test2")
+	t2:Hi();
+	log:debug(t2.gusti)
+
+	log:debug("--1");
+	t1:Hi();
+	log:debug(t1.gusti)
+
+	log:debug("--TestClass");
+	TestClass:Hi();
+	log:debug(TestClass.gusti)
+
+	log:debug("------");
 end
 
 local pets = {};
