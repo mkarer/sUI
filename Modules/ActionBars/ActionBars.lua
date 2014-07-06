@@ -47,12 +47,7 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	if (S.bCharacterLoaded) then
-		self:CheckMountShortcut();
-		self:CheckPotionShortcut();
 		self:SetupActionBars();
-
-		self:RegisterEvent("AbilityBookChange", "CheckMountShortcut");
-		self:RegisterEvent("UpdateInventory", "CheckPotionShortcut"); -- TODO: Option to disable this
 	else
 		self:RegisterEvent("Sezz_CharacterLoaded", "SetupActionBars");
 	end
@@ -182,6 +177,10 @@ end
 
 function M:SetupActionBars()
 	self:RestoreProfile(); -- Character isn't available when Sezz_VariablesLoaded fires!
+	self:CheckMountShortcut();
+	self:CheckPotionShortcut();
+	self:RegisterEvent("AbilityBookChange", "CheckMountShortcut");
+	self:RegisterEvent("UpdateInventory", "CheckPotionShortcut"); -- TODO: Option to disable this
 
 	-----------------------------------------------------------------------------
 	-- Main/LAS Bar
