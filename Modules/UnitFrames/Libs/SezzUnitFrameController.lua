@@ -27,23 +27,22 @@ local format, floor, modf = string.format, math.floor, math.modf;
 local tRegisteredElements = {};
 
 -- Default Colors
--- Copied from my World of Warcraft Unit Frames
 local tColors = {
 	Power = {
-		["MANA"]					= { 45/255, 82/255, 137/255 },
-		["RAGE"]					= { 226/255, 45/255, 75/255 },
-		["FOCUS"]					= { 1, 210/255, 0 },
-		["ENERGY"]					= { 1, 220/255, 25/255 },
-		["RUNIC_POWER"]				= { 1, 210/255, 0 },
-		["POWER_TYPE_STEAM"]		= { 0.55, 0.57, 0.61 },
-		["POWER_TYPE_PYRITE"]		= { 0.60, 0.09, 0.17 },
-		["POWER_TYPE_FEL_ENERGY"]	= { 1, 1, 0.3 },
-		["AMMOSLOT"]				= { 0.8, 0.6, 0 },
+--		["MANA"]					= { 45/255, 82/255, 137/255 },
+--		["RAGE"]					= { 226/255, 45/255, 75/255 },
+--		["FOCUS"]					= { 1, 210/255, 0 },
+--		["ENERGY"]					= { 1, 220/255, 25/255 },
+--		["RUNIC_POWER"]				= { 1, 210/255, 0 },
+--		["POWER_TYPE_STEAM"]		= { 0.55, 0.57, 0.61 },
+--		["POWER_TYPE_PYRITE"]		= { 0.60, 0.09, 0.17 },
+--		["POWER_TYPE_FEL_ENERGY"]	= { 1, 1, 0.3 },
+--		["AMMOSLOT"]				= { 0.8, 0.6, 0 },
 	},
 	Reaction = {
-		[2] = { 1, 0, 0 },
-		[4] = { 1, 1, 0 },
-		[5] = { 0, 1, 0 },
+		[2] = { 1, 0, 0 }, -- Aggressive
+		[4] = { 1, 1, 0 }, -- Neutral
+		[5] = { 0, 1, 0 }, -- Friendly
 	},
 	Shield = { 1, 1, 1, 0.47 },
 	Health = { 38/255, 38/255, 38/255 },
@@ -59,7 +58,7 @@ local tColors = {
 		Normal = { 0.43, 0.75, 0.44 },
 		Uninterruptable = { 1.00, 0.75, 0.44 },
 		Vulnerability = { 127/255, 38/255, 127/255 },
-		Warning = { 1, 0, 0 },
+--		Warning = { 1, 0, 0 },
 	},
 	Class = setmetatable({
 		["Default"]								= { 255/255, 255/255, 255/255 },
