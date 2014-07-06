@@ -275,6 +275,17 @@ function S:GetInventoryByCategory(nCategoryId, bRaw)
 	return tInventoryFiltered;
 end
 
+function S:IsItemInInventory(nItemId)
+	local tInventory = self:GetInventory();
+	for _, tItemData in pairs(tInventory) do
+		if (tItemData and tItemData.itemInBag and tItemData.itemInBag:GetItemId() == nItemId) then
+			return true;
+		end
+	end
+
+	return false;
+end
+
 -----------------------------------------------------------------------------
 -- Path Abilities
 -----------------------------------------------------------------------------
