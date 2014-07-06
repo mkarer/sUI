@@ -47,7 +47,12 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	if (S.bCharacterLoaded) then
+		self:CheckMountShortcut();
+		self:CheckPotionShortcut();
 		self:SetupActionBars();
+
+		self:RegisterEvent("AbilityBookChange", "CheckMountShortcut");
+		self:RegisterEvent("UpdateInventory", "CheckPotionShortcut"); -- TODO: Option to disable this
 	else
 		self:RegisterEvent("Sezz_CharacterLoaded", "SetupActionBars");
 	end
@@ -128,6 +133,37 @@ function M:RestoreProfile()
 	if (S.myCharacter) then
 		GameLib.SetShortcutMount(self.P.SelectedMount or 0);
 		GameLib.SetShortcutPotion(self.P.SelectedPotion or 0);
+	end
+end
+
+function M:CheckMountShortcut()
+	if (S.myLevel < 15) then return; end
+
+	if (GameLib.GetShortcutMount() == 0) then
+		local tMountList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
+			log:debug(tMountList);
+		if (#tMountList > 0) then
+			local nSpellId = tMountList[1].tTiers[1].splObject:GetId();
+
+			log:debug("Setting mount to: "..nSpellId);
+			self.P["SelectedMount"] = nSpellId;
+			GameLib.SetShortcutMount(nSpellId);
+		end
+	end
+end
+
+function M:CheckPotionShortcut()
+	local nCurrentId = GameLib.GetShortcutPotion();
+
+	if (nCurrentId == 0 or not S:IsItemInInventory(nCurrentId)) then
+		local tPotions = S:GetInventoryByCategory(48, true);
+		if (#tPotions > 0) then
+			local nPotionId = tPotions[1].itemInBag:GetItemId();
+
+			log:debug("Setting potion to: "..nPotionId);
+			self.P["SelectedPotion"] = nPotionId;
+			GameLib.SetShortcutPotion(nPotionId);
+		end
 	end
 end
 
