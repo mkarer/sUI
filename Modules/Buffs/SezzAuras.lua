@@ -122,55 +122,64 @@ function Auras:Call(strEvent, ...)
 	end
 end
 
+function Auras:ScanAuras(arAuras, tCache, bIsDebuff)
+	-- Mark all auras as expired
+	for _, tAura in pairs(tCache) do
+		tAura.bExpired = true;
+	end
+
+	-- Add/Update Auras
+	for _, tAura in ipairs(arAuras) do
+		tAura.bIsDebuff = bIsDebuff;
+
+		if (not tCache[tAura.idBuff]) then
+			-- New Aura
+			log:debug("Added Aura: %s", tAura.splEffect:GetName());
+			tCache[tAura.idBuff] = tAura;
+			self:Call("OnAuraAdded", tAura);
+		else
+			-- Update Existing Aura
+			local bAuraChanged = false;
+
+			if (tCache[tAura.idBuff].fTimeRemaining ~= tAura.fTimeRemaining) then
+				tCache[tAura.idBuff].fTimeRemaining = tAura.fTimeRemaining;
+--				bAuraChanged = true;
+			end
+
+			if (tCache[tAura.idBuff].nCount ~= tAura.nCount) then
+				tCache[tAura.idBuff].nCount = tAura.nCount;
+				bAuraChanged = true;
+			end
+
+			if (bAuraChanged) then
+				log:debug("Updated Aura: %s", tAura.splEffect:GetName());
+				self:Call("OnAuraUpdated", tAura);
+			end
+		end
+
+		-- Remove IsExpired
+		tCache[tAura.idBuff].bExpired = false;
+	end
+
+	-- Remove expired
+	for _, tAura in pairs(tCache) do
+		if (tAura.bExpired) then
+			-- Remove Aura
+			tCache[tAura.idBuff] = nil;
+			log:debug("Removed Aura: %s", tAura.splEffect:GetName());
+			self:Call("OnAuraRemoved", tAura);
+		end
+	end
+end
+
 function Auras:Update()
 --	log:debug("Update");
 
 	if (self.unit and self.unit:IsValid()) then
-		-- Mark all auras as expired
-		for _, tAura in pairs(self.tBuffs) do
-			tAura.bExpired = true;
-		end
+		local tAuras = self.unit:GetBuffs();
 
-		-- Add/Update Auras
-		for _, tAura in ipairs(self.unit:GetBuffs().arBeneficial) do
-			if (not self.tBuffs[tAura.idBuff]) then
-				-- New Aura
---				log:debug("XXXXXXXXXXXX added aura: %s", tAura.splEffect:GetName());
-				self.tBuffs[tAura.idBuff] = tAura;
-				self:Call("OnAuraAdded", tAura);
-			else
-				-- Update Existing Aura
-				local bAuraChanged = false;
-
-				if (self.tBuffs[tAura.idBuff].fTimeRemaining ~= tAura.fTimeRemaining) then
-					self.tBuffs[tAura.idBuff].fTimeRemaining = tAura.fTimeRemaining;
---					bAuraChanged = true;
-				end
-
-				if (self.tBuffs[tAura.idBuff].nCount ~= tAura.nCount) then
-					self.tBuffs[tAura.idBuff].nCount = tAura.nCount;
-					bAuraChanged = true;
-				end
-
-				if (bAuraChanged) then
---					log:debug("XXXXXXXXXXXX changed aura: %s", tAura.splEffect:GetName());
-					self:Call("OnAuraUpdated", tAura);
-				end
-			end
-
-			-- Remove IsExpired
-			self.tBuffs[tAura.idBuff].bExpired = false;
-		end
-
-		-- Remove expired
-		for _, tAura in pairs(self.tBuffs) do
-			if (tAura.bExpired) then
-				-- Remove Aura
-				self.tBuffs[tAura.idBuff] = nil;
---				log:debug("XXXXXXXXXXXX removed aura: %s", tAura.splEffect:GetName());
-				self:Call("OnAuraRemoved", tAura);
-			end
-		end
+		self:ScanAuras(tAuras.arBeneficial, self.tBuffs, false);
+		self:ScanAuras(tAuras.arHarmful, self.tDebuffs, true);
 	else
 		-- Invalid Unit
 		log:debug("Unit Invalid!")

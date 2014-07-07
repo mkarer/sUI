@@ -27,14 +27,37 @@ end
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
-	self:WindowTest();
+	-- Create Container Windows
+	local tBuffContainer = {
+		Name			= "SezzBuffContainer",
+		Picture			= false,
+		Moveable		= false,
+		Border			= false,
+		Sizable			= false,
+		IgnoreMouse		= true,
+		AnchorPoints	= { 0.5, 1, 1, 1 },
+		AnchorOffsets	= { 0, -323, -9, -272 },
+	}
 
+	local tDebuffContainer = S:Clone(tBuffContainer);
+	tDebuffContainer.AnchorOffsets = { 0, -400, -9, -349 };
+
+	-- Buffs
+	self.tBuffs = GeminiGUI:Create(tBuffContainer);
+	self.tBuffs.tChildren = {};
+	self.wndBuffs = self.tBuffs:GetInstance();
+
+	-- Debuffs
+	self.tDebuffs = GeminiGUI:Create(tDebuffContainer);
+	self.tDebuffs.tChildren = {};
+	self.wndDebuffs = self.tDebuffs:GetInstance();
+
+	-- Activate Auras Class
 	if (S.bCharacterLoaded) then
-		self:Auras_Init();
+		self:EnableAuras();
 	else
-		self:RegisterEvent("Sezz_CharacterLoaded", "Auras_Init");
+		self:RegisterEvent("Sezz_CharacterLoaded", "EnableAuras");
 	end
-
 end
 
 function M:OnDisable()
@@ -43,7 +66,7 @@ end
 
 -----------------------------------------------------------------------------
 
-function M:Auras_Init()
+function M:EnableAuras()
 	-- Auras Unit Updater
 	local fnUpdatePlayerUnit = function(self)
 		if (not self.unit or S.myCharacter ~= self.unit) then
@@ -55,8 +78,8 @@ function M:Auras_Init()
 	self.tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
 
 	-- Buffs
-	self.tPlayerAuras:RegisterCallback("OnAuraAdded", "OnBuffAdded", self);
-	self.tPlayerAuras:RegisterCallback("OnAuraRemoved", "OnBuffRemoved", self);
+	self.tPlayerAuras:RegisterCallback("OnAuraAdded", "OnAuraAdded", self);
+	self.tPlayerAuras:RegisterCallback("OnAuraRemoved", "OnAuraRemoved", self);
 
 	-- Enable
 	self.tPlayerAuras:UpdateUnit();
@@ -97,6 +120,8 @@ local tBuffPrototype = {
 			Children = {
 				{
 					Name = "Background",
+					BGColor = "ff000000",
+					Sprite = "ClientSprites:WhiteFill",
 					Class = "Window",
 					Picture = true,
 					AnchorPoints = { 0, 0, 1, 1 },
@@ -135,40 +160,25 @@ local tBuffPrototype = {
 local tDebuffPrototype = S:Clone(tBuffPrototype);
 tDebuffPrototype.Children[2].BGColor = "ff791104";
 
-function M:WindowTest()
-	local GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage
+function M:OnAuraAdded(tAura)
+	local tCache = (tAura.bIsDebuff and self.tDebuffs or self.tBuffs);
+	local wndContainer = (tAura.bIsDebuff and self.wndDebuffs or self.wndBuffs);
 
-	-- Setup the table definition for the window
-	local tWindowDefinition = {
-		Name			= "MyExampleWindow",
-		Template		= "CRB_TooltipSimple",
-		UseTemplateBG	= true,
-		Picture			= true,
-		Moveable		= true,
-		Border			= true,
-		Sizable			= true,
-		AnchorPoints = { 0, 0, 0, 0 },
-		AnchorOffsets = { 0, 50, 500, 201 },
-	}
-
-	-- Aura Container
-	self.tBuffs = GeminiGUI:Create(tWindowDefinition);
-	self.tBuffs.tChildren = {};
-	self.wndBuffs = self.tBuffs:GetInstance();
-end
-
-function M:OnBuffAdded(tAura)
-	if (not self.tBuffs.tChildren[tAura.idBuff]) then
-		local tAuraControl = AuraControl:New(self.wndBuffs, tAura, tBuffPrototype);
-		self.tBuffs.tChildren[tAura.idBuff] = tAuraControl;
-		self:OrderAuras(self.wndBuffs);
+	if (not tCache.tChildren[tAura.idBuff]) then
+		local tAuraControl = AuraControl:New(wndContainer, tAura, (tAura.bIsDebuff and tDebuffPrototype or tBuffPrototype));
+		tCache.tChildren[tAura.idBuff] = tAuraControl;
+		self:OrderAuras(wndContainer);
 	end
 end
 
-function M:OnBuffRemoved(tAura)
-	if (self.tBuffs.tChildren[tAura.idBuff]) then
-		self.tBuffs.tChildren[tAura.idBuff]:Destroy();
-		self:OrderAuras(self.wndBuffs);
+function M:OnAuraRemoved(tAura)
+	local tCache = (tAura.bIsDebuff and self.tDebuffs or self.tBuffs);
+	local wndContainer = (tAura.bIsDebuff and self.wndDebuffs or self.wndBuffs);
+
+	if (tCache.tChildren[tAura.idBuff]) then
+		tCache.tChildren[tAura.idBuff]:Destroy()
+		tCache.tChildren[tAura.idBuff] = nil;
+		self:OrderAuras(wndContainer);
 	end
 end
 
