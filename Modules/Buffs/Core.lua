@@ -2,6 +2,8 @@
 
 	s:UI Buffs/Debuffs
 
+	TODO: Buff Tooltips, Buff Canceling
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -41,27 +43,30 @@ end
 
 -----------------------------------------------------------------------------
 
-local tPlayerAuras;
-
 function M:Auras_Init()
+	-- Auras Unit Updater
 	local fnUpdatePlayerUnit = function(self)
 		if (not self.unit or S.myCharacter ~= self.unit) then
-			log:debug("XXXXXXXXXXXX update unit")
 			self:SetUnit(S.myCharacter);
 		end
 	end
 
-	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnit", Auras);
+	-- Initialize Auras
+	self.tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
 
-	tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
-	tPlayerAuras:RegisterCallback("OnAuraAdded", "OnBuffAdded", self);
-	tPlayerAuras:RegisterCallback("OnAuraRemoved", "OnBuffRemoved", self);
-	tPlayerAuras:Enable();
+	-- Buffs
+	self.tPlayerAuras:RegisterCallback("OnAuraAdded", "OnBuffAdded", self);
+	self.tPlayerAuras:RegisterCallback("OnAuraRemoved", "OnBuffRemoved", self);
+
+	-- Enable
+	self.tPlayerAuras:UpdateUnit();
+	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnit", self.tPlayerAuras);
+	Apollo.RegisterEventHandler("PlayerCreated", "UpdateUnit", self.tPlayerAuras);
 end
 
 -----------------------------------------------------------------------------
 
-local tAuraPrototype = {
+local tBuffPrototype = {
 	WidgetType = "Window",
 	AnchorPoints = { 0, 0, 0, 0 },
 	AnchorOffsets = { 0, 0, 34, 51 },
@@ -71,7 +76,7 @@ local tAuraPrototype = {
 			Class = "Window",
 			Text = "",
 			TextColor = "ffffffff",
-			Font = "CRB_Interface9_O",
+			Font = "CRB_Pixel_O", -- CRB_Interface9_O
 			DT_VCENTER = true,
 			DT_CENTER = true,
 			DT_SINGLELINE = true,
@@ -86,7 +91,7 @@ local tAuraPrototype = {
 			AnchorPoints = { 0, 1, 1, 1 },
 			AnchorOffsets = { 0, -34, 0, 0 },
 			Picture = true,
-			BGColor = "33ffffff",
+			BGColor = "33ffffff", --ff791104
 			Sprite = "ClientSprites:WhiteFill",
 			IgnoreMouse = true,
 			Children = {
@@ -127,7 +132,8 @@ local tAuraPrototype = {
 	},
 };
 
-local tAuraTemplate;
+local tDebuffPrototype = S:Clone(tBuffPrototype);
+tDebuffPrototype.Children[2].BGColor = "ff791104";
 
 function M:WindowTest()
 	local GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage
@@ -149,40 +155,34 @@ function M:WindowTest()
 	self.tBuffs = GeminiGUI:Create(tWindowDefinition);
 	self.tBuffs.tChildren = {};
 	self.wndBuffs = self.tBuffs:GetInstance();
-
-	-- Aura Template
-	tAuraTemplate = GeminiGUI:Create(tAuraPrototype);
-
-	-- Add Sample Buf
---	tAuraTemplate:GetInstance(self, self.wndBuffs);
 end
 
 function M:OnBuffAdded(tAura)
 	if (not self.tBuffs.tChildren[tAura.idBuff]) then
-		local tAuraControl = AuraControl:New(self.wndBuffs, tAura, tAuraPrototype);
+		local tAuraControl = AuraControl:New(self.wndBuffs, tAura, tBuffPrototype);
 		self.tBuffs.tChildren[tAura.idBuff] = tAuraControl;
-		self:OrderBuffs();
+		self:OrderAuras(self.wndBuffs);
 	end
 end
 
 function M:OnBuffRemoved(tAura)
 	if (self.tBuffs.tChildren[tAura.idBuff]) then
 		self.tBuffs.tChildren[tAura.idBuff]:Destroy();
-		self:OrderBuffs();
+		self:OrderAuras(self.wndBuffs);
 	end
 end
 
 -- Aura Sorting
 local bAnchorLeft = false;
-local nAuraSize = 34;
+local nAuraSize = tBuffPrototype.AnchorOffsets[3];
 local nAuraPadding = 4;
 
 local TableSortAura = function(a, b)
 	return (a.fTimeRemaining > b.fTimeRemaining);
 end
 
-function M:OrderBuffs()
-	local tAuras = self.wndBuffs:GetChildren();
+function M:OrderAuras(wndParent)
+	local tAuras = wndParent:GetChildren();
 
 	for i = 1, #tAuras do
 		local wndAura = tAuras[i];
