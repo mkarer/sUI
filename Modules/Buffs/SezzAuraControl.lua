@@ -15,6 +15,9 @@ local NAME = string.match(MAJOR, ":(%a+)\-");
 local AuraControl = APkg and APkg.tPackage or {};
 local log;
 
+-- Lua API
+local format, floor, mod = string.format, math.floor, math.mod;
+
 -----------------------------------------------------------------------------
 -- Tooltips
 -----------------------------------------------------------------------------
@@ -99,16 +102,47 @@ end
 function AuraControl:Destroy()
 	-- We can't reuse windows (right?), so we have to self-destruct ;)
 	-- Remove Timers, Destroy windows
+	self.wndMain:Destroy();
+	self = nil;
 end
 
 function AuraControl:Update()
 	-- Update Timer + Count
 end
 
+local TimeBreakDown = function(nSeconds)
+    local days = floor(nSeconds / (60 * 60 * 24));
+    local hours = floor((nSeconds - (days * (60 * 60 * 24))) / (60 * 60));
+    local minutes = floor((nSeconds - (days * (60 * 60 * 24)) - (hours * (60 * 60))) / 60);
+    local seconds = mod(nSeconds, 60);
+
+    return days, hours, minutes, seconds;
+end
+
 function AuraControl:UpdateDuration(fDuration)
+	self.fDuration = fDuration;
+
+	if (fDuration <= 0) then
+		self.wndDuration:SetText("");
+	else
+		local d, h, m, s = TimeBreakDown(fDuration);
+
+		if (m < 10) then
+			self.wndDuration:SetText(format("%1d:%02d", m, s));
+		elseif (h < 1) then
+			self.wndDuration:SetText(format("%02d:%02d", m, s));
+		elseif (h >= 10) then
+			self.wndDuration:SetText(format("%1dh", h));
+		else
+			self.wndDuration:SetText(format("%1dh:%02d", h, m));
+		end
+	end
 end
 
 function AuraControl:UpdateCount(nCount)
+	self.nCount = nCount;
+	self.wndCount:SetText(nCount);
+	self.wndCount:Show(nCount > 1, true);
 end
 
 function AuraControl:UpdateTooltip()
@@ -132,8 +166,6 @@ function AuraControl:New(wndParent, tAuraData, tWindow)
 	self = setmetatable({}, { __index = AuraControl });
 
 	-- Initialize Properties
-	self.fDuration = 0;
-	self.nCount = 0;
 	self.tAura = tAuraData;
 
 	-- Create Aura Window
@@ -144,6 +176,14 @@ function AuraControl:New(wndParent, tAuraData, tWindow)
 	local wndIcon = wndMain:FindChild("Icon");
 	self.wndIcon = wndIcon;
 	wndIcon:SetSprite(tAuraData.splEffect:GetIcon());
+
+	-- Update Duration
+	self.wndDuration = wndMain:FindChild("Duration");
+	self:UpdateDuration(tAuraData.fTimeRemaining);
+
+	-- Update Stack Counter
+	self.wndCount = wndMain:FindChild("Count");
+	self:UpdateCount(tAuraData.nCount);
 
 	-- Create Tooltip
 	self:UpdateTooltip();
