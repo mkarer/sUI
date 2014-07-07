@@ -42,6 +42,7 @@ local tXml = {
 -----------------------------------------------------------------------------
 
 function Auras:Enable()
+	if (self.bEnabled) then return; end
 --[[
 	-- Create Buff Window
 	if (not self.wndBuffContainer) then
@@ -52,21 +53,36 @@ function Auras:Enable()
 --]]
 
 	-- Update
-	self:Update();
-	Apollo.RegisterEventHandler("VarChange_FrameCount", "Update", self);
+	if (self.unit and self.unit:IsValid()) then
+		log:debug("Enable");
+		self.bEnabled = true;
+		Apollo.RegisterEventHandler("VarChange_FrameCount", "Update", self);
+		self:Update();
+	else
+		self:Disable();
+	end
 end
 
 function Auras:Disable()
+	if (not self.bEnabled) then return; end
+
+	log:debug("Disable");
+	self.bEnabled = false;
 	Apollo.RemoveEventHandler("VarChange_FrameCount", self);
+	self:Reset();
 end
 
 function Auras:RegisterCallback(strEvent, strFunction, tEventHandler)
 	self.tCallbacks[strEvent] = { strFunction, tEventHandler };
 end
 
-function Auras:UpdateUnit()
-	log:debug("update unit")
+function Auras:UpdateUnit(bNoAutoEnable)
+	log:debug("Unit Update")
 	self.fnUpdateUnit(self);
+
+	if (not bNoAutoEnable) then
+		self:Enable();
+	end
 end
 
 function Auras:SetUnit(unit, bClearBuffs)
@@ -84,6 +100,8 @@ function Auras:SetUnit(unit, bClearBuffs)
 end
 
 function Auras:Reset()
+	log:debug("Reset");
+
 	for _, tAura in pairs(self.tDebuffs) do
 		self.tBuffs[tAura.idBuff] = nil;
 		self:Call("OnAuraRemoved", tAura);
@@ -105,21 +123,23 @@ function Auras:Call(strEvent, ...)
 end
 
 function Auras:Update()
+--	log:debug("Update");
+
 	if (self.unit and self.unit:IsValid()) then
-		-- mark all auras as expired
+		-- Mark all auras as expired
 		for _, tAura in pairs(self.tBuffs) do
 			tAura.bExpired = true;
 		end
 
-		-- add/update auras
+		-- Add/Update Auras
 		for _, tAura in ipairs(self.unit:GetBuffs().arBeneficial) do
 			if (not self.tBuffs[tAura.idBuff]) then
-				-- new aura
-				log:debug("XXXXXXXXXXXX new aura: %s", tAura.splEffect:GetName());
+				-- New Aura
+--				log:debug("XXXXXXXXXXXX added aura: %s", tAura.splEffect:GetName());
 				self.tBuffs[tAura.idBuff] = tAura;
 				self:Call("OnAuraAdded", tAura);
 			else
-				-- update existing
+				-- Update Existing Aura
 				local bAuraChanged = false;
 
 				if (self.tBuffs[tAura.idBuff].fTimeRemaining ~= tAura.fTimeRemaining) then
@@ -133,29 +153,28 @@ function Auras:Update()
 				end
 
 				if (bAuraChanged) then
-					log:debug("XXXXXXXXXXXX changed aura: %s", tAura.splEffect:GetName());
+--					log:debug("XXXXXXXXXXXX changed aura: %s", tAura.splEffect:GetName());
 					self:Call("OnAuraUpdated", tAura);
 				end
 			end
 
-			-- remove expired mark
+			-- Remove IsExpired
 			self.tBuffs[tAura.idBuff].bExpired = false;
 		end
 
-		-- remove expired
+		-- Remove expired
 		for _, tAura in pairs(self.tBuffs) do
 			if (tAura.bExpired) then
-				-- free window
-				-- remove aura
+				-- Remove Aura
 				self.tBuffs[tAura.idBuff] = nil;
-				log:debug("XXXXXXXXXXXX removed aura: %s", tAura.splEffect:GetName());
+--				log:debug("XXXXXXXXXXXX removed aura: %s", tAura.splEffect:GetName());
 				self:Call("OnAuraRemoved", tAura);
 			end
 		end
 	else
-		log:debug("XXXXXXXXXXXX invalid unit - reset");
-		self:Reset();
-		self:UpdateUnit();
+		-- Invalid Unit
+		log:debug("Unit Invalid!")
+		self:Disable();
 	end
 end
 
@@ -166,6 +185,7 @@ end
 function Auras:New(fnUpdateUnit)
 	self = setmetatable({}, { __index = Auras });
 
+	self.bEnabled = false;
 	self.tBuffs = {};
 	self.tDebuffs = {};
 	self.tCallbacks = {};
