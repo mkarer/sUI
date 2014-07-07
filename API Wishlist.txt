@@ -1,15 +1,18 @@
 Game Events
-	...
+	ADD Shitload of events (http://wowprogramming.com/docs/events)
 
 Control Events
 	FIX MouseButtonUp // self.wndMain:AddEventHandler("MouseButtonUp", "OnMouseClick", self);
 	ADD MouseButtonClick
-	FIX MouseWheel // Camera shouldn't change zoom level when using the mousewheel on a window that also has a MouseWheel event handler
+	FIX MouseWheel // Camera shouldn't change zoom level when using the mousewheel on a window that also has a MouseWheel event handler (I think there are more events affected by this)
 
 Unit
 	ADD GetCastingSpell
 	ADD GetCastingSpellId
 	ADD GetCastingSpellIcon
+
+Spell
+	ADD GetBuffTooltip/GetBuffFlavor/GetBuffSpell (whatever, just something like that)
 
 Others
 	Slash /CoMMandS should be case insensitive!
