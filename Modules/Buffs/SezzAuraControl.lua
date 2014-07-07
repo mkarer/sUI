@@ -128,13 +128,14 @@ function AuraControl:UpdateDuration(fDuration)
 	else
 		local d, h, m, s = TimeBreakDown(fDuration);
 
-		if (fDuration < 10) then
-			self.wndDuration:SetText(format("%1d:%02d", m, s));
-		elseif (fDuration < 600) then
+		if (fDuration < 3600) then
+			-- Less than 1h, [MM:SS]
 			self.wndDuration:SetText(format("%02d:%02d", m, s));
-		elseif (fDuration >= 6000) then
+		elseif (fDuration >= 36000) then
+			-- 10 hours or more, [HHh]
 			self.wndDuration:SetText(format("%1dh", h));
 		else
+			-- from 1 to 9 hours, [HHh:MM]
 			self.wndDuration:SetText(format("%1dh:%02d", h, m));
 		end
 	end
