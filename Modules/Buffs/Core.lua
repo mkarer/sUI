@@ -81,17 +81,17 @@ local tAuraPrototype = {
 			IgnoreMouse = true,
 			Overlapped = true,
 		}, {
-			Name = "Background",
+			Name = "Border",
 			Class = "Window",
 			AnchorPoints = { 0, 1, 1, 1 },
 			AnchorOffsets = { 0, -34, 0, 0 },
 			Picture = true,
-			BGColor = "black",
+			BGColor = "33ffffff",
 			Sprite = "ClientSprites:WhiteFill",
 			IgnoreMouse = true,
 			Children = {
 				{
-					Name = "Icon",
+					Name = "Background",
 					Class = "Window",
 					Picture = true,
 					AnchorPoints = { 0, 0, 1, 1 },
@@ -99,16 +99,26 @@ local tAuraPrototype = {
 					IgnoreMouse = false,
 					Children = {
 						{
-							Name = "Count",
+							Name = "Icon",
 							Class = "Window",
-							Text = "",
-							TextColor = "ffffffff",
-							Font = "CRB_Interface12_BO",
-							DT_RIGHT = true,
-							DT_BOTTOM = true,
+							Picture = true,
 							AnchorPoints = { 0, 0, 1, 1 },
-							AnchorOffsets = { 0, 0, -2, 0 },
-							IgnoreMouse = true,
+							AnchorOffsets = { 0, 0, 0, 0 },
+							IgnoreMouse = false,
+							Children = {
+								{
+									Name = "Count",
+									Class = "Window",
+									Text = "",
+									TextColor = "ffffffff",
+									Font = "CRB_Interface12_BO",
+									DT_RIGHT = true,
+									DT_BOTTOM = true,
+									AnchorPoints = { 0, 0, 1, 1 },
+									AnchorOffsets = { 0, 0, -2, 0 },
+									IgnoreMouse = true,
+								},
+							},
 						},
 					},
 				},
@@ -149,7 +159,7 @@ end
 
 function M:OnBuffAdded(tAura)
 	if (not self.tBuffs.tChildren[tAura.idBuff]) then
-		local tAuraControl = AuraControl:New(self.wndBuffs, tAura, tAuraTemplate);
+		local tAuraControl = AuraControl:New(self.wndBuffs, tAura, tAuraPrototype);
 		self.tBuffs.tChildren[tAura.idBuff] = tAuraControl;
 		self:OrderBuffs();
 	end

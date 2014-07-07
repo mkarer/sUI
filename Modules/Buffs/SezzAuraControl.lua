@@ -13,7 +13,7 @@ if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local NAME = string.match(MAJOR, ":(%a+)\-");
 local AuraControl = APkg and APkg.tPackage or {};
-local log;
+local GeminiGUI, log;
 
 -- Lua API
 local format, floor, mod = string.format, math.floor, math.mod;
@@ -102,6 +102,7 @@ end
 function AuraControl:Destroy()
 	-- We can't reuse windows (right?), so we have to self-destruct ;)
 	-- Remove Timers, Destroy windows
+	self.wndIcon:RemoveEventHandler("MouseButtonUp", self);
 	self.wndMain:Destroy();
 	self = nil;
 end
@@ -127,11 +128,11 @@ function AuraControl:UpdateDuration(fDuration)
 	else
 		local d, h, m, s = TimeBreakDown(fDuration);
 
-		if (m < 10) then
+		if (fDuration < 10) then
 			self.wndDuration:SetText(format("%1d:%02d", m, s));
-		elseif (h < 1) then
+		elseif (fDuration < 600) then
 			self.wndDuration:SetText(format("%02d:%02d", m, s));
-		elseif (h >= 10) then
+		elseif (fDuration >= 6000) then
 			self.wndDuration:SetText(format("%1dh", h));
 		else
 			self.wndDuration:SetText(format("%1dh:%02d", h, m));
@@ -157,19 +158,25 @@ function AuraControl:UpdateTooltip()
 	GenerateBuffTooltipForm(self.wndIcon, self.wndMain, self.tAura.splEffect);
 end
 
+function AuraControl:CancelAura(wndHandler, wndControl, eMouseButton)
+	if (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+		log:debug("Cancel Aura: %s (ID: %d)", self.tAura.splEffect:GetName(), self.tAura.splEffect:GetId());
+	end
+end
+
 -----------------------------------------------------------------------------
 -- Constructor
 -----------------------------------------------------------------------------
 
-function AuraControl:New(wndParent, tAuraData, tWindow)
-	-- tWindow: GeminiGUI window prototype
+function AuraControl:New(wndParent, tAuraData, tWindowPrototype)
+	-- tWindowPrototype: GeminiGUI window prototype
 	self = setmetatable({}, { __index = AuraControl });
 
 	-- Initialize Properties
 	self.tAura = tAuraData;
 
 	-- Create Aura Window
-	local wndMain = tUserDataWrapper:New(tWindow:GetInstance(self, wndParent));
+	local wndMain = tUserDataWrapper:New(GeminiGUI:Create(tWindowPrototype):GetInstance(self, wndParent));
 	self.wndMain = wndMain;
 
 	-- Update Icon Sprite
@@ -188,8 +195,10 @@ function AuraControl:New(wndParent, tAuraData, tWindow)
 	-- Create Tooltip
 	self:UpdateTooltip();
 
-	-- Return
+	-- Add Click Event (Cancel Aura)
+	self.wndIcon:AddEventHandler("MouseButtonUp", "CancelAura", self);
 
+	-- Return
 	return self;
 end
 
@@ -204,6 +213,8 @@ function AuraControl:OnLoad()
 		pattern = "%d %n %c %l - %m",
 		appender = "GeminiConsole"
 	});
+
+	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 end
 
 function AuraControl:OnDependencyError(strDep, strError)
@@ -212,4 +223,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(AuraControl, MAJOR, MINOR, { "Gemini:Logging-1.2" });
+Apollo.RegisterPackage(AuraControl, MAJOR, MINOR, { "Gemini:Logging-1.2", "Gemini:GUI-1.0" });
