@@ -133,6 +133,6 @@ function tUserDataWrapper:New(o)
 	return setmetatable({__proto__ = o}, tUserDataMetatable);
 end
 
-function s:EnhanceControl(wndControl)
+function S:EnhanceControl(wndControl)
 	return tUserDataWrapper:New(wndControl);
 end
