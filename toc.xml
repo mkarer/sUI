@@ -43,6 +43,9 @@
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
 	<Script Name="Modules\CritLine\CritLine.lua" />
+	<!-- Buffs & Debuffs -->
+	<Script Name="Modules\Buffs\SezzAuras.lua" />
+	<Script Name="Modules\Buffs\SezzAuraControl.lua" />
 	<Script Name="Modules\Buffs\Core.lua" />
 	<!-- Unit Frames Library -->
 	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrame.lua" />

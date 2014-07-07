@@ -9,7 +9,7 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("Buffs", "Gemini:Hook-1.0");
-local log, GeminiGUI;
+local log, GeminiGUI, Auras, AuraControl;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -18,109 +18,25 @@ local log, GeminiGUI;
 function M:OnInitialize()
 	log = S.Log;
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+	Auras = Apollo.GetPackage("Sezz:Auras-0.1").tPackage;
+	AuraControl = Apollo.GetPackage("Sezz:Controls:Aura-0.1").tPackage;
 end
 
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
+
+	self:WindowTest();
 
 	if (S.bCharacterLoaded) then
 		self:Auras_Init();
 	else
 		self:RegisterEvent("Sezz_CharacterLoaded", "Auras_Init");
 	end
+
 end
 
 function M:OnDisable()
 	log:debug("%s disabled.", self:GetName());
-end
-
------------------------------------------------------------------------------
--- Code
------------------------------------------------------------------------------
-
------------------------------------------------------------------------------
-
-local Auras = {};
-
-function Auras:New(fnUpdateUnit)
-	self = setmetatable({}, { __index = Auras });
-
-	self.tBuffs = {};
-	self.tDebuffs = {};
-	self.fnUpdateUnit = fnUpdateUnit;
-	self.fnUpdateUnit(self);
-	self:Update();
-
-	return self;
-end
-
-function Auras:UpdateUnit()
-	self.fnUpdateUnit(self);
-end
-
-function Auras:SetUnit(unit, bClearBuffs)
-	self.unit = unit;
-
-	if (bClearBuffs) then
-		self:Reset();
-	end
-end
-
-function Auras:Reset()
-	self.tBuffs = {};
-	self.tDebuffs = {};
-end
-
-function Auras:Update()
-	if (self.unit and self.unit:IsValid()) then
-		-- mark all auras as expired
-		for _, tAura in pairs(self.tBuffs) do
-			tAura.bExpired = true;
-		end
-
-		-- add/update auras
-		for _, tAura in ipairs(self.unit:GetBuffs().arBeneficial) do
-			if (not self.tBuffs[tAura.idBuff]) then
-				-- new aura
-				log:debug("XXXXXXXXXXXX new aura: %s", tAura.splEffect:GetName());
-				self.tBuffs[tAura.idBuff] = tAura;
-				-- attach window
-			else
-				-- update existing
-				local bAuraChanged = false;
-
-				if (self.tBuffs[tAura.idBuff].fTimeRemaining ~= tAura.fTimeRemaining) then
-					self.tBuffs[tAura.idBuff].fTimeRemaining = tAura.fTimeRemaining;
---					bAuraChanged = true;
-				end
-
-				if (self.tBuffs[tAura.idBuff].nCount ~= tAura.nCount) then
-					self.tBuffs[tAura.idBuff].nCount = tAura.nCount;
-					bAuraChanged = true;
-				end
-
-				if (bAuraChanged) then
-					log:debug("XXXXXXXXXXXX changed aura: %s", tAura.splEffect:GetName());
-				end
-			end
-
-			-- remove expired mark
-			self.tBuffs[tAura.idBuff].bExpired = false;
-		end
-
-		-- remove expired
-		for nId, tAura in pairs(self.tBuffs) do
-			if (tAura.bExpired) then
-				-- free window
-				-- remove aura
-				self.tBuffs[nId] = nil;
-				log:debug("XXXXXXXXXXXX removed aura: %s", tAura.splEffect:GetName());
-			end
-		end
-	else
-		log:debug("XXXXXXXXXXXX invalid unit - reset");
-		self:Reset();
-	end
 end
 
 -----------------------------------------------------------------------------
@@ -135,55 +51,223 @@ function M:Auras_Init()
 		end
 	end
 
-	tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
 
-	Apollo.RegisterEventHandler("VarChange_FrameCount", "Update", tPlayerAuras);
-	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnit", tPlayerAuras);
+	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnit", Auras);
+
+	tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
+	tPlayerAuras:RegisterCallback("OnAuraAdded", "OnBuffAdded", self);
+	tPlayerAuras:RegisterCallback("OnAuraRemoved", "OnBuffRemoved", self);
+	tPlayerAuras:Enable();
 end
 
 -----------------------------------------------------------------------------
 
-function M:SetupBuffs()
-	local tBuffProto = {
-		WidgetType = "Window",
-		WhiteFillMe = true,
-		Anchor = "TOPLEFT",
-		AnchorOffsets = { 0, 0, 200, 20 },
-	};
+local OnGenerateTooltip = function(self, wndControl, wndHandler, eType, arg1, arg2)
+log:debug(wndControl)
+log:debug(wndControl:IsMouseTarget())
+	if (wndControl ~= wndHandler) then return; end
 
-	-- Retrieve the GeminiGUI library from Apollo's package system
+	local tAura = wndControl:GetData();	
+	if (tAura and self.tBuffs.tChildren[tAura.idBuff]) then
+--		Tooltip.GetSpellTooltipForm(self, self.tBuffs.tChildren[tAura.idBuff], tAura.splEffect, false)
+--		Tooltip.GetBuffTooltipForm(self, self.tBuffs.tChildren[tAura.idBuff], tAura.splEffect, {bFutureSpell = false});
+	end
+end
+
+local tAuraPrototype = {
+	WidgetType = "Window",
+	Picture = true,
+	BGColor = "green",
+	Sprite = "ClientSprites:WhiteFill",
+	AnchorPoints = { 0, 0, 0, 0 },
+	AnchorOffsets = { 0, 0, 34, 51 },
+--	Events = {
+--		GenerateTooltip = OnGenerateTooltip;
+--	},
+	Children = {
+		{
+			Name = "Duration",
+			Text = "00:00",
+			TextColor = "ffffffff",
+			Font = "CRB_Pixel_O",
+			DT_VCENTER = true,
+			DT_CENTER = true,
+			AnchorPoints = { 0, 0, 1, 0 },
+			AnchorOffsets = { 0, 0, 0, 17 },
+			IgnoreMouse = true,
+	}, {
+			Name = "Background",
+			AnchorPoints = { 0, 1, 1, 1 },
+			AnchorOffsets = { 0, -34, 0, 0 },
+			Picture = true,
+			BGColor = "black",
+			Sprite = "ClientSprites:WhiteFill",
+			Children = {
+			IgnoreMouse = true,
+				{
+					Name = "Icon",
+					Class = "Window",
+					Picture = true,
+					AnchorPoints = { 0, 0, 1, 1 },
+					AnchorOffsets = { 3, 3, -3, -3 },
+					IgnoreMouse = false,
+				},
+			},
+		},
+	},
+};
+
+local tAuraTemplate;
+
+function M:WindowTest()
 	local GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage
 
 	-- Setup the table definition for the window
 	local tWindowDefinition = {
-		Name          = "MyExampleWindow",
-		Template      = "CRB_TooltipSimple",
-		UseTemplateBG = true,
-		Picture       = true,
-		Moveable      = true,
-		Border        = true,
-		AnchorCenter  = { 500, 300 },
-		Children = {
-		{
-			WidgetType     = "PushButton",
-			Base           = "CRB_UIKitSprites:btn_square_LARGE_Red",
-			Text           = "Close Parent",
-			TextThemeColor = "ffffffff", -- sets normal, flyby, pressed, pressedflyby, disabled to a color
-			AnchorCenter   = { 150, 40 },
-			Events = {
-			ButtonSignal = function(self, wndHandler, wndControl)
-				wndControl:GetParent():Close()
-			end
-			},
-		},
-		},
+		Name			= "MyExampleWindow",
+		Template		= "CRB_TooltipSimple",
+		UseTemplateBG	= true,
+		Picture			= true,
+		Moveable		= true,
+		Border			= true,
+		Sizable			= true,
+		AnchorPoints = { 0, 0, 0, 0 },
+		AnchorOffsets = { 0, 50, 500, 201 },
 	}
 
 	-- Aura Container
-	local tContainer = GeminiGUI:Create(tWindowDefinition)
-	local wndContainer = tContainer:GetInstance()
+	self.tBuffs = GeminiGUI:Create(tWindowDefinition);
+	self.tBuffs.tChildren = {};
+	self.wndBuffs = self.tBuffs:GetInstance();
 
-	-- Add Auras
-	local tBuff = GeminiGUI:Create(tBuffProto):GetInstance(self, wndContainer);
+	-- Aura Template
+	tAuraTemplate = GeminiGUI:Create(tAuraPrototype);
 
+	-- Add Sample Buf
+--	tAuraTemplate:GetInstance(self, self.wndBuffs);
+end
+
+-- ToolTips.lua
+local function GenerateBuffTooltipForm(luaCaller, wndParent, splSource, tFlags)
+	-- Initial Bad Data Checks
+	if splSource == nil then
+		return
+	end
+
+	local wndTooltip = wndParent:LoadTooltipForm("ui\\Tooltips\\TooltipsForms.xml", "BuffTooltip_Base", luaCaller)
+	wndTooltip:FindChild("NameString"):SetText(splSource:GetName())
+
+    -- Dispellable
+	local eSpellClass = splSource:GetClass()
+	if eSpellClass == Spell.CodeEnumSpellClass.BuffDispellable or eSpellClass == Spell.CodeEnumSpellClass.DebuffDispellable then
+		wndTooltip:FindChild("DispellableString"):SetText(Apollo.GetString("Tooltips_Dispellable"))
+	else
+		wndTooltip:FindChild("DispellableString"):SetText("")
+	end
+
+	-- Calculate width
+	local nNameLeft, nNameTop, nNameRight, nNameBottom = wndTooltip:FindChild("NameString"):GetAnchorOffsets()
+	local nNameWidth = Apollo.GetTextWidth("CRB_InterfaceLarge", splSource:GetName())
+	local nDispelWidth = Apollo.GetTextWidth("CRB_InterfaceMedium", wndTooltip:FindChild("DispellableString"):GetText())
+	local nOffset = math.max(0, nNameWidth + nDispelWidth + (nNameLeft * 4) - wndTooltip:FindChild("NameString"):GetWidth())
+
+	-- Resize Tooltip width
+	wndTooltip:SetAnchorOffsets(0, 0, wndTooltip:GetWidth() + nOffset, wndTooltip:GetHeight())
+
+	-- General Description
+	wndTooltip:FindChild("GeneralDescriptionString"):SetText(wndParent:GetBuffTooltip())
+	wndTooltip:FindChild("GeneralDescriptionString"):SetHeightToContentHeight()
+
+	-- Resize tooltip height
+	wndTooltip:SetAnchorOffsets(0, 0, wndTooltip:GetWidth(), wndTooltip:GetHeight() + wndTooltip:FindChild("GeneralDescriptionString"):GetHeight())
+
+	return wndTooltip
+end
+
+function M:OnBuffAdded(tAura)
+	if (not self.tBuffs.tChildren[tAura.idBuff]) then
+		local wndAura = tAuraTemplate:GetInstance(self, self.wndBuffs);
+
+		local tAuraControl = AuraControl:New(self.wndBuffs, tAura, tAuraTemplate);
+
+		-- Add GetBuffTooltip
+		local game_wrapper = {}
+		local game_wrapper_mt = {}
+
+		function game_wrapper_mt:__index(key)
+			local proto = rawget(self, "__proto__")
+			local field = proto and proto[key]
+
+			if type(field) ~= "function" then
+				return field
+			else
+				return function (obj, ...)
+					if obj == self then
+						return field(proto, ...)
+					else
+						return field(obj, ...)
+					end
+				end
+			end
+		end
+
+		function game_wrapper:new()
+			return setmetatable({__proto__ = wndAura}, game_wrapper_mt)
+		end
+
+		local my_game = game_wrapper:new()
+		function my_game:GetBuffTooltip()
+			return self.strFlavorText;
+		end
+
+--		self.OnGenerateTooltip = OnGenerateTooltip;
+		my_game.strFlavorText = tAura.splEffect:GetFlavor();
+
+
+
+		my_game:FindChild("Icon"):SetSprite(tAura.splEffect:GetIcon());
+--		my_game:FindChild("Icon"):AddEventHandler("GenerateTooltip", "OnGenerateTooltip", self);
+		my_game:FindChild("Icon"):SetData(tAura);
+
+		GenerateBuffTooltipForm(my_game:FindChild("Icon"), my_game, tAura.splEffect)
+
+		self.tBuffs.tChildren[tAura.idBuff] = my_game;
+		self:OrderBuffs();
+	end
+end
+
+function M:OnBuffRemoved(tAura)
+	if (self.tBuffs.tChildren[tAura.idBuff]) then
+		self.tBuffs.tChildren[tAura.idBuff]:Destroy();
+		self.tBuffs.tChildren[tAura.idBuff] = nil;
+		self:OrderBuffs();
+	end
+end
+
+-- Aura Sorting
+local bAnchorLeft = false;
+local nAuraSize = 34;
+local nAuraPadding = 4;
+
+local TableSortAura = function(a, b)
+	return (a.fTimeRemaining > b.fTimeRemaining);
+end
+
+function M:OrderBuffs()
+	local tAuras = self.wndBuffs:GetChildren();
+
+	for i = 1, #tAuras do
+		local wndAura = tAuras[i];
+		local nPosX = (i - 1) * (nAuraSize + nAuraPadding);
+
+		if (bAnchorLeft) then
+			-- LTR
+			wndAura:SetAnchorPoints(0, 0, 0, 0);
+			wndAura:SetAnchorOffsets(nPosX, 0, nPosX + nAuraSize, 51);
+		else
+			-- RTL
+			wndAura:SetAnchorPoints(1, 0, 1, 0);
+			wndAura:SetAnchorOffsets(-nPosX - nAuraSize, 0, -nPosX, 51);
+		end
+	end
 end
