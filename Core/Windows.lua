@@ -104,3 +104,35 @@ function S:UpdateElementInXml(tXml, strElementName, tData)
 
 	return false;
 end
+
+-----------------------------------------------------------------------------
+-- Window Metatable Wrapper
+-----------------------------------------------------------------------------
+
+local tUserDataWrapper = {};
+local tUserDataMetatable = {};
+
+function tUserDataMetatable:__index(strKey)
+	local proto = rawget(self, "__proto__");
+	local field = proto and proto[strKey];
+
+	if (type(field) ~= "function") then
+		return field;
+	else
+		return function(obj, ...)
+			if (obj == self) then
+				return field(proto, ...);
+			else
+				return field(obj, ...);
+			end
+		end
+	end
+end
+
+function tUserDataWrapper:New(o)
+	return setmetatable({__proto__ = o}, tUserDataMetatable);
+end
+
+function s:EnhanceControl(wndControl)
+	return tUserDataWrapper:New(wndControl);
+end
