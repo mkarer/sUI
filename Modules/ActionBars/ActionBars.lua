@@ -231,7 +231,7 @@ function M:SetupActionBars()
 	local barRight = self:CreateActionBar("Right", "A", false, 24, 35, true);
 	local barHeightOffset = math.ceil(barRight.Height / 2);
 	barRight.wndMain:SetAnchorOffsets(-barRight.Width, -barHeightOffset, 0, barHeightOffset);
-	barRight.wndMain:SetAnchorPoints(1, 0.5, 1, 0.5);
+	barRight.wndMain:SetAnchorPoints(1, 0.4, 1, 0.4);
 	self.tBars[barRight.strName] = barRight;
 
 	-----------------------------------------------------------------------------
