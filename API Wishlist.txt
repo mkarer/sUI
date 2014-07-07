@@ -1,3 +1,6 @@
+Please note:
+	As a World of Warcraft addon developer I *VERY OFTEN* refer to WoW-related stuff, because that's what I'm used to.
+
 Game Events
 	ADD Shitload of events (http://wowprogramming.com/docs/events)
 
@@ -10,6 +13,12 @@ Unit
 	ADD GetCastingSpell
 	ADD GetCastingSpellId
 	ADD GetCastingSpellIcon
+
+MLWindow
+	ADD DT_SINGLELINE
+	ADD DT_WORDBREAK
+
+	(Or just add coloring to every text like it works in WoW, this would make it stupid easy.)
 
 Spell
 	ADD GetBuffTooltip/GetBuffFlavor/GetBuffSpell (whatever, just something like that)
