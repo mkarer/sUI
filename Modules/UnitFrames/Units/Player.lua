@@ -26,12 +26,12 @@ UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 	-- Experience Bar
 	bExperienceBarEnabled = true,
 	-- Buffs
-	bBuffsEnabled = true,
+	bBuffsEnabled = false,
 	tBuffsAnchorPoints = { 0.5, 1, 1, 1 },
 	tBuffsAnchorOffsets = { 0, -306, -9, -272 },
 	tBuffsStyles = { "AutoAddBuffs", "AlignBuffsRight", "PulseWhenExpiring", "BuffNonDispelRightClick", "ShowMS" },
 	-- Debuffs
-	bDebuffsEnabled = true,
+	bDebuffsEnabled = false,
 	tDebuffsAnchorPoints = { 0.5, 1, 1, 1 },
 --	tDebuffsAnchorOffsets = { 0, -383, -9, -349 },
 	tDebuffsAnchorOffsets = { 0, -363, -9, -329 },
