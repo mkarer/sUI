@@ -96,8 +96,45 @@ function M:OnEnable()
 	end
 
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
-	self:RegisterEvent("CombatLogPet", "EventHandler");
+	self:RegisterEvent("TargetThreatListUpdated", "OnTargetThreatListUpdated");
+	self:RegisterEvent("TargetedByUnit", "OnTargetedByUnit");
+	self:RegisterEvent("UnTargetedByUnit", "OnUnTargetedByUnit");
 --	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
+end
+
+function M:OnTargetedByUnit(event, unit)
+	if (unit and unit == GameLib.GetPlayerUnit():GetTarget()) then
+		Print("100% Aggro vom Target")
+	end
+end
+
+function M:OnUnTargetedByUnit(event, unit)
+	if (unit and unit == GameLib.GetPlayerUnit():GetTarget()) then
+		Print("Aggro vom Target verloren")
+	end
+end
+
+function M:OnTargetThreatListUpdated(event, ...)
+	local nThreatMax = 0;
+	local nThreatPlayer = 0;
+
+	for i = 1, select("#", ...), 2 do
+		local unit, nThreat = select(i, ...);
+
+		if (unit) then
+			if (unit == GameLib.GetPlayerUnit()) then
+				nThreatPlayer = nThreat;
+			end
+
+			if (nThreat > nThreatMax) then
+				nThreatMax = nThreat;
+			end
+		end
+	end
+
+	if (nThreatMax > 0) then
+		log:debug("Player Threat: %d (%d/%d)", nThreatPlayer / (nThreatMax / 100) + 0.01, nThreatPlayer, nThreatMax);
+	end
 end
 
 function S:Test()
