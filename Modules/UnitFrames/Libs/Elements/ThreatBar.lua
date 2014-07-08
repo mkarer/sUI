@@ -26,7 +26,7 @@ local UnitIsFriend = function(unit)
 end
 
 local UnitTargetsPlayer = function(unit)
-	return (unit and unit:GetTarget() and unit:GetTarget():IsThePlayer());
+	return (unit and unit:IsInCombat() and unit:GetTarget() and unit:GetTarget():IsThePlayer());
 end
 
 -----------------------------------------------------------------------------
@@ -35,13 +35,14 @@ end
 local UpdateThreat = function(self, ...)
 	if (not self.bEnabled) then return; end
 
-	local unitPlayer = GameLib.GetPlayerUnit();
 	local unit = self.tUnitFrame.unit;
+	if (unit:IsDead()) then self:Disable(); return; end -- Mobs don't get resurrected, right?
+
+	local nUnitPlayerId = GameLib.GetPlayerUnit():GetId();
 	local wndThreat = self.tUnitFrame.wndThreat;
 	local tColors = self.tUnitFrame.tColors;
 
 	-- Calculate Player Threat
-	-- TODO: Test if ALL units on the threat table are supplied or if this event is fired more than once for every update
 	local nThreatMax = 0;
 	local nThreatPlayer = 0;
 	local nUnits = 0;
@@ -50,19 +51,21 @@ local UpdateThreat = function(self, ...)
 		local unit, nThreat = select(i, ...);
 
 		if (unit) then
-			nUnits = nUnits + 1;
-
-			if (unit == unitPlayer) then
-				nThreatPlayer = nThreat;
-			end
-
-			if (nThreat > nThreatMax) then
-				nThreatMax = nThreat;
-			end
+			self.tThreat[unit:GetId()] = nThreat;
 		end
 	end
 
-	if (nUnits > 0 and not unit:IsDead()) then
+	for nUnitId, nThreat in pairs(self.tThreat) do
+		if (nUnitId == nUnitPlayerId) then
+			nThreatPlayer = nThreat;
+		end
+
+		if (nThreat > nThreatMax) then
+			nThreatMax = nThreat;
+		end
+	end
+
+	if (nThreatPlayer > 0) then
 		-- TODO: Only show in group or solo when more than 1 unit on threat table
 		local nThreadPercent = floor(nThreatPlayer / (nThreatMax / 100) + 0.01);
 
@@ -105,6 +108,7 @@ local Enable = function(self)
 
 	self.bEnabled = true;
 
+	self.tThreat = {};
 	Apollo.RegisterEventHandler("TargetThreatListUpdated", "UpdateThreat", self);
 	Apollo.RegisterEventHandler("TargetedByUnit", "TargetedByUnit", self);
 
@@ -116,6 +120,8 @@ local Disable = function(self, bForce)
 	if (not self.bEnabled and not bForce) then return; end
 
 	self.bEnabled = false;
+
+	self.tThreat = {};
 	Apollo.RemoveEventHandler("TargetThreatListUpdated", self);
 	Apollo.RemoveEventHandler("TargetedByUnit", self);
 end
