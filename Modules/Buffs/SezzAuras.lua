@@ -134,24 +134,20 @@ function Auras:ScanAuras(arAuras, tCache, bIsDebuff)
 
 		if (not tCache[tAura.idBuff]) then
 			-- New Aura
-			log:debug("Added Aura: %s", tAura.splEffect:GetName());
+--			log:debug("Added Aura: %s", tAura.splEffect:GetName());
 			tCache[tAura.idBuff] = tAura;
 			self:Call("OnAuraAdded", tAura);
 		else
 			-- Update Existing Aura
-			local bAuraChanged = false;
-
-			if (tCache[tAura.idBuff].fTimeRemaining ~= tAura.fTimeRemaining) then
-				tCache[tAura.idBuff].fTimeRemaining = tAura.fTimeRemaining;
---				bAuraChanged = true;
-			end
+			local bAuraUpdated = (tAura.fTimeRemaining > tCache[tAura.idBuff].fTimeRemaining);
+			tCache[tAura.idBuff].fTimeRemaining = tAura.fTimeRemaining; -- fTimeRemaining doesn't get updated when a buff is refreshed!
 
 			if (tCache[tAura.idBuff].nCount ~= tAura.nCount) then
 				tCache[tAura.idBuff].nCount = tAura.nCount;
-				bAuraChanged = true;
+				bAuraUpdated = true;
 			end
 
-			if (bAuraChanged) then
+			if (bAuraUpdated) then
 				log:debug("Updated Aura: %s", tAura.splEffect:GetName());
 				self:Call("OnAuraUpdated", tAura);
 			end
@@ -166,7 +162,7 @@ function Auras:ScanAuras(arAuras, tCache, bIsDebuff)
 		if (tAura.bExpired) then
 			-- Remove Aura
 			tCache[tAura.idBuff] = nil;
-			log:debug("Removed Aura: %s", tAura.splEffect:GetName());
+--			log:debug("Removed Aura: %s", tAura.splEffect:GetName());
 			self:Call("OnAuraRemoved", tAura);
 		end
 	end
