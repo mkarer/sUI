@@ -157,7 +157,7 @@ function Auras:ScanAuras(arAuras, tCache, bIsDebuff)
 			end
 
 			if (bAuraUpdated) then
-				log:debug("Updated Aura: %s", tAura.splEffect:GetName());
+--				log:debug("Updated Aura: %s", tAura.splEffect:GetName());
 				self:Call("OnAuraUpdated", tAura);
 			end
 		end
