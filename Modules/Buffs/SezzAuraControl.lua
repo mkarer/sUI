@@ -128,9 +128,9 @@ function AuraControl:UpdateDuration(fDuration)
 		local nEndTime = GameLib.GetTickCount() + nDuration;
 
 		if (not self.nEndTime or self.nEndTime ~= nEndTime) then
-			if (self.nEndTime) then
-				log:debug("%s endtimer changed from %d to %d", self.tAura.splEffect:GetName(), self.nEndTime or 0, nEndTime);
-			end
+--			if (self.nEndTime) then
+--				log:debug("%s endtimer changed from %d to %d", self.tAura.splEffect:GetName(), self.nEndTime or 0, nEndTime);
+--			end
 
 			self.nEndTime = nEndTime;
 			self:UpdateTimeLeft();
