@@ -80,6 +80,7 @@ function M:EnableAuras()
 	-- Buffs
 	self.tPlayerAuras:RegisterCallback("OnAuraAdded", "OnAuraAdded", self);
 	self.tPlayerAuras:RegisterCallback("OnAuraRemoved", "OnAuraRemoved", self);
+	self.tPlayerAuras:RegisterCallback("OnAuraUpdated", "OnAuraUpdated", self);
 
 	-- Enable
 	self.tPlayerAuras:UpdateUnit();
@@ -165,7 +166,7 @@ function M:OnAuraAdded(tAura)
 	local wndContainer = (tAura.bIsDebuff and self.wndDebuffs or self.wndBuffs);
 
 	if (not tCache.tChildren[tAura.idBuff]) then
-		local tAuraControl = AuraControl:New(wndContainer, tAura, (tAura.bIsDebuff and tDebuffPrototype or tBuffPrototype));
+		local tAuraControl = AuraControl:New(wndContainer, tAura, (tAura.bIsDebuff and tDebuffPrototype or tBuffPrototype)):Enable();
 		tCache.tChildren[tAura.idBuff] = tAuraControl;
 		self:OrderAuras(wndContainer);
 	end
@@ -179,6 +180,15 @@ function M:OnAuraRemoved(tAura)
 		tCache.tChildren[tAura.idBuff]:Destroy()
 		tCache.tChildren[tAura.idBuff] = nil;
 		self:OrderAuras(wndContainer);
+	end
+end
+
+function M:OnAuraUpdated(tAura)
+	local tCache = (tAura.bIsDebuff and self.tDebuffs or self.tBuffs);
+
+	if (tCache.tChildren[tAura.idBuff]) then
+		tCache.tChildren[tAura.idBuff]:UpdateDuration(tAura.fTimeRemaining);
+		tCache.tChildren[tAura.idBuff]:UpdateCount(tAura.nCount);
 	end
 end
 
