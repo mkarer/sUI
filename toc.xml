@@ -11,6 +11,17 @@
 	<Script Name="Libs\GeminiTimer\GeminiTimer-1.0.lua" />
 	<Script Name="Libs\XmlDocument\XmlDocument.lua" />
 	<Script Name="Libs\GeminiGUI\GeminiGUI.lua" />
+	<!-- Unit Frames Library -->
+	<Script Name="Libs\SezzUnitFrames\SezzUnitFrame.lua" />
+	<Script Name="Libs\SezzUnitFrames\SezzUnitFrameController.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\HealthBar.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\CastBar.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\ExperienceBar.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\ShieldBar.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\ThreatBar.lua" />
+	<!-- Auras Library -->
+	<Script Name="Libs\SezzAuras\SezzAuras.lua" />
+	<Script Name="Libs\SezzAuraControl\SezzAuraControl.lua" />
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />
@@ -44,17 +55,7 @@
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
 	<Script Name="Modules\CritLine\CritLine.lua" />
 	<!-- Buffs & Debuffs -->
-	<Script Name="Modules\Buffs\SezzAuras.lua" />
-	<Script Name="Modules\Buffs\SezzAuraControl.lua" />
 	<Script Name="Modules\Buffs\Core.lua" />
-	<!-- Unit Frames Library -->
-	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrame.lua" />
-	<Script Name="Modules\UnitFrames\Libs\SezzUnitFrameController.lua" />
-	<Script Name="Modules\UnitFrames\Libs\Elements\HealthBar.lua" />
-	<Script Name="Modules\UnitFrames\Libs\Elements\CastBar.lua" />
-	<Script Name="Modules\UnitFrames\Libs\Elements\ExperienceBar.lua" />
-	<Script Name="Modules\UnitFrames\Libs\Elements\ShieldBar.lua" />
-	<Script Name="Modules\UnitFrames\Libs\Elements\ThreatBar.lua" />
 	<!-- Unit Frames -->
 	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<Script Name="Modules\UnitFrames\Core.lua" />
@@ -96,7 +97,7 @@
 	<Script Name="Modules\crafting\SlashSalvage.lua" />
 -->
 
-	<!-- Disable Carbine Addons -->
+	<!-- Disable/Replace Carbine Addons -->
     <ReplaceAddon Name="ActionBarFrame" />
     <ReplaceAddon Name="ActionBarShortcut" />
     <ReplaceAddon Name="RecallFrame" />
