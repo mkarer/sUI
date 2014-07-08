@@ -13,6 +13,9 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("Buffs", "Gemini:Hook-1.0");
 local log, GeminiGUI, Auras, AuraControl;
 
+-- Lua API
+local tinsert, tremove, sort = table.insert, table.remove, table.sort;
+
 -----------------------------------------------------------------------------
 -- Initialization
 -----------------------------------------------------------------------------
@@ -89,6 +92,8 @@ function M:EnableAuras()
 end
 
 -----------------------------------------------------------------------------
+-- Aura Control Prototype
+-----------------------------------------------------------------------------
 
 local tBuffPrototype = {
 	WidgetType = "Window",
@@ -161,34 +166,51 @@ local tBuffPrototype = {
 local tDebuffPrototype = S:Clone(tBuffPrototype);
 tDebuffPrototype.Children[2].BGColor = "ff791104";
 
+-----------------------------------------------------------------------------
+-- Callbacks
+-----------------------------------------------------------------------------
+
+function M:GetAura(tCache, nId)
+	for i, tAuraData in ipairs(tCache) do
+		if (tAuraData.idBuff == nId) then
+			return tAuraData, i;
+		end
+	end
+
+	return false;
+end
+
 function M:OnAuraAdded(tAura)
 	local tCache = (tAura.bIsDebuff and self.tDebuffs or self.tBuffs);
-	local wndContainer = (tAura.bIsDebuff and self.wndDebuffs or self.wndBuffs);
 
-	if (not tCache.tChildren[tAura.idBuff]) then
-		local tAuraControl = AuraControl:New(wndContainer, tAura, (tAura.bIsDebuff and tDebuffPrototype or tBuffPrototype)):Enable();
-		tCache.tChildren[tAura.idBuff] = tAuraControl;
-		self:OrderAuras(wndContainer);
+	if (not self:GetAura(tCache, tAura.idBuff)) then
+		local wndContainer = (tAura.bIsDebuff and self.wndDebuffs or self.wndBuffs);
+
+		tAura.tControl = AuraControl:New(wndContainer, tAura, (tAura.bIsDebuff and tDebuffPrototype or tBuffPrototype)):Enable();
+		tAura.nAdded = GameLib.GetTickCount();
+		tinsert(tCache, tAura);
+		self:OrderAuras(tCache);
 	end
 end
 
 function M:OnAuraRemoved(tAura)
 	local tCache = (tAura.bIsDebuff and self.tDebuffs or self.tBuffs);
-	local wndContainer = (tAura.bIsDebuff and self.wndDebuffs or self.wndBuffs);
 
-	if (tCache.tChildren[tAura.idBuff]) then
-		tCache.tChildren[tAura.idBuff]:Destroy()
-		tCache.tChildren[tAura.idBuff] = nil;
-		self:OrderAuras(wndContainer);
+	local tAuraData, nIndex = self:GetAura(tCache, tAura.idBuff);
+	if (tAuraData and nIndex) then
+		tAuraData.tControl:Destroy()
+		tremove(tCache, nIndex);
+		self:OrderAuras(tCache);
 	end
 end
 
 function M:OnAuraUpdated(tAura)
 	local tCache = (tAura.bIsDebuff and self.tDebuffs or self.tBuffs);
 
-	if (tCache.tChildren[tAura.idBuff]) then
-		tCache.tChildren[tAura.idBuff]:UpdateDuration(tAura.fTimeRemaining);
-		tCache.tChildren[tAura.idBuff]:UpdateCount(tAura.nCount);
+	local tAuraData, nIndex = self:GetAura(tCache, tAura.idBuff);
+	if (tAuraData and nIndex) then
+		tAuraData.tControl:UpdateDuration(tAura.fTimeRemaining);
+		tAuraData.tControl:UpdateCount(tAura.nCount);
 	end
 end
 
@@ -197,15 +219,19 @@ local bAnchorLeft = false;
 local nAuraSize = tBuffPrototype.AnchorOffsets[3];
 local nAuraPadding = 4;
 
-local TableSortAura = function(a, b)
-	return (a.fTimeRemaining > b.fTimeRemaining);
+local fnSortAurasTimeAdded = function(a, b)
+	return a.nAdded < b.nAdded;
 end
 
-function M:OrderAuras(wndParent)
-	local tAuras = wndParent:GetChildren();
+local fnSortAurasTimeAddedDebuffsFirst = function(a, b)
+	return a.bIsDebuff and not b.bIsDebuff or (a.bIsDebuff == b.bIsDebuff and a.nAdded < b.nAdded);
+end
+
+function M:OrderAuras(tAuras)
+	sort(tAuras, fnSortAurasTimeAdded);
 
 	for i = 1, #tAuras do
-		local wndAura = tAuras[i];
+		local wndAura = tAuras[i].tControl.wndMain;
 		local nPosX = (i - 1) * (nAuraSize + nAuraPadding);
 
 		if (bAnchorLeft) then
