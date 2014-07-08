@@ -42,6 +42,7 @@ function M:OnEnable()
 		self:CreateCastBarElement(strUnit);
 		self:CreateExperienceBarElement(strUnit);
 		self:CreateAurasElement(strUnit);
+		self:CreateThreatBarElement(strUnit);
 
 		self.tUnitFrameController:CreateUnitFrame(self.strLayoutName, strUnit, tSettings.tXmlData);
 	end

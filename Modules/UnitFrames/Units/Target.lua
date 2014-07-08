@@ -30,4 +30,6 @@ UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	tAurasStyles = { "AutoAddAuras", "AlignAurasRight", "PulseWhenExpiring", "ShowMS" },
 	-- Shield Bar
 	bShieldBarEnabled = true,
+	-- Threat Bar
+	bThreatBarEnabled = true,
 });
