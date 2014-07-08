@@ -33,9 +33,8 @@ function M:OnEnable()
 
 	-- Events
 	self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
-	if (S:IsAddOnLoaded("FloatTextPanel")) then
-		self:OnAddonAvailable(nil, "FloatTextPanel", Apollo.GetAddon("FloatTextPanel"));
-	end
+	self:CheckAddonAvailable("FloatTextPanel");
+	self:CheckAddonAvailable("SprintMeter");
 
 	-- Quest Tracker
 	self:UpdateQuestTrackerForms();
@@ -46,6 +45,12 @@ end
 -- Events
 -----------------------------------------------------------------------------
 
+function M:CheckAddonAvailable(strAddon)
+	if (S:IsAddOnLoaded(strAddon)) then
+		self:OnAddonAvailable(nil, strAddon, Apollo.GetAddon(strAddon));
+	end
+end
+
 function M:OnAddonAvailable(strEvent, strAddon, tAddon)
 	if (strAddon == "FloatTextPanel") then
 		local wndHintArrow = tAddon.wndHintArrowDistance;
@@ -55,6 +60,8 @@ function M:OnAddonAvailable(strEvent, strAddon, tAddon)
 			tAnchors[4] = tAnchors[4] + 100;
 			wndHintArrow:SetAnchorOffsets(unpack(tAnchors));
 		end
+	elseif (strAddon == "SprintMeter") then
+		tAddon.wndMain:FindChild("ProgBar"):SetStyle("IgnoreMouse", 1);
 	end
 end
 

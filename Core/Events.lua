@@ -69,6 +69,11 @@ local tAddonLoadingInformation = {
 		hook = "OnHintArrowDistanceUpdate", -- Can't use OnDocumentReady because of LibApolloFixes
 		properties = { "OnHintArrowDistanceUpdate", "OnAdvanceErrorTimer" },
 	},
+	SprintMeter = {
+		window = "wndMain",
+		hook = "OnDocumentReady",
+		properties = { "OnSprintMeterGracePeriod" },
+	},
 };
 
 function S:CheckExternalAddon(name)
