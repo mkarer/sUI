@@ -14,7 +14,7 @@ Unit
 	ADD GetCastingSpellId
 	ADD GetCastingSpellIcon
 	FIX GetBuffs - fTimeRemaining doesn't change when a buff is refreshed (tested with Deadly Chain)
-	FIX GetBuffs - Some debuffs aren't in the array (like Frostbitten Chill, Coldburrow Cavern low body temp debuff)
+	FIX GetBuffs - Some debuffs aren't in the array (like Frostbitten Chill, Coldburrow Cavern low body temp debuff), same issue with buffs.
 
 MLWindow
 	ADD DT_SINGLELINE
@@ -27,3 +27,4 @@ Spell
 
 Others
 	Slash /CoMMandS should be case insensitive!
+	Add a way to create a unit tooltip.
