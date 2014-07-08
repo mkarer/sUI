@@ -124,7 +124,7 @@ function M:HandleCombatData(eCombatResult, strSpell, nType, nAmount)
 end
 
 function M:OnCombatLog(event, tEventArgs)
-	if (tEventArgs and tEventArgs.splCallingSpell and tEventArgs.unitCaster == S.myCharacter) then
+	if (tEventArgs and tEventArgs.splCallingSpell and (tEventArgs.unitCaster == S.myCharacter or tEventArgs.unitCaster:GetUnitOwner() == S.myCharacter)) then
 		if (tEventArgs.eCombatResult == eCombatResultHit or tEventArgs.eCombatResult == eCombatResultCrit) then
 			self:HandleCombatData(tEventArgs.eCombatResult, tEventArgs.splCallingSpell:GetName(), knTypeDamage, tEventArgs.nDamageAmount or 0);
 			self:HandleCombatData(tEventArgs.eCombatResult, tEventArgs.splCallingSpell:GetName(), knTypeHeal, tEventArgs.nHealAmount or 0);
