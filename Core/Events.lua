@@ -74,6 +74,11 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "OnSprintMeterGracePeriod" },
 	},
+	LootNotificationWindow = {
+		window = "wndLootStack",
+		hook = "OnDocumentReady",
+		properties = { "OnLootedItem", "OnLootStack_CashTimer" },
+	},
 };
 
 function S:CheckExternalAddon(name)

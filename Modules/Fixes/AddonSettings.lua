@@ -11,6 +11,9 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("AddonSettings", "Gemini:Hook-1.0");
 local log;
 
+-- Lua API
+local abs = math.abs;
+
 -----------------------------------------------------------------------------
 -- Initialization
 -----------------------------------------------------------------------------
@@ -26,6 +29,7 @@ function M:OnInitialize()
 	self:HideTrackMaster();
 	self:UpdateHarvester();
 	self:EnableJunkIt();
+	self:UpdateLootNotificationWindow();
 end
 
 function M:OnEnable()
@@ -295,6 +299,25 @@ function M:UpdateHarvester()
 		tHarvester.OnRestore = function(self, eType, tSavedData)
 			self:_OnRestore(eType, tSavedData);
 		    self.settings.Options.TrackMaster = (Apollo.GetAddon("TrackMaster") ~= nil);
+		end
+	end
+end
+
+-----------------------------------------------------------------------------
+-- LootNotificationWindow
+-----------------------------------------------------------------------------
+
+function M:UpdateLootNotificationWindow()
+	local tAddon = Apollo.GetAddon("LootNotificationWindow");
+
+	if (tAddon and not tAddon._OnLoad) then
+		tAddon._OnLoad = tAddon.OnLoad;
+		tAddon.OnLoad = function(self)
+			self:_OnLoad();
+
+			local tXml = self.xmlDoc:ToTable();
+			S:UpdateElementInXml(tXml, "LootStackForm", { LAnchorPoint = 0, LAnchorOffset = 20, RAnchorPoint = 0, RAnchorOffset = 260 });
+			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
 		end
 	end
 end

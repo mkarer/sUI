@@ -28,6 +28,7 @@ S.DB = {
 	NoWindowManagement = {
 		[Apollo.GetString("MiniMap_Title")] = true,
 		[Apollo.GetString("CRB_QuestTracker")] = true,
+		[Apollo.GetString("HUDAlert_VacuumLoot")] = true,
 	},
 
 	-- Module Debugging
