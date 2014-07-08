@@ -96,9 +96,6 @@ function M:OnEnable()
 	end
 
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
-	self:RegisterEvent("TargetThreatListUpdated", "OnTargetThreatListUpdated");
-	self:RegisterEvent("TargetedByUnit", "OnTargetedByUnit");
-	self:RegisterEvent("UnTargetedByUnit", "OnUnTargetedByUnit");
 --	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
 end
 
