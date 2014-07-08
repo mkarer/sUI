@@ -13,6 +13,7 @@ Unit
 	ADD GetCastingSpell
 	ADD GetCastingSpellId
 	ADD GetCastingSpellIcon
+	FIX GetBuffs - fTimeRemaining doesn't change when a buff is refreshed (tested with Deadly Chain)
 
 MLWindow
 	ADD DT_SINGLELINE
