@@ -18,6 +18,9 @@ local NAME = string.match(MAJOR, ":(%a+)\-");
 local Auras = APkg and APkg.tPackage or {};
 local log;
 
+-- Lua API
+local tinsert = table.insert;
+
 -----------------------------------------------------------------------------
 
 --[[
@@ -73,7 +76,11 @@ function Auras:Disable()
 end
 
 function Auras:RegisterCallback(strEvent, strFunction, tEventHandler)
-	self.tCallbacks[strEvent] = { strFunction, tEventHandler };
+	if (not self.tCallbacks[strEvent]) then
+		self.tCallbacks[strEvent] = {};
+	end
+
+	tinsert(self.tCallbacks[strEvent], { strFunction, tEventHandler });
 end
 
 function Auras:UpdateUnit(bNoAutoEnable)
@@ -115,10 +122,12 @@ end
 
 function Auras:Call(strEvent, ...)
 	if (self.tCallbacks[strEvent]) then
-		local strFunction = self.tCallbacks[strEvent][1];
-		local tEventHandler = self.tCallbacks[strEvent][2];
+		for _, tCallback in ipairs(self.tCallbacks[strEvent]) do
+			local strFunction = tCallback[1];
+			local tEventHandler = tCallback[2];
 
-		tEventHandler[strFunction](tEventHandler, ...);
+			tEventHandler[strFunction](tEventHandler, ...);
+		end
 	end
 end
 
