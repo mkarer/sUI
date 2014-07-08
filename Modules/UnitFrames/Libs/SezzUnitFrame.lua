@@ -67,7 +67,8 @@ local ShortNumber = function(nValue)
 end
 
 local UnitIsFriend = function(unit)
-	return (unit:IsThePlayer() or unit:GetDispositionTo(GameLib.GetPlayerUnit()) == Unit.CodeEnumDisposition.Friendly);
+	local unitPlayer = GameLib.GetPlayerUnit();
+	return (unit == unitPlayer or unit:GetDispositionTo(unitPlayer) == Unit.CodeEnumDisposition.Friendly);
 end
 
 local WrapAML = function(strTag, strText, strColor, strAlign)

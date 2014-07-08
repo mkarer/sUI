@@ -21,11 +21,12 @@ local floor = math.floor;
 -----------------------------------------------------------------------------
 
 local UnitIsFriend = function(unit)
-	return (unit:IsThePlayer() or unit:GetDispositionTo(GameLib.GetPlayerUnit()) == Unit.CodeEnumDisposition.Friendly);
+	local unitPlayer = GameLib.GetPlayerUnit();
+	return (unit == unitPlayer or unit:GetDispositionTo(unitPlayer) == Unit.CodeEnumDisposition.Friendly);
 end
 
 local UnitTargetsPlayer = function(unit)
-	return (unit and unit:GetTarget() == GameLib.GetPlayerUnit());
+	return (unit and unit:GetTarget() and unit:GetTarget():IsThePlayer());
 end
 
 -----------------------------------------------------------------------------
@@ -34,6 +35,8 @@ end
 local UpdateThreat = function(self, ...)
 	if (not self.bEnabled) then return; end
 
+	local unitPlayer = GameLib.GetPlayerUnit();
+	local unit = self.tUnitFrame.unit;
 	local wndThreat = self.tUnitFrame.wndThreat;
 	local tColors = self.tUnitFrame.tColors;
 
@@ -49,7 +52,7 @@ local UpdateThreat = function(self, ...)
 		if (unit) then
 			nUnits = nUnits + 1;
 
-			if (unit == GameLib.GetPlayerUnit()) then
+			if (unit == unitPlayer) then
 				nThreatPlayer = nThreat;
 			end
 
@@ -59,14 +62,14 @@ local UpdateThreat = function(self, ...)
 		end
 	end
 
-	if (nUnits > 0 and not self.tUnitFrame.unit:IsDead()) then
+	if (nUnits > 0 and not unit:IsDead()) then
 		-- TODO: Only show in group or solo when more than 1 unit on threat table
 		local nThreadPercent = floor(nThreatPlayer / (nThreatMax / 100) + 0.01);
 
 		wndThreat:Show(true, true);
 		wndThreat:SetProgress(nThreadPercent);
 
-		if (nThreadPercent == 100 or UnitTargetsPlayer(self.tUnitFrame.unit)) then
+		if (nThreadPercent == 100 or UnitTargetsPlayer(unit)) then
 			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[4]));
 		elseif (nThreadPercent > 80) then
 			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[3]));
@@ -85,8 +88,8 @@ local Update = function(self)
 
 	if (UnitIsFriend(unit) or unit:IsDead()) then
 		self.tUnitFrame.wndThreat:Show(false, true);
-	elseif (UnitTargetsPlayer(self.tUnitFrame.unit)) then
-		self:Update(GameLib.GetPlayerUnit(), 1);
+	elseif (UnitTargetsPlayer(unit)) then
+		self:UpdateThreat(GameLib.GetPlayerUnit(), 1);
 	end
 end
 
