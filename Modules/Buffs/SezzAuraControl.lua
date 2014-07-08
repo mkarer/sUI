@@ -13,7 +13,7 @@ if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local NAME = string.match(MAJOR, ":(%a+)\-");
 local AuraControl = APkg and APkg.tPackage or {};
-local GeminiGUI, log;
+local GeminiGUI, GeminiTimer, log;
 
 -- Lua API
 local format, floor, mod = string.format, math.floor, math.mod;
@@ -97,46 +97,64 @@ end
 
 function AuraControl:Enable()
 	-- Create/Enable Timer
+	if (not self.tmrUpdater and not self.bAura) then
+		self.tmrUpdater = self:ScheduleRepeatingTimer("UpdateTimeLeft", 0.1);
+	end
+
+	return self;
 end
 
 function AuraControl:Destroy()
 	-- We can't reuse windows (right?), so we have to self-destruct ;)
-	-- Remove Timers, Destroy windows
+	self:CancelTimer(self.tmrUpdater, true);
 	self.wndIcon:RemoveEventHandler("MouseButtonUp", self);
 	self.wndMain:Destroy();
 	self = nil;
 end
 
-function AuraControl:Update()
-	-- Update Timer + Count
-end
-
 local TimeBreakDown = function(nSeconds)
-    local days = floor(nSeconds / (60 * 60 * 24));
-    local hours = floor((nSeconds - (days * (60 * 60 * 24))) / (60 * 60));
-    local minutes = floor((nSeconds - (days * (60 * 60 * 24)) - (hours * (60 * 60))) / 60);
-    local seconds = mod(nSeconds, 60);
+    local nDays = floor(nSeconds / (60 * 60 * 24));
+    local nHours = floor((nSeconds - (nDays * (60 * 60 * 24))) / (60 * 60));
+    local nMinutes = floor((nSeconds - (nDays * (60 * 60 * 24)) - (nHours * (60 * 60))) / 60);
+    local nSeconds = mod(nSeconds, 60);
 
-    return days, hours, minutes, seconds;
+    return nDays, nHours, nMinutes, nSeconds;
 end
 
 function AuraControl:UpdateDuration(fDuration)
-	self.fDuration = fDuration;
+	-- (float) fDuration: time left in seconds from unit:GetBuffs(), we need to convert this to milliseconds
+	if (not self.bAura) then
+		local nDuration = floor(fDuration * 1000);
+		local nEndTime = GameLib.GetTickCount() + nDuration;
 
-	if (fDuration <= 0) then
+		if (not self.nEndTime or self.nEndTime ~= nEndTime) then
+			if (self.nEndTime) then
+				log:debug("%s endtimer changed from %d to %d", self.tAura.splEffect:GetName(), self.nEndTime or 0, nEndTime);
+			end
+
+			self.nEndTime = nEndTime;
+			self:UpdateTimeLeft();
+		end
+	end
+end
+
+function AuraControl:UpdateTimeLeft()
+	local nTimeLeft = floor((self.nEndTime - GameLib.GetTickCount()) / 1000);
+
+	if (self.bAura or nTimeLeft < 0) then -- nTimeLeft < 0 = Carbine's Bug!
 		self.wndDuration:SetText("");
 	else
-		local d, h, m, s = TimeBreakDown(fDuration);
+		local nDays, nHours, nMinutes, nSeconds = TimeBreakDown(nTimeLeft);
 
-		if (fDuration < 3600) then
+		if (nTimeLeft < 3600) then
 			-- Less than 1h, [MM:SS]
-			self.wndDuration:SetText(format("%02d:%02d", m, s));
-		elseif (fDuration >= 36000) then
+			self.wndDuration:SetText(format("%02d:%02d", nMinutes, nSeconds));
+		elseif (nTimeLeft >= 36000) then
 			-- 10 hours or more, [HHh]
-			self.wndDuration:SetText(format("%1dh", h));
+			self.wndDuration:SetText(format("%1dh", nHours));
 		else
 			-- from 1 to 9 hours, [HHh:MM]
-			self.wndDuration:SetText(format("%1dh:%02d", h, m));
+			self.wndDuration:SetText(format("%1dh:%02d", nHours, nMinutes));
 		end
 	end
 end
@@ -186,6 +204,7 @@ function AuraControl:New(wndParent, tAuraData, tWindowPrototype)
 	wndIcon:SetSprite(tAuraData.splEffect:GetIcon());
 
 	-- Update Duration
+	self.bAura = (tAuraData.fTimeRemaining == 0);
 	self.wndDuration = wndMain:FindChild("Duration");
 	self:UpdateDuration(tAuraData.fTimeRemaining);
 
@@ -216,6 +235,7 @@ function AuraControl:OnLoad()
 	});
 
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+	Apollo.GetPackage("Gemini:Timer-1.0").tPackage:Embed(self);
 end
 
 function AuraControl:OnDependencyError(strDep, strError)
@@ -224,4 +244,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(AuraControl, MAJOR, MINOR, { "Gemini:Logging-1.2", "Gemini:GUI-1.0" });
+Apollo.RegisterPackage(AuraControl, MAJOR, MINOR, { "Gemini:Logging-1.2", "Gemini:GUI-1.0", "Gemini:Timer-1.0" });
