@@ -57,7 +57,7 @@ function Auras:Enable()
 
 	-- Update
 	if (self.unit and self.unit:IsValid()) then
-		log:debug("Enable");
+--		log:debug("Enable");
 		self.bEnabled = true;
 		Apollo.RegisterEventHandler("VarChange_FrameCount", "Update", self);
 		self:Update();
@@ -69,9 +69,10 @@ end
 function Auras:Disable()
 	if (not self.bEnabled) then return; end
 
-	log:debug("Disable");
+--	log:debug("Disable");
 	self.bEnabled = false;
 	Apollo.RemoveEventHandler("VarChange_FrameCount", self);
+	self.unit = nil;
 	self:Reset();
 end
 
@@ -97,7 +98,7 @@ function Auras:SetUnit(unit, bNoAutoEnable)
 		self:Reset();
 	end
 
-	if (not bNoAutoEnable) then
+	if (not bNoAutoEnable and not self.bEnabled) then
 		self:Enable()
 	end
 
@@ -105,10 +106,10 @@ function Auras:SetUnit(unit, bNoAutoEnable)
 end
 
 function Auras:Reset()
-	log:debug("Reset");
+--	log:debug("Reset");
 
 	for _, tAura in pairs(self.tDebuffs) do
-		self.tBuffs[tAura.idBuff] = nil;
+		self.tDebuffs[tAura.idBuff] = nil;
 		self:Call("OnAuraRemoved", tAura);
 	end
 
