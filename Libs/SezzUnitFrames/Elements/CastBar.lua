@@ -2,6 +2,8 @@
 
 	s:UI Unit Frame Element: Cast Bar
 
+	TODO: Channeled casts should show a inversed bar (not possible because of API limitations? [Spell.CodeEnumCastMethod.Channeled])
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
