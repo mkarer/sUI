@@ -44,7 +44,7 @@ function M:OnEnable()
 		self:CreateAurasElement(strUnit);
 		self:CreateThreatBarElement(strUnit);
 
-		self.tUnitFrameController:CreateUnitFrame(self.strLayoutName, strUnit, tSettings.tXmlData);
+		self.tUnitFrameController:CreateUnitFrame(self.strLayoutName, strUnit, tSettings.tXmlData, tSettings.tAttributes);
 	end
 
 
