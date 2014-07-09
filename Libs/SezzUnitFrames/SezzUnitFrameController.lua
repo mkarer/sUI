@@ -82,9 +82,9 @@ local tColors = {
 -- Frame Creation
 -----------------------------------------------------------------------------
 
-local CreateUnitFrame = function(self, strLayoutName, strUnit, tXmlData)
+local CreateUnitFrame = function(self, strLayoutName, strUnit, tXmlData, tAttributes)
 	log:debug("Creating Unit Frame for: %s", strUnit)
-	local tUnitFrame = UnitFrame:New(self, strLayoutName, strUnit, tXmlData);
+	local tUnitFrame = UnitFrame:New(self, strLayoutName, strUnit, tXmlData, tAttributes);
 
 	self.tUnitFrames[strUnit] = tUnitFrame;
 	return tUnitFrame;

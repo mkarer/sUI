@@ -73,3 +73,13 @@ function M:InitializeUnitFrameXML(strUnit)
 		}),
 	};
 end
+
+function M:SetUnitFrameAttribute(strUnit, strAttribute, vValue)
+	local tSettings = self.tSettings[strUnit];
+
+	if (not tSettings["tAttributes"]) then
+		tSettings["tAttributes"] = {};
+	end
+
+	tSettings["tAttributes"][strAttribute] = vValue;
+end

@@ -464,11 +464,12 @@ end
 -- Constructor
 -----------------------------------------------------------------------------
 
-function UnitFrame:New(tUnitFrameController, strLayoutName, strUnit, tXmlData)
+function UnitFrame:New(tUnitFrameController, strLayoutName, strUnit, tXmlData, tAttributes)
 	self = setmetatable({}, { __index = UnitFrame });
 
 	-- Properties
 	self.tXmlData = tXmlData;
+	self.tAttributes = (tAttributes or {});
 	self.strUnit = strUnit;
 	self.strLayoutName = strLayoutName;
 	self.bEnabled = false;
