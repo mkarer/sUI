@@ -69,14 +69,13 @@ end
 
 -----------------------------------------------------------------------------
 
-function M:EnableAuras()
-	-- Auras Unit Updater
-	local fnUpdatePlayerUnit = function(self)
-		if (not self.unit or S.myCharacter ~= self.unit) then
-			self:SetUnit(S.myCharacter);
-		end
+function M:UpdatePlayerUnit()
+	if (not self.tPlayerAuras.unit or S.myCharacter ~= self.tPlayerAuras.unit) then
+		self.tPlayerAuras:SetUnit(S.myCharacter);
 	end
+end
 
+function M:EnableAuras()
 	-- Initialize Auras
 	self.tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
 
@@ -86,9 +85,9 @@ function M:EnableAuras()
 	self.tPlayerAuras:RegisterCallback("OnAuraUpdated", "OnAuraUpdated", self);
 
 	-- Enable
-	self.tPlayerAuras:UpdateUnit();
-	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnit", self.tPlayerAuras);
-	Apollo.RegisterEventHandler("PlayerCreated", "UpdateUnit", self.tPlayerAuras);
+	self.tPlayerAuras:SetUnit(S.myCharacter);
+	Apollo.RegisterEventHandler("PlayerChanged", "UpdatePlayerUnit", self);
+	Apollo.RegisterEventHandler("PlayerCreated", "UpdatePlayerUnit", self);
 end
 
 -----------------------------------------------------------------------------

@@ -83,16 +83,8 @@ function Auras:RegisterCallback(strEvent, strFunction, tEventHandler)
 	tinsert(self.tCallbacks[strEvent], { strFunction, tEventHandler });
 end
 
-function Auras:UpdateUnit(bNoAutoEnable)
-	log:debug("Unit Update")
-	self.fnUpdateUnit(self);
-
-	if (not bNoAutoEnable) then
-		self:Enable();
-	end
-end
-
-function Auras:SetUnit(unit, bClearBuffs)
+function Auras:SetUnit(unit)
+	local bClearBuffs = (not self.unit or self.unit ~= unit);
 	self.unit = unit;
 
 --[[
@@ -103,6 +95,10 @@ function Auras:SetUnit(unit, bClearBuffs)
 
 	if (bClearBuffs) then
 		self:Reset();
+	end
+
+	if (not bNoAutoEnable) then
+		self:Enable()
 	end
 end
 
@@ -196,16 +192,13 @@ end
 -- Constructor
 -----------------------------------------------------------------------------
 
-function Auras:New(fnUpdateUnit)
+function Auras:New()
 	self = setmetatable({}, { __index = Auras });
 
 	self.bEnabled = false;
 	self.tBuffs = {};
 	self.tDebuffs = {};
 	self.tCallbacks = {};
-
-	self.fnUpdateUnit = fnUpdateUnit;
-	self.fnUpdateUnit(self);
 
 	return self;
 end
