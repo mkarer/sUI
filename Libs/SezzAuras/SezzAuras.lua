@@ -83,7 +83,7 @@ function Auras:RegisterCallback(strEvent, strFunction, tEventHandler)
 	tinsert(self.tCallbacks[strEvent], { strFunction, tEventHandler });
 end
 
-function Auras:SetUnit(unit)
+function Auras:SetUnit(unit, bNoAutoEnable)
 	local bClearBuffs = (not self.unit or self.unit ~= unit);
 	self.unit = unit;
 
@@ -100,6 +100,8 @@ function Auras:SetUnit(unit)
 	if (not bNoAutoEnable) then
 		self:Enable()
 	end
+
+	return self;
 end
 
 function Auras:Reset()
