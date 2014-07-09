@@ -26,7 +26,7 @@ UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	-- Auras
 	bAurasEnabled = true,
 	tAurasAnchorPoints = { 0.5, 1, 0.5, 1 },
-	tAurasAnchorOffsets = { -127 - 200, -214, -127, -180 },
+	tAurasAnchorOffsets = { -129 - 300, -214, -129, -180 },
 	tAurasStyles = { "AutoAddAuras", "AlignAurasRight", "PulseWhenExpiring", "ShowMS" },
 	-- Shield Bar
 	bShieldBarEnabled = true,
