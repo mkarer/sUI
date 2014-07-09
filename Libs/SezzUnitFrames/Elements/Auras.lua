@@ -25,11 +25,11 @@ local sort, tinsert, tremove = table.sort, table.insert, table.remove;
 -----------------------------------------------------------------------------
 
 local fnSortAurasTimeAdded = function(a, b)
-	return a.nAdded < b.nAdded;
+	return (a.nAdded < b.nAdded);
 end
 
 local fnSortAurasTimeAddedDebuffsFirst = function(a, b)
-	return a.bIsDebuff and not b.bIsDebuff or (a.bIsDebuff == b.bIsDebuff and a.nAdded < b.nAdded);
+	return (a.bIsDebuff == b.bIsDebuff and (a.nAdded < b.nAdded) or (a.bIsDebuff and not b.bIsDebuff));
 end
 
 function Element:OrderAuras()

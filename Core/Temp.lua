@@ -12,7 +12,117 @@ local M = S:CreateSubmodule("Temp", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
+-- Initialization
+-----------------------------------------------------------------------------
 
+function M:OnInitialize()
+	log = S.Log;
+end
+
+function M:OnEnable()
+	if (S.bCharacterLoaded) then
+--		self:EventHandler();
+	else
+--		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
+	end
+
+--	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
+--	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
+end
+
+local fnMultiSort
+
+local lexsort
+do
+	local join, sort, select, format = string.join, table.sort, select, string.format
+	local function lexcmp(...)
+		local code = {"local lhs, rhs = ..."}
+		for i = 1, select('#', ...) - 1 do
+			local k = select(i, ...)
+			code[#code+1] = format("local lv, rv = lhs[%q], rhs[%q]", k, k)
+			code[#code+1] = "if lv < rv then return true end"
+			code[#code+1] = "if lv > rv then return false end"
+		end
+		local k = select(-1, ...)
+		code[#code+1] = format("return lhs[%q] < rhs[%q]", k, k)
+		return assert(loadstring(table.concat(code, "\n")))
+	end
+	local lexcmps = {}
+	function lexsort(t, ...)
+		if select('#', ...) == 0 then
+			sort(t)
+		else
+			local key = join("\0", ...)
+			local cmp = lexcmps[key]
+			if not cmp then
+			cmp = lexcmp(...)
+			lexcmps[key] = cmp
+		end
+		sort(t, cmp)
+	end
+	return t
+	end
+end
+
+
+
+local function cmp_col1_col2(a, b)
+	return (a.bIsDebuff == b.bIsDebuff and (a.nAdded < b.nAdded) or (a.bIsDebuff and not b.bIsDebuff));
+
+--	 if a.bIsDebuff and not b.bIsDebuff then return true end
+--	 if not a.bIsDebuff and b.bIsDebuff then return false end
+--	 return a.nAdded < b.nAdded
+
+--	local strSortA = (a.bIsDebuff and "a" or "b")..a.nAdded;
+--	local strSortB = (b.bIsDebuff and "a" or "b")..b.nAdded;
+
+--	 return strSortA < strSortB;
+end
+
+
+local fnSortAurasTimeAdded = function(a, b)
+	return a.nAdded < b.nAdded;
+end
+
+local fnSortAurasTimeAddedDebuffsFirst = function(a, b)
+	return a.bIsDebuff and not b.bIsDebuff or (a.bIsDebuff == b.bIsDebuff and a.nAdded < b.nAdded);
+end
+
+function S:Test()
+	local x = {};
+	table.insert(x, { nAdded = 05, name = "Buff #1", bIsDebuff = false });
+	table.insert(x, { nAdded = 10, name = "Debuff #1", bIsDebuff = true });
+	table.insert(x, { nAdded = 15, name = "Buff #2", bIsDebuff = false });
+	table.insert(x, { nAdded = 25, name = "Debuff #2", bIsDebuff = true });
+	table.insert(x, { nAdded = 35, name = "Buff #3", bIsDebuff = false });
+	table.insert(x, { nAdded = 45, name = "Buff #4", bIsDebuff = false });
+
+	table.sort(x, cmp_col1_col2);
+
+	for i = 1, #x do
+		log:debug("%d -> %s (%d)", i, x[i].name, x[i].nAdded)
+	end
+
+end
+
+function M:EventHandler(event, ...)
+	log:debug(event);
+	log:debug({...});
+
+--[[
+	if (true) then return; end
+
+	if (event == "InterfaceMenuList_AlertAddOn") then
+		local strAddon, tAlertInfo = ...;
+
+		if (strAddon == Apollo.GetString("InterfaceMenu_Mail")) then
+			log:debug("[InterfaceMenuList_AlertAddOn] Show Mail Alert: "..(tAlertInfo[1] and "YES" or "NO"));
+		end
+	end
+--]]
+end
+
+--[[
 local TestClass = {};
 
 TestClass.strName = "Base";
@@ -78,25 +188,6 @@ function TestClass:New(strName, tCustomColors)
 	self.tColors = (tCustomColors and setmetatable(tCustomColors, { __index = tColors }) or tColors);
 
 	return self;
-end
-
------------------------------------------------------------------------------
--- Initialization
------------------------------------------------------------------------------
-
-function M:OnInitialize()
-	log = S.Log;
-end
-
-function M:OnEnable()
-	if (S.bCharacterLoaded) then
---		self:EventHandler();
-	else
---		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
-	end
-
---	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
---	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
 end
 
 function M:OnTargetedByUnit(event, unit)
@@ -171,20 +262,7 @@ local tc= {
 end
 
 local pets = {};
-
-function M:EventHandler(event, ...)
-	log:debug(event);
-	log:debug({...});
-
-	if (true) then return; end
-
-	if (event == "InterfaceMenuList_AlertAddOn") then
-		local strAddon, tAlertInfo = ...;
-
-		if (strAddon == Apollo.GetString("InterfaceMenu_Mail")) then
-			log:debug("[InterfaceMenuList_AlertAddOn] Show Mail Alert: "..(tAlertInfo[1] and "YES" or "NO"));
-		end
-	end
+--]]
 
 
 --	ChallengeRewardPanel:OnWindowCloseDelay();
@@ -201,4 +279,3 @@ function M:EventHandler(event, ...)
 		return Apollo._LoadForm(strFile, ...);
 	end
 ]]
-end

@@ -223,7 +223,7 @@ local fnSortAurasTimeAdded = function(a, b)
 end
 
 local fnSortAurasTimeAddedDebuffsFirst = function(a, b)
-	return a.bIsDebuff and not b.bIsDebuff or (a.bIsDebuff == b.bIsDebuff and a.nAdded < b.nAdded);
+	return (a.bIsDebuff == b.bIsDebuff and (a.nAdded < b.nAdded) or (a.bIsDebuff and not b.bIsDebuff));
 end
 
 function M:OrderAuras(tAuras)
