@@ -72,13 +72,19 @@ local UpdateThreat = function(self, ...)
 		wndThreat:Show(true, true);
 		wndThreat:SetProgress(nThreadPercent);
 
-		if (nThreadPercent == 100 or UnitTargetsPlayer(unit)) then
+		local bIsPlayerTargetted = UnitTargetsPlayer(unit);
+
+		if (nThreadPercent == 100 and bIsPlayerTargetted) then
+			-- Aggro
 			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[4]));
-		elseif (nThreadPercent > 80) then
-			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[3]));
+		elseif (nThreadPercent > 80 or bIsPlayerTargetted) then
+			-- High Aggro or Taunted by another player
+			wndThreat:Threat(UnitFrameController:ColorArrayToHex(tColors.Threat[3]));
 		elseif (nThreadPercent > 60) then
+			-- Medium Threat
 			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[2]));
 		else
+			-- Low Threat
 			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[1]));
 		end
 	else
