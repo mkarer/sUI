@@ -20,6 +20,81 @@ local knBuffBarTypeBuffs = 0;
 local knBuffBarTypeDebuffs = 1;
 local knBuffBarTypeCombined = 2;
 
+-----------------------------------------------------------------------------
+
+local tBuffPrototype = {
+	WidgetType = "Window",
+	AnchorPoints = { 0, 0, 0, 0 },
+	AnchorOffsets = { 0, 0, 34, 51 },
+	Children = {
+		{
+			Name = "Duration",
+			Class = "Window",
+			Text = "",
+			TextColor = "ffffffff",
+			Font = "CRB_Pixel_O", -- CRB_Interface9_O
+			DT_VCENTER = true,
+			DT_CENTER = true,
+			DT_SINGLELINE = true,
+			AutoScaleTextOff = true,
+			AnchorPoints = { 0, 0, 1, 0 },
+			AnchorOffsets = { -2, -2, 2, 19 },
+			IgnoreMouse = true,
+			Overlapped = true,
+		}, {
+			Name = "Border",
+			Class = "Window",
+			AnchorPoints = { 0, 1, 1, 1 },
+			AnchorOffsets = { 0, -34, 0, 0 },
+			Picture = true,
+			BGColor = "33ffffff", --ff791104
+			Sprite = "ClientSprites:WhiteFill",
+			IgnoreMouse = true,
+			Children = {
+				{
+					Name = "Background",
+					BGColor = "ff000000",
+					Sprite = "ClientSprites:WhiteFill",
+					Class = "Window",
+					Picture = true,
+					AnchorPoints = { 0, 0, 1, 1 },
+					AnchorOffsets = { 3, 3, -3, -3 },
+					IgnoreMouse = false,
+					Children = {
+						{
+							Name = "Icon",
+							Class = "Window",
+							Picture = true,
+							AnchorPoints = { 0, 0, 1, 1 },
+							AnchorOffsets = { 0, 0, 0, 0 },
+							IgnoreMouse = false,
+							Children = {
+								{
+									Name = "Count",
+									Class = "Window",
+									Text = "",
+									TextColor = "ffffffff",
+									Font = "CRB_Interface12_BO",
+									DT_RIGHT = true,
+									DT_BOTTOM = true,
+									AnchorPoints = { 0, 0, 1, 1 },
+									AnchorOffsets = { 0, 0, -2, 0 },
+									IgnoreMouse = true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+};
+
+local tDebuffPrototype = S:Clone(tBuffPrototype);
+tDebuffPrototype.Children[2].BGColor = "ff791104";
+
+-----------------------------------------------------------------------------
+
 local CreateAuraBar = function(strUnit, tSettings, eStyle)
 	-- Initialize
 	local strName;
@@ -74,6 +149,11 @@ local CreateAuraBar = function(strUnit, tSettings, eStyle)
 
 	-- Add as root element
 	UnitFramesLayout.xmlDoc:GetRoot():AddChild(tXmlData[strName .. "Container"]);
+
+	-- NEW!1
+
+	UnitFramesLayout:SetUnitFrameAttribute(strUnit, "AuraPrototypeBuff", tBuffPrototype);
+	UnitFramesLayout:SetUnitFrameAttribute(strUnit, "AuraPrototypeDebuff", tDebuffPrototype);
 end
 
 function UnitFramesLayout:CreateAurasElement(strUnit)
