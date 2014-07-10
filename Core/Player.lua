@@ -194,7 +194,7 @@ S.HandleCombatChanges = function(self, event, unit, inCombat)
 	end
 
 	if (inCombatState ~= self.inCombat) then
-		self.Log:debug("%s: %s", event, (inCombatState and "True" or "False"));
+--		self.Log:debug("%s: %s", event, (inCombatState and "True" or "False"));
 		self.inCombat = inCombatState;
 		self:RaiseCombatEvent();
 	end
