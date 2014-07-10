@@ -34,6 +34,7 @@ end
 
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
+	self:RestoreProfile(); -- Initialize Profile on First Load
 
 	eCombatResultHit = GameLib.CodeEnumCombatResult.Hit;
 	eCombatResultCrit = GameLib.CodeEnumCombatResult.Critical;
