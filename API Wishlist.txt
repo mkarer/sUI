@@ -25,6 +25,11 @@ MLWindow
 Spell
 	ADD GetBuffTooltip/GetBuffFlavor/GetBuffSpell (whatever, just something like that)
 
+Threat
+	ADD Data for everyone.
+
 Others
 	Slash /CoMMandS should be case insensitive!
 	Add a way to create a unit tooltip.
+	Allow us to map a keybindings to a macro.
+
