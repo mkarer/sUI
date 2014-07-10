@@ -31,7 +31,7 @@ function M:OnInitialize()
 	self.DB = {
 		buttonSize = 36,
 		buttonPadding = 2,
-		barPadding = 4, -- Menu needs atleast 4!
+		barPadding = 10, -- Menu needs atleast 10 because the toggle is ignored by ContainsMouse()
 	};
 	self.tBars = {};
 	self:EnableProfile();
@@ -202,7 +202,7 @@ function M:SetupActionBars()
 
 	local barMain = self:CreateActionBar("Main", barMainItems, true, nil, nil, false, 30);
 	local barWidthOffset = math.ceil((barMain.Width + 3 * (30 + self.DB.buttonPadding)) / 2); -- Center the LAS buttons, the extra buttons should look like they are separated.
-	local barPositionY = -162; -- Calculated from Bottom
+	local barPositionY = -168; -- Calculated from Bottom
 	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
 	self.tBars[barMain.strName] = barMain;
 
@@ -234,7 +234,7 @@ function M:SetupActionBars()
 
 	local barBottom = self:CreateActionBar("Bottom", barBottomItems, true, nil, nil, true);
 	local barWidthOffset = math.ceil(barBottom.Width / 2);
-	local barPositionOffset = 6;
+	local barPositionOffset = 0;
 	barBottom.wndMain:SetAnchorOffsets(-barWidthOffset, -barBottom.Height - barPositionOffset, barWidthOffset, -barPositionOffset);
 	self.tBars[barBottom.strName] = barBottom;
 
@@ -244,8 +244,8 @@ function M:SetupActionBars()
 	-----------------------------------------------------------------------------
 	local barRight = self:CreateActionBar("Right", "A", false, 24, 35, true);
 	local barHeightOffset = math.ceil(barRight.Height / 2);
-	barRight.wndMain:SetAnchorOffsets(-barRight.Width, -barHeightOffset, 0, barHeightOffset);
-	barRight.wndMain:SetAnchorPoints(1, 0.4, 1, 0.4);
+	barRight.wndMain:SetAnchorOffsets(-barRight.Width + 6, -barHeightOffset, 6, barHeightOffset);
+	barRight.wndMain:SetAnchorPoints(1, 0.44, 1, 0.44);
 	self.tBars[barRight.strName] = barRight;
 
 	-----------------------------------------------------------------------------
@@ -631,6 +631,7 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 						-- Set Position
 						local nToggleX, nToggleY = S:GetWindowPosition(self.wndMenuToggle);
 						nToggleX = nToggleX + self.wndMenuToggle:GetWidth() / 2;
+						nToggleY = nToggleY + 6;
 						self.wndMenu:SetAnchorOffsets(nToggleX - buttonSize / 2, nToggleY - nMenuHeight, nToggleX + buttonSize / 2, nToggleY);
 
 						-- Show Menu
