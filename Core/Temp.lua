@@ -26,15 +26,24 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
+
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
 --	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
+
+--	self:RegisterEvent("ItemAuctionSearchResults", "EventHandler");
+end
+
+
+function S:Test()
 end
 
 function M:EventHandler(event, ...)
 	log:debug(event);
 	log:debug({...});
+end
 
 --[[
+
 	if (true) then return; end
 
 	if (event == "InterfaceMenuList_AlertAddOn") then
@@ -44,10 +53,7 @@ function M:EventHandler(event, ...)
 			log:debug("[InterfaceMenuList_AlertAddOn] Show Mail Alert: "..(tAlertInfo[1] and "YES" or "NO"));
 		end
 	end
---]]
-end
 
---[[
 local TestClass = {};
 
 TestClass.strName = "Base";
