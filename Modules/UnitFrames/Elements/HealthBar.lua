@@ -67,8 +67,10 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit)
 
 		-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
 		tXmlData["TextRight"] = self.xmlDoc:NewControlNode("TextRight", "MLWindow", {
-			AnchorPoints = { (tSettings.strTagsTextLeft and 0.5 or 0), 0.5, 1, 0.5 },
-			AnchorOffsets = { (tSettings.strTagsTextLeft and 0 or 4), -7, -4, 7 },
+--			AnchorPoints = { (tSettings.strTagsTextLeft and 0.5 or 0), 0.5, 1, 0.5 },
+			AnchorPoints = { 0, 0.5, 1, 0.5 },
+--			AnchorOffsets = { (tSettings.strTagsTextLeft and 0 or 4), -7, -4, 7 },
+			AnchorOffsets = { 4, -7, -4, 7 },
 			TextColor = "white",
 			Text = "",
 			IgnoreMouse = "true",
@@ -95,8 +97,10 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit)
 
 		-- MLWindow allows colors, but it doesn't care about DT_VCENTER/DT_RIGHT/Font
 		tXmlData["TextLeft"] = self.xmlDoc:NewControlNode("TextLeft", "MLWindow", {
-			AnchorPoints = { 0, 0.5, (tSettings.strTagsTextRight and 0.5 or 1), 0.5 },
-			AnchorOffsets = { 4, -7, (tSettings.strTagsTextRight and 0 or -4), 7 },
+--			AnchorPoints = { 0, 0.5, (tSettings.strTagsTextRight and 0.5 or 1), 0.5 },
+			AnchorPoints = { 0, 0.5, 1, 0.5 },
+--			AnchorOffsets = { 4, -7, (tSettings.strTagsTextRight and 0 or -4), 7 },
+			AnchorOffsets = { 4, -7, -4, 7 },
 			TextColor = "white",
 			Text = "",
 			IgnoreMouse = "true",
