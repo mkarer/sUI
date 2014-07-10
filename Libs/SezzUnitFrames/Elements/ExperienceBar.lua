@@ -91,7 +91,7 @@ local UpdateTooltip = function(self)
 	wndExperience:SetTooltip(strTooltip);
 end
 
-local Update = function(self)
+function Element:Update()
 	if (not self.bEnabled) then return; end
 
 	local wndExperience = self.tUnitFrame.wndExperience;
@@ -130,7 +130,7 @@ local Update = function(self)
 	UpdateTooltip(self);
 end
 
-local Enable = function(self)
+function Element:Enable()
 	-- Register Events
 	if (self.bEnabled) then return; end
 
@@ -149,7 +149,7 @@ local Enable = function(self)
 	self:Update();
 end
 
-local Disable = function(self, bForce)
+function Element:Disable(bForce)
 	-- Unregister Events
 	if (not self.bEnabled and not bForce) then return; end
 
@@ -180,19 +180,10 @@ end
 function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
-	self = setmetatable({}, self);
-	self.__index = self;
+	local self = setmetatable({ tUnitFrame = tUnitFrame }, { __index = Element });
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
-
-	-- Reference Unit Frame
-	self.tUnitFrame = tUnitFrame;
-
-	-- Expose Methods
-	self.Enable = Enable;
-	self.Disable = Disable;
-	self.Update = Update;
 
 	-- Done
 	self:Disable(true);

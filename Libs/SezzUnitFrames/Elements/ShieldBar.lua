@@ -17,7 +17,7 @@ local log, UnitFrameController;
 
 -----------------------------------------------------------------------------
 
-local Update = function(self)
+function Element:Update()
 	if (not self.bEnabled) then return; end
 
 	local unit = self.tUnitFrame.unit;
@@ -35,15 +35,13 @@ local Update = function(self)
 	end
 end
 
-local Enable = function(self)
-	-- Register Events
+function Element:Enable()
 	if (self.bEnabled) then return; end
 
 	self.bEnabled = true;
 end
 
-local Disable = function(self, bForce)
-	-- Unregister Events
+function Element:Disable(bForce)
 	if (not self.bEnabled and not bForce) then return; end
 
 	self.bEnabled = false;
@@ -63,19 +61,10 @@ end
 function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
-	self = setmetatable({}, self);
-	self.__index = self;
+	local self = setmetatable({ tUnitFrame = tUnitFrame }, { __index = Element });
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = true;
-
-	-- Reference Unit Frame
-	self.tUnitFrame = tUnitFrame;
-
-	-- Expose Methods
-	self.Enable = Enable;
-	self.Disable = Disable;
-	self.Update = Update;
 
 	-- Done
 	self:Disable(true);

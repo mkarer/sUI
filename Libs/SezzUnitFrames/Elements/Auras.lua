@@ -138,7 +138,7 @@ end
 function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
-	local self = setmetatable({}, { __index = Element });
+	local self = setmetatable({ tUnitFrame = tUnitFrame }, { __index = Element });
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
@@ -146,9 +146,6 @@ function Element:New(tUnitFrame)
 	self.nAuraPadding = 4;
 	self.tChildren = {};
 	self.nAuraSize = 0;
-
-	-- Reference Unit Frame
-	self.tUnitFrame = tUnitFrame;
 
 	-- Auras Library
 	self.tAuras = Auras:New():SetUnit(self.tUnitFrame.unit, true);

@@ -181,13 +181,12 @@ end
 function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
-	local self = setmetatable({}, { __index = Element });
+	local self = setmetatable({ tUnitFrame = tUnitFrame }, { __index = Element });
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
 
-	-- Reference Unit Frame
-	self.tUnitFrame = tUnitFrame;
+	-- Initialize Threat Control
 	self.tUnitFrame.wndThreat:SetMax(100);
 
 	-- Done
