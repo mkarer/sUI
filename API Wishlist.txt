@@ -32,4 +32,4 @@ Others
 	Slash /CoMMandS should be case insensitive!
 	Add a way to create a unit tooltip.
 	Allow us to map a keybindings to a macro (or change actionbutton content, I think we're able to set keybindings for them).
-	Addon settings for addons with ":" in their name in toc.xml are saved in (and loaded from) the alternate NTFS data stream of a file named [everything_before:] (in my case specific case the data for "s:UI" will be saved to "s" instead of sUI_0_Char.xml) (Apollo.GetAddonInfo() also has problems, but it works when removing the ":").
+	Addon settings for addons with ":" in their name in toc.xml are saved in (and loaded from) the alternate NTFS data stream of a file named [everything_before:] (in my case specific case the data for "s:UI" will be saved to "s" instead of sUI_0_Char.xml) (Apollo.GetAddonInfo() also has problems, but it works when removing the ":"). (Update: GetAddonInfo used the folder name, that's why it didn't find my addon)
