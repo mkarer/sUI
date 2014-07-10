@@ -2,6 +2,9 @@
 
 	s:UI Unit Frame Element: Threat Bar
 
+	Only uses threat data available from the current target!
+	When (If) Carbine implements a better API or someone creates a nifty library I'll add that.
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -31,16 +34,21 @@ end
 
 -----------------------------------------------------------------------------
 
-
-local UpdateThreat = function(self, ...)
+function Element:UpdateThreat(...)
 	if (not self.bEnabled) then return; end
 
 	local unit = self.tUnitFrame.unit;
-	if (unit:IsDead()) then self:Disable(); return; end -- Mobs don't get resurrected, right?
-
 	local nUnitPlayerId = GameLib.GetPlayerUnit():GetId();
 	local wndThreat = self.tUnitFrame.wndThreat;
 	local tColors = self.tUnitFrame.tColors;
+
+	if (unit:IsDead()) then
+		-- Mobs don't get resurrected, right?
+		self:Disable();
+	elseif (not self.bIsInCombat) then
+		-- Clear player threat, should reset on Death/Void Slip
+		self.tThreat[nUnitPlayerId] = nil;
+	end
 
 	-- Calculate Player Threat
 	local nThreatMax = 0;
@@ -69,8 +77,8 @@ local UpdateThreat = function(self, ...)
 		-- TODO: Only show in group or solo when more than 1 unit on threat table
 		local nThreadPercent = floor(nThreatPlayer / (nThreatMax / 100) + 0.01);
 
-		wndThreat:Show(true, true);
 		wndThreat:SetProgress(nThreadPercent);
+		wndThreat:Show(true, true);
 
 		local bIsPlayerTargetted = UnitTargetsPlayer(unit);
 
@@ -78,7 +86,7 @@ local UpdateThreat = function(self, ...)
 			-- Aggro
 			wndThreat:SetBarColor(UnitFrameController:ColorArrayToHex(tColors.Threat[4]));
 		elseif (nThreadPercent > 80 or bIsPlayerTargetted) then
-			-- High Aggro or Taunted by another player
+			-- High Threat/Taunted by another player (Threat < 100, but we are still targetted)
 			wndThreat:Threat(UnitFrameController:ColorArrayToHex(tColors.Threat[3]));
 		elseif (nThreadPercent > 60) then
 			-- Medium Threat
@@ -92,37 +100,63 @@ local UpdateThreat = function(self, ...)
 	end
 end
 
-local Update = function(self)
+function Element:Update()
+	-- Update() is only called when the element is enabled/target has changed
 	local unit = self.tUnitFrame.unit;
 
 	if (UnitIsFriend(unit) or unit:IsDead()) then
 		self.tUnitFrame.wndThreat:Show(false, true);
+		-- Not sure if friendly NPCs can turn into enemies, won't disable the element until someone can confirm.
+		-- self:Disable();
 	elseif (UnitTargetsPlayer(unit)) then
 		self:UpdateThreat(GameLib.GetPlayerUnit(), 1);
+	else
+		self:UpdateThreat();
 	end
 end
 
-local TargetedByUnit = function(self, unit)
+function Element:OnTargetedByUnit(unit)
 	if (unit == self.tUnitFrame.unit) then
 		self:Update();
 	end
 end
 
-local Enable = function(self)
-	-- Register Events
-	if (self.bEnabled) then return; end
+function Element:OnUnitEnteredCombat(unit, bIsInCombat)
+	if (unit and unit == self.tUnitFrame.unit and not bIsInCombat) then
+		-- Reset Threat
+		self.tThreat = {};
+		self:Update();
+	else
+		local unitPlayer = GameLib.GetPlayerUnit();
 
-	self.bEnabled = true;
+		if (not unit or unit == unitPlayer) then
+			self.bIsInCombat = bIsInCombat ~= nil and bIsInCombat or unitPlayer:IsInCombat();
+			self:Update();
+		end
+	end
+end
 
-	self.tThreat = {};
-	Apollo.RegisterEventHandler("TargetThreatListUpdated", "UpdateThreat", self);
-	Apollo.RegisterEventHandler("TargetedByUnit", "TargetedByUnit", self);
+-----------------------------------------------------------------------------
+
+function Element:Enable()
+	if (not self.bEnabled) then
+		-- Enable
+		self.bEnabled = true;
+
+		self.tThreat = {};
+		Apollo.RegisterEventHandler("TargetThreatListUpdated", "UpdateThreat", self);
+		Apollo.RegisterEventHandler("TargetedByUnit", "OnTargetedByUnit", self);
+		Apollo.RegisterEventHandler("UnitEnteredCombat", "OnUnitEnteredCombat", self);
+	elseif (not self.unit or self.unit ~= self.tUnitFrame.unit) then
+		-- Unit changed, clear Threat Table
+		self.unit = self.tUnitFrame.unit;
+		self.tThreat = {};
+	end
 
 	self:Update();
 end
 
-local Disable = function(self, bForce)
-	-- Unregister Events
+function Element:Disable(bForce)
 	if (not self.bEnabled and not bForce) then return; end
 
 	self.bEnabled = false;
@@ -130,6 +164,7 @@ local Disable = function(self, bForce)
 	self.tThreat = {};
 	Apollo.RemoveEventHandler("TargetThreatListUpdated", self);
 	Apollo.RemoveEventHandler("TargetedByUnit", self);
+	Apollo.RemoveEventHandler("UnitEnteredCombat", self);
 end
 
 local IsSupported = function(tUnitFrame)
@@ -146,8 +181,7 @@ end
 function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
-	self = setmetatable({}, self);
-	self.__index = self;
+	local self = setmetatable({}, { __index = Element });
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
@@ -155,13 +189,6 @@ function Element:New(tUnitFrame)
 	-- Reference Unit Frame
 	self.tUnitFrame = tUnitFrame;
 	self.tUnitFrame.wndThreat:SetMax(100);
-
-	-- Expose Methods
-	self.Enable = Enable;
-	self.Disable = Disable;
-	self.Update = Update;
-	self.UpdateThreat = UpdateThreat;
-	self.TargetedByUnit = TargetedByUnit;
 
 	-- Done
 	self:Disable(true);
