@@ -79,6 +79,11 @@ local tAddonLoadingInformation = {
 		hook = "OnDocumentReady",
 		properties = { "OnLootedItem", "OnLootStack_CashTimer" },
 	},
+	TradeskillContainer = {
+		window = "wndMain",
+		hook = "OnInterfaceMenuListHasLoaded", -- Can't use OnDocumentReady because of LibApolloFixes
+		properties = { "OnAlwaysShowTradeskills", "OnTopTabBtn" },
+	},
 };
 
 function S:CheckExternalAddon(name)

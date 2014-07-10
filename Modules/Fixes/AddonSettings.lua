@@ -41,6 +41,7 @@ function M:OnEnable()
 	self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
 	self:CheckAddonAvailable("FloatTextPanel");
 	self:CheckAddonAvailable("SprintMeter");
+	self:CheckAddonAvailable("TradeskillContainer");
 
 	-- Quest Tracker
 	self:UpdateQuestTrackerForms();
@@ -68,6 +69,8 @@ function M:OnAddonAvailable(strEvent, strAddon, tAddon)
 		end
 	elseif (strAddon == "SprintMeter") then
 		tAddon.wndMain:FindChild("ProgBar"):SetStyle("IgnoreMouse", 1);
+	elseif (strAddon == "TradeskillContainer") then
+		Apollo.RemoveEventHandler("AlwaysHideTradeskills", tAddon);
 	end
 end
 
