@@ -27,7 +27,7 @@ S.DB = {
 		-- Auras
 		Buffs = {
 			Filter = {
-				[38646] = true, -- Authentication Dividends
+				[70391] = true, -- Authentication Dividends
 			}
 		}
 
