@@ -289,8 +289,14 @@ local UpdateName = function(self)
 	if (self.wndTextLeft) then
 		local strText = tTags["Sezz:DifficultyColor"](self, tTags["Sezz:Level"](self));
 		strText = strText..tTags["Sezz:ClassColor"](self, self.unit:GetName());
-
 		strText = WrapAML("P", strText);
+
+		-- TODO
+--		local nWidth = Apollo.GetTextWidth("CRB_Pixel_O", gsub(strText, "%b<>", "")); -- TODO: Read Font Attribute
+--		local nOffsetL, nOffsetT, nOffsetR, nOffsetB = self.wndTextLeft:GetAnchorOffsets(); 
+--		self.wndTextLeft:SetAnchorPoints(0, 0.5, 0, 0.5);
+--		self.wndTextLeft:SetAnchorOffsets(nOffsetL, nOffsetT, nOffsetL + nWidth, nOffsetB);
+--		Print(nWidth)
 
 		self.wndTextLeft:SetText(strText);
 	end
