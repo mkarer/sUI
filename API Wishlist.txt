@@ -31,5 +31,6 @@ Threat
 Others
 	Slash /CoMMandS should be case insensitive!
 	Add a way to create a unit tooltip.
-	Allow us to map a keybindings to a macro.
+	Allow us to map a keybindings to a macro (or change actionbutton content, I think we're able to set keybindings for them).
+	Addon settings for addons with invalid characters (like ":") in their Name in toc.xml won't get saved/loaded (Apollo.GetAddonInfo() works when removing the invalid characters).
 
