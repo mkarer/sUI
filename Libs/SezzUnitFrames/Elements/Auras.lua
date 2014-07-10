@@ -138,7 +138,7 @@ end
 function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
-	self = setmetatable({}, { __index = Element });
+	local self = setmetatable({}, { __index = Element });
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
