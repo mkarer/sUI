@@ -98,7 +98,11 @@ end
 function AuraControl:Enable()
 	-- Create/Enable Timer
 	if (not self.tmrUpdater and not self.bAura) then
-		self.tmrUpdater = self:ScheduleRepeatingTimer("UpdateTimeLeft", 0.1);
+		if (self.wndOverlay and self.nDuration < 50000) then
+			Apollo.RegisterEventHandler("NextFrame", "UpdateTimeLeft", self);
+		else
+			self.tmrUpdater = self:ScheduleRepeatingTimer("UpdateTimeLeft", 0.1);
+		end
 	end
 
 	return self;
@@ -106,6 +110,7 @@ end
 
 function AuraControl:Destroy()
 	-- We can't reuse windows (right?), so we have to self-destruct ;)
+	Apollo.RemoveEventHandler("NextFrame", self);
 	self:CancelTimer(self.tmrUpdater, true);
 	self.wndIcon:RemoveEventHandler("MouseButtonUp", self);
 	self.wndMain:Destroy();
@@ -133,16 +138,23 @@ function AuraControl:UpdateDuration(fDuration)
 --			end
 
 			self.nEndTime = nEndTime;
+			self.nDuration = nDuration;
 			self:UpdateTimeLeft();
 		end
 	end
 end
 
 function AuraControl:UpdateTimeLeft()
-	local nTimeLeft = floor((self.nEndTime - GameLib.GetTickCount()) / 1000);
+	local nNow = GameLib.GetTickCount();
+	local nTimeLeftMs = self.nEndTime - nNow;
+	local nTimeLeft = floor(nTimeLeftMs / 1000);
 
 	if (self.bAura or nTimeLeft < 0) then -- nTimeLeft < 0 = Carbine's Bug!
 		self.wndDuration:SetText("");
+
+		if (self.wndOverlay) then
+			self.wndOverlay:SetProgress(0);
+		end
 	else
 		local nDays, nHours, nMinutes, nSeconds = TimeBreakDown(nTimeLeft);
 
@@ -155,6 +167,11 @@ function AuraControl:UpdateTimeLeft()
 		else
 			-- from 1 to 9 hours, [HHh:MM]
 			self.wndDuration:SetText(format("%1dh:%02d", nHours, nMinutes));
+		end
+
+		if (self.wndOverlay and self.nDuration and self.nDuration > 0) then
+			local fProgress = floor(nTimeLeftMs / (self.nDuration / 100) + 0.01);
+			self.wndOverlay:SetProgress(fProgress);
 		end
 	end
 end
@@ -197,6 +214,14 @@ function AuraControl:New(wndParent, tAuraData, tWindowPrototype)
 	-- Create Aura Window
 	local wndMain = tUserDataWrapper:New(GeminiGUI:Create(tWindowPrototype):GetInstance(self, wndParent));
 	self.wndMain = wndMain;
+
+	-- Overlay
+	local wndOverlay = wndMain:FindChild("IconOverlay");
+	if (wndOverlay) then
+		wndOverlay:SetProgress(100);
+		wndOverlay:SetMax(100);
+		self.wndOverlay = wndOverlay;
+	end
 
 	-- Update Icon Sprite
 	local wndIcon = wndMain:FindChild("Icon");
