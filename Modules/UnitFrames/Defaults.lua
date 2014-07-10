@@ -42,6 +42,7 @@ UnitFramesLayout.tDefaults = {
 --	bAurasEnabled = true,
 --	tAurasAnchorPoints = { 0, 0, 0, 0 },
 --	tAurasAnchorOffsets = { 0, 0, 200, 30 },
+	tAurasFilter = S.DB.Modules.Buffs.Filter, -- { [nBuffId] = 1, [nBuffId] = 1 }
 	-------------------------------------------------------------------------
 	-- Shield Bar
 	-------------------------------------------------------------------------

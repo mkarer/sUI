@@ -119,13 +119,13 @@ function Auras:Reset()
 	end
 end
 
-function Auras:Call(strEvent, ...)
-	if (self.tCallbacks[strEvent]) then
+function Auras:Call(strEvent, tAura, ...)
+	if (not self.tFilter[tAura.idBuff] and self.tCallbacks[strEvent]) then
 		for _, tCallback in ipairs(self.tCallbacks[strEvent]) do
 			local strFunction = tCallback[1];
 			local tEventHandler = tCallback[2];
 
-			tEventHandler[strFunction](tEventHandler, ...);
+			tEventHandler[strFunction](tEventHandler, tAura, ...);
 		end
 	end
 end
@@ -191,6 +191,10 @@ function Auras:Update()
 	end
 end
 
+function Auras:SetFilter(tFilter)
+	self.tFilter = tFilter;
+end
+
 -----------------------------------------------------------------------------
 -- Constructor
 -----------------------------------------------------------------------------
@@ -202,6 +206,7 @@ function Auras:New()
 	self.tBuffs = {};
 	self.tDebuffs = {};
 	self.tCallbacks = {};
+	self.tFilter = {};
 
 	return self;
 end

@@ -110,4 +110,5 @@ function UnitFramesLayout:CreateAurasElement(strUnit)
 	-- Set Prototypes
 	UnitFramesLayout:SetUnitFrameAttribute(strUnit, "AuraPrototypeBuff", tBuffPrototype);
 	UnitFramesLayout:SetUnitFrameAttribute(strUnit, "AuraPrototypeDebuff", tDebuffPrototype);
+	UnitFramesLayout:SetUnitFrameAttribute(strUnit, "AuraFilter", tSettings.tAurasFilter);
 end

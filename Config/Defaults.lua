@@ -23,6 +23,16 @@ S.DB = {
 		},
 	},
 
+	Modules = {
+		-- Auras
+		Buffs = {
+			Filter = {
+				[38646] = true, -- Authentication Dividends
+			}
+		}
+
+	},
+
 	-- Hide Windows from Window Management
 	-- This should disable/override user customization (Interface Options / Window)
 	NoWindowManagement = {

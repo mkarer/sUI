@@ -78,6 +78,7 @@ end
 function M:EnableAuras()
 	-- Initialize Auras
 	self.tPlayerAuras = Auras:New(fnUpdatePlayerUnit);
+	self.tPlayerAuras:SetFilter(S.DB.Modules.Buffs.Filter);
 
 	-- Buffs
 	self.tPlayerAuras:RegisterCallback("OnAuraAdded", "OnAuraAdded", self);

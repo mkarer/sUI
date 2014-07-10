@@ -155,6 +155,7 @@ function Element:New(tUnitFrame)
 	self.tAuras:RegisterCallback("OnAuraAdded", "OnAuraAdded", self);
 	self.tAuras:RegisterCallback("OnAuraRemoved", "OnAuraRemoved", self);
 	self.tAuras:RegisterCallback("OnAuraUpdated", "OnAuraUpdated", self);
+	self.tAuras:SetFilter(self.tUnitFrame.tAttributes.AuraFilter);
 
 	-- Done
 	self:Disable(true);
