@@ -186,8 +186,22 @@ function M:SetupActionBars()
 	-- Main/LAS Bar
 	-- Button IDs: 0 - 7
 	-----------------------------------------------------------------------------
-	local barMain = self:CreateActionBar("Main", "LAS", true, 0, 7, false, 30);
-	local barWidthOffset = math.ceil(barMain.Width / 2);
+	local barMainItems = {
+		{ type = "LAS", id = 8 }, -- Gadget
+		{ type = "LAS", id = 9, menu = "Path" }, -- Path Ability
+		{ type = "GC", id = 2, menu = "Stance" }, -- Stance (Innate Ability)
+		{ type = "LAS", id = 0 },
+		{ type = "LAS", id = 1 },
+		{ type = "LAS", id = 2 },
+		{ type = "LAS", id = 3 },
+		{ type = "LAS", id = 4 },
+		{ type = "LAS", id = 5 },
+		{ type = "LAS", id = 6 },
+		{ type = "LAS", id = 7 },
+	};
+
+	local barMain = self:CreateActionBar("Main", barMainItems, true, nil, nil, false, 30);
+	local barWidthOffset = math.ceil((barMain.Width + 3 * (30 + self.DB.buttonPadding)) / 2); -- Center the LAS buttons, the extra buttons should look like they are separated.
 	local barPositionY = -162; -- Calculated from Bottom
 	barMain.wndMain:SetAnchorOffsets(-barWidthOffset, barPositionY, barWidthOffset, barPositionY + barMain.Height);
 	self.tBars[barMain.strName] = barMain;
@@ -233,20 +247,6 @@ function M:SetupActionBars()
 	barRight.wndMain:SetAnchorOffsets(-barRight.Width, -barHeightOffset, 0, barHeightOffset);
 	barRight.wndMain:SetAnchorPoints(1, 0.4, 1, 0.4);
 	self.tBars[barRight.strName] = barRight;
-
-	-----------------------------------------------------------------------------
-	-- Extra Bar
-	-----------------------------------------------------------------------------
-	local barExtraItems = {
-		{ type = "LAS", id = 8 }, -- Gadget
-		{ type = "LAS", id = 9, menu = "Path" }, -- Path Ability
-		{ type = "GC", id = 2, menu = "Stance" }, -- Stance (Innate Ability)
-	};
-
-	local barExtra = self:CreateActionBar("Extra", barExtraItems, true, nil, nil, false, 30);
-	local barPositionY = -162;
-	barExtra.wndMain:SetAnchorOffsets(-math.ceil(barMain.Width / 2) - barExtra.Width + self.DB.barPadding + self.DB.buttonPadding, barPositionY, -math.ceil(barMain.Width / 2) + self.DB.barPadding + self.DB.buttonPadding, barPositionY + barExtra.Height);
-	self.tBars[barExtra.strName] = barExtra;
 
 	-----------------------------------------------------------------------------
 	-- Shortcut Bars
@@ -681,7 +681,7 @@ end
 function M:UpdateActionBarButtonBorders()
 	-- Update LAS Bar Background Sprite (Workaround)
 	for i, tButton in ipairs(self.tBars["Main"].Buttons) do
-		if (not S.myLAS[i] or S.myLAS[i] == 0) then
+		if (tButton.Attributes.type == "LAS" and (tButton.Attributes.id >= 0 and tButton.Attributes.id <= 7) and (not S.myLAS[tButton.Attributes.id + 1] or S.myLAS[tButton.Attributes.id + 1] == 0)) then
 			tButton.wndMain:FindChild("ButtonBorder"):SetSprite(nil);
 		else
 			tButton.wndMain:FindChild("ButtonBorder"):SetSprite("ActionButton");
