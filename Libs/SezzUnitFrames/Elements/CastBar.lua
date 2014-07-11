@@ -32,7 +32,7 @@ function Element:Update()
 	-- Vulnerability/Default Casts
 	local nVulnerabilityTime = unit:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability) or 0;
 
-	if (nVulnerabilityTime > 0 or unit:ShouldShowCastBar() or self.tCurrentOpSpell) then
+	if (nVulnerabilityTime > 0 or unit:IsCasting() or self.tCurrentOpSpell) then
 		local wndProgress = wndCastBar:FindChild("Progress");
 		local wndIcon = wndCastBar:FindChild("Icon");
 		local wndText = wndCastBar:FindChild("Text");
@@ -74,8 +74,13 @@ function Element:Update()
 			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(arColor));
 		end
 
-		wndProgress:SetMax(nDuration);
-		wndProgress:SetProgress(nElapsed);
+		if (nDuration > 0) then
+			wndProgress:SetMax(nDuration);
+			wndProgress:SetProgress(nElapsed);
+		else
+			wndProgress:SetMax(1);
+			wndProgress:SetProgress(1);
+		end
 
 		if (wndText) then
 			wndText:SetText(strSpellName);
@@ -84,8 +89,10 @@ function Element:Update()
 		if (wndTime) then
 			if (nVulnerabilityTime > 0) then
 				wndTime:SetText(format("%00.01f", nElapsed));
-			else
+			elseif (nDuration > 0 or unit:ShouldShowCastBar()) then
 				wndTime:SetText(format("%00.01f", (nDuration - nElapsed) / 1000));
+			else
+				wndTime:SetText();
 			end
 		end
 
