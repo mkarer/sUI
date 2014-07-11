@@ -17,10 +17,6 @@ local log;
 
 function M:OnInitialize()
 	log = S.Log;
-
---	self:PostHook(Apollo.GetAddon("TradeskillContainer"), "OnDocumentReady", function(self)
---		Apollo.RemoveEventHandler("AlwaysHideTradeskills", self);
---	end);
 end
 
 function M:OnEnable()
@@ -30,15 +26,9 @@ function M:OnEnable()
 --		self:RegisterEvent("Sezz_CharacterLoaded", "EventHandler");
 	end
 
-
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
---	Apollo.RegisterEventHandler("ObscuredAddonVisible", "EventHandler", self);
-
---	self:RegisterEvent("ItemAuctionSearchResults", "EventHandler");
---	self:RegisterEvent("AlwaysHideTradeskills", "EventHandler");
 
 end
-
 
 function S:Test()
 end
@@ -46,7 +36,6 @@ end
 function M:EventHandler(event, ...)
 	log:debug(event);
 	log:debug({...});
-
 end
 
 --[[
