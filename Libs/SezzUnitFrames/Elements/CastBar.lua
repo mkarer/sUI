@@ -135,9 +135,12 @@ function Element:Enable()
 	self.nVulnerabilityTime = 0;
 	self.nVulnerabilityStart = 0;
 	Apollo.RegisterEventHandler("NextFrame", "Update", self);
-	Apollo.RegisterEventHandler("StartSpellThreshold", 	"OnStartSpellThreshold", self);
-	Apollo.RegisterEventHandler("ClearSpellThreshold", 	"OnClearSpellThreshold", self);
-	Apollo.RegisterEventHandler("UpdateSpellThreshold", "OnUpdateSpellThreshold", self);
+
+	if (self.tUnitFrame.strUnit == "Player") then
+		Apollo.RegisterEventHandler("StartSpellThreshold", 	"OnStartSpellThreshold", self);
+		Apollo.RegisterEventHandler("ClearSpellThreshold", 	"OnClearSpellThreshold", self);
+		Apollo.RegisterEventHandler("UpdateSpellThreshold", "OnUpdateSpellThreshold", self);
+	end
 end
 
 function Element:Disable(bForce)
