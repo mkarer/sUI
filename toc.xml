@@ -50,7 +50,6 @@
 	<Script Name="Modules\Crafting\RandomCraft.lua" />
 	<Form Name="Modules\Crafting\RandomCraft.xml" />
 	<Script Name="Modules\Crafting\Unmount.lua" />
-	<Script Name="Modules\ProcBar\Core.lua" />
 	<Script Name="Modules\PowerBar\PowerBar.lua" />
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
@@ -91,6 +90,9 @@
 	<Script Name="Modules\Automation\OpenBags.lua" />
 	<Script Name="Modules\Automation\AutoRepair.lua" />
 	<Script Name="Modules\Automation\VendorTrash.lua" />
+	<!-- Proc Bar -->
+	<Script Name="Modules\ProcBar\Core.lua" />
+	<Script Name="Modules\ProcBar\Anchor.lua" />
 	<!-- Misc -->
 	<Script Name="Modules\DataText\DataText.lua" />
 
