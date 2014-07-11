@@ -102,13 +102,13 @@
 -->
 
 	<!-- Disable/Replace Carbine Addons -->
-    <ReplaceAddon Name="ActionBarFrame" />
-    <ReplaceAddon Name="ActionBarShortcut" />
-    <ReplaceAddon Name="RecallFrame" />
-    <ReplaceAddon Name="Medic" />
-    <ReplaceAddon Name="ClassResources" />
-    <ReplaceAddon Name="StalkerResource" />
-    <ReplaceAddon Name="WarriorResource" />
-    <ReplaceAddon Name="XPBar" />
-    <ReplaceAddon Name="TargetFrame" />
+	<ReplaceAddon Name="ActionBarFrame" />
+	<ReplaceAddon Name="ActionBarShortcut" />
+	<ReplaceAddon Name="RecallFrame" />
+	<ReplaceAddon Name="Medic" />
+	<ReplaceAddon Name="ClassResources" />
+	<ReplaceAddon Name="StalkerResource" />
+	<ReplaceAddon Name="WarriorResource" />
+	<ReplaceAddon Name="XPBar" />
+	<ReplaceAddon Name="TargetFrame" />
 </Addon>
