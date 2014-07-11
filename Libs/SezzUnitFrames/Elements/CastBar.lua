@@ -2,8 +2,6 @@
 
 	s:UI Unit Frame Element: Cast Bar
 
-	TODO: Channeled casts should show a inversed bar (not possible because of API limitations? [Spell.CodeEnumCastMethod.Channeled])
-
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -30,9 +28,11 @@ function Element:Update()
 
 	local unit = self.tUnitFrame.unit;
 	local wndCastBar = self.tUnitFrame.wndCastBar;
+
+	-- Vulnerability/Default Casts
 	local nVulnerabilityTime = unit:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability) or 0;
 
-	if (nVulnerabilityTime > 0 or unit:ShouldShowCastBar()) then
+	if (nVulnerabilityTime > 0 or unit:ShouldShowCastBar() or self.tCurrentOpSpell) then
 		local wndProgress = wndCastBar:FindChild("Progress");
 		local wndIcon = wndCastBar:FindChild("Icon");
 		local wndText = wndCastBar:FindChild("Text");
@@ -57,10 +57,18 @@ function Element:Update()
 			self.nVulnerabilityTime = nVulnerabilityTime;
 			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Vulnerability));
 		else
-			-- Cast
-			nDuration, nElapsed = unit:GetCastDuration(), unit:GetCastElapsed();
-			strSpellName = unit:GetCastName();
-			strSpellIcon = tSpellIcons[strSpellName];
+			if (self.tCurrentOpSpell) then
+				-- Charged Cast
+				nElapsed = unit:GetCastElapsed();
+				nDuration = nElapsed / (GameLib.GetSpellThresholdTimePrcntDone(self.tCurrentOpSpell.id) * 100) * 100; -- Not very exact :(
+				strSpellName = self.tCurrentOpSpell.strName.." ["..self.tCurrentOpSpell.nCurrentTier.."/"..self.tCurrentOpSpell.nMaxTier.."]";
+				strSpellIcon = tSpellIcons[self.tCurrentOpSpell.strName];
+			else
+				-- Cast
+				nDuration, nElapsed = unit:GetCastDuration(), unit:GetCastElapsed();
+				strSpellName = unit:GetCastName();
+				strSpellIcon = tSpellIcons[strSpellName];
+			end
 
 			local arColor = (unit:GetInterruptArmorValue() ~= 0 and self.tUnitFrame.tColors.CastBar.Uninterruptable or self.tUnitFrame.tColors.CastBar.Normal);
 			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(arColor));
@@ -93,6 +101,32 @@ function Element:Update()
 	end
 end
 
+function Element:OnStartSpellThreshold(idSpell, nMaxThresholds, eCastMethod)
+	if (self.tCurrentOpSpell ~= nil and idSpell == self.tCurrentOpSpell.id) then return; end
+
+	self.tCurrentOpSpell = {
+		id = idSpell,
+		nCurrentTier = 1,
+		nMaxTier = nMaxThresholds,
+		eCastMethod = eCastMethod,
+		strName = GameLib.GetSpell(idSpell):GetName(),
+	};
+
+	self:OnUpdateSpellThreshold(idSpell, 1);
+end
+
+function Element:OnClearSpellThreshold(idSpell)
+	if (self.tCurrentOpSpell ~= nil and idSpell ~= self.tCurrentOpSpell.id) then return; end
+
+	self.tCurrentOpSpell = nil;
+end
+
+function Element:OnUpdateSpellThreshold(idSpell, nNewThreshold)
+	if (self.tCurrentOpSpell == nil or idSpell ~= self.tCurrentOpSpell.id) then return; end
+
+	self.tCurrentOpSpell.nCurrentTier = nNewThreshold;
+end
+
 function Element:Enable()
 	-- Register Events
 	if (self.bEnabled) then return; end
@@ -101,6 +135,9 @@ function Element:Enable()
 	self.nVulnerabilityTime = 0;
 	self.nVulnerabilityStart = 0;
 	Apollo.RegisterEventHandler("NextFrame", "Update", self);
+	Apollo.RegisterEventHandler("StartSpellThreshold", 	"OnStartSpellThreshold", self);
+	Apollo.RegisterEventHandler("ClearSpellThreshold", 	"OnClearSpellThreshold", self);
+	Apollo.RegisterEventHandler("UpdateSpellThreshold", "OnUpdateSpellThreshold", self);
 end
 
 function Element:Disable(bForce)
@@ -109,6 +146,9 @@ function Element:Disable(bForce)
 
 	self.bEnabled = false;
 	Apollo.RemoveEventHandler("NextFrame", self);
+	Apollo.RemoveEventHandler("StartSpellThreshold", self);
+	Apollo.RemoveEventHandler("ClearSpellThreshold", self);
+	Apollo.RemoveEventHandler("UpdateSpellThreshold", self);
 	self.tUnitFrame.wndCastBar:Show(false, true);
 end
 
