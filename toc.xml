@@ -50,6 +50,7 @@
 	<Script Name="Modules\Crafting\RandomCraft.lua" />
 	<Form Name="Modules\Crafting\RandomCraft.xml" />
 	<Script Name="Modules\Crafting\Unmount.lua" />
+	<Script Name="Modules\ProcBar\Core.lua" />
 	<Script Name="Modules\PowerBar\PowerBar.lua" />
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
@@ -59,7 +60,6 @@
 	<!-- Buffs & Debuffs -->
 	<Script Name="Modules\Buffs\Core.lua" />
 	<!-- Unit Frames -->
-	<Script Name="Modules\UnitFrames\Experience.lua" />
 	<Script Name="Modules\UnitFrames\Core.lua" />
 	<Script Name="Modules\UnitFrames\Layout.lua" />
 	<Script Name="Modules\UnitFrames\Defaults.lua" />
