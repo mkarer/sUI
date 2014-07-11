@@ -122,16 +122,16 @@ local UpdateUnits = function(self)
 
 	-- Reduce Updates/Second
 	local nTicks = GameLib.GetTickCount();
-	if (nTicks - self.nUpdated < 50) then return; end
+
+	if (self.nUpdated and nTicks - self.nUpdated < 50) then return; end
 	self.nUpdated = nTicks;
 
 	-- Check Character
-	if (GameLib and GameLib.IsCharacterLoaded()) then
+	if (GameLib.IsCharacterLoaded()) then
 		local unitPlayer = GameLib.GetPlayerUnit();
 
 		if (unitPlayer and unitPlayer:IsValid()) then
 			-- Update Unit Frames
---			log:debug("Updating Units...");
 			bCharacterLoaded = true;
 			UpdateUnit(self, "Player", unitPlayer);
 			UpdateUnit(self, "Target", unitPlayer:GetTarget());
@@ -234,7 +234,6 @@ function UnitFrameController:New(xmlDoc, tCustomColors)
 
 	-- Properties
 	self.tUnitFrames = {};
-	self.nUpdated = 0;
 	self.tColors = (tCustomColors and setmetatable(tCustomColors, { __index = tColors }) or tColors);
 
 	-- Create a new XML Document
