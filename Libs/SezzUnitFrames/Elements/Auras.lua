@@ -126,7 +126,7 @@ end
 
 local IsSupported = function(tUnitFrame)
 	local bSupported = (Auras ~= nil and AuraControl ~= nil and tUnitFrame.wndAuras ~= nil);
-	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
+--	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
 end
@@ -142,7 +142,7 @@ function Element:New(tUnitFrame)
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
-	self.bAnchorLeft = false;
+	self.bAnchorLeft = (self.tUnitFrame.tAttributes.AuraAnchorLeft);
 	self.nAuraPadding = 4;
 	self.tChildren = {};
 	self.nAuraSize = 0;
