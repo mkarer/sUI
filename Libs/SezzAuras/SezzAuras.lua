@@ -120,7 +120,9 @@ function Auras:Reset()
 end
 
 function Auras:Call(strEvent, tAura, ...)
-	if (not self.tFilter[tAura.splEffect:GetId()] and self.tCallbacks[strEvent]) then
+	local bFiltered = (tAura.bIsDebuff and self.tFilter["Debuff"]) or (not tAura.bIsDebuff and self.tFilter["Buff"]) or (self.tFilter[tAura.splEffect:GetId()]);
+
+	if (not bFiltered and self.tCallbacks[strEvent]) then
 		for _, tCallback in ipairs(self.tCallbacks[strEvent]) do
 			local strFunction = tCallback[1];
 			local tEventHandler = tCallback[2];
