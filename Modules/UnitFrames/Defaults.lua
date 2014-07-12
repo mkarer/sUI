@@ -43,6 +43,7 @@ UnitFramesLayout.tDefaults = {
 --	tAurasAnchorPoints = { 0, 0, 0, 0 },
 --	tAurasAnchorOffsets = { 0, 0, 200, 30 },
 	tAurasFilter = S.DB.Modules.Buffs.Filter, -- { [nBuffId] = 1, [nBuffId] = 1 }
+	bAurasAnchorLeft = false,
 	-------------------------------------------------------------------------
 	-- Shield Bar
 	-------------------------------------------------------------------------
@@ -92,6 +93,96 @@ UnitFramesLayout.tDefaults = {
 -- Colors
 UnitFramesLayout.tColors = {
 };
+
+-- Aura Prototypes
+UnitFramesLayout.tDefaults.tAuraPrototypeBuff = {
+	WidgetType = "Window",
+	AnchorPoints = { 0, 0, 0, 0 },
+	AnchorOffsets = { 0, 0, 34, 34 },
+	Children = {
+		{
+			Name = "Border",
+			Class = "Window",
+			AnchorPoints = { 0, 0, 1, 1 },
+			AnchorOffsets = { 0, 0, 0, 0 },
+			Picture = true,
+			BGColor = "33ffffff", --ff791104
+			Sprite = "ClientSprites:WhiteFill",
+			IgnoreMouse = true,
+			Children = {
+				{
+					Name = "Background",
+					BGColor = "ff000000",
+					Sprite = "ClientSprites:WhiteFill",
+					Class = "Window",
+					Picture = true,
+					AnchorPoints = { 0, 0, 1, 1 },
+					AnchorOffsets = { 2, 2, -2, -2 },
+					IgnoreMouse = false,
+					Children = {
+						{
+							Name = "Icon",
+							Class = "Window",
+							Picture = true,
+							AnchorPoints = { 0, 0, 1, 1 },
+							AnchorOffsets = { 0, 0, 0, 0 },
+							IgnoreMouse = false,
+							Children = {
+								{
+									Name = "IconOverlay",
+									Class = "ProgressBar",
+									AnchorPoints = { 0, 0, 1, 1 },
+									AnchorOffsets = { 0, 0, 0, 0 },
+									Picture = true,
+									BGColor = "bb000000",
+									ProgressFull = "ClientSprites:WhiteFill",
+									IgnoreMouse = true,
+									RadialBar = true,
+									UsePercent = true,
+									SwallowMouseClicks = true,
+									RadialMin = 90,
+									RadialMax = 450,
+									Children = {
+										{
+											Name = "Count",
+											Class = "Window",
+											Text = "",
+											TextColor = "ffffffff",
+											Font = "CRB_Interface12_BO",
+											DT_RIGHT = true,
+											DT_BOTTOM = true,
+											AnchorPoints = { 0, 0, 1, 1 },
+											AnchorOffsets = { 0, 0, -2, 0 },
+											IgnoreMouse = true,
+										}, {
+											Name = "Duration",
+											Class = "Window",
+											Text = "",
+											TextColor = "ffffffff",
+											Font = "CRB_Pixel_O", -- CRB_Interface9_O
+											DT_VCENTER = true,
+											DT_CENTER = true,
+											DT_SINGLELINE = true,
+											AutoScaleTextOff = true,
+											AnchorPoints = { 0, 0, 1, 1 },
+											AnchorOffsets = { -2, -2, 2, 2 },
+											IgnoreMouse = true,
+										},
+
+									},
+
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+};
+
+UnitFramesLayout.tDefaults.tAuraPrototypeDebuff = S:Clone(UnitFramesLayout.tDefaults.tAuraPrototypeBuff);
+UnitFramesLayout.tDefaults.tAuraPrototypeDebuff.Children[1].BGColor = "ff791104";
 
 -- Settings Initialization
 function UnitFramesLayout:SetUnitFrameConfiguration(strUnit, tSettings)
