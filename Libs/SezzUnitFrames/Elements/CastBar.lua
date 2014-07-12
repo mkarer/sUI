@@ -90,7 +90,14 @@ function Element:Update()
 			if (nVulnerabilityTime > 0) then
 				wndTime:SetText(format("%00.01f", nElapsed));
 			elseif (nDuration > 0 or unit:ShouldShowCastBar()) then
-				wndTime:SetText(format("%00.01f", (nDuration - nElapsed) / 1000));
+				local nTimeLeft = (nDuration - nElapsed);
+				if (nTimeLeft > 0) then
+					nTimeLeft = nTimeLeft / 1000;
+				else
+					nTimeLeft = 0;
+				end
+				
+				wndTime:SetText(format("%00.01f", nTimeLeft));
 			else
 				wndTime:SetText();
 			end
