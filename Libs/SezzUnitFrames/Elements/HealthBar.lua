@@ -75,7 +75,7 @@ end
 
 local IsSupported = function(tUnitFrame)
 	local bSupported = (tUnitFrame.wndHealth ~= nil);
-	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
+--	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
 end
