@@ -168,7 +168,7 @@ end
 
 local IsSupported = function(tUnitFrame)
 	local bSupported = (tUnitFrame.strUnit == "Player" and tUnitFrame.wndExperience ~= nil and tUnitFrame.wndExperience:FindChild("Progress") and tUnitFrame.wndExperience:FindChild("ProgressRested") and true);
-	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
+--	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
 end
