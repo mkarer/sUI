@@ -20,6 +20,9 @@ local XmlDocument, UnitFrame, GeminiLogging, log;
 -- Lua APIs
 local format, floor, modf = string.format, math.floor, math.modf;
 
+-- Constants
+local knMaxGroupSize = 50; -- Not sure - they said battlegrounds for 50 people are coming, so I assume 50 for now.
+
 -----------------------------------------------------------------------------
 -- Child Libraries + Settings
 -----------------------------------------------------------------------------
@@ -133,6 +136,8 @@ local UpdateUnits = function(self)
 		if (unitPlayer and unitPlayer:IsValid()) then
 			-- Update Unit Frames
 			bCharacterLoaded = true;
+
+			-- Main Unit Frames
 			UpdateUnit(self, "Player", unitPlayer);
 			UpdateUnit(self, "Target", unitPlayer:GetTarget());
 			UpdateUnit(self, "TargetOfTarget", unitPlayer:GetTargetOfTarget());
@@ -140,6 +145,15 @@ local UpdateUnits = function(self)
 			UpdateUnit(self, "Focus", unitPlayer:GetAlternateTarget());
 			UpdateUnit(self, "FocusTarget", unitPlayer:GetAlternateTarget() and unitPlayer:GetAlternateTarget():GetTarget() or nil);
 			UpdateUnit(self, "FocusTargetOfTarget", unitPlayer:GetAlternateTarget() and unitPlayer:GetAlternateTarget():GetTargetOfTarget() or nil);
+
+			-- Party / Raid Frames
+			local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
+
+			-- Raid Frames
+			for i = 1, knMaxGroupSize do
+				UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and GroupLib.GetUnitForGroupMember(i) or nil);
+				UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and GroupLib.GetUnitForGroupMember(i) or nil);
+			end
 		end
 	end
 
