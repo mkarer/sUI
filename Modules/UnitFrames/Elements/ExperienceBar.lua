@@ -12,11 +12,10 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateExperienceBarElement(strUnit)
-	local tSettings = self.tSettings[strUnit];
+function UnitFramesLayout:CreateExperienceBarElement(strUnit, tSettings)
 	if (strUnit ~= "Player" or not tSettings.bExperienceBarEnabled) then return; end
 
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------

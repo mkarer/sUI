@@ -12,11 +12,10 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateThreatBarElement(strUnit)
-	local tSettings = self.tSettings[strUnit];
+function UnitFramesLayout:CreateThreatBarElement(strUnit, tSettings)
 	if (not tSettings.bThreatBarEnabled) then return; end
 
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------

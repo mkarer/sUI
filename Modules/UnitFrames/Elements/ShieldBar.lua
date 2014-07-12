@@ -12,11 +12,10 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateShieldBarElement(strUnit)
-	local tSettings = self.tSettings[strUnit];
+function UnitFramesLayout:CreateShieldBarElement(strUnit, tSettings)
 	if (not tSettings.bShieldBarEnabled) then return; end
 
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------

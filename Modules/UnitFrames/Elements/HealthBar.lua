@@ -12,9 +12,8 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateHealthBarElement(strUnit)
-	local tSettings = self.tSettings[strUnit];
-	local tXmlData = self.tSettings[strUnit].tXmlData;
+function UnitFramesLayout:CreateHealthBarElement(strUnit, tSettings)
+	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
 
 	-------------------------------------------------------------------------
