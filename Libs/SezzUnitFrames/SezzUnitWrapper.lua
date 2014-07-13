@@ -45,8 +45,11 @@ function UnitClassMetatable:__index(strKey)
 	end
 end
 
-function UnitClassWrapper:New(unit)
-	local self = setmetatable({__proto__ = unit}, UnitClassMetatable);
+function UnitClassWrapper:New(unit, nIndex)
+	local tUnit = nIndex and GroupLib.GetGroupMember(nIndex) or {};
+	tUnit.__proto__ = unit;
+
+	local self = setmetatable(tUnit, UnitClassMetatable);
 
 	self.IsOnline = fnTrue;
 	self.IsDisconnected = fnFalse;
@@ -57,9 +60,10 @@ function UnitClassWrapper:New(unit)
 	return self;
 end
 
-local WrapRealUnit = function(unit)
+local WrapRealUnit = function(unit, nIndex)
 	if (not unit) then return; end
-	return UnitClassWrapper:New(unit);
+
+	return UnitClassWrapper:New(unit, nIndex);
 end
 
 -----------------------------------------------------------------------------
@@ -80,10 +84,14 @@ function GroupLibUnit:IsDisconnected()
 	return self.bDisconnected;
 end
 
-
 GroupLibUnit.GetHealth = function(self)
 	return self.nHealth;
 end
+
+GroupLibUnit.GetTarget = fnNil;
+GroupLibUnit.Inspect = fnNil;
+GroupLibUnit.ShowHintArrow = fnNil;
+GroupLibUnit.IsInYourGroup = fnTrue;
 
 GroupLibUnit.GetMaxHealth = function(self)
 	return self.nHealthMax;
@@ -187,7 +195,7 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 		elseif (nIndex > 0) then
 			-- Party/Raid
 			local strUnit = strUnit..nIndex;
-			return WrapRealUnit(GroupLib.GetUnitForGroupMember(nIndex)) or WrapGroupUnit(GroupLib.GetGroupMember(nIndex));
+			return WrapRealUnit(GroupLib.GetUnitForGroupMember(nIndex), nIndex) or WrapGroupUnit(GroupLib.GetGroupMember(nIndex));
 		end
 	end
 end
