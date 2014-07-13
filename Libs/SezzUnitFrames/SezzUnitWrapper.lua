@@ -13,6 +13,15 @@ local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tP
 if (UnitFrameController.GetUnit) then return; end
 
 -----------------------------------------------------------------------------
+-- Helper Functions
+-----------------------------------------------------------------------------
+
+local fnNil = function() return nil; end
+local fnZero = function() return 0; end
+local fnTrue = function() return true; end
+local fnFalse = function() return false; end
+
+-----------------------------------------------------------------------------
 -- Units
 -----------------------------------------------------------------------------
 
@@ -36,8 +45,15 @@ function UnitClassMetatable:__index(strKey)
 	end
 end
 
-function UnitClassWrapper:New(o)
-	local self = setmetatable({__proto__ = o}, UnitClassMetatable);
+function UnitClassWrapper:New(unit)
+	local self = setmetatable({__proto__ = unit}, UnitClassMetatable);
+
+	self.IsOnline = fnTrue;
+	self.IsDisconnected = fnFalse;
+
+	if (unit:IsInYourGroup()) then
+	end
+
 	return self;
 end
 
@@ -50,15 +66,20 @@ end
 -- GroupLib
 -----------------------------------------------------------------------------
 
-local fnNil = function() return nil; end
-local fnZero = function() return 0; end
-local fnTrue = function() return true; end
-
 local GroupLibUnit = {};
 
 GroupLibUnit.GetName = function(self)
 	return self.strCharacterName;
 end
+
+function GroupLibUnit:IsOnline()
+	return self.bIsOnline;
+end
+
+function GroupLibUnit:IsDisconnected()
+	return self.bDisconnected;
+end
+
 
 GroupLibUnit.GetHealth = function(self)
 	return self.nHealth;
