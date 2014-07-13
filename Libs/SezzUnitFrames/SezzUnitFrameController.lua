@@ -85,18 +85,18 @@ local tColors = {
 -- Frame Creation
 -----------------------------------------------------------------------------
 
-local CreateUnitFrame = function(self, strLayoutName, strUnit, tXmlData, tAttributes)
-	log:debug("Creating Unit Frame for: %s", strUnit)
+function UnitFrameController:CreateUnitFrame(strLayoutName, strUnit, tXmlData, tAttributes)
+--	log:debug("Creating Unit Frame for: %s", strUnit)
 	local tUnitFrame = UnitFrame:New(self, strLayoutName, strUnit, tXmlData, tAttributes);
 
 	self.tUnitFrames[strUnit] = tUnitFrame;
 	return tUnitFrame;
 end
 
-local LoadForm = function(self)
+function UnitFrameController:LoadForm()
 	-- Add all Unit Frames' XML and load them with Apollo
 	for _, tUnitFrame in pairs(self.tUnitFrames) do
-		log:debug("Loading Unit Frame: %s", tUnitFrame.strUnit);
+--		log:debug("Loading Unit Frame: %s", tUnitFrame.strUnit);
 		tUnitFrame:LoadForm();
 
 		-- Add Elements
@@ -199,7 +199,7 @@ end
 function UnitFrameController:RegisterElement(strPackageName)
 	local strElementName = string.match(strPackageName, ":(%a+)\-");
 	if (type(strElementName) == "string" and string.len(strElementName) > 0) then
-		log:debug("Registered Element: %s (Package: %s)", strElementName, strPackageName);
+--		log:debug("Registered Element: %s (Package: %s)", strElementName, strPackageName);
 		tRegisteredElements[strPackageName] = false;
 	end
 end
@@ -272,10 +272,6 @@ function UnitFrameController:New(xmlDoc, tCustomColors)
 			tRegisteredElements[strPackageName] = Apollo.GetPackage(strPackageName).tPackage;
 		end
 	end
-
-	-- Expose Methods
-	self.CreateUnitFrame = CreateUnitFrame;
-	self.LoadForm = LoadForm;
 
 	-- Done
 	return self;
