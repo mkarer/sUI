@@ -52,7 +52,7 @@ local ktDifficultyColors = {
 	{ 4, "ffff00ff"} -- Impossible
 };
 
-local kbTestMode = false;
+local kbTestMode = true;
 
 -----------------------------------------------------------------------------
 -- Helper Functions
@@ -238,7 +238,7 @@ local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
 		end
 		return false
 	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
-		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit);
+		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
 		return true
 	end
 
