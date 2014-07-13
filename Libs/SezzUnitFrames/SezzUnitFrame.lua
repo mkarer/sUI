@@ -76,7 +76,7 @@ local WrapAML = function(strTag, strText, strColor, strAlign)
 end
 
 local GetDifficultyColor = function(unitComparison)
-	local nUnitCon = GameLib.GetPlayerUnit():GetLevelDifferential(unitComparison) + unitComparison:GetGroupValue();
+	local nUnitCon = (GameLib.GetPlayerUnit():GetLevelDifferential(unitComparison) or 0) + unitComparison:GetGroupValue();
 	local nCon = 1; --default setting
 
 	if (nUnitCon <= ktDifficultyColors[1][1]) then -- lower bound
@@ -122,11 +122,8 @@ local UnitStatus = function(unit)
 		return WrapAML("P", "DEAD", "ffff7f7f", "Right");
 --	elseif (UnitIsGhost(unit)) then
 --		return "Ghost";
---	elseif (not UnitIsConnected(unit)) then
---			Offline only works in groups
---		Unit:IsInYourGroup()
--- 		GroupLib.GetGroupMember(i).bDisconnected
---		return "Offline";
+	elseif (unit:IsDisconnected() or not unit:IsOnline()) then
+		return WrapAML("P", "OFFLINE", "ffff7f7f", "Right");
 	end
 	
 	return nil;
@@ -142,7 +139,7 @@ tTags["Sezz:HP"] = function(unit)
 		if (not nCurrentHealth or not nMaxHealth or (nCurrentHealth == 0 and nMaxHealth == 0)) then return ""; end
 
 		-- ? UnitCanAttack//not UnitIsFriend
-		if (UnitIsFriend(unit) and unit:IsACharacter(unit)) then
+		if (UnitIsFriend(unit) and unit:IsACharacter()) then
 			-- Unit is friendly and a Player
 			-- HP Style: [CURHP]-[LOSTHP]
 			if (nCurrentHealth ~= nMaxHealth) then
@@ -368,6 +365,7 @@ local SetUnit = function(self, unit)
 	-- Update Unit
 	if (not self.unit or (self.unit and self.unit:GetId() ~= unit:GetId())) then
 		log:debug("[%s] Updated Unit: %s", self.strUnit, unit:GetName());
+
 		self.unit = unit;
 		self.bIsObject = UnitIsObject(unit);
 		self:Enable();
