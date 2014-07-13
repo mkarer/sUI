@@ -120,7 +120,11 @@ local UpdateUnit = function(self, strUnit, unit)
 	return false;
 end
 
-local UpdateUnits = function(self)
+function UnitFrameController:UpdateDefaultUnit(strUnit)
+	UpdateUnit(self, strUnit, self:GetUnit(strUnit));
+end
+
+function UnitFrameController:UpdateUnits()
 	local bCharacterLoaded = false;
 
 	-- Reduce Updates/Second
@@ -138,21 +142,21 @@ local UpdateUnits = function(self)
 			bCharacterLoaded = true;
 
 			-- Main Unit Frames
-			UpdateUnit(self, "Player", unitPlayer);
-			UpdateUnit(self, "Target", unitPlayer:GetTarget());
-			UpdateUnit(self, "TargetOfTarget", unitPlayer:GetTargetOfTarget());
-			UpdateUnit(self, "TargetOfTargetOfTarget", unitPlayer:GetTargetOfTarget() and unitPlayer:GetTargetOfTarget():GetTarget() or nil);
-			UpdateUnit(self, "Focus", unitPlayer:GetAlternateTarget());
-			UpdateUnit(self, "FocusTarget", unitPlayer:GetAlternateTarget() and unitPlayer:GetAlternateTarget():GetTarget() or nil);
-			UpdateUnit(self, "FocusTargetOfTarget", unitPlayer:GetAlternateTarget() and unitPlayer:GetAlternateTarget():GetTargetOfTarget() or nil);
+			self:UpdateDefaultUnit("Player");
+			self:UpdateDefaultUnit("Target");
+			self:UpdateDefaultUnit("TargetOfTarget");
+			self:UpdateDefaultUnit("TargetOfTargetOfTarget");
+			self:UpdateDefaultUnit("Focus");
+			self:UpdateDefaultUnit("FocusTarget");
+			self:UpdateDefaultUnit("FocusTargetOfTarget");
 
 			-- Party / Raid Frames
 			local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
 
 			-- Raid Frames
 			for i = 1, knMaxGroupSize do
-				UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and GroupLib.GetUnitForGroupMember(i) or nil);
-				UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and GroupLib.GetUnitForGroupMember(i) or nil);
+				UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and self:GetUnit("Raid", i));
+				UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and self:GetUnit("Party", i));
 			end
 		end
 	end
@@ -166,9 +170,7 @@ end
 
 -----------------------------------------------------------------------------
 
-local Enable = function(self)
-	self.UpdateUnits = UpdateUnits;
-
+function UnitFrameController:Enable()
 	if (GameLib and GameLib.IsCharacterLoaded()) then
 		self:UpdateUnits();
 	end
@@ -263,7 +265,6 @@ function UnitFrameController:New(xmlDoc, tCustomColors)
 	-- Expose Methods
 	self.CreateUnitFrame = CreateUnitFrame;
 	self.LoadForm = LoadForm;
-	self.Enable = Enable;
 
 	-- Done
 	return self;
