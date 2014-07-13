@@ -52,6 +52,8 @@ local ktDifficultyColors = {
 	{ 4, "ffff00ff"} -- Impossible
 };
 
+local kbTestMode = false;
+
 -----------------------------------------------------------------------------
 -- Helper Functions
 -----------------------------------------------------------------------------
@@ -343,7 +345,11 @@ local Disable = function(self)
 	end
 
 	self.unit = nil;
-	self:Hide();
+	if (not kbTestMode) then
+		self:Hide();
+	else
+		self:Show();
+	end
 end
 
 local Enable = function(self)
@@ -370,6 +376,9 @@ local SetUnit = function(self, unit)
 
 		self.unit = unit;
 		self.bIsObject = UnitIsObject(unit);
+		self:Enable();
+	elseif (self.unit and self.unit:GetId() == 0) then
+		-- GroupLib unit, update all (until we find events for group size changes)
 		self:Enable();
 	end
 end
