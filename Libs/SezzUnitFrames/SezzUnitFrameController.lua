@@ -155,8 +155,8 @@ function UnitFrameController:UpdateUnits()
 
 			-- Raid Frames
 			for i = 1, knMaxGroupSize do
+				UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", i));
 				UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and self:GetUnit("Raid", i));
-				UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and self:GetUnit("Party", i));
 			end
 		end
 	end
