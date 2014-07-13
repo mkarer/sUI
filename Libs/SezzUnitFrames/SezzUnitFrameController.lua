@@ -124,6 +124,18 @@ function UnitFrameController:UpdateDefaultUnit(strUnit)
 	UpdateUnit(self, strUnit, self:GetUnit(strUnit));
 end
 
+function UnitFrameController:OnAlternateTargetUnitChanged()
+	self:UpdateDefaultUnit("Focus");
+	self:UpdateDefaultUnit("FocusTarget");
+	self:UpdateDefaultUnit("FocusTargetOfTarget");
+end
+
+function UnitFrameController:OnTargetUnitChanged()
+	self:UpdateDefaultUnit("Target");
+	self:UpdateDefaultUnit("TargetOfTarget");
+	self:UpdateDefaultUnit("TargetOfTargetOfTarget");
+end
+
 function UnitFrameController:UpdateUnits()
 	local bCharacterLoaded = false;
 
@@ -142,13 +154,9 @@ function UnitFrameController:UpdateUnits()
 			bCharacterLoaded = true;
 
 			-- Main Unit Frames
-			self:UpdateDefaultUnit("Player");
-			self:UpdateDefaultUnit("Target");
-			self:UpdateDefaultUnit("TargetOfTarget");
-			self:UpdateDefaultUnit("TargetOfTargetOfTarget");
-			self:UpdateDefaultUnit("Focus");
-			self:UpdateDefaultUnit("FocusTarget");
-			self:UpdateDefaultUnit("FocusTargetOfTarget");
+			self:UpdateDefaultUnit("Player");		-- TODO: Only update on Login/PlayerChanged
+			self:OnTargetUnitChanged();				-- TODO: Only update on Login/PlayerChanged
+			self:OnAlternateTargetUnitChanged();	-- TODO: Only update on Login/PlayerChanged
 
 			-- Party / Raid Frames
 			local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
@@ -177,8 +185,8 @@ function UnitFrameController:Enable()
 
 	Apollo.RegisterEventHandler("CharacterCreated", "UpdateUnits", self);
 	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnits", self);
-	Apollo.RegisterEventHandler("TargetUnitChanged", "UpdateUnits", self);
-	Apollo.RegisterEventHandler("AlternateTargetUnitChanged", "UpdateUnits", self);
+	Apollo.RegisterEventHandler("TargetUnitChanged", "OnTargetUnitChanged", self);
+	Apollo.RegisterEventHandler("AlternateTargetUnitChanged", "OnAlternateTargetUnitChanged", self);
 	Apollo.RegisterEventHandler("VarChange_FrameCount", "UpdateUnits", self);
 end
 
