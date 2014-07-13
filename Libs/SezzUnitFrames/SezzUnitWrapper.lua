@@ -70,9 +70,27 @@ end
 -- GroupLib
 -----------------------------------------------------------------------------
 
-local GroupLibUnit = {};
+local GroupLibUnit = {
+	GetGroupValue = fnZero,
+	IsACharacter = fnTrue,
+	GetTarget = fnNil,
+	Inspect = fnNil,
+	ShowHintArrow = fnNil,
+	IsInYourGroup = fnTrue,
+	IsValid = fnTrue,
+	GetTargetMarker = fnNil,
+	SetTargetMarker = fnNil,
+	ClearTargetMarker = fnNil,
+	IsTagged = fnFalse,
+	IsTaggedByMe = fnTrue,
+	IsSoftKill = fnTrue,
+	GetCCStateTimeRemaining = fnZero,
+	IsCasting = fnFalse,
+	GetInterruptArmorValue = fnZero,
+	GetId = fnZero,
+};
 
-GroupLibUnit.GetName = function(self)
+function GroupLibUnit:GetName()
 	return self.strCharacterName;
 end
 
@@ -84,39 +102,31 @@ function GroupLibUnit:IsDisconnected()
 	return self.bDisconnected;
 end
 
-GroupLibUnit.GetHealth = function(self)
+function GroupLibUnit:GetHealth()
 	return self.nHealth;
 end
 
-GroupLibUnit.GetTarget = fnNil;
-GroupLibUnit.Inspect = fnNil;
-GroupLibUnit.ShowHintArrow = fnNil;
-GroupLibUnit.IsInYourGroup = fnTrue;
-
-GroupLibUnit.GetMaxHealth = function(self)
+function GroupLibUnit:GetMaxHealth()
 	return self.nHealthMax;
 end
 
-GroupLibUnit.GetDispositionTo = function(self)
+function GroupLibUnit:GetDispositionTo()
 	return Unit.CodeEnumDisposition.Friendly;
 end
 
-GroupLibUnit.GetGroupValue = fnZero;
-GroupLibUnit.IsACharacter = fnTrue;
-
-GroupLibUnit.GetClassId = function(self)
+function GroupLibUnit:GetClassId()
 	return self.eClassId;
 end
 
-GroupLibUnit.GetLevel = function(self)
+function GroupLibUnit:GetLevel()
 	return self.nLevel;
 end
 
-GroupLibUnit.GetRank = function(self)
+function GroupLibUnit:GetRank()
 	return Unit.CodeEnumRank.Minion;
 end
 
-GroupLibUnit.GetBasicStats = function(self)
+function GroupLibUnit:GetBasicStats()
 	return {
 		nEffectiveLevel	= self.nEffectiveLevel,
 		nHealth			= self.nHealth,
@@ -126,40 +136,32 @@ GroupLibUnit.GetBasicStats = function(self)
 	};
 end
 
-GroupLibUnit.IsValid = fnTrue;
-
-GroupLibUnit.GetBuffs = function(self)
+function GroupLibUnit:GetBuffs()
 	return {
 		arBeneficial = {},
 		arHarmful = {},
 	};
 end
 
-GroupLibUnit.IsDead = function(self)
-	return self.bIsOnline and self.nHealth > 0;
+function GroupLibUnit:IsDead()
+	return self.bIsOnline and self.nHealth == 0;
 end
 
-GroupLibUnit.GetShieldCapacity = function(self)
+function GroupLibUnit:GetShieldCapacity()
 	return self.nShield;
 end
 
-GroupLibUnit.GetShieldCapacityMax = function(self)
+function GroupLibUnit:GetShieldCapacityMax()
 	return self.nShieldMax;
 end
 
-GroupLibUnit.GetType = function(self)
+function GroupLibUnit:GetType()
 	return "Player";
 end
 
-GroupLibUnit.GetTargetMarker = fnNil;
-GroupLibUnit.SetTargetMarker = fnNil;
-GroupLibUnit.ClearTargetMarker = fnNil;
-
-GroupLibUnit.GetFaction = function()
+function GroupLibUnit:GetFaction()
 	return GameLib.GetPlayerUnit():GetFaction();
 end
-
-GroupLibUnit.GetId = fnZero;
 
 local WrapGroupUnit = function(unit)
 	if (not unit) then return; end
