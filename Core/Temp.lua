@@ -27,7 +27,30 @@ function M:OnEnable()
 	end
 
 --	self:RegisterEvent("ObscuredAddonVisible", "EventHandler");
-
+	self:RegisterEvent("Group_AcceptInvite", "EventHandler");
+	self:RegisterEvent("Group_Add", "EventHandler");
+	self:RegisterEvent("Group_DeclineInvite", "EventHandler");
+	self:RegisterEvent("Group_FlagsChanged", "EventHandler");
+	self:RegisterEvent("Group_Invite_Result", "EventHandler");
+	self:RegisterEvent("Group_Invited", "EventHandler");
+	self:RegisterEvent("Group_Join", "EventHandler");
+	self:RegisterEvent("Group_JoinRequest", "EventHandler");
+	self:RegisterEvent("Group_Left", "EventHandler");
+	self:RegisterEvent("Group_LootRulesChanged", "EventHandler");
+	self:RegisterEvent("Group_MemberConnect", "EventHandler");
+	self:RegisterEvent("Group_MemberFlagsChanged", "EventHandler");
+	self:RegisterEvent("Group_MemberPromoted", "EventHandler");
+	self:RegisterEvent("Group_Mentor", "EventHandler");
+	self:RegisterEvent("Group_MentorLeftAOI", "EventHandler");
+	self:RegisterEvent("Group_MentorRelationship", "EventHandler");
+	self:RegisterEvent("Group_Operation_Result", "EventHandler");
+	self:RegisterEvent("Group_ReadyCheck", "EventHandler");
+	self:RegisterEvent("Group_Referral", "EventHandler");
+	self:RegisterEvent("Group_Remove", "EventHandler");
+	self:RegisterEvent("Group_Request_Result", "EventHandler");
+	self:RegisterEvent("Group_Updated", "EventHandler");
+	self:RegisterEvent("Group_UpdatePosition", "EventHandler");
+	self:RegisterEvent("UnitNameChanged", "EventHandler");
 end
 
 function S:Test()
