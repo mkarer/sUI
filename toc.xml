@@ -73,6 +73,9 @@
 	<Script Name="Modules\UnitFrames\Units\Target.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTargetOfTarget.lua" />
+	<Script Name="Modules\UnitFrames\Units\Focus.lua" />
+	<Script Name="Modules\UnitFrames\Units\FocusTarget.lua" />
+	<Script Name="Modules\UnitFrames\Units\FocusTargetOfTarget.lua" />
 	<Script Name="Modules\UnitFrames\Groups\Party.lua" />
 	<Script Name="Modules\UnitFrames\Groups\Raid.lua" />
 	<!-- Chat -->
