@@ -136,9 +136,11 @@ function UnitFrameController:OnTargetUnitChanged()
 	self:UpdateDefaultUnit("TargetOfTargetOfTarget");
 end
 
-function UnitFrameController:UpdateUnits()
-	local bCharacterLoaded = false;
+function UnitFrameController:OnPlayerChanged()
+	self:UpdateDefaultUnit("Player");
+end
 
+function UnitFrameController:UpdateUnits()
 	-- Reduce Updates/Second
 	local nTicks = GameLib.GetTickCount();
 
@@ -151,12 +153,13 @@ function UnitFrameController:UpdateUnits()
 
 		if (unitPlayer and unitPlayer:IsValid()) then
 			-- Update Unit Frames
-			bCharacterLoaded = true;
+			self.bCharacterLoaded = true;
 
 			-- Main Unit Frames
-			self:UpdateDefaultUnit("Player");		-- TODO: Only update on Login/PlayerChanged
-			self:OnTargetUnitChanged();				-- TODO: Only update on Login/PlayerChanged
-			self:OnAlternateTargetUnitChanged();	-- TODO: Only update on Login/PlayerChanged
+			-- I don't think there are events for "TargetChanged" or "TargetOfTargetChanged" for non-players, so we'll update all.
+			self:OnPlayerChanged();
+			self:OnTargetUnitChanged();
+			self:OnAlternateTargetUnitChanged();
 
 			-- Party / Raid Frames
 			local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
@@ -169,10 +172,9 @@ function UnitFrameController:UpdateUnits()
 		end
 	end
 
-	if (not bCharacterLoaded) then
+	if (not self.bCharacterLoaded) then
 		-- Delay
-		log:debug("Delaying OnCharacterCreated")
-		ApolloTimer.Create(0.1, false, "OnCharacterCreated", self);
+		ApolloTimer.Create(0.1, false, "UpdateUnits", self);
 	end
 end
 
@@ -184,7 +186,7 @@ function UnitFrameController:Enable()
 	end
 
 	Apollo.RegisterEventHandler("CharacterCreated", "UpdateUnits", self);
-	Apollo.RegisterEventHandler("PlayerChanged", "UpdateUnits", self);
+	Apollo.RegisterEventHandler("PlayerChanged", "OnPlayerChanged", self);
 	Apollo.RegisterEventHandler("TargetUnitChanged", "OnTargetUnitChanged", self);
 	Apollo.RegisterEventHandler("AlternateTargetUnitChanged", "OnAlternateTargetUnitChanged", self);
 	Apollo.RegisterEventHandler("VarChange_FrameCount", "UpdateUnits", self);
@@ -259,6 +261,7 @@ function UnitFrameController:New(xmlDoc, tCustomColors)
 	-- Properties
 	self.tUnitFrames = {};
 	self.tColors = (tCustomColors and setmetatable(tCustomColors, { __index = tColors }) or tColors);
+	self.bCharacterLoaded = false;
 
 	-- Create a new XML Document
 	self.xmlDoc = xmlDoc or XmlDocument.NewForm();
