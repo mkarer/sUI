@@ -17,7 +17,7 @@ UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
 	tAnchorOffsets = { -127, -126, 127, -92 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:ClassColor][Name][ >Sezz:Role][ >Sezz:RaidGroup]",
+	strTagsTextLeft = "[Sezz:Difficulty][Sezz:ClassColor][Name][ >Sezz:Role]",
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
