@@ -96,13 +96,20 @@ function M:OnEnable()
 		local tBaseSettings = self.tSettings[strUnit];
 		local tBaseAnchorOffsets = tBaseSettings.tAnchorOffsets;
 		local nColumn = 1;
+		local nRow = 0;
 		local nFramePadding = 2;
 		local nAnchorIncreaseL, nAnchorIncreaseT, nAnchorIncreaseR, nAnchorIncreaseB = 0, 0, 0, 0;
 
 		if (tBaseSettings.strDirection and tBaseSettings.strDirection == "TOPBOTTOM") then
 			-- Spawndirection: Top to Bottom
-			nAnchorIncreaseT = tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2] - nFramePadding;
-			nAnchorIncreaseB = tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2] - nFramePadding;
+			nAnchorIncreaseT = tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2] + nFramePadding;
+			nAnchorIncreaseB = tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2] + nFramePadding;
+		end
+
+		if (tBaseSettings.strDirectionColumn and tBaseSettings.strDirectionColumn == "LEFTRIGHT") then
+			-- Spawndirection: Top to Bottom
+			nAnchorIncreaseL = tBaseAnchorOffsets[3] - tBaseAnchorOffsets[1] + nFramePadding;
+			nAnchorIncreaseR = tBaseAnchorOffsets[3] - tBaseAnchorOffsets[1] + nFramePadding;
 		end
 
 		for i = 1, 40 do
@@ -111,9 +118,19 @@ function M:OnEnable()
 			if (i - 1 > 0 and (i - 1) % tBaseSettings.nUnitsPerColumn == 0) then
 				-- Next Column
 				nColumn = nColumn + 1;
+				nRow = 1;
+			else
+				nRow = nRow + 1;
 			end
 
 			-- Update Anchors
+			tSettings.tAnchorOffsets = {
+				tBaseSettings.tAnchorOffsets[1] + (nColumn - 1) * nAnchorIncreaseL,
+				tBaseSettings.tAnchorOffsets[2] + (nRow - 1) * nAnchorIncreaseT,
+				tBaseSettings.tAnchorOffsets[3] + (nColumn - 1) * nAnchorIncreaseR,
+				tBaseSettings.tAnchorOffsets[4] + (nRow - 1) * nAnchorIncreaseB,
+			};
+
 			self.tSettings[strUnit..i] = setmetatable(tSettings, { __index = tBaseSettings });
 		end
 	end
