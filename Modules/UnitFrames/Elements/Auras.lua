@@ -39,5 +39,4 @@ function UnitFramesLayout:CreateAurasElement(strUnit, tSettings)
 	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraPrototypeDebuff", tSettings.tAuraPrototypeDebuff);
 	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraFilter", tSettings.tAurasFilter);
 	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraAnchorLeft", tSettings.bAurasAnchorLeft);
-
 end
