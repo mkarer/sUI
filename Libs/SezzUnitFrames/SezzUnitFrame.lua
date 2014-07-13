@@ -231,7 +231,9 @@ end
 
 local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
 	if (eMouseButton == GameLib.CodeEnumInputMouse.Left) then
-		GameLib.SetTargetUnit(self.unit);
+		if (self.unit.__proto__) then
+			GameLib.SetTargetUnit(self.unit.__proto__);
+		end
 		return false
 	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
 		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit);
@@ -318,7 +320,7 @@ local UnitIsObject = function(unit)
 	local nCurrent = unit:GetHealth();
 	local nMax = unit:GetMaxHealth();
 
-	return (not nCurrent or not nMax or (nCurrent == 0 and nMax == 0));
+	return (unit:IsOnline() and not unit:IsDisconnected() and (not nCurrent or not nMax or (nCurrent == 0 and nMax == 0)));
 end
 
 local Update = function(self)
