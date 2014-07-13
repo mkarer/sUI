@@ -1,6 +1,6 @@
 --[[
 
-	s:UI Unit Frame Layout Settings: Player
+	s:UI Unit Frame Layout Settings: Party
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
