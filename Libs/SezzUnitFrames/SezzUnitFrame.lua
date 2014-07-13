@@ -52,7 +52,7 @@ local ktDifficultyColors = {
 	{ 4, "ffff00ff"} -- Impossible
 };
 
-local kbTestMode = true;
+local kbTestMode = false;
 
 -----------------------------------------------------------------------------
 -- Helper Functions
