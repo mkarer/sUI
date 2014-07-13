@@ -44,3 +44,11 @@ function M:ToggleWindowWireFrames()
 end
 
 Apollo.RegisterSlashCommand("fstack", "ToggleWindowWireFrames", M);
+
+-- Focus
+function M:SetFocus()
+	local unitPlayer = GameLib.GetPlayerUnit();
+	unitPlayer:SetAlternateTarget(unitPlayer:GetTarget());
+end
+
+Apollo.RegisterSlashCommand("focus", "SetFocus", M);
