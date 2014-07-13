@@ -52,35 +52,68 @@ function M:OnEnable()
 		local tBaseSettings = self.tSettings[strUnit];
 		local tBaseAnchorOffsets = tBaseSettings.tAnchorOffsets;
 
+		local nFramePadding = 2;
 		local nAnchorIncreaseL, nAnchorIncreaseT, nAnchorIncreaseR, nAnchorIncreaseB = 0, 0, 0, 0;
 		if (tBaseSettings.strDirection and tBaseSettings.strDirection == "BOTTOMTOP") then
 			-- Spawndirection: Bottom to Top
-			nAnchorIncreaseT = -(tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2]) - 2;
-			nAnchorIncreaseB = -(tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2]) - 2;
+			nAnchorIncreaseT = -(tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2]) - nFramePadding;
+			nAnchorIncreaseB = -(tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2]) - nFramePadding;
 		end
 
-		for i = 1, 5 do
+		for i = 2, 5 do
 			local tSettings = {};
 
 			-- Update Anchors
-			if (i  > 1) then
+			if (i  > 2) then
 				tSettings.tAnchorOffsets = {
-					tBaseSettings.tAnchorOffsets[1] + (i - 1) * nAnchorIncreaseL,
-					tBaseSettings.tAnchorOffsets[2] + (i - 1) * nAnchorIncreaseT,
-					tBaseSettings.tAnchorOffsets[3] + (i - 1) * nAnchorIncreaseR,
-					tBaseSettings.tAnchorOffsets[4] + (i - 1) * nAnchorIncreaseB,
+					tBaseSettings.tAnchorOffsets[1] + (i - 2) * nAnchorIncreaseL,
+					tBaseSettings.tAnchorOffsets[2] + (i - 2) * nAnchorIncreaseT,
+					tBaseSettings.tAnchorOffsets[3] + (i - 2) * nAnchorIncreaseR,
+					tBaseSettings.tAnchorOffsets[4] + (i - 2) * nAnchorIncreaseB,
 				};
 
 				if (tBaseSettings.bAurasEnabled) then
 					tSettings.tAurasAnchorOffsets = {
-						tBaseSettings.tAurasAnchorOffsets[1] + (i - 1) * nAnchorIncreaseL,
-						tBaseSettings.tAurasAnchorOffsets[2] + (i - 1) * nAnchorIncreaseT,
-						tBaseSettings.tAurasAnchorOffsets[3] + (i - 1) * nAnchorIncreaseR,
-						tBaseSettings.tAurasAnchorOffsets[4] + (i - 1) * nAnchorIncreaseB,
+						tBaseSettings.tAurasAnchorOffsets[1] + (i - 2) * nAnchorIncreaseL,
+						tBaseSettings.tAurasAnchorOffsets[2] + (i - 2) * nAnchorIncreaseT,
+						tBaseSettings.tAurasAnchorOffsets[3] + (i - 2) * nAnchorIncreaseR,
+						tBaseSettings.tAurasAnchorOffsets[4] + (i - 2) * nAnchorIncreaseB,
 					};
 				end
 			end
 
+			self.tSettings[strUnit..i] = setmetatable(tSettings, { __index = tBaseSettings });
+		end
+	end
+
+--	strDirection = "TOPBOTTOM",
+--	nUnitsPerColumn = 5,
+--	strDirectionColumn = "LEFTRIGHT",
+
+	-- Create Settings for Raid
+	if (self.tSettings["Raid"]) then
+		local strUnit = "Raid";
+		local tBaseSettings = self.tSettings[strUnit];
+		local tBaseAnchorOffsets = tBaseSettings.tAnchorOffsets;
+		local nColumn = 1;
+		local nFramePadding = 2;
+		local nAnchorIncreaseL, nAnchorIncreaseT, nAnchorIncreaseR, nAnchorIncreaseB = 0, 0, 0, 0;
+
+		if (tBaseSettings.strDirection and tBaseSettings.strDirection == "TOPBOTTOM") then
+			-- Spawndirection: Top to Bottom
+			nAnchorIncreaseT = tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2] - nFramePadding;
+			nAnchorIncreaseB = tBaseAnchorOffsets[4] - tBaseAnchorOffsets[2] - nFramePadding;
+		end
+
+		for i = 1, 40 do
+			local tSettings = {};
+
+			if (i - 1 > 0 and (i - 1) % tBaseSettings.nUnitsPerColumn == 0) then
+				-- Next Column
+				nColumn = nColumn + 1;
+			end
+
+			-- Update Anchors
 			self.tSettings[strUnit..i] = setmetatable(tSettings, { __index = tBaseSettings });
 		end
 	end

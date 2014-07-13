@@ -74,6 +74,7 @@
 	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTargetOfTarget.lua" />
 	<Script Name="Modules\UnitFrames\Groups\Party.lua" />
+	<Script Name="Modules\UnitFrames\Groups\Raid.lua" />
 	<!-- Chat -->
 	<Script Name="Modules\Chat\Core.lua" />
 	<Script Name="Modules\Chat\ChannelColors.lua" />
