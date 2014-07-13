@@ -17,7 +17,7 @@ UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
 	tAnchorOffsets = { -127, -214, 127, -180 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:Level< ][Sezz:ClassColor][Name][ >Sezz:Role][ >Sezz:RaidGroup][ >Sezz:ComboPoints]",
+	strTagsTextLeft = "[Sezz:Difficulty][Sezz:Level< ][Sezz:ClassColor][Name][ >Sezz:Role]",
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
