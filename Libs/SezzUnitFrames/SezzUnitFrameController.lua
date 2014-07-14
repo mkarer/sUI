@@ -70,7 +70,7 @@ local tColors = {
 --		Warning = { 1, 0, 0 },
 	},
 	Class = setmetatable({
-		["Default"]								= { 255/255, 255/255, 255/255 },
+		["Default"]								= { 1, 1, 1 },
 		["Object"]								= { 0, 1, 0 },
 		[GameLib.CodeEnumClass.Engineer]		= { 164/255,  26/255,  49/255 },
 		[GameLib.CodeEnumClass.Esper]			= { 116/255, 221/255, 255/255 },
