@@ -42,6 +42,10 @@ function Element:UpdateThreat(...)
 	local wndThreat = self.tUnitFrame.wndThreat;
 	local tColors = self.tUnitFrame.tColors;
 
+	if (UnitIsFriend(unit)) then
+		return;
+	end
+
 	if (unit:IsDead()) then
 		-- Mobs don't get resurrected, right?
 		self:Disable();
