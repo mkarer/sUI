@@ -17,7 +17,7 @@ local tSettings = {
 	tAnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
 	tAnchorOffsets = { 283, -92, 537, -58 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:Level< ][Sezz:ClassColor][Name][ >Sezz:Role]",
+	strTagsTextLeft = "[TDifficultyColor][Level][Classification][TClose][TClassColor][ >Name][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,

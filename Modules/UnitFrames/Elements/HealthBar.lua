@@ -77,6 +77,7 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit, tSettings)
 		});
 
 		tXmlData["HealthBar"]:AddChild(tXmlData["TextRight"]);
+		UnitFramesLayout:SetTagAttribute(strUnit, "TextRight", tSettings.strTagsTextRight, "CRB_Pixel_O", "Right", 50);
 	end
 
 	-------------------------------------------------------------------------
@@ -107,5 +108,6 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit, tSettings)
 		});
 
 		tXmlData["HealthBar"]:AddChild(tXmlData["TextLeft"]);
+		UnitFramesLayout:SetTagAttribute(strUnit, "TextLeft", tSettings.strTagsTextLeft, "CRB_Pixel_O", "Left");
 	end
 end

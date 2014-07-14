@@ -20,7 +20,7 @@ local tSettings = {
 	tAnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
 	tAnchorOffsets = { 250, 0, 325, 35 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:ClassColor][Name][ >Sezz:Role]",
+	strTagsTextLeft = "[TClassColor][ >Sezz:RaidName][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HPMinimalParty]",
 	-- Shield Bar
 	bShieldBarEnabled = true,

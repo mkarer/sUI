@@ -18,7 +18,7 @@ local tSettings = {
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
 	tAnchorOffsets = { 129, -126, 299, -98 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:Level< ][Sezz:ClassColor][Name][ >Sezz:Role][ >Sezz:RaidGroup]",
+	strTagsTextLeft = "[TDifficultyColor][Level][Classification][TClose][TClassColor][ >Name][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HPMinimalParty]",
 	-- Shield Bar
 	bShieldBarEnabled = true,
@@ -39,3 +39,8 @@ tSettings.tAurasFilter["Buff"] = true;
 
 -- Set Configuration
 UnitFramesLayout:SetUnitFrameConfiguration("Party", tSettings);
+
+
+
+
+

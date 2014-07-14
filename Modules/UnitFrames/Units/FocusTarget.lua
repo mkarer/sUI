@@ -17,7 +17,7 @@ UnitFramesLayout:SetUnitFrameConfiguration("FocusTarget", {
 	tAnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
 	tAnchorOffsets = { 539, -92, 705, -58 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:ClassColor][Name][ >Sezz:Role]",
+	strTagsTextLeft = "[TClassColor][Name][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HPMinimalParty]",
 	-- Cast Bar
 	bCastBarEnabled = true,

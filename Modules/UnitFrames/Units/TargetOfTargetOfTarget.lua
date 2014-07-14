@@ -17,6 +17,6 @@ UnitFramesLayout:SetUnitFrameConfiguration("TargetOfTargetOfTarget", {
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
 	tAnchorOffsets = { -127, -240, -23, -218 },
 	-- Health Bar
-	strTagsTextLeft = "[Sezz:Difficulty][Sezz:ClassColor][Name][ >Sezz:Role]",
+	strTagsTextLeft = "[TClassColor][Name][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HPMinimal]",
 });

@@ -45,6 +45,7 @@ function M:OnEnable()
 	self.tUnitFrameController = UnitFrameController:New();
 	self.tUnitFrameController:SetColors(self.tColors);
 	self.xmlDoc = self.tUnitFrameController.xmlDoc;
+	self:RegisterTags();
 
 	-- Create Settings for Party
 	if (self.tSettings["Party"]) then
@@ -85,10 +86,6 @@ function M:OnEnable()
 			self.tSettings[strUnit..i] = setmetatable(tSettings, { __index = tBaseSettings });
 		end
 	end
-
---	strDirection = "TOPBOTTOM",
---	nUnitsPerColumn = 5,
---	strDirectionColumn = "LEFTRIGHT",
 
 	-- Create Settings for Raid
 	if (self.tSettings["Raid"]) then
@@ -142,7 +139,6 @@ function M:OnEnable()
 		end
 	end
 
-
 	-- Enable Unit Frames
 	self.tUnitFrameController:LoadForm();
 	self.tUnitFrameController:Enable();
@@ -165,6 +161,10 @@ function M:InitializeUnitFrameXML(strUnit, tSettings)
 			TooltipType = "OnCursor",
 		}),
 	};
+
+	-- Attributes
+	tSettings["tAttributes"] = {};
+	tSettings["tAttributes"]["Tags"] = {};
 end
 
 function M:SetUnitFrameAttribute(strUnit, strAttribute, vValue)
@@ -175,4 +175,8 @@ function M:SetUnitFrameAttribute(strUnit, strAttribute, vValue)
 	end
 
 	tSettings["tAttributes"][strAttribute] = vValue;
+end
+
+function M:SetTagAttribute(strUnit, strWindowName, strTags, strFont, strAlign, nUpdateInterval)
+	self.tSettings[strUnit].tAttributes.Tags[strWindowName] = { Tags = strTags, Font = strFont, Align = strAlign or "Left", Interval = nUpdateInterval };
 end
