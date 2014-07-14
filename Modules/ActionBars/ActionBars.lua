@@ -33,6 +33,22 @@ function M:OnInitialize()
 		buttonPadding = 2,
 		barPadding = 10, -- Menu needs atleast 10 because the toggle is ignored by ContainsMouse()
 	};
+
+	self.tAbilityQuickSwitch = {
+		-- Stalker
+		[23218] = 23161,
+		[23161] = 23218,
+		-- Medic
+		[26061] = 16322,
+		[16322] = 26061,
+		-- Esper
+		[19102] = 21613,
+		[21613] = 19102,
+		-- Engineer
+		[25473] = 20763,
+		[20763] = 25473,
+	};
+
 	self.tBars = {};
 	self:EnableProfile();
 
@@ -207,8 +223,8 @@ function M:SetupActionBars()
 	self.tBars[barMain.strName] = barMain;
 
 	-- Update Events
-	self:RegisterEvent("Sezz_LimitedActionSetChanged", "UpdateActionBarButtonBorders"); -- Stupid hack until AbilityBookChange works as expected
-	self:UpdateActionBarButtonBorders();
+	self:RegisterEvent("Sezz_LimitedActionSetChanged", "OnLimitedActionSetChanged");
+	self:OnLimitedActionSetChanged();
 
 	-----------------------------------------------------------------------------
 	-- Bottom Bar
@@ -654,6 +670,34 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			buttonContainer.wndMenu:AddEventHandler("WindowClosed", "CloseMenu", buttonContainer);
 		end
 
+		-- Ability Switcher
+		if (buttonAttributes.type == "LAS" and buttonAttributes.id >= 0 and buttonAttributes.id <= 7) then
+			buttonContainer.AbilityQuickSwitch = function(self)
+				if (S.inCombat) then return; end
+
+				local tLAS = ActionSetLib.GetCurrentActionSet();
+				local nAbilityId = tLAS[self.Attributes.id + 1];
+
+				if (M.tAbilityQuickSwitch[nAbilityId]) then
+					tLAS[self.Attributes.id + 1] = M.tAbilityQuickSwitch[nAbilityId];
+
+					local tAbilities = AbilityBook.GetAbilitiesList();
+					local nTier = 1;
+					for _, tAbility in ipairs(tAbilities) do
+						if (tAbility.nId == nAbilityId) then
+							nTier = tAbility.nCurrentTier;
+							break
+						end
+					end
+
+					AbilityBook.UpdateSpellTier(nAbilityId, 1);
+					AbilityBook.UpdateSpellTier(M.tAbilityQuickSwitch[nAbilityId], nTier);
+					ActionSetLib.RequestActionSetChanges(tLAS);
+				end
+			end
+			buttonContainer.wndMain:FindChild("AbilitySwitcher"):AddEventHandler("MouseButtonUp", "AbilityQuickSwitch", buttonContainer);
+		end
+
 		-- Update Position
 		local buttonPosition = (i - 1) * (buttonSize + self.DB.buttonPadding);
 		if (dirHorizontal) then
@@ -679,13 +723,17 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 	return barContainer;
 end
 
-function M:UpdateActionBarButtonBorders()
-	-- Update LAS Bar Background Sprite (Workaround)
+function M:OnLimitedActionSetChanged()
+	-- Update LAS Bar Background Sprite
 	for i, tButton in ipairs(self.tBars["Main"].Buttons) do
-		if (tButton.Attributes.type == "LAS" and (tButton.Attributes.id >= 0 and tButton.Attributes.id <= 7) and (not S.myLAS[tButton.Attributes.id + 1] or S.myLAS[tButton.Attributes.id + 1] == 0)) then
-			tButton.wndMain:FindChild("ButtonBorder"):SetSprite(nil);
-		else
-			tButton.wndMain:FindChild("ButtonBorder"):SetSprite("ActionButton");
+		if (tButton.Attributes.type == "LAS") then
+			if ((tButton.Attributes.id >= 0 and tButton.Attributes.id <= 7) and (not S.myLAS[tButton.Attributes.id + 1] or S.myLAS[tButton.Attributes.id + 1] == 0)) then
+				tButton.wndMain:FindChild("ButtonBorder"):SetSprite(nil);
+				tButton.wndMain:FindChild("AbilitySwitcher"):Show(false, false);
+			else
+				tButton.wndMain:FindChild("ButtonBorder"):SetSprite("ActionButton");
+				tButton.wndMain:FindChild("AbilitySwitcher"):Show(self.tAbilityQuickSwitch[S.myLAS[tButton.Attributes.id + 1]] ~= nil, false);
+			end
 		end
 	end
 end
