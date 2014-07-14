@@ -295,4 +295,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Drafto:Lib:XmlDocument-1.0", "Sezz:UnitFrame-0.1", "Gemini:Logging-1.2" });
+Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Drafto:Lib:XmlDocument-1.0", "Sezz:UnitFrame-0.1", "Gemini:Logging-1.2", "Gemini:Event-1.0" });
