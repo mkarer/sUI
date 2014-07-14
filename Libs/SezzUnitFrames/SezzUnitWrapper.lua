@@ -21,6 +21,10 @@ local fnZero = function() return 0; end
 local fnTrue = function() return true; end
 local fnFalse = function() return false; end
 
+local fnUnitRole = function(self)
+	return (self.bHealer == true and "HEALER") or (self.bTank == true and "TANK") or "DAMAGER";
+end
+
 -----------------------------------------------------------------------------
 -- Units
 -----------------------------------------------------------------------------
@@ -53,6 +57,7 @@ function UnitClassWrapper:New(unit, nIndex)
 
 	self.IsOnline = fnTrue;
 	self.IsDisconnected = fnFalse;
+	self.GetRole = fnUnitRole;
 
 	if (unit:IsInYourGroup()) then
 	end
@@ -88,6 +93,7 @@ local GroupLibUnit = {
 	IsCasting = fnFalse,
 	GetInterruptArmorValue = fnZero,
 	GetId = fnZero,
+	GetRole = fnUnitRole;
 };
 
 function GroupLibUnit:GetName()
