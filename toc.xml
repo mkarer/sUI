@@ -25,6 +25,7 @@
 	<Script Name="Libs\SezzUnitFrames\Elements\ShieldBar.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\ThreatBar.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\Auras.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\Range.lua" />
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />
