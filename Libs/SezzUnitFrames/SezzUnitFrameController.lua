@@ -110,11 +110,10 @@ end
 -- Events
 -----------------------------------------------------------------------------
 
-local UpdateUnit = function(self, strUnit, unit)
+local UpdateUnit = function(self, strUnit, unit, bForceUnitChange)
 	if (self.tUnitFrames[strUnit]) then
-		self.tUnitFrames[strUnit]:SetUnit(unit);
-		self.tUnitFrames[strUnit]:Update();
-		return true;
+		self.tUnitFrames[strUnit]:SetUnit(unit, bForceUnitChange);
+		return self.tUnitFrames[strUnit]:Update();
 	end
 
 	return false;
@@ -140,6 +139,26 @@ function UnitFrameController:OnPlayerChanged()
 	self:UpdateDefaultUnit("Player");
 end
 
+function UnitFrameController:UpdateGroups()
+	local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
+
+	-- Raid Frames
+	for i = 1, knMaxGroupSize do
+		UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", i));
+		UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and self:GetUnit("Raid", i));
+	end
+end
+
+function UnitFrameController:OnGroupMemberFlagsChanged(nIndex, bNoIdea, tFlags)
+	local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
+
+	UpdateUnit(self, "Party"..nIndex, nIndex <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", nIndex), true);
+	UpdateUnit(self, "Raid"..nIndex, nIndex <= nGroupSize and bInRaid and self:GetUnit("Raid", nIndex), true);
+end
+
+function UnitFrameController:OnGroupUpdated(tData)
+end
+
 function UnitFrameController:UpdateUnits()
 	-- Reduce Updates/Second
 	local nTicks = GameLib.GetTickCount();
@@ -162,13 +181,7 @@ function UnitFrameController:UpdateUnits()
 			self:OnAlternateTargetUnitChanged();
 
 			-- Party / Raid Frames
-			local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
-
-			-- Raid Frames
-			for i = 1, knMaxGroupSize do
-				UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", i));
-				UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and self:GetUnit("Raid", i));
-			end
+			self:UpdateGroups();
 		end
 	end
 
@@ -190,6 +203,9 @@ function UnitFrameController:Enable()
 	Apollo.RegisterEventHandler("TargetUnitChanged", "OnTargetUnitChanged", self);
 	Apollo.RegisterEventHandler("AlternateTargetUnitChanged", "OnAlternateTargetUnitChanged", self);
 	Apollo.RegisterEventHandler("VarChange_FrameCount", "UpdateUnits", self);
+--	Apollo.RegisterEventHandler("Group_Updated", "OnGroupUpdated", self);
+	Apollo.RegisterEventHandler("Group_MemberFlagsChanged", "OnGroupMemberFlagsChanged", self);
+
 end
 
 -----------------------------------------------------------------------------
