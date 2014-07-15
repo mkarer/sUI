@@ -28,3 +28,4 @@ local tSettings = {
 
 -- Set Configuration
 UnitFramesLayout:SetUnitFrameConfiguration("Raid", tSettings);
+UnitFramesLayout:SetUnitFrameAttribute("Raid", "OutOfRangeOpacity", 0.5);

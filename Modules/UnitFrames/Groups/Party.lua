@@ -39,8 +39,4 @@ tSettings.tAurasFilter["Buff"] = true;
 
 -- Set Configuration
 UnitFramesLayout:SetUnitFrameConfiguration("Party", tSettings);
-
-
-
-
-
+UnitFramesLayout:SetUnitFrameAttribute("Party", "OutOfRangeOpacity", 0.5);
