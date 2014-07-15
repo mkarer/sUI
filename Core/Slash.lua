@@ -52,3 +52,10 @@ function M:SetFocus()
 end
 
 Apollo.RegisterSlashCommand("focus", "SetFocus", M);
+
+-- Ready Check
+function M:ReadyCheck()
+	GroupLib.ReadyCheck(Apollo.GetString("CRB__2"));
+end
+
+Apollo.RegisterSlashCommand("rc", "ReadyCheck", M);
