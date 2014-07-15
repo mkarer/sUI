@@ -19,23 +19,23 @@ local M = {};
 -- Reload UI
 Apollo.RegisterSlashCommand("rl", "RequestReloadUI");
 
--- Emotes
--- ChatSystemLib.GetEmotes()
-local emoteShortcuts = {
+-- Command Shortcuts
+local tCommandShortcuts = {
 	ty = "thanks",
 	thx = "thanks",
 	lol = "laugh",
 	hi = "welcome",
+	inv = "invite",
 };
 
-function M:DoEmote(emote, target)
-	if (emote and emoteShortcuts[emote]) then
-		ChatSystemLib.Command("/"..emoteShortcuts[emote].. " "..target);
+function M:ExecuteCommand(strCommand, strArguments)
+	if (strCommand and tCommandShortcuts[strCommand]) then
+		ChatSystemLib.Command("/"..tCommandShortcuts[strCommand].. " "..strArguments);
 	end
 end
 
-for emote, v in pairs(emoteShortcuts) do
-	Apollo.RegisterSlashCommand(emote, "DoEmote", M);
+for strCommand in pairs(tCommandShortcuts) do
+	Apollo.RegisterSlashCommand(strCommand, "ExecuteCommand", M);
 end
 
 -- Window Wire Frames
