@@ -149,7 +149,7 @@ function UnitFrameController:UpdateGroups()
 	end
 end
 
-function UnitFrameController:OnGroupMemberFlagsChanged(nIndex, bNoIdea, tFlags)
+function UnitFrameController:OnGroupMemberFlagsChanged(nIndex)
 	local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
 
 	self:UpdateUnit("Party"..nIndex, nIndex <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", nIndex));
