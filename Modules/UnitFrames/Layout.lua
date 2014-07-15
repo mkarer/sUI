@@ -163,8 +163,13 @@ function M:InitializeUnitFrameXML(strUnit, tSettings)
 	};
 
 	-- Attributes
-	tSettings["tAttributes"] = {};
-	tSettings["tAttributes"]["Tags"] = {};
+	if (not tSettings["tAttributes"]) then
+		tSettings["tAttributes"] = {};
+	end
+
+	if not (tSettings["tAttributes"]["Tags"]) then
+		tSettings["tAttributes"]["Tags"] = {};
+	end
 end
 
 function M:SetUnitFrameAttribute(strUnit, strAttribute, vValue)
