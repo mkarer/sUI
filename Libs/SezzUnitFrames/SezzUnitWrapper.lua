@@ -177,6 +177,10 @@ function GroupLibUnit:IsMentoring()
 	return self.bIsMentoring;
 end
 
+function GroupLibUnit:GetRaceId()
+	return self.eRaceId;
+end
+
 local WrapGroupUnit = function(unit)
 	if (not unit) then return; end
 
@@ -223,6 +227,7 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 						for k, v in pairs(unit) do
 							if (type(v) ~= "table" and tCache[strUnit][k] ~= v) then
 								-- ignore tMentoredBy...
+								S.Log:debug("%s - Updated %s from %s to %s", unit.strCharacterName, k, tostring(tCache[strUnit][k]), tostring(v));
 								tCache[strUnit].bUpdated = true;
 								tCache[strUnit][k] = v;
 							end
