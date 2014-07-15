@@ -59,6 +59,7 @@
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
 	<Script Name="Modules\CritLine\CritLine.lua" />
 	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
+	<Script Name="Modules\ReadyCheck\ReadyCheck.lua" />
 	<!-- Buffs & Debuffs -->
 	<Script Name="Modules\Buffs\Core.lua" />
 	<!-- Unit Frames -->
