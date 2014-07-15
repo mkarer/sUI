@@ -20,6 +20,9 @@ local format = string.format;
 
 -- Spell Icons
 local tSpellIcons = {};
+local splVulnerability = GameLib.GetSpell(30334);
+local strVulnerabilityIcon = splVulnerability:GetIcon();
+local strVulnerabilityText = splVulnerability:GetName();
 
 -----------------------------------------------------------------------------
 
@@ -50,9 +53,9 @@ function Element:Update()
 				nDuration = self.nVulnerabilityStart;
 			end
 
-			strSpellName = "Vulnerability";
+			strSpellName = strVulnerabilityText;
 			nElapsed = nVulnerabilityTime;
-			strSpellIcon = "CRB_ActionBarIconSprites:sprAS_TestIcon";
+			strSpellIcon = strVulnerabilityIcon;
 
 			self.nVulnerabilityTime = nVulnerabilityTime;
 			wndProgress:SetBarColor(UnitFrameController:ColorArrayToHex(self.tUnitFrame.tColors.CastBar.Vulnerability));
