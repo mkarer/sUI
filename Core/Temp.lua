@@ -38,7 +38,7 @@ function M:OnEnable()
 	self:RegisterEvent("Group_Left", "EventHandler");
 	self:RegisterEvent("Group_LootRulesChanged", "EventHandler");
 	self:RegisterEvent("Group_MemberConnect", "EventHandler");
---	self:RegisterEvent("Group_MemberFlagsChanged", "EventHandler"); -- index, ?, tFlags (inv/kick/mark/disconnected/dps/healer/mainass/maintank/pending/raidass/ready/rolelocked/tank)
+	self:RegisterEvent("Group_MemberFlagsChanged", "EventHandler"); -- index, ?, tFlags (inv/kick/mark/disconnected/dps/healer/mainass/maintank/pending/raidass/ready/rolelocked/tank)
 	self:RegisterEvent("Group_MemberPromoted", "EventHandler");
 	self:RegisterEvent("Group_Mentor", "EventHandler");
 	self:RegisterEvent("Group_MentorLeftAOI", "EventHandler");
@@ -48,8 +48,8 @@ function M:OnEnable()
 	self:RegisterEvent("Group_Referral", "EventHandler");
 	self:RegisterEvent("Group_Remove", "EventHandler");
 	self:RegisterEvent("Group_Request_Result", "EventHandler");
---	self:RegisterEvent("Group_Updated", "EventHandler"); -- Happens all the time ;)
---	self:RegisterEvent("Group_UpdatePosition", "EventHandler"); -- Maybe when players are outofrange/in range? 
+--	self:RegisterEvent("Group_Updated", "EventHandler"); -- happens all the time, no args
+--	self:RegisterEvent("Group_UpdatePosition", "EventHandler"); -- also all the time, table with tables with nIndex to associate unit and coords
 	self:RegisterEvent("UnitNameChanged", "EventHandler");
 end
 
@@ -58,7 +58,11 @@ end
 
 function M:EventHandler(event, ...)
 	log:debug(event);
-	log:debug({...});
+
+	local tArgs = {...};
+	if (#tArgs > 0) then
+		log:debug(tArgs);
+	end
 end
 
 --[[
