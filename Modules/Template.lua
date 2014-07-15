@@ -8,7 +8,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:CreateSubmodule("ActionBars", "Gemini:Hook-1.0");
+local M = S:CreateSubmodule("XXX", "Gemini:Hook-1.0");
 local log;
 
 -----------------------------------------------------------------------------
