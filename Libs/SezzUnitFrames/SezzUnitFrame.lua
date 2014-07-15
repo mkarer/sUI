@@ -237,11 +237,11 @@ local LoadForm = function(self)
 end
 
 local Show = function(self)
-	Apollo.RegisterEventHandler("VarChange_FrameCount", "ShowDelayed", self); -- We need this because SetBGOpacity apparently needs 1 frame....
+	Apollo.RegisterEventHandler("NextFrame", "ShowDelayed", self); -- We need this because SetBGOpacity apparently needs 1 frame....
 end
 
 local ShowDelayed = function(self)
-	Apollo.RemoveEventHandler("VarChange_FrameCount", self);
+	Apollo.RemoveEventHandler("NextFrame", self);
 	self.wndMain:Show(true, true);
 	self.wndMain:ToFront();
 end
