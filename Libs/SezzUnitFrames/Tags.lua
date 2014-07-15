@@ -161,12 +161,10 @@ local tagStrings = {
 	end]],
 
 	["Classification"] = [[function(unit)
-		local tUnitStats = unit:GetBasicStats();
-		local bIsMentoring = (tUnitStats and tUnitStats.nEffectiveLevel > 0);
 		local strRank = "";
 
 		-- Scale Indicator
-		if (bIsMentoring) then
+		if (unit:IsMentoring()) then
 			strRank = strRank.."~";
 		end
 
