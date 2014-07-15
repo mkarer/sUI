@@ -76,7 +76,15 @@ end
 
 function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
 	-- This event only fires on login, not on ReloadUI.
-	if (nBar == nil or not self.tBars["Shortcut"..nBar]) then return; end
+	if (nBar == nil or not self.tBars["Shortcut"..nBar]) then
+		if (not self.bLoaded and bIsVisible) then
+			-- Event fired before OnEnable()
+			self.nActiveShortcutBar = nBar;
+			self.nActiveShortcutBarShortcuts = nShortcuts;
+		end
+		return;
+	end
+
 	log:debug("ShowActionBarShortcut: Bar %d %s (%d)", nBar, bIsVisible and "SHOW" or "HIDE", nShortcuts);
 
 	if (self.P.CurrentShortcutBar and not bIsVisible and self.P.CurrentShortcutBar == nBar) then
@@ -317,6 +325,16 @@ function M:SetupActionBars()
 
 		self:RegisterEvent("PetDespawned", "OnPetEvent");
 		self:RegisterEvent("PetSpawned", "OnPetEvent");
+	end
+
+	-----------------------------------------------------------------------------
+	-- Done
+	-----------------------------------------------------------------------------
+	self.bLoaded = true;
+	if (self.nActiveShortcutBar and self.nActiveShortcutBarShortcuts) then
+		self:OnShowActionBarShortcut(nil, self.nActiveShortcutBar, true, self.nActiveShortcutBarShortcuts);
+		self.nActiveShortcutBar = nil;
+		self.nActiveShortcutBarShortcuts = nil;
 	end
 end
 
