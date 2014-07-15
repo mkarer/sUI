@@ -28,6 +28,7 @@ function M:OnInitialize()
 	self:InitializeForms();
 
 	-- Configuration
+	self.nShortcutBars = (ActionSetLib.ShortcutSet and ActionSetLib.ShortcutSet.Count) or (ActionSetLib.CodeEnumShortcutSet and ActionSetLib.CodeEnumShortcutSet.Count) or 9;
 	self.DB = {
 		buttonSize = 36,
 		buttonPadding = 2,
@@ -95,7 +96,7 @@ function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
 end
 
 function M:SetActiveShortcutBar(nActiveBarId, nShortcuts)
-	for i = 0, ActionSetLib.ShortcutSet.Count do
+	for i = 0, self.nShortcutBars do
 		local bShowBar = (nActiveBarId == i);
 		local tBar = self.tBars["Shortcut"..i];
 		if (tBar) then
@@ -267,7 +268,7 @@ function M:SetupActionBars()
 	-----------------------------------------------------------------------------
 	-- Shortcut Bars
 	-----------------------------------------------------------------------------
-	for i = 4, ActionSetLib.ShortcutSet.Count do
+	for i = 4, self.nShortcutBars do
 		local barShortcut = self:CreateActionBar("Shortcut"..i, "S", true, i * 12, i * 12 + 7);
 		local barWidthOffset = math.ceil(barShortcut.Width / 2);
 		local barPositionOffset = 300;
