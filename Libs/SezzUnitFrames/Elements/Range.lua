@@ -23,11 +23,7 @@ function Element:Update()
 	if (not self.bEnabled) then return; end
 
 	local unit = self.tUnitFrame.unit;
-	if (unit:IsRealUnit()) then
-		return self:Disable();
-	end
-
-	if (unit:IsDisconnected() or not unit:IsOnline()) then
+	if (not unit:IsRealUnit() or unit:IsDisconnected() or not unit:IsOnline()) then
 		self.tUnitFrame.wndMain:SetOpacity(self.fOutOfRangeOpacity);
 	else
 		self.tUnitFrame.wndMain:SetOpacity(1);
@@ -43,9 +39,7 @@ function Element:OnGroupMemberFlagsChanged(nIndex)
 end
 
 function Element:Enable()
-	if (self.tUnitFrame.unit:IsRealUnit()) then
-		return self:Disable();
-	elseif (not self.bEnabled) then
+	if (not self.bEnabled) then
 		self.bEnabled = true;
 		Apollo.RegisterEventHandler("Group_MemberFlagsChanged", "OnGroupMemberFlagsChanged", self);
 	end
@@ -55,6 +49,7 @@ end
 
 function Element:Disable(bForce)
 	if (not self.bEnabled and not bForce) then return; end
+
 	self.tUnitFrame.wndMain:SetOpacity(1);
 	self.bEnabled = false;
 	Apollo.RemoveEventHandler("Group_MemberFlagsChanged", self);
