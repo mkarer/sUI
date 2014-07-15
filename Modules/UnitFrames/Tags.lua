@@ -41,8 +41,8 @@ local UnitStatus = function(unit)
 		return '<P Font="CRB_Pixel_O" Align="Right" TextColor="ffff7f7f">DEAD</P>';
 	elseif (unit:IsDisconnected() or not unit:IsOnline()) then
 		return '<P Font="CRB_Pixel_O" Align="Right" TextColor="ffff7f7f">OFFLINE</P>';
-	elseif (not unit:IsRealUnit()) then
-		return '<P Font="CRB_Pixel_O" Align="Right" TextColor="ffcccccc">OUT OF RANGE</P>';
+--	elseif (not unit:IsRealUnit()) then
+--		return '<P Font="CRB_Pixel_O" Align="Right" TextColor="ffcccccc">OUT OF RANGE</P>';
 	end
 end
 
