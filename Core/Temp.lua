@@ -47,7 +47,7 @@ function M:OnEnable()
 	self:RegisterEvent("Group_ReadyCheck", "EventHandler");
 	self:RegisterEvent("Group_Referral", "EventHandler");
 	self:RegisterEvent("Group_Remove", "EventHandler");
-	self:RegisterEvent("Group_Request_Result", "EventHandler");
+	self:RegisterEvent("Group_Request_Result", "EventHandler"); -- nonleader invites someone arg1=player arg2=20/21=? arg3=false=?
 --	self:RegisterEvent("Group_Updated", "EventHandler"); -- happens all the time, no args
 --	self:RegisterEvent("Group_UpdatePosition", "EventHandler"); -- also all the time, table with tables with nIndex to associate unit and coords
 	self:RegisterEvent("UnitNameChanged", "EventHandler");
