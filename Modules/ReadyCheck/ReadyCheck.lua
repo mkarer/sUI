@@ -20,116 +20,18 @@ local knReadyCheckTimeout = 60;
 -- Forms
 -----------------------------------------------------------------------------
 
-function M:HideReadyCheck()
-log:debug("hide rc")
+local tReadyCheckWindow;
+
+function M:DestroyReadyCheck()
 	if (self.wndReadyCheckPopup and self.wndReadyCheckPopup:IsValid()) then
-log:debug("hide rc")
 		self.wndReadyCheckPopup:Destroy();
 	end
-log:debug("hide rc")
 end
 
-function M:ShowReadyCheck()
-	local tReadyCheckWindow = {
-		Class = "Window",
-		AnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
-		AnchorOffsets = { -150, -150, 150, 50 },
-		Name = "RaidReadyCheck",
-		Picture = true,
-		Overlapped = true,
-		BGColor = "ffffffff",
-		TextColor = "ffffffff",
-		IgnoreMouse = true,
-		Sprite = "CRB_Basekit:kitBase_Hybrid_Message",
-		Events = {
-			WindowClosed = self.OnReadyCheckResponse,
-		},
-		Children = {
-			-- Button: Ready
-			{
-				Class = "Button",
-				Base = "CRB_Basekit:kitBtn_Holo_Large",
-				Font = "CRB_InterfaceMedium_B",
-				ButtonType = "PushButton",
-				AnchorPoints = { 0, 1, 0.5, 1 },
-				AnchorOffsets = { 35, -75, -4, -35 },
-				DT_VCENTER = true,
-				DT_CENTER = true,
-				Name = "ReadyCheckYesBtn",
-				NormalTextColor = "ff2f94ac",
-				PressedTextColor = "ff31fcf6",
-				FlybyTextColor = "ff31fcf6",
-				PressedFlybyTextColor = "ff31fcf6",
-				DisabledTextColor = "ff333333",
-				TextId = "RaidFrame_Ready",
-				TooltipType = "OnCursor",
-				Events = {
-					ButtonSignal = self.OnReadyCheckResponse,
-				},
-			},
-			-- Button: Not Ready
-			{
-				Class = "Button",
-				Base = "CRB_Basekit:kitBtn_Holo_Large",
-				Font = "CRB_InterfaceMedium_B",
-				ButtonType = "PushButton",
-				AnchorPoints = { 0.5, 1, 1, 1 },
-				AnchorOffsets = { 4, -75, -35, -35 },
-				DT_VCENTER = true,
-				DT_CENTER = true,
-				Name = "ReadyCheckNoBtn",
-				NormalTextColor = "ff2f94ac",
-				PressedTextColor = "ff31fcf6",
-				FlybyTextColor = "ff31fcf6",
-				PressedFlybyTextColor = "ff31fcf6",
-				DisabledTextColor = "ff333333",
-				TextId = "RaidFrame_NotReady",
-				TooltipType = "OnCursor",
-				Events = {
-					ButtonSignal = self.OnReadyCheckResponse,
-				},
-			},
-			-- Button: Close
-			{
-				Class = "Button",
-				Base = "CRB_Basekit:kitBtn_Close",
-				Font = "CRB_InterfaceMedium_B",
-				ButtonType = "PushButton",
-				AnchorPoints = { 1, 0, 1, 0 },
-				AnchorOffsets = { -36, 9, -9, 38 },
-				DT_VCENTER = true,
-				DT_CENTER = true,
-				Name = "ReadyCheckCloseBtn",
-				NormalTextColor = "ff2f94ac",
-				PressedTextColor = "ff31fcf6",
-				FlybyTextColor = "ff31fcf6",
-				PressedFlybyTextColor = "ff31fcf6",
-				DisabledTextColor = "ff333333",
-				TooltipType = "OnCursor",
-				Events = {
-					ButtonSignal = self.OnReadyCheckResponse,
-				},
-			},
-			-- Text
-			{
-				Class = "Window",
-				AnchorPoints = { 0, 0, 1, 0 },
-				AnchorOffsets = { 35, 35, -35, 107 },
-				Name = "ReadyCheckMessage",
-				Font = "CRB_InterfaceMedium_B",
-				BGColor = "ffffffff",
-				TextColor = "ff31fcf6",
-				DT_VCENTER = true,
-				DT_CENTER = true,
-				DT_WORDBREAK = true,
-				TextId = "CRB__2",
-			},
-		},
-	};
-
-	self:HideReadyCheck();
-	self.wndReadyCheckPopup = GeminiGUI:Create(tReadyCheckWindow):GetInstance();
-	return self.wndReadyCheckPopup;
+function M:ShowReadyCheck(strMessage)
+	self:DestroyReadyCheck();
+	self.wndReadyCheckPopup = GeminiGUI:Create(tReadyCheckWindow):GetInstance(self);
+	self.wndReadyCheckPopup:FindChild("ReadyCheckMessage"):SetText(strMessage);
 end
 
 -----------------------------------------------------------------------------
@@ -143,6 +45,102 @@ function M:OnInitialize()
 		self:SetEnabledState(false);
 	else
 		GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+
+		tReadyCheckWindow = {
+			Class = "Window",
+			AnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
+			AnchorOffsets = { -150, -150, 150, 50 },
+			Name = "RaidReadyCheck",
+			Picture = true,
+			Overlapped = true,
+			BGColor = "ffffffff",
+			TextColor = "ffffffff",
+			IgnoreMouse = true,
+			Sprite = "CRB_Basekit:kitBase_Hybrid_Message",
+			Events = {
+				WindowClosed = self.OnReadyCheckResponse,
+			},
+			Children = {
+				-- Button: Ready
+				{
+					Class = "Button",
+					Base = "CRB_Basekit:kitBtn_Holo_Large",
+					Font = "CRB_InterfaceMedium_B",
+					ButtonType = "PushButton",
+					AnchorPoints = { 0, 1, 0.5, 1 },
+					AnchorOffsets = { 35, -75, -4, -35 },
+					DT_VCENTER = true,
+					DT_CENTER = true,
+					Name = "ReadyCheckYesBtn",
+					NormalTextColor = "ff2f94ac",
+					PressedTextColor = "ff31fcf6",
+					FlybyTextColor = "ff31fcf6",
+					PressedFlybyTextColor = "ff31fcf6",
+					DisabledTextColor = "ff333333",
+					TextId = "RaidFrame_Ready",
+					TooltipType = "OnCursor",
+					Events = {
+						ButtonSignal = self.OnReadyCheckResponse,
+					},
+				},
+				-- Button: Not Ready
+				{
+					Class = "Button",
+					Base = "CRB_Basekit:kitBtn_Holo_Large",
+					Font = "CRB_InterfaceMedium_B",
+					ButtonType = "PushButton",
+					AnchorPoints = { 0.5, 1, 1, 1 },
+					AnchorOffsets = { 4, -75, -35, -35 },
+					DT_VCENTER = true,
+					DT_CENTER = true,
+					Name = "ReadyCheckNoBtn",
+					NormalTextColor = "ff2f94ac",
+					PressedTextColor = "ff31fcf6",
+					FlybyTextColor = "ff31fcf6",
+					PressedFlybyTextColor = "ff31fcf6",
+					DisabledTextColor = "ff333333",
+					TextId = "RaidFrame_NotReady",
+					TooltipType = "OnCursor",
+					Events = {
+						ButtonSignal = self.OnReadyCheckResponse,
+					},
+				},
+				-- Button: Close
+				{
+					Class = "Button",
+					Base = "CRB_Basekit:kitBtn_Close",
+					Font = "CRB_InterfaceMedium_B",
+					ButtonType = "PushButton",
+					AnchorPoints = { 1, 0, 1, 0 },
+					AnchorOffsets = { -36, 9, -9, 38 },
+					DT_VCENTER = true,
+					DT_CENTER = true,
+					Name = "ReadyCheckCloseBtn",
+					NormalTextColor = "ff2f94ac",
+					PressedTextColor = "ff31fcf6",
+					FlybyTextColor = "ff31fcf6",
+					PressedFlybyTextColor = "ff31fcf6",
+					DisabledTextColor = "ff333333",
+					TooltipType = "OnCursor",
+					Events = {
+						ButtonSignal = self.OnReadyCheckResponse,
+					},
+				},
+				-- Text
+				{
+					Class = "Window",
+					AnchorPoints = { 0, 0, 1, 0 },
+					AnchorOffsets = { 35, 35, -35, 107 },
+					Name = "ReadyCheckMessage",
+					Font = "CRB_InterfaceMedium_B",
+					BGColor = "ffffffff",
+					TextColor = "ff31fcf6",
+					DT_VCENTER = true,
+					DT_CENTER = true,
+					DT_WORDBREAK = true,
+				},
+			},
+		};
 	end
 end
 
@@ -150,7 +148,7 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	self:RegisterEvent("Group_ReadyCheck", "OnGroupReadyCheck");
-	self:RegisterEvent("ReadyCheckTimeout", "OnReadyCheckTimeout");
+	self:RegisterEvent("ReadyCheckTimeout", "DestroyReadyCheck");
 end
 
 function M:OnDisable()
@@ -169,19 +167,14 @@ function M:OnGroupReadyCheck(event, nMemberIdx, strMessage)
 		strName = tMember.strCharacterName;
 	end
 
-	self:ShowReadyCheck();
-	self.wndReadyCheckPopup:FindChild("ReadyCheckMessage"):SetText(String_GetWeaselString(Apollo.GetString("RaidFrame_ReadyCheckStarted"), strName).."\n"..strMessage);
+	self:ShowReadyCheck(String_GetWeaselString(Apollo.GetString("RaidFrame_ReadyCheckStarted"), strName).."\n"..strMessage);
 	Apollo.CreateTimer("ReadyCheckTimeout", knReadyCheckTimeout, false);
 end
 
 function M:OnReadyCheckResponse(wndHandler, wndControl)
-	if (wndHandler == wndControl) then
+	if (wndHandler and wndHandler == wndControl) then
 		GroupLib.SetReady(wndHandler:GetName() == "ReadyCheckYesBtn");
 	end
 
-	self:HideReadyCheck();
-end
-
-function M:OnReadyCheckTimeout()
-	self:HideReadyCheck();
+	self:DestroyReadyCheck();
 end
