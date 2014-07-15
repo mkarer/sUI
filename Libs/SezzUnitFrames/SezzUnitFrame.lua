@@ -169,7 +169,7 @@ local Enable = function(self)
 	self:Show();
 end
 
-local SetUnit = function(self, unit)
+local SetUnit = function(self, unit, bForceUnitChange)
 	-- Invalid Unit
 	if (not unit or (unit and not unit:IsValid())) then
 --		log:debug("[%s] Unit Invalid!", self.strUnit);
@@ -185,6 +185,10 @@ local SetUnit = function(self, unit)
 		self:Enable();
 	elseif (self.unit and self.unit:GetId() == 0) then
 		-- GroupLib unit, update all (until we find events for group size changes)
+		if (bForceUnitChange) then
+			self.unit = unit;
+		end
+
 		if (not self.bEnabled) then
 			self:Enable();
 		else
