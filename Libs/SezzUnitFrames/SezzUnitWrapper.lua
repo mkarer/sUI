@@ -12,6 +12,8 @@
 local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
 if (UnitFrameController.GetUnit) then return; end
 
+local tCache = {};
+
 -----------------------------------------------------------------------------
 -- Helper Functions
 -----------------------------------------------------------------------------
@@ -205,7 +207,44 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 		elseif (nIndex > 0) then
 			-- Party/Raid
 			local strUnit = strUnit..nIndex;
-			return WrapRealUnit(GroupLib.GetUnitForGroupMember(nIndex), nIndex) or WrapGroupUnit(GroupLib.GetGroupMember(nIndex));
+			local unit = GroupLib.GetUnitForGroupMember(nIndex) or GroupLib.GetGroupMember(nIndex) or nil;
+
+			if (unit) then
+				if (type(unit) == "table") then
+					-- GetGroupMember
+					if (tCache[strUnit] and not tCache[strUnit]:IsRealUnit()) then
+						-- Update cached data
+						tCache[strUnit].bUpdated = false;
+
+						for k, v in pairs(unit) do
+							if (type(v) ~= "table" and tCache[strUnit][k] ~= v) then
+								-- ignore tMentoredBy...
+								tCache[strUnit].bUpdated = true;
+								tCache[strUnit][k] = v;
+							end
+						end
+
+						if (tCache[strUnit].bUpdated) then
+							S.Log:debug("Updated cached group unit data for "..unit.strCharacterName)
+						end
+					else
+						-- Unit changed (not cached or was a real unit)
+						S.Log:debug("New cached group unit "..unit.strCharacterName)
+						tCache[strUnit] = WrapGroupUnit(unit);
+					end
+
+					return tCache[strUnit];
+				else
+					-- GetUnitForGroupMember
+					if (not tCache[strUnit] or (tCache[strUnit] and tCache[strUnit]:GetId() ~= unit:GetId())) then
+						S.Log:debug("New cached real unit "..unit:GetName())
+						tCache[strUnit] = WrapRealUnit(unit, nIndex);
+					end
+				end
+
+				-- Return cached unit
+				return tCache[strUnit];
+			end
 		end
 	end
 end

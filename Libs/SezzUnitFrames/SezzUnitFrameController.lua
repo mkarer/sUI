@@ -110,9 +110,9 @@ end
 -- Events
 -----------------------------------------------------------------------------
 
-local UpdateUnit = function(self, strUnit, unit, bForceUnitChange)
+function UnitFrameController:UpdateUnit(strUnit, unit)
 	if (self.tUnitFrames[strUnit]) then
-		self.tUnitFrames[strUnit]:SetUnit(unit, bForceUnitChange);
+		self.tUnitFrames[strUnit]:SetUnit(unit);
 		return self.tUnitFrames[strUnit]:Update();
 	end
 
@@ -120,7 +120,7 @@ local UpdateUnit = function(self, strUnit, unit, bForceUnitChange)
 end
 
 function UnitFrameController:UpdateDefaultUnit(strUnit)
-	UpdateUnit(self, strUnit, self:GetUnit(strUnit));
+	self:UpdateUnit(strUnit, self:GetUnit(strUnit));
 end
 
 function UnitFrameController:OnAlternateTargetUnitChanged()
@@ -144,19 +144,16 @@ function UnitFrameController:UpdateGroups()
 
 	-- Raid Frames
 	for i = 1, knMaxGroupSize do
-		UpdateUnit(self, "Party"..i, i <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", i));
-		UpdateUnit(self, "Raid"..i, i <= nGroupSize and bInRaid and self:GetUnit("Raid", i));
+		self:UpdateUnit("Party"..i, i <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", i));
+		self:UpdateUnit("Raid"..i, i <= nGroupSize and bInRaid and self:GetUnit("Raid", i));
 	end
 end
 
 function UnitFrameController:OnGroupMemberFlagsChanged(nIndex, bNoIdea, tFlags)
 	local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
 
-	UpdateUnit(self, "Party"..nIndex, nIndex <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", nIndex), true);
-	UpdateUnit(self, "Raid"..nIndex, nIndex <= nGroupSize and bInRaid and self:GetUnit("Raid", nIndex), true);
-end
-
-function UnitFrameController:OnGroupUpdated(tData)
+	self:UpdateUnit("Party"..nIndex, nIndex <= nGroupSize and bInGroup and not bInRaid and self:GetUnit("Party", nIndex));
+	self:UpdateUnit("Raid"..nIndex, nIndex <= nGroupSize and bInRaid and self:GetUnit("Raid", nIndex));
 end
 
 function UnitFrameController:UpdateUnits()
