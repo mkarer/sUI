@@ -240,6 +240,8 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 						S.Log:debug("New cached real unit "..unit:GetName())
 						tCache[strUnit] = WrapRealUnit(unit, nIndex);
 					end
+
+					tCache[strUnit].nMemberIdx = nIndex;
 				end
 
 				-- Return cached unit
