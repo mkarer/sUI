@@ -32,6 +32,37 @@ local log;
 -- Constants
 local kbTestMode = false;
 
+local ktClassStrings = {
+	[GameLib.CodeEnumClass.Warrior]			= Apollo.GetString("ClassWarrior"),
+	[GameLib.CodeEnumClass.Engineer]		= Apollo.GetString("ClassEngineer"),
+	[GameLib.CodeEnumClass.Esper]			= Apollo.GetString("ClassESPER"),
+	[GameLib.CodeEnumClass.Medic]			= Apollo.GetString("ClassMedic"),
+	[GameLib.CodeEnumClass.Stalker]			= Apollo.GetString("ClassStalker"),
+	[GameLib.CodeEnumClass.Spellslinger]	= Apollo.GetString("ClassSpellslinger"),
+};
+
+local ktPathStrings = {
+	[PlayerPathLib.PlayerPathType_Soldier]		= Apollo.GetString("PlayerPathSoldier"),
+	[PlayerPathLib.PlayerPathType_Settler]		= Apollo.GetString("PlayerPathSettler"),
+	[PlayerPathLib.PlayerPathType_Scientist]	= Apollo.GetString("PlayerPathExplorer"),
+	[PlayerPathLib.PlayerPathType_Explorer]		= Apollo.GetString("PlayerPathScientist"),
+};
+
+local ktFactionStrings = {
+	[Unit.CodeEnumFaction.ExilesPlayer]		= Apollo.GetString("CRB_Exile"),
+	[Unit.CodeEnumFaction.DominionPlayer]	= Apollo.GetString("CRB_Dominion"),
+};
+
+local ktRaceStrings = {
+	[GameLib.CodeEnumRace.Human]	= Apollo.GetString("RaceHuman"),
+	[GameLib.CodeEnumRace.Granok]	= Apollo.GetString("RaceGranok"),
+	[GameLib.CodeEnumRace.Aurin]	= Apollo.GetString("RaceAurin"),
+	[GameLib.CodeEnumRace.Draken]	= Apollo.GetString("RaceDraken"),
+	[GameLib.CodeEnumRace.Mechari]	= Apollo.GetString("RaceMechari"),
+	[GameLib.CodeEnumRace.Chua]		= Apollo.GetString("RaceChua"),
+	[GameLib.CodeEnumRace.Mordesh]	= Apollo.GetString("CRB_Mordesh"),
+};
+
 -----------------------------------------------------------------------------
 -- Tags
 -----------------------------------------------------------------------------
@@ -97,8 +128,30 @@ end
 function UnitFrame:UpdateTooltip()
 	local strTooltip = self.unit:GetName();
 
+	-- Name
 	if (self.unit:GetGroupValue() > 0) then
 		strTooltip = strTooltip.."\n"..String_GetWeaselString(Apollo.GetString("TargetFrame_GroupSize"), self.unit:GetGroupValue());
+	end
+
+	-- Level/Race/Class
+	local strInfo = "";
+	local nLevel = self.unit:GetLevel();
+	if (nLevel) then
+		strInfo = strInfo..nLevel.." ";
+	end
+
+	local nRaceId = self.unit:GetRaceId();
+	if (nRaceId and ktRaceStrings[nRaceId]) then
+		strInfo = strInfo..ktRaceStrings[nRaceId].." ";
+	end
+
+	local nClassId = self.unit:GetClassId();
+	if (nClassId and ktClassStrings[nClassId]) then
+		strInfo = strInfo..ktClassStrings[nClassId].." ";
+	end
+
+	if (string.len(strInfo) > 0) then
+		strTooltip = strTooltip.."\n"..strInfo;
 	end
 
 	self.wndMain:SetTooltip(strTooltip);
