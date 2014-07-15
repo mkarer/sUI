@@ -173,6 +173,10 @@ function GroupLibUnit:GetFaction()
 	return GameLib.GetPlayerUnit():GetFaction();
 end
 
+function GroupLibUnit:IsMentoring()
+	return self.bIsMentoring;
+end
+
 local WrapGroupUnit = function(unit)
 	if (not unit) then return; end
 
