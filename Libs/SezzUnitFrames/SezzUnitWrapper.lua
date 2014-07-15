@@ -58,6 +58,7 @@ function UnitClassWrapper:New(unit, nIndex)
 	self.IsOnline = fnTrue;
 	self.IsDisconnected = fnFalse;
 	self.GetRole = fnUnitRole;
+	self.IsRealUnit = fnTrue;
 
 	if (unit:IsInYourGroup()) then
 	end
@@ -94,6 +95,7 @@ local GroupLibUnit = {
 	GetInterruptArmorValue = fnZero,
 	GetId = fnZero,
 	GetRole = fnUnitRole;
+	IsRealUnit = fnFalse;
 };
 
 function GroupLibUnit:GetName()
