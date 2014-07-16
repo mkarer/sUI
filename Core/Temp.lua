@@ -31,9 +31,9 @@ function M:OnEnable()
 	self:RegisterEvent("Group_Add", "EventHandler");
 	self:RegisterEvent("Group_DeclineInvite", "EventHandler");
 	self:RegisterEvent("Group_FlagsChanged", "EventHandler");
-	self:RegisterEvent("Group_Invite_Result", "EventHandler");
+--	self:RegisterEvent("Group_Invite_Result", "EventHandler"); -- strCharName, eRsult (0=inv sent, 2=accepted)
 	self:RegisterEvent("Group_Invited", "EventHandler");
-	self:RegisterEvent("Group_Join", "EventHandler");
+--	self:RegisterEvent("Group_Join", "EventHandler"); -- some joined group, member indexes will change?
 	self:RegisterEvent("Group_JoinRequest", "EventHandler");
 --	self:RegisterEvent("Group_Left", "EventHandler"); -- someone left, member indexes will change (last frame needs to be disabled)
 	self:RegisterEvent("Group_LootRulesChanged", "EventHandler");
