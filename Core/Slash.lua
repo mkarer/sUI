@@ -55,7 +55,9 @@ Apollo.RegisterSlashCommand("focus", "SetFocus", M);
 
 -- Ready Check
 function M:ReadyCheck()
-	GroupLib.ReadyCheck(Apollo.GetString("CRB__2"));
+	GroupLib.ReadyCheck("Are you ready?");
 end
 
 Apollo.RegisterSlashCommand("rc", "ReadyCheck", M);
+Apollo.RegisterSlashCommand("rch", "ReadyCheck", M);
+Apollo.RegisterSlashCommand("readycheck", "ReadyCheck", M);
