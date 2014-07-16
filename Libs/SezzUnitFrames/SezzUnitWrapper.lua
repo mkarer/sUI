@@ -12,6 +12,7 @@
 local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
 if (UnitFrameController.GetUnit) then return; end
 
+local fmod, byte, len = math.fmod, string.byte, string.len;
 local tCache = {};
 
 -----------------------------------------------------------------------------
@@ -78,6 +79,21 @@ end
 -- GroupLib
 -----------------------------------------------------------------------------
 
+local function StringHash(strText)
+	-- http://www.wowwiki.com/USERAPI_StringHash
+	local nCounter = 1;
+	local nLength = len(strText);
+
+	for i = 1, nLength, 3 do 
+		nCounter = fmod(nCounter * 8161, 4294967279) +  -- 2^32 - 17: Prime!
+			(byte(strText, i) * 16776193) +
+			((byte(strText, i + 1) or (nLength - i + 256)) * 8372226) +
+			((byte(strText, i + 2) or (nLength - i + 256)) * 3932164);
+	end
+
+	return -fmod(nCounter, 4294967291); -- 2^32 - 5: Prime (and different from the prime in the loop)
+end
+
 local GroupLibUnit = {
 	GetGroupValue = fnZero,
 	IsACharacter = fnTrue,
@@ -95,10 +111,13 @@ local GroupLibUnit = {
 	GetCCStateTimeRemaining = fnZero,
 	IsCasting = fnFalse,
 	GetInterruptArmorValue = fnZero,
-	GetId = fnZero,
 	GetRole = fnUnitRole;
 	IsRealUnit = fnFalse;
 };
+
+function GroupLibUnit:GetId()
+	return self.nId;
+end
 
 function GroupLibUnit:GetName()
 	return self.strCharacterName;
@@ -184,7 +203,10 @@ end
 local WrapGroupUnit = function(unit)
 	if (not unit) then return; end
 
-	return setmetatable(unit, { __index = GroupLibUnit });
+	local tGroupUnit = setmetatable(unit, { __index = GroupLibUnit });
+	tGroupUnit.nId = StringHash(tGroupUnit.strCharacterName);
+
+	return tGroupUnit;
 end
 
 -----------------------------------------------------------------------------
