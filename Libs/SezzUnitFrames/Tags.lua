@@ -240,7 +240,7 @@ _ENV._TAGS = tags;
 local tagEvents = {
 	["Name"]				= "UnitNameChanged",
 	["Level"]				= "UnitLevelChanged Sezz_GroupUnitLevelChanged",
-	["TDifficultyColor"]	= "UnitLevelChanged PlayerLevelChange",
+	["TDifficultyColor"]	= "UnitLevelChanged Sezz_GroupUnitLevelChanged PlayerLevelChange",
 };
 
 local unitlessEvents = {
