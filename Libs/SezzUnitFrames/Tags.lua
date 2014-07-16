@@ -239,7 +239,7 @@ _ENV._TAGS = tags;
 
 local tagEvents = {
 	["Name"]				= "UnitNameChanged",
-	["Level"]				= "UnitLevelChanged",
+	["Level"]				= "UnitLevelChanged Sezz_GroupUnitLevelChanged",
 	["TDifficultyColor"]	= "UnitLevelChanged PlayerLevelChange",
 };
 
@@ -252,9 +252,14 @@ local frame = GeminiEvent:Embed({});
 frame.OnEvent = function(self, event, unit)
 	local strings = events[event];
 
-	if (strings) then
+	if (type(unit) == "number") then
+		-- Group_* Events
+		unit = UnitFrameController:GetUnit((GroupLib.InRaid() and "Raid" or "Party"), unit);
+	end
+
+	if (strings and unit) then
 		for k, fontstring in next, strings do
-			if (fontstring:IsVisible() and (unitlessEvents[event] or fontstring.parent.unit == unit)) then
+			if (fontstring:IsVisible() and (unitlessEvents[event] or fontstring.parent.unit:GetId() == unit:GetId())) then
 				fontstring:UpdateTag();
 			end
 		end
