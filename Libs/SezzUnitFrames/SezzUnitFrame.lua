@@ -296,7 +296,6 @@ end
 local ShowDelayed = function(self)
 	Apollo.RemoveEventHandler("NextFrame", self);
 	self.wndMain:Show(true, true);
-	self.wndMain:ToFront();
 end
 
 local Hide = function(self)
