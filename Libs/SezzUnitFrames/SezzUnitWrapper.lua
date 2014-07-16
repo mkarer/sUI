@@ -252,11 +252,16 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 								S.Log:debug("%s - Updated %s from %s to %s", unit.strCharacterName, k, tostring(tCache[strUnit][k]), tostring(v));
 								tCache[strUnit].bUpdated = true;
 								tCache[strUnit][k] = v;
+
+								if (k == "nLevel") then
+									Event_FireGenericEvent("Sezz_GroupUnitLevelChanged", nIndex);
+								end
 							end
 						end
 
 						if (tCache[strUnit].bUpdated) then
 							S.Log:debug("Updated cached group unit data for "..unit.strCharacterName)
+							Event_FireGenericEvent("Sezz_GroupUnitUpdated", nIndex);
 						end
 					else
 						-- Unit changed (not cached or was a real unit)
@@ -277,6 +282,9 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 
 				-- Return cached unit
 				return tCache[strUnit];
+			else
+				-- Invalid unit
+				tCache[strUnit] = nil;
 			end
 		end
 	end
