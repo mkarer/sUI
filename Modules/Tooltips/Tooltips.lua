@@ -69,8 +69,8 @@ function M:OnInitialize()
 	ToolTips = Apollo.GetAddon("ToolTips");
 	if (ToolTips and not ToolTips._OnGenerateWorldObjectTooltip) then
 		self:PostHook(ToolTips, "OnDocumentReady", "UpdateWorldTooltipContainer");
-		ToolTips._OnGenerateWorldObjectTooltip = ToolTips.OnGenerateWorldObjectTooltip;
-		ToolTips.OnGenerateWorldObjectTooltip = self.OnGenerateWorldObjectTooltip;
+--		ToolTips._OnGenerateWorldObjectTooltip = ToolTips.OnGenerateWorldObjectTooltip;
+--		ToolTips.OnGenerateWorldObjectTooltip = self.OnGenerateWorldObjectTooltip;
 	else
 		self:SetEnabledState(false);
 	end
@@ -92,12 +92,14 @@ end
 -- Unit Tooltips
 -----------------------------------------------------------------------------
 
+--[[
 local sub = string.sub;
 
 function M:OnGenerateWorldObjectTooltip(wndHandler, wndControl, eToolTipType, unit, strPropName)
 	if (eToolTipType == Tooltip.TooltipGenerateType_UnitOrProp) then
 		if (sub(wndHandler:GetName(), 1, 4) == "Sezz") then
-			M:GenerateUnitTooltip(wndHandler, unit);
+--			M:GenerateUnitTooltip(wndHandler, unit);
+			ToolTips:UnitTooltipGen(wndHandler, unit, strPropName);
 		else
 			ToolTips:_OnGenerateWorldObjectTooltip(wndHandler, wndControl, eToolTipType, unit, strPropName);
 		end
@@ -143,3 +145,4 @@ function M:GenerateUnitTooltip(wndParent, unit)
 
 	return wndParent:SetTooltip(strTooltip);
 end
+--]]
