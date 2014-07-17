@@ -27,7 +27,7 @@ local APkg = Apollo.GetPackage(MAJOR);
 if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local UnitFrame = APkg and APkg.tPackage or {};
-local log;
+local log, ToolTips;
 
 -- Constants
 local kbTestMode = false;
@@ -92,76 +92,11 @@ end
 
 ------------------------------------------------------------------------------
 -- Unit Tooltips
--- TODO: Completely remove from this library, Carbine should allow us to create them...
+-- Sorry, only works for me, because I hooked OnGenerateWorldObjectTooltip.
 -----------------------------------------------------------------------------
 
-local ktClassStrings = {
-	[GameLib.CodeEnumClass.Warrior]			= Apollo.GetString("ClassWarrior"),
-	[GameLib.CodeEnumClass.Engineer]		= Apollo.GetString("ClassEngineer"),
-	[GameLib.CodeEnumClass.Esper]			= Apollo.GetString("ClassESPER"),
-	[GameLib.CodeEnumClass.Medic]			= Apollo.GetString("ClassMedic"),
-	[GameLib.CodeEnumClass.Stalker]			= Apollo.GetString("ClassStalker"),
-	[GameLib.CodeEnumClass.Spellslinger]	= Apollo.GetString("ClassSpellslinger"),
-};
-
-local ktPathStrings = {
-	[PlayerPathLib.PlayerPathType_Soldier]		= Apollo.GetString("PlayerPathSoldier"),
-	[PlayerPathLib.PlayerPathType_Settler]		= Apollo.GetString("PlayerPathSettler"),
-	[PlayerPathLib.PlayerPathType_Scientist]	= Apollo.GetString("PlayerPathExplorer"),
-	[PlayerPathLib.PlayerPathType_Explorer]		= Apollo.GetString("PlayerPathScientist"),
-};
-
-local ktFactionStrings = {
-	[Unit.CodeEnumFaction.ExilesPlayer]		= Apollo.GetString("CRB_Exile"),
-	[Unit.CodeEnumFaction.DominionPlayer]	= Apollo.GetString("CRB_Dominion"),
-};
-
-local ktRaceStrings = {
-	[GameLib.CodeEnumRace.Human]	= Apollo.GetString("RaceHuman"),
-	[GameLib.CodeEnumRace.Granok]	= Apollo.GetString("RaceGranok"),
-	[GameLib.CodeEnumRace.Aurin]	= Apollo.GetString("RaceAurin"),
-	[GameLib.CodeEnumRace.Draken]	= Apollo.GetString("RaceDraken"),
-	[GameLib.CodeEnumRace.Mechari]	= Apollo.GetString("RaceMechari"),
-	[GameLib.CodeEnumRace.Chua]		= Apollo.GetString("RaceChua"),
-	[GameLib.CodeEnumRace.Mordesh]	= Apollo.GetString("CRB_Mordesh"),
-};
-
-function UnitFrame:UpdateTooltip()
-	local strTooltip = self.unit:GetName();
-
-	-- Name
-	if (self.unit:GetGroupValue() > 0) then
-		strTooltip = strTooltip.."\n"..String_GetWeaselString(Apollo.GetString("TargetFrame_GroupSize"), self.unit:GetGroupValue());
-	end
-
-	-- Level/Race/Class
-	local strInfo = "";
-	local nLevel = self.unit:GetLevel();
-	if (nLevel) then
-		strInfo = strInfo..nLevel.." ";
-	end
-
-	local nRaceId = self.unit:GetRaceId();
-	if (nRaceId and ktRaceStrings[nRaceId]) then
-		strInfo = strInfo..ktRaceStrings[nRaceId].." ";
-	end
-
-	local nClassId = self.unit:GetClassId();
-	if (nClassId and ktClassStrings[nClassId]) then
-		strInfo = strInfo..ktClassStrings[nClassId].." ";
-	end
-
-	-- Path
-	local nPathId = self.unit:GetPlayerPathType();
-	if (nPathId and ktPathStrings[nPathId]) then
-		strInfo = strInfo.."("..ktPathStrings[nPathId]..")";
-	end
-
-	if (string.len(strInfo) > 0) then
-		strTooltip = strTooltip.."\n"..strInfo;
-	end
-
-	self.wndMain:SetTooltip(strTooltip);
+function UnitFrame:OnGenerateTooltip(wndHandler, wndControl)
+	ToolTips:OnGenerateWorldObjectTooltip(wndHandler, wndControl, Tooltip.TooltipGenerateType_UnitOrProp, self.unit, "");
 end
 
 -----------------------------------------------------------------------------
@@ -216,22 +151,16 @@ local Disable = function(self)
 	self:DisableTags();
 	self.unit = nil;
 	self.bEnabled = false;
-
-	Apollo.RemoveEventHandler("PlayerLevelChange", self);
 end
 
 local Enable = function(self)
 	self.bEnabled = true;
 	self:EnableElements();
-	self:UpdateTooltip();
 	self:EnableTags();
 	self:UpdateTags();
 	self:Update();
+	self.wndMain:SetTooltip("");
 	self:Show();
-
-	if (self.strUnit == "Player") then
-		Apollo.RegisterEventHandler("PlayerLevelChange", "UpdateTooltip", self);
-	end
 end
 
 local SetUnit = function(self, unit)
@@ -280,6 +209,11 @@ local LoadForm = function(self)
 	self.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", self);
 	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
 	self.wndMain:SetBGOpacity(0.2, 5e+20);
+
+	-- Tooltips
+	if (ToolTips) then
+		self.wndMain:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", self);
+	end
 
 	-- Enable Targetting
 	self.wndMain:AddEventHandler("MouseButtonDown", "OnMouseClick", self);
@@ -366,6 +300,8 @@ function UnitFrame:OnLoad()
 		pattern = "%d %n %c %l - %m",
 		appender = "GeminiConsole"
 	});
+
+	ToolTips = Apollo.GetAddon("ToolTips");
 end
 
 function UnitFrame:OnDependencyError(strDep, strError)
