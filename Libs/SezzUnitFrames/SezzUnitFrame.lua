@@ -209,6 +209,8 @@ local Disable = function(self)
 	self:DisableTags();
 	self.unit = nil;
 	self.bEnabled = false;
+
+	Apollo.RemoveEventHandler("PlayerLevelChange", self);
 end
 
 local Enable = function(self)
@@ -219,6 +221,10 @@ local Enable = function(self)
 	self:UpdateTags();
 	self:Update();
 	self:Show();
+
+	if (self.strUnit == "Player") then
+		Apollo.RegisterEventHandler("PlayerLevelChange", "UpdateTooltip", self);
+	end
 end
 
 local SetUnit = function(self, unit)
