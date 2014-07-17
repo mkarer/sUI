@@ -111,8 +111,8 @@ local GroupLibUnit = {
 	GetCCStateTimeRemaining = fnZero,
 	IsCasting = fnFalse,
 	GetInterruptArmorValue = fnZero,
-	GetRole = fnUnitRole;
-	IsRealUnit = fnFalse;
+	GetRole = fnUnitRole,
+	IsRealUnit = fnFalse,
 };
 
 function GroupLibUnit:GetId()
