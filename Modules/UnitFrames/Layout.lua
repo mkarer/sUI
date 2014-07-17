@@ -157,7 +157,8 @@ function M:InitializeUnitFrameXML(strUnit, tSettings)
 			Picture = true,
 			Sprite = "WhiteFill",
 			BGColor = "ffffffff",
-			Moveable = true,
+			IgnoreMouse = false,
+			Moveable = false,
 			TooltipType = "OnCursor",
 		}),
 	};

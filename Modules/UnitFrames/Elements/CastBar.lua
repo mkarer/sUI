@@ -32,7 +32,7 @@ function UnitFramesLayout:CreateCastBarElement(strUnit, tSettings)
 		Picture = true,
 		Sprite = "WhiteFill",
 		BGColor = "33ffffff",
-		Moveable = true,
+		IgnoreMouse = true,
 	});
 
 	-------------------------------------------------------------------------
