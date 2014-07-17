@@ -200,6 +200,10 @@ function GroupLibUnit:GetRaceId()
 	return self.eRaceId;
 end
 
+function GroupLibUnit:GetPlayerPathType()
+	return self.ePathType;
+end
+
 local WrapGroupUnit = function(unit)
 	if (not unit) then return; end
 
