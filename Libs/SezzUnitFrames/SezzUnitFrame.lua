@@ -92,11 +92,10 @@ end
 
 ------------------------------------------------------------------------------
 -- Unit Tooltips
--- Sorry, only works for me, because I hooked OnGenerateWorldObjectTooltip.
 -----------------------------------------------------------------------------
 
-function UnitFrame:OnGenerateTooltip(wndHandler, wndControl)
-	ToolTips:OnGenerateWorldObjectTooltip(wndHandler, wndControl, Tooltip.TooltipGenerateType_UnitOrProp, self.unit.__proto__ or self.unit, "");
+function UnitFrame:OnGenerateTooltip()
+	ToolTips:UnitTooltipGen(self.wndMain, self.unit.__proto__ or self.unit, "");
 end
 
 -----------------------------------------------------------------------------
