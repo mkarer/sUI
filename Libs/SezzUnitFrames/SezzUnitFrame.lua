@@ -96,7 +96,7 @@ end
 -----------------------------------------------------------------------------
 
 function UnitFrame:OnGenerateTooltip(wndHandler, wndControl)
-	ToolTips:OnGenerateWorldObjectTooltip(wndHandler, wndControl, Tooltip.TooltipGenerateType_UnitOrProp, self.unit, "");
+	ToolTips:OnGenerateWorldObjectTooltip(wndHandler, wndControl, Tooltip.TooltipGenerateType_UnitOrProp, self.unit.__proto__ or self.unit, "");
 end
 
 -----------------------------------------------------------------------------
