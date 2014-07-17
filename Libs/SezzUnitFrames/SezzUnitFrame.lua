@@ -32,37 +32,6 @@ local log;
 -- Constants
 local kbTestMode = false;
 
-local ktClassStrings = {
-	[GameLib.CodeEnumClass.Warrior]			= Apollo.GetString("ClassWarrior"),
-	[GameLib.CodeEnumClass.Engineer]		= Apollo.GetString("ClassEngineer"),
-	[GameLib.CodeEnumClass.Esper]			= Apollo.GetString("ClassESPER"),
-	[GameLib.CodeEnumClass.Medic]			= Apollo.GetString("ClassMedic"),
-	[GameLib.CodeEnumClass.Stalker]			= Apollo.GetString("ClassStalker"),
-	[GameLib.CodeEnumClass.Spellslinger]	= Apollo.GetString("ClassSpellslinger"),
-};
-
-local ktPathStrings = {
-	[PlayerPathLib.PlayerPathType_Soldier]		= Apollo.GetString("PlayerPathSoldier"),
-	[PlayerPathLib.PlayerPathType_Settler]		= Apollo.GetString("PlayerPathSettler"),
-	[PlayerPathLib.PlayerPathType_Scientist]	= Apollo.GetString("PlayerPathExplorer"),
-	[PlayerPathLib.PlayerPathType_Explorer]		= Apollo.GetString("PlayerPathScientist"),
-};
-
-local ktFactionStrings = {
-	[Unit.CodeEnumFaction.ExilesPlayer]		= Apollo.GetString("CRB_Exile"),
-	[Unit.CodeEnumFaction.DominionPlayer]	= Apollo.GetString("CRB_Dominion"),
-};
-
-local ktRaceStrings = {
-	[GameLib.CodeEnumRace.Human]	= Apollo.GetString("RaceHuman"),
-	[GameLib.CodeEnumRace.Granok]	= Apollo.GetString("RaceGranok"),
-	[GameLib.CodeEnumRace.Aurin]	= Apollo.GetString("RaceAurin"),
-	[GameLib.CodeEnumRace.Draken]	= Apollo.GetString("RaceDraken"),
-	[GameLib.CodeEnumRace.Mechari]	= Apollo.GetString("RaceMechari"),
-	[GameLib.CodeEnumRace.Chua]		= Apollo.GetString("RaceChua"),
-	[GameLib.CodeEnumRace.Mordesh]	= Apollo.GetString("CRB_Mordesh"),
-};
-
 -----------------------------------------------------------------------------
 -- Tags
 -----------------------------------------------------------------------------
@@ -123,7 +92,39 @@ end
 
 ------------------------------------------------------------------------------
 -- Unit Tooltips
+-- TODO: Completely remove from this library, Carbine should allow us to create them...
 -----------------------------------------------------------------------------
+
+local ktClassStrings = {
+	[GameLib.CodeEnumClass.Warrior]			= Apollo.GetString("ClassWarrior"),
+	[GameLib.CodeEnumClass.Engineer]		= Apollo.GetString("ClassEngineer"),
+	[GameLib.CodeEnumClass.Esper]			= Apollo.GetString("ClassESPER"),
+	[GameLib.CodeEnumClass.Medic]			= Apollo.GetString("ClassMedic"),
+	[GameLib.CodeEnumClass.Stalker]			= Apollo.GetString("ClassStalker"),
+	[GameLib.CodeEnumClass.Spellslinger]	= Apollo.GetString("ClassSpellslinger"),
+};
+
+local ktPathStrings = {
+	[PlayerPathLib.PlayerPathType_Soldier]		= Apollo.GetString("PlayerPathSoldier"),
+	[PlayerPathLib.PlayerPathType_Settler]		= Apollo.GetString("PlayerPathSettler"),
+	[PlayerPathLib.PlayerPathType_Scientist]	= Apollo.GetString("PlayerPathExplorer"),
+	[PlayerPathLib.PlayerPathType_Explorer]		= Apollo.GetString("PlayerPathScientist"),
+};
+
+local ktFactionStrings = {
+	[Unit.CodeEnumFaction.ExilesPlayer]		= Apollo.GetString("CRB_Exile"),
+	[Unit.CodeEnumFaction.DominionPlayer]	= Apollo.GetString("CRB_Dominion"),
+};
+
+local ktRaceStrings = {
+	[GameLib.CodeEnumRace.Human]	= Apollo.GetString("RaceHuman"),
+	[GameLib.CodeEnumRace.Granok]	= Apollo.GetString("RaceGranok"),
+	[GameLib.CodeEnumRace.Aurin]	= Apollo.GetString("RaceAurin"),
+	[GameLib.CodeEnumRace.Draken]	= Apollo.GetString("RaceDraken"),
+	[GameLib.CodeEnumRace.Mechari]	= Apollo.GetString("RaceMechari"),
+	[GameLib.CodeEnumRace.Chua]		= Apollo.GetString("RaceChua"),
+	[GameLib.CodeEnumRace.Mordesh]	= Apollo.GetString("CRB_Mordesh"),
+};
 
 function UnitFrame:UpdateTooltip()
 	local strTooltip = self.unit:GetName();
