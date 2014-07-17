@@ -150,6 +150,12 @@ function UnitFrame:UpdateTooltip()
 		strInfo = strInfo..ktClassStrings[nClassId].." ";
 	end
 
+	-- Path
+	local nPathId = self.unit:GetPlayerPathType();
+	if (nPathId and ktPathStrings[nPathId]) then
+		strInfo = strInfo.."("..ktPathStrings[nPathId]..")";
+	end
+
 	if (string.len(strInfo) > 0) then
 		strTooltip = strTooltip.."\n"..strInfo;
 	end
