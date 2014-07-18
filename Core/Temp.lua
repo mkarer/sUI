@@ -52,7 +52,7 @@ function M:OnEnable()
 --	self:RegisterEvent("Group_UpdatePosition", "EventHandler"); -- also all the time, table with tables with nIndex to associate unit and coords
 --	self:RegisterEvent("UnitNameChanged", "EventHandler"); -- tUnit, strNewName (quest mobs etc)
 
-	self:UFTest();
+--	self:UFTest();
 end
 
 function S:Test()
@@ -289,12 +289,12 @@ local OpacityFix = {
 	tWindows = {},
 };
 
-Apollo.RegisterTimerHandler("SezzUITimer_UnitFrameOpacityFix", "ShowWindows", OpacityFix);
-Apollo.CreateTimer("SezzUITimer_UnitFrameOpacityFix", 1 / 1000, false);
+Apollo.RegisterTimerHandler("SezzUITimer_UnitFrameOpacityFixxxx", "ShowWindows", OpacityFix);
+Apollo.CreateTimer("SezzUITimer_UnitFrameOpacityFixxxx", 1 / 1000, false);
 
 function OpacityFix:FixWindow(wndControl)
 	table.insert(self.tWindows, wndControl);
-	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFix");
+	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFixxxx");
 end
 
 function OpacityFix:ShowWindows()
@@ -384,6 +384,21 @@ function M:UFTest()
 		},
 	};
 
+	-- Cast Bar
+	local tCastBar = {
+		Name = "HcasterbarPBG",
+		AnchorPoints = { 0, 0, 1, 0 },
+		AnchorOffsets = { 0, -22, 0, -2 },
+		Picture = true,
+		Sprite = "ClientSprites:WhiteFill",
+		BGColor = "33ffffff",
+		IgnoreMouse = "true",
+		Children = {},
+		NoClip = true,
+	};
+
+	table.insert(tUnitFrame.Children, tCastBar);
+
 	local function FindElements(wndControl)
 		local tData = wndControl:GetData();
 		if (type(tData) == "table" and tData.Element) then
@@ -404,7 +419,7 @@ function M:UFTest()
 --	x:Show(false,true) -- Fires WindowHide
 --	x:SetBGOpacity(0.2, 5e+20);
 --	table.insert(OpacityFix.tWindows, x);
---	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFix"); -- erstes mal show = fix need
+--	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFixxxx"); -- erstes mal show = fix need
 	wndUnitFrame:Show(true, true); -- Called by Unit Frames Library
 
 end
