@@ -220,7 +220,7 @@ function Element:CacheSpellIcon(tEventArgs)
 		local strName, strIcon = tEventArgs.splCallingSpell:GetName(), tEventArgs.splCallingSpell:GetIcon();
 
 		if (strName and strIcon and not tSpellIcons[strName]) then
-			log:debug("Cached: %s -> %s", strName, strIcon);
+--			log:debug("Cached: %s -> %s", strName, strIcon);
 			tSpellIcons[strName] = strIcon;
 		end
 	end

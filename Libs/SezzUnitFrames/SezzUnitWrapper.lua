@@ -253,7 +253,7 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 						for k, v in pairs(unit) do
 							if (type(v) ~= "table" and tCache[strUnit][k] ~= v) then
 								-- ignore tMentoredBy...
-								S.Log:debug("%s - Updated %s from %s to %s", unit.strCharacterName, k, tostring(tCache[strUnit][k]), tostring(v));
+--								S.Log:debug("%s - Updated %s from %s to %s", unit.strCharacterName, k, tostring(tCache[strUnit][k]), tostring(v));
 								tCache[strUnit].bUpdated = true;
 								tCache[strUnit][k] = v;
 
@@ -264,12 +264,12 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 						end
 
 						if (tCache[strUnit].bUpdated) then
-							S.Log:debug("Updated cached group unit data for "..unit.strCharacterName)
+--							S.Log:debug("Updated cached group unit data for "..unit.strCharacterName)
 							Event_FireGenericEvent("Sezz_GroupUnitUpdated", nIndex);
 						end
 					else
 						-- Unit changed (not cached or was a real unit)
-						S.Log:debug("New cached group unit "..unit.strCharacterName)
+--						S.Log:debug("New cached group unit "..unit.strCharacterName)
 						tCache[strUnit] = WrapGroupUnit(unit);
 					end
 
@@ -277,7 +277,7 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 				else
 					-- GetUnitForGroupMember
 					if (not tCache[strUnit] or (tCache[strUnit] and tCache[strUnit]:GetId() ~= unit:GetId())) then
-						S.Log:debug("New cached real unit "..unit:GetName())
+--						S.Log:debug("New cached real unit "..unit:GetName())
 						tCache[strUnit] = WrapRealUnit(unit, nIndex);
 					end
 
