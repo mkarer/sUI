@@ -37,6 +37,7 @@ function S:OnCharacterCreated()
 		self.myName = unitPlayer:GetName();
 		self.inCombat = unitPlayer:IsInCombat();
 		self.myCharacter = unitPlayer;
+		self.mySpecialization = 0; -- 0: Assault, 1: Support
 
 		-- Events (Combat, Action Sets, Player)
 		self:UpdateLimitedActionSetData();
@@ -148,6 +149,35 @@ function S:UpdateLimitedActionSetData(timedUpdate)
 	-- Raise Event
 	if (changed or initialUpdate) then
 		self:RaiseEvent("Sezz_LimitedActionSetChanged");
+
+		-- Set Specialization
+		local nAssaultAbilities = 0;
+		local nSupportAbilities = 0;
+		local nSpecialization = self.mySpecialization;
+
+		local tActionSet = {};
+		for i, nAbilityId in ipairs(ActionSetLib.GetCurrentActionSet()) do
+			if (i > 8) then break; end
+			tActionSet[nAbilityId] = 0;
+		end
+
+		for _, tAbility in ipairs(AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Support)) do
+			if (tActionSet[tAbility.nId]) then
+				nSupportAbilities = nSupportAbilities + 1;
+			end
+		end
+
+		for _, tAbility in ipairs(AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Assault)) do
+			if (tActionSet[tAbility.nId]) then
+				nAssaultAbilities = nAssaultAbilities + 1;
+			end
+		end
+
+		nSpecialization = (nAssaultAbilities >= nSupportAbilities and 0 or 1);
+		if (initialUpdate or nSpecialization ~= self.mySpecialization) then
+			self.mySpecialization = nSpecialization;
+			self:RaiseEvent("Sezz_SpecializationChanged", nSpecialization);
+		end
 	end
 
 	return changed;
