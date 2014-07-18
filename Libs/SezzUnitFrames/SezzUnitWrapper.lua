@@ -113,6 +113,7 @@ local GroupLibUnit = {
 	GetInterruptArmorValue = fnZero,
 	GetRole = fnUnitRole,
 	IsRealUnit = fnFalse,
+	IsThePlayer = fnFalse,
 };
 
 function GroupLibUnit:GetId()
