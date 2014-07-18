@@ -114,6 +114,15 @@ local GroupLibUnit = {
 	GetRole = fnUnitRole,
 	IsRealUnit = fnFalse,
 	IsThePlayer = fnFalse,
+	GetRewardInfo = fnNil,
+	IsSettlerImprovement = fnFalse,
+	IsFriendlyWarplotStructure = fnFalse,
+	-- Unknown at this state:
+	GetAffiliationName = fnNil,
+	GetGuildName = fnNil,
+	IsPvpFlagged = fnFalse,
+	IsFriend = fnFalse,
+	IsRival = fnFalse,
 };
 
 function GroupLibUnit:GetId()
