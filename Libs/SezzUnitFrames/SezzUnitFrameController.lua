@@ -94,7 +94,7 @@ end
 function UnitFrameController:SpawnUnits()
 	for _, tUnitFrame in pairs(self.tUnitFrames) do
 --		log:debug("Loading Unit Frame: %s", tUnitFrame.strUnit);
-		tUnitFrame:SpawnUnit();
+		tUnitFrame:Spawn();
 
 		-- Add Elements
 		for _, tElement in pairs(tRegisteredElements) do

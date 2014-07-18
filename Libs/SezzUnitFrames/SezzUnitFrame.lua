@@ -191,8 +191,8 @@ FindElementControls = function(wndControl, tControls)
 	return tControls;
 end
 
-local SpawnUnit = function(self)
-	-- Spawn Window
+local Spawn = function(self)
+	-- Create Window
 	self.wndMain = self.tPrototype:GetInstance(self);
 	self.tControls = FindElementControls(self.wndMain, {});
 	self.wndMain:Show(false, true);
@@ -237,7 +237,7 @@ function UnitFrame:New(tUnitFrameController, strUnit, tWindowDefinition)
 	self.Untag = tUnitFrameController.Untag;
 
 	-- Expose Methods
-	self.SpawnUnit = SpawnUnit;
+	self.Spawn = Spawn;
 	self.OnMouseClick = OnMouseClick;
 	self.Show = Show;
 	self.Hide = Hide;
