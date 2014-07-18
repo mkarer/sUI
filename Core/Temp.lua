@@ -51,6 +51,8 @@ function M:OnEnable()
 --	self:RegisterEvent("Group_Updated", "EventHandler"); -- happens all the time, no args
 --	self:RegisterEvent("Group_UpdatePosition", "EventHandler"); -- also all the time, table with tables with nIndex to associate unit and coords
 --	self:RegisterEvent("UnitNameChanged", "EventHandler"); -- tUnit, strNewName (quest mobs etc)
+
+	self:UFTest();
 end
 
 function S:Test()
@@ -233,3 +235,181 @@ local pets = {};
 		return Apollo._LoadForm(strFile, ...);
 	end
 ]]
+
+-----------------------------------------------------------------------------
+-- GeminiGUI Unit Frames
+-----------------------------------------------------------------------------
+
+local UnitFrameController, GeminiGUI;
+local tColors = {
+	HealthSmooth = { 255/255, 38/255, 38/255, 255/255, 38/255, 38/255, 38/255, 38/255, 38/255 },
+};
+local tUF = {
+	test = 0,
+};
+
+local function RegisterWindow(self, wndHandler, wndControl)
+	log:debug(wndHandler.children);
+
+	local tAttributes = wndHandler:GetData();
+	log:debug(tAttributes);
+
+	log:debug("Registering %s", wndHandler:GetName());
+	wndHandler:SetData(tUF);
+
+	tUF.test = tUF.test + 1;
+	local x = wndHandler:GetData();
+	log:debug(x.test);
+end
+
+local function OnMouseEnter(self, wndHandler, wndControl, x, y)
+	if (wndHandler:ContainsMouse()) then
+		wndHandler:SetBGOpacity(0.4);
+	end
+end
+
+local function OnMouseExit(self, wndHandler, wndControl, x, y)
+	if (not wndHandler:ContainsMouse()) then
+		wndHandler:SetBGOpacity(0.2);
+	end
+end
+
+local function OnWindowHide(self, wndHandler, wndControl)
+	log:debug("hide")
+	local tAttributes = wndHandler:GetData();
+	log:debug(tAttributes);
+	wndHandler:SetBGOpacity(0.2, 5e+20);
+end
+
+-----------------------------------------------------------------------------
+-- Background Opacity Fix
+-----------------------------------------------------------------------------
+
+local OpacityFix = {
+	tWindows = {},
+};
+
+Apollo.RegisterTimerHandler("SezzUITimer_UnitFrameOpacityFix", "ShowWindows", OpacityFix);
+Apollo.CreateTimer("SezzUITimer_UnitFrameOpacityFix", 1 / 1000, false);
+
+function OpacityFix:FixWindow(wndControl)
+	table.insert(self.tWindows, wndControl);
+	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFix");
+end
+
+function OpacityFix:ShowWindows()
+	for i in ipairs(self.tWindows) do
+		local wndControl = table.remove(self.tWindows);
+		wndControl:Show(true, true);
+	end
+end
+
+local function OnClick(self, wndHandler, wndControl, x, y)
+	wndHandler:Show(false,true);
+	-- Show again in 2 seconds for testing!
+	table.insert(OpacityFix.tWindows, wndHandler);
+	Apollo.StartTimer("fffffffffff");
+end
+
+local function OnWindowShow(self, wndHandler, wndControl)
+	-- Background Opacity Fix
+	if (wndHandler:GetBGOpacity() == 1) then
+		wndHandler:Show(false, true);
+		OpacityFix:FixWindow(wndHandler); 
+	end
+end
+
+Apollo.RegisterTimerHandler("fffffffffff", "ShowWindows", OpacityFix);
+Apollo.CreateTimer("fffffffffff", 2, false);
+
+function M:UFTest()
+	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+
+	-- Root
+	local tUnitFrame = {
+		Name = "BlarRRROOOT",
+		AnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
+		AnchorOffsets = { 283, -92, 537, -58 },
+		Picture = true,
+		BGColor = "ffffffff",
+--		BGOpacity = 0.2,
+		Sprite = "ClientSprites:WhiteFill",
+		IgnoreMouse = false,
+		Events = {
+--			WindowLoad = RegisterWindow,	-- Unit Frames Library Registration
+			MouseEnter = OnMouseEnter,		-- Background Fade In
+			MouseExit = OnMouseExit,		-- Background Fade Out
+			MouseButtonUp = OnClick,		-- Temporary Click Handler
+			WindowHide = OnWindowHide,		-- Background Fade Out (Instantly)
+			WindowShow = OnWindowShow,
+		},
+		Children = {},
+		Visible = false,
+		UserData = {
+			Element = "Main",
+		},
+	};
+
+	-- Health Bar
+	local tHealthBar = {
+		Name = "HPBG",
+		AnchorPoints = { 0, 0, 1, 1 },
+		AnchorOffsets = { 2, 2, -2, -2 },
+		Picture = true,
+		Sprite = "ClientSprites:WhiteFill",
+		BGColor = "ff000000",
+		IgnoreMouse = "true",
+		Children = {},
+	};
+	table.insert(tUnitFrame.Children, tHealthBar);
+
+	tHealthBar.Children[1] = {
+		Class = "ProgressBar",
+		Name = "HP_Progress",
+		AnchorPoints = { 0, 0, 1, 1 },
+		AnchorOffsets = { 0, 0, 0, 0 },
+		AutoSetText = false,
+		UseValues = true,
+		SetTextToProgress = false,
+		ProgressFull = "sUI:ProgressBar",
+		IgnoreMouse = "true",
+		BarColor = UnitFrameController:RGBColorToHex(tColors.HealthSmooth[1], tColors.HealthSmooth[2], tColors.HealthSmooth[3]),
+		Events = {
+			WindowLoad = RegisterWindow,	-- Unit Frames Library Registration
+		},
+		UserData = {
+			Element = "HealthBar",
+			Tags = "[Bla]",
+		},
+	};
+
+	local function FindElements(wndControl)
+		local tData = wndControl:GetData();
+		if (type(tData) == "table" and tData.Element) then
+			log:debug(tData);
+		end
+
+		for _, wndChild in ipairs(wndControl:GetChildren()) do
+			FindElements(wndChild);
+		end
+	end
+
+
+	-- Spawn Unit Frame
+	local wndUnitFrame = GeminiGUI:Create(tUnitFrame):GetInstance(self);
+	-- Register Elements
+	FindElements(wndUnitFrame);
+
+--	x:Show(false,true) -- Fires WindowHide
+--	x:SetBGOpacity(0.2, 5e+20);
+--	table.insert(OpacityFix.tWindows, x);
+--	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFix"); -- erstes mal show = fix need
+	wndUnitFrame:Show(true, true); -- Called by Unit Frames Library
+
+end
+
+
+function M:T()
+
+end
