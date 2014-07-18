@@ -36,22 +36,6 @@ function UnitFramesLayout:CreateExperienceBarElement(strUnit, tSettings)
 		TooltipType = "OnCursor",
 		Children = {
 			{
-				-- Rested Experience Bar
-				Class = "ProgressBar",
-				Name = "ExperienceBarRested",
-				AnchorPoints = { 0, 0, 1, 1 },
-				AnchorOffsets = { 0, 0, 0, 0 },
-				AutoSetText = false,
-				UseValues = true,
-				SetTextToProgress = false,
-				ProgressFull = "sUI:ProgressBar",
-				IgnoreMouse = "true",
-				BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Experience.Rested),
-				UserData = {
-					Element = "ExperienceBarRested",
-				},
-			},
-			{
 				-- Experience Bar
 				Class = "ProgressBar",
 				Name = "ExperienceBar",
@@ -65,6 +49,22 @@ function UnitFramesLayout:CreateExperienceBarElement(strUnit, tSettings)
 				BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Experience.Normal),
 				UserData = {
 					Element = "ExperienceBar",
+				},
+			},
+			{
+				-- Rested Experience Bar
+				Class = "ProgressBar",
+				Name = "ExperienceBarRested",
+				AnchorPoints = { 0, 0, 1, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				AutoSetText = false,
+				UseValues = true,
+				SetTextToProgress = false,
+				ProgressFull = "sUI:ProgressBar",
+				IgnoreMouse = "true",
+				BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Experience.Rested),
+				UserData = {
+					Element = "ExperienceBarRested",
 				},
 			},
 		},
