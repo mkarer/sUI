@@ -63,7 +63,7 @@ function Element:Update()
 			if (self.tCurrentOpSpell) then
 				-- Charged Cast
 				nElapsed = unit:GetCastElapsed();
-				nDuration = nElapsed / (GameLib.GetSpellThresholdTimePrcntDone(self.tCurrentOpSpell.id) * 100) * 100; -- Not very exact :(
+				nDuration = nElapsed / (GameLib.GetSpellThresholdTimePrcntDone(self.tCurrentOpSpell.id) * 100) * 100; -- Not very exact, maybe Spell:GetChannelData() is more useful?
 				strSpellName = self.tCurrentOpSpell.strName.." ["..self.tCurrentOpSpell.nCurrentTier.."/"..self.tCurrentOpSpell.nMaxTier.."]";
 				strSpellIcon = tSpellIcons[self.tCurrentOpSpell.strName];
 			else
