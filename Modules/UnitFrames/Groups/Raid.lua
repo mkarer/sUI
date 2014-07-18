@@ -19,10 +19,10 @@ local tSettings = {
 	nUnitsPerColumn = 5,
 	strDirectionColumn = "LEFTRIGHT",
 	tAnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
-	tAnchorOffsets = { 259, 0, 334, 35 },
+--	tAnchorOffsets = { 259, 0, 334, 35 },
+	tAnchorOffsets = { 259, 0, 336, 37 },
 	-- Health Bar
-	strTagsTextLeft = "[TClassColor][ >Sezz:RaidName][TClose][Sezz:Role]",
-	strTagsTextRight = "[Sezz:HPMinimalParty]",
+	strTagsTextRight = "[Sezz:RaidHP]",
 	-- Shield Bar
 	bShieldBarEnabled = true,
 };

@@ -167,4 +167,22 @@ function UnitFramesLayout:RegisterTags()
 		return UTF8Sub(unit:GetName(), 4, false);
 	end
 
+	self.tUnitFrameController.Tags.Methods["Sezz:RaidHP"] = function(unit)
+		local strStatus = UnitStatus(unit);
+		if (strStatus) then
+			return strStatus;
+		else
+			local nCurrentHealth, nMaxHealth, fHealthPercent = unit:GetHealth(), unit:GetMaxHealth(), 1;
+			if (nCurrentHealth and nMaxHealth and nMaxHealth > 0 and nCurrentHealth ~= nMaxHealth) then
+				fHealthPercent = nCurrentHealth / nMaxHealth;
+			end
+
+			if (fHealthPercent < .9) then
+				return WrapAML("P", "-"..ShortNumber(nMaxHealth - nCurrentHealth), "ffff7f7f", "Right");
+			else
+				local strName = self.tUnitFrameController.Tags.Methods["TClassColor"](unit)..UTF8Sub(unit:GetName(), 4, false)..self.tUnitFrameController.Tags.Methods["TClose"](unit);
+				return WrapAML("P", strName, nil, "Right");
+			end
+		end
+	end
 end
