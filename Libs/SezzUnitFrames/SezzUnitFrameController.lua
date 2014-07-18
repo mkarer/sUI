@@ -31,17 +31,14 @@ local tRegisteredElements = {};
 
 -- Default Colors
 local tColors = {
-	Power = {
---		["MANA"]					= { 45/255, 82/255, 137/255 },
---		["RAGE"]					= { 226/255, 45/255, 75/255 },
---		["FOCUS"]					= { 1, 210/255, 0 },
---		["ENERGY"]					= { 1, 220/255, 25/255 },
---		["RUNIC_POWER"]				= { 1, 210/255, 0 },
---		["POWER_TYPE_STEAM"]		= { 0.55, 0.57, 0.61 },
---		["POWER_TYPE_PYRITE"]		= { 0.60, 0.09, 0.17 },
---		["POWER_TYPE_FEL_ENERGY"]	= { 1, 1, 0.3 },
---		["AMMOSLOT"]				= { 0.8, 0.6, 0 },
-	},
+	Power = setmetatable({
+		Default			= { 1, 1, 0.3 },
+		SpellPower		= { 1, 1, 0.3 },
+		Focus			= { 0.3, 1, 1 },
+		SuitPower		= { 1, 1, 0.3 },
+		KineticEnergy	= { 1, 0.25, 0.05 },
+		Volatility		= { 1, 1, 0.3 },
+	}, { __index = function(t, k) return rawget(t, k) or rawget(t, "Default"); end }),
 	Reaction = {
 		[2] = { 1, 0, 0 }, -- Aggressive
 		[4] = { 1, 1, 0 }, -- Neutral
