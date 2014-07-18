@@ -163,7 +163,6 @@ function M:CheckMountShortcut()
 
 	if (GameLib.GetShortcutMount() == 0) then
 		local tMountList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
-			log:debug(tMountList);
 		if (#tMountList > 0) then
 			local nSpellId = tMountList[1].tTiers[1].splObject:GetId();
 
