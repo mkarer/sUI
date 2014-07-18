@@ -15,6 +15,24 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
+local function OnWindowShow(self, wndHandler, wndControl)
+	-- Reduce Health Bar Size
+	local nHeight = wndHandler:GetData().Height;
+	local nOffsetL, nOffsetT, nOffsetR, nOffsetB = self.tControls.Health:GetAnchorOffsets();
+	nOffsetB = nOffsetB - nHeight;
+
+	self.tControls.Health:SetAnchorOffsets(nOffsetL, nOffsetT, nOffsetR, nOffsetB);
+end
+
+local function OnWindowHide(self, wndHandler, wndControl)
+	-- Enlarge Health Bar
+	local nHeight = wndHandler:GetData().Height;
+	local nOffsetL, nOffsetT, nOffsetR, nOffsetB = self.tControls.Health:GetAnchorOffsets();
+	nOffsetB = nOffsetB + nHeight;
+
+	self.tControls.Health:SetAnchorOffsets(nOffsetL, nOffsetT, nOffsetR, nOffsetB);
+end
+
 function UnitFramesLayout:CreatePowerBarElement(strUnit)
 	local tSettings = self.tSettings[strUnit];
 	if (not tSettings.bPowerBarEnabled) then return; end
@@ -31,7 +49,7 @@ function UnitFramesLayout:CreatePowerBarElement(strUnit)
 
 	-- Add Power Bar
 	tinsert(tSettings.tElements["Main"].Children, {
-		Name = "Power",
+		Name = "PowerBarContainer",
 		AnchorPoints = { 0, 1, 1, 1 },
 		AnchorOffsets = { 2, -4 - nOffsetY, -2, -2 - nOffsetY },
 		Picture = true,
@@ -39,6 +57,15 @@ function UnitFramesLayout:CreatePowerBarElement(strUnit)
 		BGColor = "ff000000",
 		IgnoreMouse = "true",
 		TooltipType = "OnCursor",
+		Events = {
+			WindowHide = OnWindowHide, -- Resize Health Bar
+			WindowShow = OnWindowShow, -- Resize Health Bar
+		},
+		UserData = {
+			Element = "PowerBarContainer",
+			OffsetY = nOffsetY,
+			Height = tSettings.nPowerBarHeight + tSettings.nBarSpacing,
+		},
 		Children = {
 			{
 				-- Power Bar
