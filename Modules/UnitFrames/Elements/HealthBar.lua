@@ -30,6 +30,9 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit, tSettings)
 		Sprite = "WhiteFill",
 		BGColor = "ff000000",
 		IgnoreMouse = "true",
+		UserData = {
+			Element = "Health",
+		},
 		Children = {
 			{
 				Class = "ProgressBar",
