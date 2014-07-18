@@ -32,6 +32,7 @@ function M:CreateUnitFrame(strUnit, tSettings)
 	self:CreateExperienceBarElement(strUnit, tSettings);
 	self:CreateAurasElement(strUnit, tSettings);
 	self:CreateThreatBarElement(strUnit, tSettings);
+	self:CreatePowerBarElement(strUnit);
 
 	self.tUnitFrameController:CreateUnitFrame(strUnit, tSettings.tWindowDefinition);
 end

@@ -74,6 +74,7 @@
 	<Script Name="Modules\UnitFrames\Elements\Auras.lua" />
 	<Script Name="Modules\UnitFrames\Elements\ShieldBar.lua" />
 	<Script Name="Modules\UnitFrames\Elements\ThreatBar.lua" />
+	<Script Name="Modules\UnitFrames\Elements\PowerBar.lua" />
 	<Script Name="Modules\UnitFrames\Units\Player.lua" />
 	<Script Name="Modules\UnitFrames\Units\Target.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />

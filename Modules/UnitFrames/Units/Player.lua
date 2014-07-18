@@ -27,4 +27,6 @@ UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 	bExperienceBarEnabled = true,
 	-- Shield Bar
 	bShieldBarEnabled = true,
+	-- Power Bar
+	bPowerBarEnabled = true,
 });

@@ -31,6 +31,8 @@ local tSettings = {
 	bShieldBarEnabled = true,
 	-- Threat Bar
 	bThreatBarEnabled = true,
+	-- Power Bar
+	bPowerBarEnabled = true,
 };
 
 tSettings.tAurasFilter = S:Clone(S.DB.Modules.Buffs.Filter);

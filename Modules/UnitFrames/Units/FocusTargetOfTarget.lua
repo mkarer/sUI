@@ -27,4 +27,6 @@ UnitFramesLayout:SetUnitFrameConfiguration("FocusTargetOfTarget", {
 	bShieldBarEnabled = true,
 	-- Threat Bar
 	bThreatBarEnabled = true,
+	-- Power Bar
+	bPowerBarEnabled = true,
 });
