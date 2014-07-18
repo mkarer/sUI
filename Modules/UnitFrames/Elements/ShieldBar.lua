@@ -10,19 +10,20 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
+-- Lua API
+local tinsert = table.insert;
+
 -----------------------------------------------------------------------------
 
 function UnitFramesLayout:CreateShieldBarElement(strUnit, tSettings)
 	if (not tSettings.bShieldBarEnabled) then return; end
 
-	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
 
-	-------------------------------------------------------------------------
 	-- Shield Bar
-	-------------------------------------------------------------------------
-
-	tXmlData["ShieldBar"] = self.xmlDoc:NewControlNode("Shield", "ProgressBar", {
+	local tShieldBar = {
+		Class = "ProgressBar",
+		Name = "ShieldBar",
 		AnchorPoints = { 0, 0, 1, 0 },
 		AnchorOffsets = { 0, 0, 0, tSettings.nShieldBarHeight },
 		AutoSetText = false,
@@ -31,8 +32,11 @@ function UnitFramesLayout:CreateShieldBarElement(strUnit, tSettings)
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
 		BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.Shield),
-	});
+		UserData = {
+			Element = "ShieldBar",
+		},
+	};
 
-	tXmlData["HealthBar"]:AddChild(tXmlData["ShieldBar"]);
-
+	tinsert(tSettings.tElements["HealthBar"].Children, tShieldBar);
+	tSettings.tElements["ShieldBar"] = tShieldBar;
 end

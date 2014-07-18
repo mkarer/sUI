@@ -17,6 +17,7 @@ UnitFramesLayout.tDefaults = {
 	-------------------------------------------------------------------------
 	-- Base
 	-------------------------------------------------------------------------
+--	fOutOfRangeOpacity = 0.5,
 	nBarSpacing = 1,
 --	tAnchorPoints = {},
 --	tAnchorOffsets = {},
@@ -91,8 +92,7 @@ UnitFramesLayout.tDefaults = {
 };
 
 -- Colors
-UnitFramesLayout.tColors = {
-};
+UnitFramesLayout.tColors = {};
 
 -- Aura Prototypes
 UnitFramesLayout.tDefaults.tAuraPrototypeBuff = {

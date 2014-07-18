@@ -39,7 +39,7 @@ function Element:UpdateThreat(...)
 
 	local unit = self.tUnitFrame.unit;
 	local nUnitPlayerId = GameLib.GetPlayerUnit():GetId();
-	local wndThreat = self.tUnitFrame.wndThreat;
+	local wndThreat = self.tUnitFrame.tControls.ThreatBar;
 	local tColors = self.tUnitFrame.tColors;
 
 	if (UnitIsFriend(unit)) then
@@ -109,7 +109,7 @@ function Element:Update()
 	local unit = self.tUnitFrame.unit;
 
 	if (UnitIsFriend(unit) or unit:IsDead()) then
-		self.tUnitFrame.wndThreat:Show(false, true);
+		self.tUnitFrame.tControls.ThreatBar:Show(false, true);
 		-- Not sure if friendly NPCs can turn into enemies, won't disable the element until someone can confirm.
 		-- self:Disable();
 	elseif (UnitTargetsPlayer(unit)) then
@@ -172,7 +172,7 @@ function Element:Disable(bForce)
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (tUnitFrame.wndThreat ~= nil);
+	local bSupported = (tUnitFrame.tControls.ThreatBar ~= nil);
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -191,7 +191,7 @@ function Element:New(tUnitFrame)
 	self.bUpdateOnUnitFrameFrameCount = false;
 
 	-- Initialize Threat Control
-	self.tUnitFrame.wndThreat:SetMax(100);
+	self.tUnitFrame.tControls.ThreatBar:SetMax(100);
 
 	-- Done
 	self:Disable(true);
@@ -211,7 +211,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 end
 
@@ -221,4 +221,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });

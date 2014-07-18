@@ -21,8 +21,8 @@ UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
-	tCastBarAnchorPoints = { 0.5, 1, 0.5, 1 };
-	tCastBarAnchorOffsets = { -127, -86, 127, -66 };
+	tCastBarAnchorPoints = { 0, 1, 1, 1 };
+	tCastBarAnchorOffsets = { 0, 2, 0, 22 };
 	-- Experience Bar
 	bExperienceBarEnabled = true,
 	-- Shield Bar

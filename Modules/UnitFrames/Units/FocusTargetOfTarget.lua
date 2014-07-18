@@ -21,8 +21,8 @@ UnitFramesLayout:SetUnitFrameConfiguration("FocusTargetOfTarget", {
 	strTagsTextRight = "[Sezz:HPMinimalParty]",
 	-- Cast Bar
 	bCastBarEnabled = true,
-	tCastBarAnchorPoints = { 0.5, 0.5, 0.5, 0.5 };
-	tCastBarAnchorOffsets = { 707, -114, 873, -94 };
+	tCastBarAnchorPoints = { 0, 0, 1, 0 };
+	tCastBarAnchorOffsets = { 0, -22, 0, -2 };
 	-- Shield Bar
 	bShieldBarEnabled = true,
 	-- Threat Bar

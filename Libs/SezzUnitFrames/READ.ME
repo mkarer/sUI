@@ -1,41 +1,73 @@
-XML Structure
+-----------------------------------------------------------------------------
+-- Sezz Unit Frames v0.2
+-----------------------------------------------------------------------------
 
-+ Root [wndMain]
+I replaced XmlDocument with GeminiGUI, that means you can easily add elements by specifying the element name in the UserData table.
+Some elements also accept additional data (see below).
 
-This element MUST BE EXACTLY LIKE THIS: {LayoutName}{UnitName}
-Example: My layout is named "SezzUnitFrames", so my root element for the player unit will be named "SezzUnitFramesPlayer".
-This is currently needed when loading the form, so you can create a cast bar that is anywhere on the screen (in this example the cast bar would be named "SezzUnitFramesPlayerCastBar").
+Example:
 
-All the unit frame elements can be anywhere as a child of the root element when using their short name (like "Health", but then you'll need to structurize them like explained below or :GetChild("Name") wouldn't find them) or can even be a root element when using their full name (like "SezzUnitFramesPlayerHealth")!
+local tShieldBar = {
+	Class = "ProgressBar",
+	Name = "CoolShieldBar",
+	AnchorPoints = { 0, 0, 1, 0 },
+	AnchorOffsets = { 0, 0, 0, 5 },
+	ProgressFull = "sUI:ProgressBar",
+	BarColor = "red",
+	UserData = {
+		Element = "ShieldBar",
+	},
+};
 
-Supported elements:
 
-	+ Health
-		+ Progress [wndHealth]
-		+ TextLeft [wndTextLeft] (see below)
-		+ TextRight [wndTextRight] (see below)
-		
-		The tag system isn't implemented yet, so the text windows will have the following content:
-		TextLeft: Unit name
-		TextRight: HP
+-----------------------------------------------------------------------------
+-- Elements
+-----------------------------------------------------------------------------
 
-	+ CastBar [wndCastBar]
-		+ Progress (Required)
-		+ Icon (WildStar does not provide spell icons, I'm currently using the combat log to remember icons for every spell, but must spells don't even have an icon!)
-		+ Text
-		+ Time
+Main
+	Type: Window
+	REQUIRED, this is your root/parent window that contains everything else.
 
-	+ Experience [wndExperience]
-		+ Progress (Required)
-		+ ProgressRested (Required)
 
-	+ Shield [wndShield]
+Auras
+	Type: Window
+	It's only a container for auras, needs my auras package and also my aura control package.
 
---
+	Arguments:
+		AuraPrototypeBuff
+			REQUIRED, GeminiGUI window definitions for a single buff (table)
 
-wnd:SetData
-wnd:GetData
+		AuraPrototypeDebuff
+			REQUIRED, GeminiGUI window definitions for a single debuff (table)
 
-Element:Enable() should handle unit enabling of the element AND also unit changes!
+		AuraFilter
+			[Optional] Aura ids that should be ignored (table)
+			Example for filtering Authentication Dividends: { [70391] = true }
 
-Tooltips aren't working!
+		AuraAnchorLeft
+			[Optional] By default auras are anchored to the right, this inverts that behavior (boolean)
+
+
+CastBarContainer
+CastBar
+	Type: ProgressBar
+CastBarIcon
+CastBarTextSpell
+CastBarTextDuration
+
+ExperienceBar
+	Type: ProgressBar
+ExperienceBarRested
+	Type: ProgressBar
+
+HealthBar
+	Type: ProgressBar
+
+Text
+
+ThreatBar
+	Type: ProgressBar
+
+ShieldBar
+	Type: ProgressBar
+

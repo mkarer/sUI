@@ -21,12 +21,12 @@ local tSettings = {
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
-	tCastBarAnchorPoints = { 0.5, 0.5, 0.5, 0.5 };
-	tCastBarAnchorOffsets = { 283, -114, 537, -94 };
+	tCastBarAnchorPoints = { 0, 0, 1, 0 };
+	tCastBarAnchorOffsets = { 0, -22, 0, -2 };
 	-- Auras
 	bAurasEnabled = true,
-	tAurasAnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
-	tAurasAnchorOffsets = { -19, -92, 281, -58 },
+	tAurasAnchorPoints = { 0, 0, 0, 1 },
+	tAurasAnchorOffsets = { -302, 0, -2, 0 },
 	-- Shield Bar
 	bShieldBarEnabled = true,
 	-- Threat Bar

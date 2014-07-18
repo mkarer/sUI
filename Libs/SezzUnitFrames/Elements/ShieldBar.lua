@@ -21,7 +21,7 @@ function Element:Update()
 	if (not self.bEnabled) then return; end
 
 	local unit = self.tUnitFrame.unit;
-	local wndShield = self.tUnitFrame.wndShield;
+	local wndShield = self.tUnitFrame.tControls.ShieldBar;
 
 	local nCurrent = unit:GetShieldCapacity();
 	local nMax = unit:GetShieldCapacityMax();
@@ -48,7 +48,7 @@ function Element:Disable(bForce)
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (tUnitFrame.wndShield ~= nil);
+	local bSupported = (tUnitFrame.tControls.ShieldBar ~= nil);
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -84,7 +84,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 end
 
@@ -94,4 +94,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });

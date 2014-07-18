@@ -10,12 +10,12 @@
 
 --]]
 
-local MAJOR, MINOR = "Sezz:UnitFrameController-0.1", 1;
+local MAJOR, MINOR = "Sezz:UnitFrameController-0.2", 1;
 local APkg = Apollo.GetPackage(MAJOR);
 if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local UnitFrameController = APkg and APkg.tPackage or {};
-local XmlDocument, UnitFrame, GeminiLogging, log;
+local UnitFrame, GeminiLogging, log;
 
 -- Lua APIs
 local format, floor, modf = string.format, math.floor, math.modf;
@@ -85,19 +85,16 @@ local tColors = {
 -- Frame Creation
 -----------------------------------------------------------------------------
 
-function UnitFrameController:CreateUnitFrame(strLayoutName, strUnit, tXmlData, tAttributes)
+function UnitFrameController:CreateUnitFrame(strUnit, tWindowDefinition)
 --	log:debug("Creating Unit Frame for: %s", strUnit)
-	local tUnitFrame = UnitFrame:New(self, strLayoutName, strUnit, tXmlData, tAttributes);
-
-	self.tUnitFrames[strUnit] = tUnitFrame;
-	return tUnitFrame;
+	self.tUnitFrames[strUnit] = UnitFrame:New(self, strUnit, tWindowDefinition);
+	return self.tUnitFrames[strUnit];
 end
 
-function UnitFrameController:LoadForm()
-	-- Add all Unit Frames' XML and load them with Apollo
+function UnitFrameController:SpawnUnits()
 	for _, tUnitFrame in pairs(self.tUnitFrames) do
 --		log:debug("Loading Unit Frame: %s", tUnitFrame.strUnit);
-		tUnitFrame:LoadForm();
+		tUnitFrame:SpawnUnit();
 
 		-- Add Elements
 		for _, tElement in pairs(tRegisteredElements) do
@@ -202,7 +199,6 @@ function UnitFrameController:Enable()
 	Apollo.RegisterEventHandler("VarChange_FrameCount", "UpdateUnits", self);
 --	Apollo.RegisterEventHandler("Group_Updated", "OnGroupUpdated", self);
 	Apollo.RegisterEventHandler("Group_MemberFlagsChanged", "OnGroupMemberFlagsChanged", self);
-
 end
 
 -----------------------------------------------------------------------------
@@ -268,16 +264,13 @@ end
 -- Constructor
 -----------------------------------------------------------------------------
 
-function UnitFrameController:New(xmlDoc, tCustomColors)
+function UnitFrameController:New(tCustomColors)
 	self = setmetatable({}, { __index = UnitFrameController });
 
 	-- Properties
 	self.tUnitFrames = {};
 	self.tColors = (tCustomColors and setmetatable(tCustomColors, { __index = tColors }) or tColors);
 	self.bCharacterLoaded = false;
-
-	-- Create a new XML Document
-	self.xmlDoc = xmlDoc or XmlDocument.NewForm();
 
 	-- Load Element Packages
 	for strPackageName, tElement in pairs(tRegisteredElements) do
@@ -298,8 +291,7 @@ function UnitFrameController:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	XmlDocument = Apollo.GetPackage("Drafto:Lib:XmlDocument-1.0").tPackage;
-	UnitFrame = Apollo.GetPackage("Sezz:UnitFrame-0.1").tPackage;
+	UnitFrame = Apollo.GetPackage("Sezz:UnitFrame-0.2").tPackage;
 end
 
 function UnitFrameController:OnDependencyError(strDep, strError)
@@ -308,4 +300,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Drafto:Lib:XmlDocument-1.0", "Sezz:UnitFrame-0.1", "Gemini:Logging-1.2", "Gemini:Event-1.0" });
+Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Sezz:UnitFrame-0.2", "Gemini:Logging-1.2", "Gemini:Event-1.0" });

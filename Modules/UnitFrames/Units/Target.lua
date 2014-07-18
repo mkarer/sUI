@@ -21,12 +21,13 @@ UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
-	tCastBarAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
+--	tCastBarAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
+	tCastBarAnchorPoints = { 0.5, -23, 0.5, -23 };
 	tCastBarAnchorOffsets = { -200, 0, 200, 36 };
 	-- Auras
 	bAurasEnabled = true,
-	tAurasAnchorPoints = { 0.5, 1, 0.5, 1 },
-	tAurasAnchorOffsets = { -129 - 300, -214, -129, -180 },
+	tAurasAnchorPoints = { 0, 0, 0, 1 },
+	tAurasAnchorOffsets = { -302, 0, -2, 0 },
 	-- Shield Bar
 	bShieldBarEnabled = true,
 	-- Threat Bar

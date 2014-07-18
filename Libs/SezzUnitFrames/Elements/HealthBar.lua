@@ -22,7 +22,7 @@ function Element:Update()
 
 	local unit = self.tUnitFrame.unit;
 	local tColors = self.tUnitFrame.tColors;
-	local wndHealth = self.tUnitFrame.wndHealth;
+	local wndHealth = self.tUnitFrame.tControls.HealthBar;
 
 	local nCurrent = unit:GetHealth();
 	local nMax = unit:GetMaxHealth();
@@ -74,7 +74,7 @@ function Element:Disable(bForce)
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (tUnitFrame.wndHealth ~= nil);
+	local bSupported = (tUnitFrame.tControls.HealthBar ~= nil);
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -110,7 +110,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 end
 
@@ -120,4 +120,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });

@@ -10,19 +10,20 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
+-- Lua API
+local tinsert = table.insert;
+
 -----------------------------------------------------------------------------
 
 function UnitFramesLayout:CreateThreatBarElement(strUnit, tSettings)
 	if (not tSettings.bThreatBarEnabled) then return; end
 
-	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
 
-	-------------------------------------------------------------------------
 	-- Threat Bar
-	-------------------------------------------------------------------------
-
-	tXmlData["ThreatBar"] = self.xmlDoc:NewControlNode("Threat", "ProgressBar", {
+	local tThreatBar = {
+		Class = "ProgressBar",
+		Name = "ThreatBar",
 		AnchorPoints = { 0, 0, 1, 0 },
 		AnchorOffsets = { 0, 0, 0, tSettings.nThreatBarHeight },
 		AutoSetText = false,
@@ -30,8 +31,11 @@ function UnitFramesLayout:CreateThreatBarElement(strUnit, tSettings)
 		SetTextToProgress = false,
 		ProgressFull = "sUI:ProgressBar",
 		IgnoreMouse = "true",
-	});
+		UserData = {
+			Element = "ThreatBar",
+		},
+	};
 
-	tXmlData["HealthBar"]:AddChild(tXmlData["ThreatBar"]);
-
+	tinsert(tSettings.tElements["HealthBar"].Children, tThreatBar);
+	tSettings.tElements["ThreatBar"] = tThreatBar;
 end

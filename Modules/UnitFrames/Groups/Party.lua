@@ -14,6 +14,7 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 local tSettings = {
 	-- Base
+	fOutOfRangeOpacity = 0.5,
 	strDirection = "BOTTOMTOP",
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
 	tAnchorOffsets = { 129, -126, 299, -98 },
@@ -39,4 +40,3 @@ tSettings.tAurasFilter["Buff"] = true;
 
 -- Set Configuration
 UnitFramesLayout:SetUnitFrameConfiguration("Party", tSettings);
-UnitFramesLayout:SetUnitFrameAttribute("Party", "OutOfRangeOpacity", 0.5);

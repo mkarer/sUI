@@ -24,7 +24,7 @@ local knMaxLevel = 50;
 
 local UpdateTooltip = function(self)
 	-- Taken from XPBar.lua
-	local wndExperience = self.tUnitFrame.wndExperience;
+	local wndExperience = self.tUnitFrame.tControls.ExperienceBar;
 	local nLevel = self.tUnitFrame.unit:GetLevel() or 0;
 	local strTooltip = "";
 
@@ -94,9 +94,8 @@ end
 function Element:Update()
 	if (not self.bEnabled) then return; end
 
-	local wndExperience = self.tUnitFrame.wndExperience;
-	local wndProgress = self.tUnitFrame.wndExperience:FindChild("Progress");
-	local wndProgressRested = self.tUnitFrame.wndExperience:FindChild("ProgressRested");
+	local wndProgress = self.tUnitFrame.tControls.ExperienceBar;
+	local wndProgressRested = self.tUnitFrame.tControls.ExperienceBarRested;
 
 	-- Get Current Experience/Elder Points
 	local nLevel = self.tUnitFrame.unit:GetLevel() or 0;
@@ -167,7 +166,7 @@ function Element:Disable(bForce)
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (tUnitFrame.strUnit == "Player" and tUnitFrame.wndExperience ~= nil and tUnitFrame.wndExperience:FindChild("Progress") and tUnitFrame.wndExperience:FindChild("ProgressRested") and true);
+	local bSupported = (tUnitFrame.strUnit == "Player" and tUnitFrame.tControls.ExperienceBar ~= nil and tUnitFrame.tControls.ExperienceBarRested ~= nil);
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -203,7 +202,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 end
 
@@ -213,4 +212,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });

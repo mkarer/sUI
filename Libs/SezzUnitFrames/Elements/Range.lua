@@ -56,7 +56,7 @@ function Element:Disable(bForce)
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (type(tUnitFrame.tAttributes.OutOfRangeOpacity) == "number");
+	local bSupported = (type(tUnitFrame.tControls.Main:GetData().OutOfRangeOpacity) == "number");
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -73,7 +73,7 @@ function Element:New(tUnitFrame)
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
-	self.fOutOfRangeOpacity = tUnitFrame.tAttributes.OutOfRangeOpacity;
+	self.fOutOfRangeOpacity = tUnitFrame.tControls.Main:GetData().OutOfRangeOpacity;
 
 	-- Done
 	self:Disable(true);
@@ -93,7 +93,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 end
 
@@ -103,4 +103,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });

@@ -37,7 +37,7 @@
 
 --]]
 
-local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 if (UnitFrameController.Tags) then return; end
 
 local GeminiEvent = Apollo.GetPackage("Gemini:Event-1.0").tPackage;

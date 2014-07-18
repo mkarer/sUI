@@ -14,11 +14,12 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
 local tSettings = {
 	-- Base
+	fOutOfRangeOpacity = 0.5,
 	strDirection = "TOPBOTTOM",
 	nUnitsPerColumn = 5,
 	strDirectionColumn = "LEFTRIGHT",
 	tAnchorPoints = { 0.5, 0.5, 0.5, 0.5 },
-	tAnchorOffsets = { 250, 0, 325, 35 },
+	tAnchorOffsets = { 259, 0, 334, 35 },
 	-- Health Bar
 	strTagsTextLeft = "[TClassColor][ >Sezz:RaidName][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HPMinimalParty]",
@@ -28,4 +29,3 @@ local tSettings = {
 
 -- Set Configuration
 UnitFramesLayout:SetUnitFrameConfiguration("Raid", tSettings);
-UnitFramesLayout:SetUnitFrameAttribute("Raid", "OutOfRangeOpacity", 0.5);

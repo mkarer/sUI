@@ -22,53 +22,34 @@
 
 --]]
 
-local MAJOR, MINOR = "Sezz:UnitFrame-0.1", 1;
+local MAJOR, MINOR = "Sezz:UnitFrame-0.2", 1;
 local APkg = Apollo.GetPackage(MAJOR);
 if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local UnitFrame = APkg and APkg.tPackage or {};
-local log, ToolTips;
-
--- Constants
-local kbTestMode = false;
+local log, ToolTips, GeminiGUI;
 
 -----------------------------------------------------------------------------
 -- Tags
 -----------------------------------------------------------------------------
 
-function UnitFrame:EnableTags()
-	if (#self.tTagControls == 0 and self.tAttributes and self.tAttributes.Tags) then
-		for strControl, tTag in pairs(self.tAttributes.Tags) do
-			self:Tag(self.wndMain:FindChild(strControl), tTag);
+local EnableTags = function(self)
+	if (#self.tTagControls == 0 and self.tControls.Text) then
+		for _, wndControl in ipairs(self.tControls.Text) do
+			self:Tag(wndControl, { Tags = wndControl:GetData().Tags, Interval = 50 });
 		end
 	end
 end
 
-function UnitFrame:UpdateTags()
+local UpdateTags = function(self)
 	for _, tControl in ipairs(self.tTagControls) do
 		tControl:UpdateTag();
 	end
 end
 
-function UnitFrame:DisableTags()
+local DisableTags = function(self)
 	for _, tControl in ipairs(self.tTagControls) do
 		self:Untag(tControl);
-	end
-end
-
------------------------------------------------------------------------------
--- Highlight on Mouseover
------------------------------------------------------------------------------
-
-local OnMouseEnter = function(self, wndHandler)
-	if (self.wndMain:ContainsMouse()) then
-		self.wndMain:SetBGOpacity(0.4);
-	end
-end
-
-local OnMouseExit = function(self, wndHandler)
-	if (not self.wndMain:ContainsMouse()) then
-		self.wndMain:SetBGOpacity(0.2);
 	end
 end
 
@@ -77,14 +58,16 @@ end
 -----------------------------------------------------------------------------
 
 local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
+	if (wndHandler ~= wndControl) then return; end
+
 	if (eMouseButton == GameLib.CodeEnumInputMouse.Left) then
 		if (self.unit.__proto__) then
 			GameLib.SetTargetUnit(self.unit.__proto__);
 		end
-		return false
+		return false;
 	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
 		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
-		return true
+		return true;
 	end
 
 	return false;
@@ -109,7 +92,7 @@ function UnitFrame:RegisterElement(tElement)
 	end
 end
 
-function UnitFrame:UpdateElements()
+local UpdateElements = function(self)
 	if (not self.bEnabled) then return; end
 
 	for _, tElement in ipairs(self.tElements) do
@@ -119,13 +102,13 @@ function UnitFrame:UpdateElements()
 	end
 end
 
-function UnitFrame:EnableElements()
+local EnableElements = function(self)
 	for _, tElement in ipairs(self.tElements) do
 		tElement:Enable();
 	end
 end
 
-function UnitFrame:DisableElements()
+local DisableElements = function(self)
 	for _, tElement in ipairs(self.tElements) do
 		tElement:Disable();
 	end
@@ -136,28 +119,23 @@ end
 -----------------------------------------------------------------------------
 
 local Update = function(self)
-	self:UpdateElements();
+	UpdateElements(self);
 end
 
 local Disable = function(self)
-	if (not kbTestMode) then
-		self:Hide();
-	else
-		self:Show();
-	end
-
-	self:DisableElements();
-	self:DisableTags();
+	self:Hide();
+	DisableElements(self);
+	DisableTags(self);
 	self.unit = nil;
 	self.bEnabled = false;
 end
 
 local Enable = function(self)
 	self.bEnabled = true;
-	self:EnableElements();
-	self:EnableTags();
-	self:UpdateTags();
-	self:Update();
+	EnableElements(self);
+	EnableTags(self);
+	UpdateTags(self);
+	Update(self);
 	self.wndMain:SetTooltip("");
 	self:Show();
 end
@@ -190,57 +168,48 @@ end
 -- Forms
 -----------------------------------------------------------------------------
 
-local FindRootOrChildWindow = function(self, strName)
-	return self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit..strName, nil, self) or self.wndMain:FindChild(strName);
+local FindElementControls;
+FindElementControls = function(wndControl, tControls)
+	local tData = wndControl:GetData();
+	if (tData and type(tData) == "table" and tData.Element) then
+		if (tData.Element == "Text" and not tControls.Text) then
+			tControls.Text = {};
+		end
+
+		if (tControls[tData.Element]) then
+			assert(tData.Element == "Text", string.format("Adding multiple elements of type %s is not supported!", tData.Element));
+			table.insert(tControls[tData.Element], wndControl);
+		else
+			tControls[tData.Element] = wndControl;
+		end
+	end
+
+	for _, wndChild in ipairs(wndControl:GetChildren()) do
+		tControls = FindElementControls(wndChild, tControls);
+	end
+
+	return tControls;
 end
 
--- Load Form
--- Adds the Unit Frame to the UI
-local LoadForm = function(self)
-	-- Add XML Data as Root Element
-	self.xmlDoc:GetRoot():AddChild(self.tXmlData["Root"]);
-
-	-- Load Form
-	self.wndMain = self.xmlDoc:LoadForm(self.strLayoutName..self.strUnit, nil, self);
+local SpawnUnit = function(self)
+	-- Spawn Window
+	self.wndMain = self.tPrototype:GetInstance(self);
+	self.tControls = FindElementControls(self.wndMain, {});
 	self.wndMain:Show(false, true);
 
-	-- Enable Mouseover Highlight
-	self.wndMain:AddEventHandler("MouseEnter", "OnMouseEnter", self);
-	self.wndMain:AddEventHandler("MouseExit", "OnMouseExit", self);
-	self.wndMain:SetBGOpacity(0.2, 5e+20);
+	-- Enable OnClick Handler (Targetting)
+	self.wndMain:AddEventHandler("MouseButtonDown", "OnMouseClick", self);
 
-	-- Tooltips
+	-- Enable Unit Tooltips
 	if (ToolTips) then
 		self.wndMain:AddEventHandler("GenerateTooltip", "OnGenerateTooltip", self);
 	end
-
-	-- Enable Targetting
-	self.wndMain:AddEventHandler("MouseButtonDown", "OnMouseClick", self);
-
-	-- Add Properties for our Elements
-	self.wndCastBar = self:FindRootOrChildWindow("CastBar");
-	self.wndExperience = self:FindRootOrChildWindow("Experience");
-	self.wndHealth = self.wndMain:FindChild("Health:Progress");
-	self.wndShield = self.wndMain:FindChild("Shield");
-	self.wndThreat = self.wndMain:FindChild("Threat");
-	self.wndAuras = self:FindRootOrChildWindow("Auras");
-	-- Temporary Elements
-	self.wndTextLeft = self.wndMain:FindChild("TextLeft");
-	self.wndTextRight = self.wndMain:FindChild("TextRight");
-
-	-- Expose more Methods
-	self.SetHealth = SetHealth;
 
 	-- Return
 	return self.wndMain;
 end
 
 local Show = function(self)
-	Apollo.RegisterEventHandler("NextFrame", "ShowDelayed", self); -- We need this because SetBGOpacity apparently needs 1 frame....
-end
-
-local ShowDelayed = function(self)
-	Apollo.RemoveEventHandler("NextFrame", self);
 	self.wndMain:Show(true, true);
 end
 
@@ -252,20 +221,15 @@ end
 -- Constructor
 -----------------------------------------------------------------------------
 
-function UnitFrame:New(tUnitFrameController, strLayoutName, strUnit, tXmlData, tAttributes)
+function UnitFrame:New(tUnitFrameController, strUnit, tWindowDefinition)
 	self = setmetatable({}, { __index = UnitFrame });
 
 	-- Properties
-	self.tXmlData = tXmlData;
-	self.tAttributes = tAttributes or {};
+	self.tPrototype = GeminiGUI:Create(tWindowDefinition);
 	self.strUnit = strUnit;
-	self.strLayoutName = strLayoutName;
 	self.bEnabled = false;
 	self.tElements = {};
-
-	-- Reference Unit Frame Controller
-	self.xmlDoc = tUnitFrameController.xmlDoc;
-	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors })
+	self.tColors = setmetatable(self.tColors or {}, { __index = tUnitFrameController.tColors });
 
 	-- Tags
 	self.tTagControls = {};
@@ -273,14 +237,10 @@ function UnitFrame:New(tUnitFrameController, strLayoutName, strUnit, tXmlData, t
 	self.Untag = tUnitFrameController.Untag;
 
 	-- Expose Methods
-	self.LoadForm = LoadForm;
-	self.FindRootOrChildWindow = FindRootOrChildWindow;
-	self.OnMouseEnter = OnMouseEnter;
-	self.OnMouseExit = OnMouseExit;
+	self.SpawnUnit = SpawnUnit;
 	self.OnMouseClick = OnMouseClick;
 	self.Show = Show;
 	self.Hide = Hide;
-	self.ShowDelayed = ShowDelayed;
 	self.SetUnit = SetUnit;
 	self.Enable = Enable;
 	self.Disable = Disable;
@@ -301,6 +261,7 @@ function UnitFrame:OnLoad()
 	});
 
 	ToolTips = Apollo.GetAddon("ToolTips");
+	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 end
 
 function UnitFrame:OnDependencyError(strDep, strError)
@@ -309,4 +270,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(UnitFrame, MAJOR, MINOR, {});
+Apollo.RegisterPackage(UnitFrame, MAJOR, MINOR, { "Gemini:GUI-1.0" });

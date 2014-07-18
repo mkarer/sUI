@@ -86,7 +86,7 @@ function Element:OnAuraAdded(tAura)
 	if (not self.bEnabled) then return; end
 
 	if (not self:GetAura(tAura.idBuff)) then
-		tAura.tControl = AuraControl:New(self.tUnitFrame.wndAuras, tAura, (tAura.bIsDebuff and self.tUnitFrame.tAttributes.AuraPrototypeDebuff or self.tUnitFrame.tAttributes.AuraPrototypeBuff)):Enable();
+		tAura.tControl = AuraControl:New(self.tUnitFrame.tControls.Auras, tAura, (tAura.bIsDebuff and self.tAuraPrototypeDebuff or self.tAuraPrototypeBuff)):Enable();
 		tAura.nAdded = GameLib.GetTickCount();
 		tinsert(self.tChildren, tAura);
 		self:OrderAuras();
@@ -109,7 +109,7 @@ end
 function Element:Enable()
 	self.bEnabled = true;
 	self.tAuras:SetUnit(self.tUnitFrame.unit);
-	self.tUnitFrame.wndAuras:Show(true, true);
+	self.tUnitFrame.tControls.Auras:Show(true, true);
 end
 
 function Element:Disable(bForce)
@@ -117,7 +117,7 @@ function Element:Disable(bForce)
 
 	self.bEnabled = false;
 	self.tAuras:Disable();
-	self.tUnitFrame.wndAuras:Show(false, true);
+	self.tUnitFrame.tControls.Auras:Show(false, true);
 
 	for i = 1, #self.tChildren do
 		tremove(self.tChildren).tControl:Destroy();
@@ -125,7 +125,7 @@ function Element:Disable(bForce)
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (Auras ~= nil and AuraControl ~= nil and tUnitFrame.wndAuras ~= nil);
+	local bSupported = (AuraControl ~= nil and AuraControl ~= nil and tUnitFrame.tControls.Auras ~= nil);
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -139,20 +139,23 @@ function Element:New(tUnitFrame)
 	if (not IsSupported(tUnitFrame)) then return; end
 
 	local self = setmetatable({ tUnitFrame = tUnitFrame }, { __index = Element });
+	local tData = tUnitFrame.tControls.Auras:GetData();
 
 	-- Properties
 	self.bUpdateOnUnitFrameFrameCount = false;
-	self.bAnchorLeft = (self.tUnitFrame.tAttributes.AuraAnchorLeft);
+	self.bAnchorLeft = (tData.AuraAnchorLeft == true);
 	self.nAuraPadding = 4;
 	self.tChildren = {};
 	self.nAuraSize = 0;
+	self.tAuraPrototypeBuff = tData.AuraPrototypeBuff;
+	self.tAuraPrototypeDebuff = tData.AuraPrototypeDebuff;
 
 	-- Auras Library
 	self.tAuras = Auras:New():SetUnit(self.tUnitFrame.unit, true);
 	self.tAuras:RegisterCallback("OnAuraAdded", "OnAuraAdded", self);
 	self.tAuras:RegisterCallback("OnAuraRemoved", "OnAuraRemoved", self);
 	self.tAuras:RegisterCallback("OnAuraUpdated", "OnAuraUpdated", self);
-	self.tAuras:SetFilter(self.tUnitFrame.tAttributes.AuraFilter);
+	self.tAuras:SetFilter(tData.AuraFilter);
 
 	-- Done
 	self:Disable(true);
@@ -172,7 +175,7 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 
 	Auras = Apollo.GetPackage("Sezz:Auras-0.1").tPackage;
@@ -185,4 +188,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });

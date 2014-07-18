@@ -10,87 +10,105 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
+-- Lua API
+local tinsert = table.insert;
+
 -----------------------------------------------------------------------------
 
 function UnitFramesLayout:CreateCastBarElement(strUnit, tSettings)
 	if (not tSettings.bCastBarEnabled) then return; end
 
-	local tXmlData = tSettings.tXmlData;
 	local tColors = self.tUnitFrameController.tColors;
-
-	-------------------------------------------------------------------------
-
-	local nHeight = tSettings.tCastBarAnchorOffsets[4] - tSettings.tCastBarAnchorOffsets[2]; -- Icon Size
+	local nHeight = tSettings.tCastBarAnchorOffsets[4] - tSettings.tCastBarAnchorOffsets[2] - 2; -- Icon Size
 
 	-------------------------------------------------------------------------
 	-- Element Container (White BG)
 	-------------------------------------------------------------------------
 
-	tXmlData["CastBarContainer"] = self.xmlDoc:NewFormNode(self:GetUnitFramePrefix(strUnit).."CastBar", {
+	local tCastBar = {
+		Name = "CastBarContainer",
 		AnchorPoints = tSettings.tCastBarAnchorPoints,
 		AnchorOffsets = tSettings.tCastBarAnchorOffsets,
 		Picture = true,
 		Sprite = "WhiteFill",
 		BGColor = "33ffffff",
 		IgnoreMouse = true,
-	});
+		NoClip = true,
+		Children = {},
+		UserData = {
+			Element = "CastBarContainer",
+		},
+	};
+
+	tinsert(tSettings.tElements["Main"].Children, tCastBar);
 
 	-------------------------------------------------------------------------
 	-- Icon + Container (Black BG)
 	-------------------------------------------------------------------------
 
-	tXmlData["CastBarIconBG"] = self.xmlDoc:NewControlNode("IconBackground", "Window", {
+	tinsert(tCastBar.Children, {
 		AnchorPoints = { 0, 0, 0, 1 },
 		AnchorOffsets = { 2, 2, nHeight, -2 },
 		Picture = true,
 		Sprite = "WhiteFill",
 		BGColor = "ff000000",
 		IgnoreMouse = "true",
+		Children = {
+			{
+				Name = "CastBarIcon",
+				AnchorPoints = { 0, 0, 1, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Picture = true,
+				Sprite = "",
+				IgnoreMouse = "true",
+				UserData = {
+					Element = "CastBarIcon",
+				},
+			},
+		},
 	});
 
-	tXmlData["CastBarIcon"] = self.xmlDoc:NewControlNode("Icon", "Window", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { 0, 0, 0, 0 },
-		Picture = true,
-		Sprite = "",
-		IgnoreMouse = "true",
-	});
-
-	tXmlData["CastBarContainer"]:AddChild(tXmlData["CastBarIconBG"]);
-	tXmlData["CastBarIconBG"]:AddChild(tXmlData["CastBarIcon"]);
+	tSettings.tElements["CastBarIcon"] = tCastBar.Children[#tCastBar.Children].Children[1];
 
 	-------------------------------------------------------------------------
 	-- Bar + Container (Black BG)
 	-------------------------------------------------------------------------
 
-	tXmlData["CastBarBG"] = self.xmlDoc:NewControlNode("Background", "Window", {
+	tinsert(tCastBar.Children, {
 		AnchorPoints = { 0, 0, 1, 1 },
 		AnchorOffsets = { nHeight + 2, 2, -2, -2 },
 		Picture = true,
 		Sprite = "WhiteFill",
 		BGColor = "ff000000",
 		IgnoreMouse = "true",
+		Children = {
+			{
+				Class = "ProgressBar",
+				Name = "CastBar",
+				AnchorPoints = { 0, 0, 1, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				AutoSetText = false,
+				UseValues = true,
+				SetTextToProgress = false,
+				ProgressFull = "sUI:ProgressBar",
+				IgnoreMouse = "true",
+				BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.CastBar.Normal),
+				Children = {},
+				UserData = {
+					Element = "CastBar",
+				},
+			},
+		},
 	});
 
-	tXmlData["CastBar"] = self.xmlDoc:NewControlNode("Progress", "ProgressBar", {
-		AnchorPoints = { 0, 0, 1, 1 },
-		AnchorOffsets = { 0, 0, 0, 0 },
-		AutoSetText = false,
-		UseValues = true,
-		SetTextToProgress = false,
-		ProgressFull = "sUI:ProgressBar",
-		IgnoreMouse = "true",
-		BarColor = self.tUnitFrameController:ColorArrayToHex(tColors.CastBar.Normal),
-	});
-
-	tXmlData["CastBarContainer"]:AddChild(tXmlData["CastBarBG"]);
-	tXmlData["CastBarBG"]:AddChild(tXmlData["CastBar"]);
+	tSettings.tElements["CastBar"] = tCastBar.Children[#tCastBar.Children].Children[1];
 
 	-------------------------------------------------------------------------
 	-- Text Elements
 	-------------------------------------------------------------------------
 
-	tXmlData["CastBarTextLeft"] = self.xmlDoc:NewControlNode("Text", "Window", {
+	tinsert(tSettings.tElements["CastBar"].Children, {
+		Name = "CastBarTextSpell",
 		AnchorPoints = { 0, 0, 0.75, 1 },
 		AnchorOffsets = { 4, -2, 0, 0 },
 		TextColor = "white",
@@ -98,9 +116,13 @@ function UnitFramesLayout:CreateCastBarElement(strUnit, tSettings)
 		Text = "",
 		IgnoreMouse = "true",
 		Font = "CRB_Pixel_O",
+		UserData = {
+			Element = "CastBarTextSpell",
+		},
 	});
 
-	tXmlData["CastBarTextRight"] = self.xmlDoc:NewControlNode("Time", "Window", {
+	tinsert(tSettings.tElements["CastBar"].Children, {
+		Name = "CastBarTextDuration",
 		AnchorPoints = { 0.75, 0, 1, 1 },
 		AnchorOffsets = { 0, -2, -4, 0 },
 		TextColor = "white",
@@ -109,14 +131,8 @@ function UnitFramesLayout:CreateCastBarElement(strUnit, tSettings)
 		Text = "",
 		IgnoreMouse = "true",
 		Font = "CRB_Pixel_O",
+		UserData = {
+			Element = "CastBarTextDuration",
+		},
 	});
-
-	tXmlData["CastBar"]:AddChild(tXmlData["CastBarTextLeft"]);
-	tXmlData["CastBar"]:AddChild(tXmlData["CastBarTextRight"]);
-
-	-------------------------------------------------------------------------
-	-- Add as Root Element
-	-------------------------------------------------------------------------
-
-	self.xmlDoc:GetRoot():AddChild(tXmlData["CastBarContainer"]);
 end

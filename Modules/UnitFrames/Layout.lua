@@ -10,15 +10,13 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local UnitFramesCore = S:GetModule("UnitFramesCore");
 local M = UnitFramesCore:CreateSubmodule("Layout");
-local XmlDocument = Apollo.GetPackage("Drafto:Lib:XmlDocument-1.0").tPackage;
-local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 local log;
 local floor = math.floor;
 
 -----------------------------------------------------------------------------
 
 M.tSettings = {}; -- Unit specific Settings
-M.strLayoutName = "SezzUnitFrames";
 
 -----------------------------------------------------------------------------
 
@@ -35,16 +33,14 @@ function M:CreateUnitFrame(strUnit, tSettings)
 	self:CreateAurasElement(strUnit, tSettings);
 	self:CreateThreatBarElement(strUnit, tSettings);
 
-	self.tUnitFrameController:CreateUnitFrame(self.strLayoutName, strUnit, tSettings.tXmlData, tSettings.tAttributes);
+	self.tUnitFrameController:CreateUnitFrame(strUnit, tSettings.tWindowDefinition);
 end
 
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	-- Create Unit Frame Controller
-	self.tUnitFrameController = UnitFrameController:New();
-	self.tUnitFrameController:SetColors(self.tColors);
-	self.xmlDoc = self.tUnitFrameController.xmlDoc;
+	self.tUnitFrameController = UnitFrameController:New(self.tColors);
 	self:RegisterTags();
 
 	-- Create Settings for Party
@@ -140,49 +136,89 @@ function M:OnEnable()
 	end
 
 	-- Enable Unit Frames
-	self.tUnitFrameController:LoadForm();
+	self.tUnitFrameController:SpawnUnits();
 	self.tUnitFrameController:Enable();
 end
 
-function M:GetUnitFramePrefix(strUnit)
-	return self.strLayoutName..strUnit;
+-----------------------------------------------------------------------------
+-- Root Element
+-----------------------------------------------------------------------------
+
+local OpacityFix = {
+	tWindows = {},
+};
+
+Apollo.RegisterTimerHandler("SezzUITimer_UnitFrameOpacityFix", "ShowWindows", OpacityFix);
+Apollo.CreateTimer("SezzUITimer_UnitFrameOpacityFix", 1 / 1000, false);
+
+function OpacityFix:FixWindow(wndControl)
+	self.tWindows[wndControl] = GameLib.GetTickCount();
+	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFix");
+end
+
+function OpacityFix:ShowWindows()
+	local nTicks = GameLib.GetTickCount();
+
+	for wndControl, nTicksAdded in pairs(self.tWindows) do
+		if (nTicks > nTicksAdded) then
+			wndControl:Show(true, true);
+			self.tWindows[wndControl] = nil;
+		end
+	end
+end
+
+local function OnWindowShow(self, wndHandler, wndControl)
+	-- Background Opacity Fix
+	if (wndHandler:GetBGOpacity() == 1) then
+		wndHandler:Show(false, true);
+		OpacityFix:FixWindow(wndHandler); 
+	end
+end
+
+local function OnMouseEnter(self, wndHandler, wndControl, x, y)
+	if (wndHandler:ContainsMouse()) then
+		wndHandler:SetBGOpacity(0.4);
+	end
+end
+
+local function OnMouseExit(self, wndHandler, wndControl, x, y)
+	if (not wndHandler:ContainsMouse()) then
+		wndHandler:SetBGOpacity(0.2);
+	end
+end
+
+local function OnWindowHide(self, wndHandler, wndControl)
+	wndHandler:SetBGOpacity(0.2, 5e+20);
 end
 
 function M:InitializeUnitFrameXML(strUnit, tSettings)
 	-- Create Root Element
-	tSettings.tXmlData = {
-		["Root"] = self.xmlDoc:NewFormNode(self:GetUnitFramePrefix(strUnit), {
-			AnchorPoints = tSettings.tAnchorPoints,
-			AnchorOffsets = tSettings.tAnchorOffsets,
-			Picture = true,
-			Sprite = "WhiteFill",
-			BGColor = "ffffffff",
-			IgnoreMouse = false,
-			Moveable = false,
-			TooltipType = "OnCursor",
-		}),
+	tSettings.tWindowDefinition = {
+		AnchorPoints = tSettings.tAnchorPoints,
+		AnchorOffsets = tSettings.tAnchorOffsets,
+		Picture = true,
+		BGColor = "ffffffff",
+--		BGOpacity = 0.2,
+		Sprite = "ClientSprites:WhiteFill",
+		IgnoreMouse = false,
+		Events = {
+			MouseEnter = OnMouseEnter,		-- Background Fade In
+			MouseExit = OnMouseExit,		-- Background Fade Out
+			WindowHide = OnWindowHide,		-- Background Fade Out (Instantly)
+			WindowShow = OnWindowShow,		-- Opacity Fix
+		},
+		Children = {},
+		Visible = false,
+		UserData = {
+			Element = "Main",
+		},
 	};
 
-	-- Attributes
-	if (not tSettings["tAttributes"]) then
-		tSettings["tAttributes"] = {};
+	tSettings.tElements = {
+		Main = tSettings.tWindowDefinition,
+	};
+
+	if (tSettings.fOutOfRangeOpacity) then
+		tSettings.tWindowDefinition.UserData.OutOfRangeOpacity = tSettings.fOutOfRangeOpacity;
 	end
-
-	if not (tSettings["tAttributes"]["Tags"]) then
-		tSettings["tAttributes"]["Tags"] = {};
-	end
-end
-
-function M:SetUnitFrameAttribute(strUnit, strAttribute, vValue)
-	local tSettings = self.tSettings[strUnit];
-
-	if (not tSettings["tAttributes"]) then
-		tSettings["tAttributes"] = {};
-	end
-
-	tSettings["tAttributes"][strAttribute] = vValue;
-end
-
-function M:SetTagAttribute(strUnit, strWindowName, strTags, strFont, strAlign, nUpdateInterval)
-	self.tSettings[strUnit].tAttributes.Tags[strWindowName] = { Tags = strTags, Font = strFont, Align = strAlign or "Left", Interval = nUpdateInterval };
 end

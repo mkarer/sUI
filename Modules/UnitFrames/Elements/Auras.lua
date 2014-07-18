@@ -14,29 +14,30 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 
+-- Lua API
+local tinsert = table.insert;
+
 -----------------------------------------------------------------------------
 
 function UnitFramesLayout:CreateAurasElement(strUnit, tSettings)
-	local tXmlData = tSettings.tXmlData;
-
 	if (not tSettings.bAurasEnabled) then return; end
 
 	-- Create Container
-	tXmlData["Auras"] = self.xmlDoc:NewFormNode(UnitFramesLayout:GetUnitFramePrefix(strUnit).."Auras", {
+	local tAuras = {
+		Name = "Auras",
 		AnchorPoints = tSettings.tAurasAnchorPoints,
 		AnchorOffsets = tSettings.tAurasAnchorOffsets,
---		Sprite = "ClientSprites:WhiteFill",
---		Picture = true,
---		BGColor = "5500ff00",
 		IgnoreMouse = true,
-	});
+		NoClip = true,
+		UserData = {
+			Element = "Auras",
+			AuraPrototypeBuff = tSettings.tAuraPrototypeBuff,
+			AuraPrototypeDebuff = tSettings.tAuraPrototypeDebuff,
+			AuraFilter = tSettings.tAurasFilter,
+			AuraAnchorLeft = tSettings.bAurasAnchorLeft,
+		},
+	};
 
-	-- Add as root element
-	UnitFramesLayout.xmlDoc:GetRoot():AddChild(tXmlData["Auras"]);
-
-	-- Set Prototypes
-	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraPrototypeBuff", tSettings.tAuraPrototypeBuff);
-	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraPrototypeDebuff", tSettings.tAuraPrototypeDebuff);
-	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraFilter", tSettings.tAurasFilter);
-	UnitFramesLayout:SetUnitFrameAttribute(tSettings.strUnitBase or strUnit, "AuraAnchorLeft", tSettings.bAurasAnchorLeft);
+	tinsert(tSettings.tElements["Main"].Children, tAuras);
+	tSettings.tElements["Auras"] = tAuras;
 end

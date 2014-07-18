@@ -30,16 +30,16 @@ function Element:Update()
 	if (not self.bEnabled) then return; end
 
 	local unit = self.tUnitFrame.unit;
-	local wndCastBar = self.tUnitFrame.wndCastBar;
+	local wndCastBarContainer = self.tUnitFrame.tControls.CastBarContainer;
 
 	-- Vulnerability/Default Casts
 	local nVulnerabilityTime = unit:GetCCStateTimeRemaining(Unit.CodeEnumCCState.Vulnerability) or 0;
 
 	if (nVulnerabilityTime > 0 or unit:IsCasting() or self.tCurrentOpSpell) then
-		local wndProgress = wndCastBar:FindChild("Progress");
-		local wndIcon = wndCastBar:FindChild("Icon");
-		local wndText = wndCastBar:FindChild("Text");
-		local wndTime = wndCastBar:FindChild("Time");
+		local wndProgress	= self.tUnitFrame.tControls.CastBar;
+		local wndIcon		= self.tUnitFrame.tControls.CastBarIcon;
+		local wndText		= self.tUnitFrame.tControls.CastBarTextSpell;
+		local wndTime		= self.tUnitFrame.tControls.CastBarTextDuration;
 
 		local nDuration, nElapsed, strSpellName, strSpellIcon;
 
@@ -109,12 +109,12 @@ function Element:Update()
 		if (wndIcon) then
 			wndIcon:SetSprite(strSpellIcon);
 		end
-		
-		wndCastBar:Show(true, true);
+
+		wndCastBarContainer:Show(true, true);
 	else
 		self.nVulnerabilityTime = 0;
 		self.nVulnerabilityStart = 0;
-		wndCastBar:Show(false, true);
+		wndCastBarContainer:Show(false, true);
 	end
 end
 
@@ -169,11 +169,11 @@ function Element:Disable(bForce)
 	Apollo.RemoveEventHandler("StartSpellThreshold", self);
 	Apollo.RemoveEventHandler("ClearSpellThreshold", self);
 	Apollo.RemoveEventHandler("UpdateSpellThreshold", self);
-	self.tUnitFrame.wndCastBar:Show(false, true);
+	self.tUnitFrame.tControls.CastBarContainer:Show(false, true);
 end
 
 local IsSupported = function(tUnitFrame)
-	local bSupported = (tUnitFrame.wndCastBar ~= nil);
+	local bSupported = (tUnitFrame.tControls.CastBarContainer ~= nil and tUnitFrame.tControls.CastBar ~= nil);
 --	log:debug("Unit %s supports %s: %s", tUnitFrame.strUnit, NAME, string.upper(tostring(bSupported)));
 
 	return bSupported;
@@ -201,6 +201,20 @@ end
 -- Spell Icons
 -----------------------------------------------------------------------------
 
+function Element:CacheAbilityBookIcons()
+	if (GameLib and GameLib.IsCharacterLoaded()) then
+		for _, tAbility in ipairs(AbilityBook.GetAbilitiesList()) do
+			if (tAbility.tTiers and tAbility.tTiers[1] and tAbility.tTiers[1].splObject) then
+				tSpellIcons[tAbility.tTiers[1].strName] = tAbility.tTiers[1].splObject:GetIcon();
+			end
+		end
+
+		Apollo.RemoveEventHandler("CharacterCreated", self);
+	else
+		Apollo.StartTimer("SezzUITimer_DelayedInitAbilityBook");
+	end
+end
+
 function Element:CacheSpellIcon(tEventArgs)
 	if (tEventArgs.splCallingSpell and tEventArgs.splCallingSpell.GetName and tEventArgs.splCallingSpell.GetIcon) then
 		local strName, strIcon = tEventArgs.splCallingSpell:GetName(), tEventArgs.splCallingSpell:GetIcon();
@@ -224,14 +238,22 @@ function Element:OnLoad()
 		appender = "GeminiConsole"
 	});
 
-	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.1").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 	UnitFrameController:RegisterElement(MAJOR);
 
 	-- Spell Icons
-	Apollo.RegisterEventHandler("CombatLogDamage", "CacheSpellIcon", self);
-	Apollo.RegisterEventHandler("CombatLogHeal", "CacheSpellIcon", self);
-	Apollo.RegisterEventHandler("CombatLogCrafting", "CacheSpellIcon", self);
-	Apollo.RegisterEventHandler("CombatLogMount", "CacheSpellIcon", self);
+	Apollo.RegisterEventHandler("CombatLogDamage",		"CacheSpellIcon", self);
+	Apollo.RegisterEventHandler("CombatLogHeal",		"CacheSpellIcon", self);
+	Apollo.RegisterEventHandler("CombatLogCrafting",	"CacheSpellIcon", self);
+	Apollo.RegisterEventHandler("CombatLogMount",		"CacheSpellIcon", self);
+
+	Apollo.CreateTimer("SezzUITimer_DelayedInitAbilityBook", 0.10, false);
+	Apollo.RegisterTimerHandler("SezzUITimer_DelayedInitAbilityBook", "CacheAbilityBookIcons", self);
+	if (GameLib and GameLib.IsCharacterLoaded()) then
+		self:CacheAbilityBookIcons();
+	else
+		Apollo.RegisterEventHandler("CharacterCreated", "CacheAbilityBookIcons", self);
+	end
 end
 
 function Element:OnDependencyError(strDep, strError)
@@ -240,4 +262,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.1" });
+Apollo.RegisterPackage(Element, MAJOR, MINOR, { "Sezz:UnitFrameController-0.2" });
