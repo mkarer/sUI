@@ -17,12 +17,9 @@ local log;
 
 function M:OnInitialize()
 	log = S.Log;
-	self:InitializeForms();
 end
 
 function M:OnEnable()
-	log:debug("%s enabled.", self:GetName());
-
 	if (S.bCharacterLoaded) then
 		self:UpdateTelegraphDisplay();
 	else
@@ -30,10 +27,6 @@ function M:OnEnable()
 	end
 
 	self:RegisterEvent("UnitPvpFlagsChanged", "OnUnitPvpFlagsChanged");
-end
-
-function M:OnDisable()
-	log:debug("%s disabled.", self:GetName());
 end
 
 -----------------------------------------------------------------------------
