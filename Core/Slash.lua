@@ -26,6 +26,7 @@ local tCommandShortcuts = {
 	lol = "laugh",
 	hi = "welcome",
 	inv = "invite",
+	m = "macros",
 };
 
 function M:ExecuteCommand(strCommand, strArguments)
