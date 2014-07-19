@@ -66,7 +66,16 @@ local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
 		end
 		return false;
 	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
-		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
+		-- Right Click
+		if (self.strUnit == "Player" and self.unit.bIsLeader) then
+			-- Extended Menu (Default + Group/Raid Options)
+			-- TODO: Multi-purpose dropdown library...
+			Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
+		else
+			-- Default Menu
+			Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
+		end
+
 		return true;
 	end
 
