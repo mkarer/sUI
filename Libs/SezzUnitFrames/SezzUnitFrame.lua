@@ -27,7 +27,7 @@ local APkg = Apollo.GetPackage(MAJOR);
 if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local UnitFrame = APkg and APkg.tPackage or {};
-local log, ToolTips, GeminiGUI;
+local log, ToolTips, GeminiGUI, UnitFrameController;
 
 -----------------------------------------------------------------------------
 -- Tags
@@ -64,18 +64,11 @@ local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
 		if (self.unit.__proto__) then
 			GameLib.SetTargetUnit(self.unit.__proto__);
 		end
+
 		return false;
 	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
 		-- Right Click
-		if (self.strUnit == "Player" and self.unit.bIsLeader) then
-			-- Extended Menu (Default + Group/Raid Options)
-			-- TODO: Multi-purpose dropdown library...
-			Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
-		else
-			-- Default Menu
-			Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ and self.unit.__proto__ or self.unit);
-		end
-
+		UnitFrameController:ToggleMenu(self.unit);
 		return true;
 	end
 
@@ -271,6 +264,7 @@ function UnitFrame:OnLoad()
 
 	ToolTips = Apollo.GetAddon("ToolTips");
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+	UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tPackage;
 end
 
 function UnitFrame:OnDependencyError(strDep, strError)

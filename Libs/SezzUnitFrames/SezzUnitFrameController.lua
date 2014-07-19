@@ -297,4 +297,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Sezz:UnitFrame-0.2", "Gemini:Logging-1.2", "Gemini:Event-1.0" });
+Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Sezz:UnitFrame-0.2", "Gemini:Logging-1.2", "Gemini:Event-1.0", "Gemini:GUI-1.0" });

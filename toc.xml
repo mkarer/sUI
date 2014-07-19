@@ -15,10 +15,11 @@
 	<Script Name="Libs\SezzAuras\SezzAuras.lua" />
 	<Script Name="Libs\SezzAuraControl\SezzAuraControl.lua" />
 	<!-- Unit Frames Library -->
-	<Script Name="Libs\SezzUnitFrames\SezzUnitFrame.lua" />
 	<Script Name="Libs\SezzUnitFrames\SezzUnitFrameController.lua" />
+	<Script Name="Libs\SezzUnitFrames\SezzUnitFrame.lua" />
 	<Script Name="Libs\SezzUnitFrames\SezzUnitWrapper.lua" />
 	<Script Name="Libs\SezzUnitFrames\Tags.lua" />
+	<Script Name="Libs\SezzUnitFrames\DropDown.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\HealthBar.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\CastBar.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\ExperienceBar.lua" />
