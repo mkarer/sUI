@@ -63,9 +63,6 @@ function UnitClassWrapper:New(unit, nIndex)
 	self.GetRole = fnUnitRole;
 	self.IsRealUnit = fnTrue;
 
-	if (unit:IsInYourGroup()) then
-	end
-
 	return self;
 end
 
@@ -234,7 +231,7 @@ function UnitFrameController:GetUnit(strUnit, nIndex)
 		if (nIndex == nil) then
 			-- Non-Party/Non-Raid
 			if (strUnit == "Player") then
-				return WrapRealUnit(unitPlayer);
+				return WrapRealUnit(unitPlayer, 1); -- AFAIK the player always has index 1 in groups?
 			elseif (strUnit == "Target") then
 				return WrapRealUnit(unitPlayer:GetTarget());
 			elseif (strUnit == "TargetOfTarget") then
