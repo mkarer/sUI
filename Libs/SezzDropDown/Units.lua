@@ -22,8 +22,8 @@ local tMenuItems = {
 	{
 		Name = "BtnMarkTarget",
 		Text = Apollo.GetString("ContextMenu_MarkTarget"),
---		Condition = function(self) return (self.bInGroup and self.tMyGroupData.bCanMark); end,
-		Condition = function(self) return not self.bInGroup or (self.bInGroup and self.tMyGroupData.bCanMark); end,
+		Condition = function(self) return (self.bInGroup and self.tMyGroupData.bCanMark); end,
+--		Condition = function(self) return not self.bInGroup or (self.bInGroup and self.tMyGroupData.bCanMark); end,
 		OnClick = "OnClickUnit",
 		Children = {
 			-- TODO
@@ -114,7 +114,7 @@ local tMenuItems = {
 				Name = "BtnMentor",
 				Text = Apollo.GetString("ContextMenu_Mentor"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (not bMentoringTarget); end,
+				Condition = function(self) return (not self.bIsThePlayer and not bMentoringTarget); end,
 			},
 			{
 				Name = "BtnStopMentor",

@@ -69,9 +69,9 @@ local tWDefDropDownButton = {
 	AnchorPoints = { 0, 0, 1, 0 },
 	AnchorOffsets = { 0, 0, 0, 25 },
 	Overlapped = true,
-	Events = {
-		ButtonSignal = function(self, wndControl, wndHandler) Print("Clicked: "..wndControl:GetName()); end,
-	},
+--	Events = {
+--		ButtonSignal = function(self, wndControl, wndHandler) Print("Clicked: "..wndControl:GetName()); end,
+--	},
 	DT_CENTER = false,
 	Font = "CRB_InterfaceSmall",
 	Children = {
@@ -180,45 +180,61 @@ log:debug(tButton.Name)
 
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text or tButton.Icon) then
-				local wndButton = GeminiGUI:Create(tButton.Icon and tWDefDropDownIconCheckbox or tWDefDropDownButton):GetInstance(self, self.wndButtonList);
-
-				if (tButton.Name) then
-					wndButton:SetName(tButton.Name)
-				end
-
-				if (tButton.Text) then
-					wndButton:SetText(tButton.Text);
-				end
-
-				-- Icon Checkbox
-				if (tButton.Icon) then
-					wndButton:FindChild("Icon"):SetSprite(tButton.Icon);
-					wndButton:SetCheck(tButton.Checked and tButton.Checked(self));
-					self.bIsIconList = true;
-				end
-
-				-- Click Event
-				if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
-					if (tButton.Children and #tButton.Children > 0) then
-						wndButton:AddEventHandler("ButtonSignal", "OnClickIgnore");
-					else
-						wndButton:AddEventHandler("ButtonSignal", tButton.OnClick);
-					end
-				end
-
-				-- Enabled State
-				if (tButton.Enabled) then
-					wndButton:Enable(tButton.Enabled(self));
-				end
-
 				-- Children
-				if (tButton.Children and #tButton.Children > 0) then
-					wndButton:SetData(tButton.Children);
-					wndButton:FindChild("BtnCheckboxArrow"):Show(true, true);
-					wndButton:AddEventHandler("MouseEnter", "ShowSubMenu");
-				else
-					wndButton:AddEventHandler("MouseEnter", "HideSubMenu");
-					wndButton:AddEventHandler("MouseMove", "HideSubMenu");
+				local bCreateButton = true;
+				local bHasVisibleChildren = (tButton.Children and #tButton.Children > 0);
+				if (bHasVisibleChildren) then
+					for _, tChild in ipairs(tButton.Children) do
+						if (tChild.Condition and not tChild.Condition(self)) then
+							bHasVisibleChildren = false;
+							break;
+						end
+					end
+
+					bCreateButton = bHasVisibleChildren;
+				end
+
+				if (bCreateButton) then
+					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefDropDownIconCheckbox or tWDefDropDownButton):GetInstance(self, self.wndButtonList);
+
+					if (tButton.Name) then
+						wndButton:SetName(tButton.Name)
+					end
+
+					if (tButton.Text) then
+						wndButton:SetText(tButton.Text);
+					end
+
+					-- Icon Checkbox
+					if (tButton.Icon) then
+						wndButton:FindChild("Icon"):SetSprite(tButton.Icon);
+						wndButton:SetCheck(tButton.Checked and tButton.Checked(self));
+						self.bIsIconList = true;
+					end
+
+					-- Click Event
+					if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
+						if (tButton.Children and #tButton.Children > 0) then
+							wndButton:AddEventHandler("ButtonSignal", "OnClickIgnore");
+						else
+							wndButton:AddEventHandler("ButtonSignal", tButton.OnClick);
+						end
+					end
+
+					-- Enabled State
+					if (tButton.Enabled) then
+						wndButton:Enable(tButton.Enabled(self));
+					end
+
+					-- Submenu Indicator/Events
+					if (bHasVisibleChildren) then
+						wndButton:SetData(tButton.Children);
+						wndButton:FindChild("BtnCheckboxArrow"):Show(true, true);
+						wndButton:AddEventHandler("MouseEnter", "ShowSubMenu");
+					else
+						wndButton:AddEventHandler("MouseEnter", "HideSubMenu");
+						wndButton:AddEventHandler("MouseMove", "HideSubMenu");
+					end
 				end
 			else
 				GeminiGUI:Create(tWDefDropDownSeparator):GetInstance(self, self.wndButtonList);
@@ -347,10 +363,40 @@ function DropDown:OnWindowClosed()
 		for strName, tDropDown in pairs(self.tChildren) do
 			self.tChildren[strName] = tDropDown:Destroy();
 		end
+
+		-- TODO
+		self.unit = nil;
+		self.unitPlayer = nil;
+		self.bInGroup = nil;
+		self.bAmIGroupLeader = nil;
+		self.tMyGroupData = nil;
+		self.strTarget = nil;
+		self.tCharacterData = nil;
+		self.tPlayerFaction = nil;
+		self.bIsACharacter = nil;
+		self.bIsThePlayer = nil;
+		self.nGroupMemberId = nil;
+		self.tTargetGroupData = nil;
+		self.tFriend = nil;
+		self.tAccountFriend = nil;
+		self.bCanAccountWisper = nil;
+		self.bCanWhisper = nil;
+		self.bIsFriend = nil;
+		self.bIsRival = nil;
+		self.bIsNeighbor = nil;
+		self.bIsAccountFriend = nil;
+		self.bMentoringTarget = nil;
 	end
 end
 
 function DropDown:CheckWindowBounds()
+	local nWidth =  self.wndMain:GetWidth();
+	local nHeight = self.wndMain:GetHeight();
+	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
+
+	local nMaxScreenWidth, nMaxScreenHeight = Apollo.GetScreenSize();
+
+	-- Get Menu Position
 	local nPosX, nPosY;
 	if (self.wndParent) then
 		nPosX, nPosY = self.wndParent:GetPos();
@@ -370,11 +416,6 @@ function DropDown:CheckWindowBounds()
 		nPosY = tCursor.y - knYCursorOffset + 10;
 	end
 
-	local nWidth =  self.wndMain:GetWidth();
-	local nHeight = self.wndMain:GetHeight();
-	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
-
-	local nMaxScreenWidth, nMaxScreenHeight = Apollo.GetScreenSize();
 	local nNewX = nWidth + nPosX;
 	local nNewY = nHeight + nPosY;
 
@@ -382,7 +423,15 @@ function DropDown:CheckWindowBounds()
 	local bSafeY = (nNewY <= nMaxScreenHeight);
 
 	if (not bSafeX) then
-		local nRightOffset = nNewX - nMaxScreenWidth;
+		local nRightOffset;
+
+		if (not self.wndParent) then
+			nRightOffset = nNewX - nMaxScreenWidth;
+		else
+			-- Child Menu: Anchor to the left of it's parent
+			nRightOffset = self.wndParent:GetWidth() + self.wndMain:GetWidth();
+		end
+
 		self.tAnchorOffsets[1] = self.tAnchorOffsets[1] - nRightOffset;
 		self.tAnchorOffsets[3] = self.tAnchorOffsets[3] - nRightOffset;
 	end
