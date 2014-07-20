@@ -481,6 +481,22 @@ function DropDown:OnLoad()
 	end
 
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+
+	-- Listen to Carbine's Context Menu Events
+	local tDropDown = DropDown:New();
+
+	function tDropDown:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
+	end
+
+	function tDropDown:OnNewContextMenuPlayerDetailed(wndParent, strTarget, unitTarget, nReportId)
+	end
+
+	function tDropDown:OnNewContextMenuFriend(wndParent, nFriendId)
+	end
+
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayer", "OnNewContextMenuPlayer", tDropDown);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayerDetailed", "OnNewContextMenuPlayerDetailed", tDropDown);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuFriend", "OnNewContextMenuFriend", tDropDown);
 end
 
 function DropDown:OnDependencyError(strDep, strError)
