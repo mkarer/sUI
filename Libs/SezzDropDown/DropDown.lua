@@ -98,167 +98,6 @@ local tWDefDropDownSeparator = {
 };
 
 -----------------------------------------------------------------------------
--- Drop Down Menu Items
------------------------------------------------------------------------------
-
-local tMenuItems = {
-	Unit = {
-		-- Markers
-		{
-			Name = "BtnMarkTarget",
-			Text = Apollo.GetString("ContextMenu_MarkTarget"),
-			Condition = function(self) return not self.bInGroup or (self.bInGroup and self.tMyGroupData.bCanMark); end,
-			Children = {
-				-- TODO
-			},
-		},
-		-- Assist
-		{
-			Name = "BtnAssist",
-			Text = Apollo.GetString("ContextMenu_Assist"),
-			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
-			Enabled = function(self) return (self.unit:GetTarget() ~= nil); end
-		},
-		-- Focus
-		{
-			Name = "BtnClearFocus",
-			Text = Apollo.GetString("ContextMenu_ClearFocus"),
-			Condition = function(self) return (self.unitPlayer:GetAlternateTarget() and self.unit:GetId() == self.unitPlayer:GetAlternateTarget():GetId()); end,
-			OnClick = "OnClickUnit",
-		},
-		{
-			Name = "BtnSetFocus",
-			Text = Apollo.GetString("ContextMenu_SetFocus"),
-			Condition = function(self) return (not self.unitPlayer:GetAlternateTarget() or self.unit:GetId() ~= self.unitPlayer:GetAlternateTarget():GetId()); end,
-			OnClick = "OnClickUnit",
-		},
-		-- Group (Mentor/Locate/etc.)
-		{
-			Name = "BtnGroupList",
-			Text = Apollo.GetString("ChatType_Party"),
-			Condition = function(self) return (not self.bIsThePlayer and self.bInGroup); end,
-		},
-		{
-			Name = "BtnInspect",
-			Text = Apollo.GetString("ContextMenu_Inspect"),
-			Condition = function(self) return (self.bIsACharacter); end,
-		},
-		-- Social
-		{
-			Name = "BtnSocialList",
-			Text = Apollo.GetString("ContextMenu_SocialLists"),
-			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
-			Children = {
-				{
-					Name = "BtnAddFriend",
-					Text = Apollo.GetString("ContextMenu_AddFriend"),
-					Condition = function(self) return (not self.bIsFriend and self.unit:GetFaction() == self.unitPlayer:GetFaction()); end,
-				},
-				{
-					Name = "BtnUnfriend",
-					Text = Apollo.GetString("ContextMenu_RemoveFriend"),
-					Condition = function(self) return (self.bIsFriend); end,
-				},
-				{
-					Name = "BtnAccountFriend",
-					Text = Apollo.GetString("ContextMenu_PromoteFriend"),
-					Condition = function(self) return (self.bIsFriend and not self.bIsAccountFriend); end,
-				},
-				{
-					Name = "BtnUnaccountFriend",
-					Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
-					Condition = function(self) return (self.tAccountFriend ~= nil and self.bIsAccountFriend); end,
-				},
-				{
-					Name = "BtnAddRival",
-					Text = Apollo.GetString("ContextMenu_AddRival"),
-					Condition = function(self) return (not self.bIsRival); end,
-				},
-				{
-					Name = "BtnUnrival",
-					Text = Apollo.GetString("ContextMenu_RemoveRival"),
-					Condition = function(self) return (self.bIsRival and self.tAccountFriend == nil); end,
-				},
-				{
-					Name = "BtnAddNeighbor",
-					Text = Apollo.GetString("ContextMenu_AddNeighbor"),
-					Condition = function(self) return (not self.bIsNeighbor and self.unit:GetFaction() == self.unitPlayer:GetFaction()); end,
-				},
-				{
-					Name = "BtnUnneighbor",
-					Text = Apollo.GetString("ContextMenu_RemoveNeighbor"),
-					Condition = function(self) return (self.bIsNeighbor and self.tAccountFriend == nil); end,
-				},
-			},
-		},
-		-- Ignore
-		{
-			Name = "BtnIgnore",
-			Text = Apollo.GetString("ContextMenu_Ignore"),
-			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer and not (self.tFriend and self.tFriend.bIgnore) and (self.tAccountFriend == nil or self.tAccountFriend.fLastOnline == 0)); end,
-		},
-		{
-			Name = "BtnUnignore",
-			Text = Apollo.GetString("ContextMenu_Unignore"),
-			Condition = function(self) return (self.tFriend and self.tFriend.bIgnore); end,
-		},
-		-- Duel
-		{
-			Name = "BtnDuel",
-			Text = Apollo.GetString("ContextMenu_Duel"),
-			Condition = function(self)
-				local eCurrentZonePvPRules = GameLib.GetCurrentZonePvpRules();
-				return ((not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and not GameLib.GetDuelOpponent(self.unitPlayer));
-			end,
-		},
-		{
-			Name = "BtnForfeit",
-			Text = Apollo.GetString("ContextMenu_ForfeitDuel"),
-			Condition = function(self)
-				local eCurrentZonePvPRules = GameLib.GetCurrentZonePvpRules();
-				return ((not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and GameLib.GetDuelOpponent(self.unitPlayer));
-			end,
-		},
-		-- Trade
-		{
-			Name = "BtnTrade",
-			Text = Apollo.GetString("ContextMenu_Trade"),
-			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
-			Enabled = function(self)
-				local eCanTradeResult = P2PTrading.CanInitiateTrade(self.unit.__proto__ or self.unit);
-				return (eCanTradeResult == P2PTrading.P2PTradeError_Ok or eCanTradeResult == P2PTrading.P2PTradeError_TargetRangeMax);
-			end,
-		},
-		-- Whisper
-		{
-			Name = "BtnWhisper",
-			Text = Apollo.GetString("ContextMenu_Whisper"),
-			Condition = function(self) return (not self.bIsThePlayer and self.bCanWhisper); end,
-		},
-		{
-			Name = "BtnAccountWhisper",
-			Text = Apollo.GetString("ContextMenu_AccountWhisper"),
-			Condition = function(self) return (not self.bIsThePlayer and self.bCanAccountWisper); end,
-		},
-		{
-			Name = "BtnInvite",
-			Text = Apollo.GetString("ContextMenu_InviteToGroup"),
-			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer and (not self.bInGroup or (tMyGroupData.bCanInvite and self.bCanWhisper))); end,
-		},
-		{
-			Name = "BtnKick",
-			Text = Apollo.GetString("ContextMenu_Kick"),
-			Condition = function(self) return (not self.bIsThePlayer and self.bIsACharacter and self.bInGroup and self.unit:IsInYourGroup() and self.tMyGroupData.bCanKick); end,
-		},
-		{
-			Name = "BtnLeaveGroup",
-			Text = Apollo.GetString("ContextMenu_LeaveGroup"),
-			Condition = function(self) return (self.bIsThePlayer and self.bInGroup); end,
-		},
-	},
-};
-
------------------------------------------------------------------------------
 -- Drop Down Menu
 -----------------------------------------------------------------------------
 
@@ -282,11 +121,8 @@ function DropDown:Init(strType, oData)
 	end
 
 	-- Initialize
-	if (strType == "Unit") then
+	if (strType == "Unit" and oData) then
 		self:GenerateUnitMenu(oData);
-	else
-		-- Invalid Menu Type
-		return;
 	end
 
 	return self;
@@ -306,6 +142,8 @@ function DropDown:AddItems(tItems)
 	if (type(tItems) ~= "table") then return; end
 
 	for _, tButton in ipairs(tItems) do
+--log:debug(tButton.Name)
+
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text) then
 				local wndButton = GeminiGUI:Create(tWDefDropDownButton):GetInstance(self, self.wndButtonList);
@@ -317,8 +155,12 @@ function DropDown:AddItems(tItems)
 				wndButton:SetText(tButton.Text);
 
 				-- Click Event
-				if (tButton.OnClick) then
-					wndButton:AddEventHandler("ButtonSignal", tButton.OnClick);
+				if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
+					if (tButton.Children and #tButton.Children > 0) then
+						wndButton:AddEventHandler("ButtonSignal", "OnClickIgnore");
+					else
+						wndButton:AddEventHandler("ButtonSignal", tButton.OnClick);
+					end
 				end
 
 				-- Enabled State
@@ -394,6 +236,12 @@ function DropDown:HideSubMenu(wndHandler, wndControl)
 		if (self.tParent.tActiveSubMenu == self) then
 			self.tParent.tActiveSubMenu = nil;
 		end
+	end
+end
+
+function DropDown:OnClickIgnore(wndHandler, wndControl)
+	if (wndHandler:GetData()) then
+		self:ShowSubMenu(wndHandler, wndControl);
 	end
 end
 
