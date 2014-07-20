@@ -1,6 +1,6 @@
 --[[
 
-	s:UI Module Template
+	s:UI Known Schematics Highlighter
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
