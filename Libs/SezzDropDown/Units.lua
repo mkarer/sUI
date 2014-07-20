@@ -336,10 +336,11 @@ function DropDown:FindFriend(unit, bAccountFriend)
 	for _, tFriend in ipairs(tFriends) do
 		if (not bAccountFriend and tFriend.strCharacterName == strName and tFriend.strRealmName == strRealm) then
 			return tFriend;
-		elseif (bAccountFriend and tFriend.strCharacterName == strName) then
-			local unitFriend = FriendshipLib.GetUnitById(tFriend.nId);
-			if (unitFriend and unitFriend:GetId() == unit:GetId()) then -- No Realm in Account Friends List?
-				return tFriend;
+		elseif (bAccountFriend and tFriend.arCharacters) then
+			for _, tCharacter in ipairs(tFriend.arCharacters) do
+				if (tCharacter.strCharacterName == strName and tCharacter.strRealm == strRealm) then
+					return tFriend;
+				end
 			end
 		end
 	end
