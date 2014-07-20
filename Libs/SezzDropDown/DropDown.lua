@@ -306,6 +306,10 @@ function DropDown:ShowSubMenu(wndHandler, wndControl)
 		self.tChildren[strName] = tSubMenu;
 	end
 
+	if (self.tActiveSubMenu and self.tActiveSubMenu ~= tSubMenu) then
+		self:HideSubMenu(wndHandler, wndControl);
+	end
+
 	tSubMenu:Show();
 	self.tActiveSubMenu = tSubMenu;
 	wndHandler:SetCheck(true);
