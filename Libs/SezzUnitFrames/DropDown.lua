@@ -11,14 +11,13 @@ local UnitFrameController = Apollo.GetPackage("Sezz:UnitFrameController-0.2").tP
 if (UnitFrameController.ToggleMenu) then return; end
 
 local GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
-local Apollo, GameLib, GroupLib, FriendshipLib = Apollo, GameLib, GroupLib, FriendshipLib;
+local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading;
 local max, strlen = math.max, string.len;
 
 -----------------------------------------------------------------------------
 
-local knXCursorOffset = -20;
+local knXCursorOffset = -20 -200;
 local knYCursorOffset = -6;
-local wndDropDown;
 
 ----------------------------------------------------------------------------
 -- Window Definitions
@@ -72,6 +71,18 @@ local tWDefDropDownButton = {
 	},
 	DT_CENTER = false,
 	Font = "CRB_InterfaceSmall",
+	Children = {
+		{
+			Name = "BtnCheckboxArrow",
+			AnchorPoints = { 1, 0.5, 1, 0.5 },
+			AnchorOffsets = { -22, -10, -2, 10 },
+			Sprite = "Crafting_CircuitSprites:btnCircuit_Holo_RightArrowNormal",
+			Picture = true,
+			BGColor = "UI_AlphaPercent65",
+			IgnoreMouse = true,
+			Visible = false,
+		},
+	},
 };
 
 local tWDefDropDownSeparator = {
@@ -89,110 +100,6 @@ local tWDefDropDownSeparator = {
 
 local tMenuItems = {
 	Unit = {
-		{
-			Name = "BtnLeaveGroup",
-			Text = Apollo.GetString("ContextMenu_LeaveGroup"),
-		},
-		{
-			Name = "BtnKick",
-			Text = Apollo.GetString("ContextMenu_Kick"),
-		},
-		{
-			Name = "BtnInvite",
-			Text = Apollo.GetString("ContextMenu_Invite"),
-		},
-		{
-			Name = "BtnWhisper",
-			Text = Apollo.GetString("ContextMenu_Whisper"),
-		},
-		{
-			Name = "BtnAccountWhisper",
-			Text = Apollo.GetString("ContextMenu_AccountWhisper"),
-		},
-		{
-			Name = "BtnTrade",
-			Text = Apollo.GetString("ContextMenu_Trade"),
-		},
-		{
-			Name = "BtnDuel",
-			Text = Apollo.GetString("ContextMenu_Duel"),
-		},
-		{
-			Name = "BtnForfeit",
-			Text = Apollo.GetString("ContextMenu_ForfeitDuel"),
-		},
-		{
-			Name = "BtnUnignore",
-			Text = Apollo.GetString("ContextMenu_Unignore"),
-		},
-		{
-			Name = "BtnIgnore",
-			Text = Apollo.GetString("ContextMenu_Ignore"),
-		},
-		-- Social
-		{
-			Name = "BtnSocialList",
-			Text = Apollo.GetString("ContextMenu_SocialLists"),
-			Children = {
-				{
-					Name = "BtnAddFriend",
-					Text = Apollo.GetString("ContextMenu_AddFriend"),
-				},
-				{
-					Name = "BtnUnfriend",
-					Text = Apollo.GetString("ContextMenu_RemoveFriend"),
-				},
-				{
-					Name = "BtnAccountFriend",
-					Text = Apollo.GetString("ContextMenu_PromoteFriend"),
-				},
-				{
-					Name = "BtnUnaccountFriend",
-					Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
-				},
-				{
-					Name = "BtnAddRival",
-					Text = Apollo.GetString("ContextMenu_AddRival"),
-				},
-				{
-					Name = "BtnUnrival",
-					Text = Apollo.GetString("ContextMenu_RemoveRival"),
-				},
-				{
-					Name = "BtnAddNeighbor",
-					Text = Apollo.GetString("ContextMenu_AddNeighbor"),
-				},
-				{
-					Name = "BtnUnneighbor",
-					Text = Apollo.GetString("ContextMenu_RemoveNeighbor"),
-				},
-			},
-		},
-		{
-			Name = "BtnGroupList",
-			Text = Apollo.GetString("ChatType_Party"),
-		},
-		{
-			Name = "BtnInspect",
-			Text = Apollo.GetString("ContextMenu_Inspect"),
-		},
-		-- Focus
-		{
-			Name = "BtnClearFocus",
-			Text = Apollo.GetString("ContextMenu_ClearFocus"),
-			Condition = function(self) return (self.unit and unitPlayer:GetAlternateTarget() and self.unit:GetId() == unitPlayer:GetAlternateTarget():GetId()); end,
-			OnClick = "OnClickUnit",
-		},
-		{
-			Name = "BtnSetFocus",
-			Text = Apollo.GetString("ContextMenu_SetFocus"),
-			Condition = function(self) return (self.unit and (not unitPlayer:GetAlternateTarget() or self.unit:GetId() ~= unitPlayer:GetAlternateTarget():GetId())); end,
-			OnClick = "OnClickUnit",
-		},
-		{
-			Name = "BtnAssist",
-			Text = Apollo.GetString("ContextMenu_Assist"),
-		},
 		-- Markers
 		{
 			Name = "BtnMarkTarget",
@@ -202,10 +109,148 @@ local tMenuItems = {
 				-- TODO
 			},
 		},
+		-- Assist
 		{
-			Name = "BtnMarkerList",
-			Text = Apollo.GetString("ContextMenu_SpecificMark"),
-			Condition = function(self) return not self.bInGroup or (self.bInGroup and self.tMyGroupData.bCanMark); end,
+			Name = "BtnAssist",
+			Text = Apollo.GetString("ContextMenu_Assist"),
+			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
+			Enabled = function(self) return (self.unit:GetTarget() ~= nil); end
+		},
+		-- Focus
+		{
+			Name = "BtnClearFocus",
+			Text = Apollo.GetString("ContextMenu_ClearFocus"),
+			Condition = function(self) return (self.unitPlayer:GetAlternateTarget() and self.unit:GetId() == self.unitPlayer:GetAlternateTarget():GetId()); end,
+			OnClick = "OnClickUnit",
+		},
+		{
+			Name = "BtnSetFocus",
+			Text = Apollo.GetString("ContextMenu_SetFocus"),
+			Condition = function(self) return (not self.unitPlayer:GetAlternateTarget() or self.unit:GetId() ~= self.unitPlayer:GetAlternateTarget():GetId()); end,
+			OnClick = "OnClickUnit",
+		},
+		-- Group (Mentor/Locate/etc.)
+		{
+			Name = "BtnGroupList",
+			Text = Apollo.GetString("ChatType_Party"),
+			Condition = function(self) return (not self.bIsThePlayer and self.bInGroup); end,
+		},
+		{
+			Name = "BtnInspect",
+			Text = Apollo.GetString("ContextMenu_Inspect"),
+			Condition = function(self) return (self.bIsACharacter); end,
+		},
+		-- Social
+		{
+			Name = "BtnSocialList",
+			Text = Apollo.GetString("ContextMenu_SocialLists"),
+			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
+			Children = {
+				{
+					Name = "BtnAddFriend",
+					Text = Apollo.GetString("ContextMenu_AddFriend"),
+					Condition = function(self) return (not self.bIsFriend and self.unit:GetFaction() == self.unitPlayer:GetFaction()); end,
+				},
+				{
+					Name = "BtnUnfriend",
+					Text = Apollo.GetString("ContextMenu_RemoveFriend"),
+					Condition = function(self) return (self.bIsFriend); end,
+				},
+				{
+					Name = "BtnAccountFriend",
+					Text = Apollo.GetString("ContextMenu_PromoteFriend"),
+					Condition = function(self) return (self.bIsFriend and not self.bIsAccountFriend); end,
+				},
+				{
+					Name = "BtnUnaccountFriend",
+					Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
+					Condition = function(self) return (self.tAccountFriend ~= nil and self.bIsAccountFriend); end,
+				},
+				{
+					Name = "BtnAddRival",
+					Text = Apollo.GetString("ContextMenu_AddRival"),
+					Condition = function(self) return (not self.bIsRival); end,
+				},
+				{
+					Name = "BtnUnrival",
+					Text = Apollo.GetString("ContextMenu_RemoveRival"),
+					Condition = function(self) return (self.bIsRival and self.tAccountFriend == nil); end,
+				},
+				{
+					Name = "BtnAddNeighbor",
+					Text = Apollo.GetString("ContextMenu_AddNeighbor"),
+					Condition = function(self) return (not self.bIsNeighbor and self.unit:GetFaction() == self.unitPlayer:GetFaction()); end,
+				},
+				{
+					Name = "BtnUnneighbor",
+					Text = Apollo.GetString("ContextMenu_RemoveNeighbor"),
+					Condition = function(self) return (self.bIsNeighbor and self.tAccountFriend == nil); end,
+				},
+			},
+		},
+		-- Ignore
+		{
+			Name = "BtnIgnore",
+			Text = Apollo.GetString("ContextMenu_Ignore"),
+			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer and not (self.tFriend and self.tFriend.bIgnore) and (self.tAccountFriend == nil or self.tAccountFriend.fLastOnline == 0)); end,
+		},
+		{
+			Name = "BtnUnignore",
+			Text = Apollo.GetString("ContextMenu_Unignore"),
+			Condition = function(self) return (self.tFriend and self.tFriend.bIgnore); end,
+		},
+		-- Duel
+		{
+			Name = "BtnDuel",
+			Text = Apollo.GetString("ContextMenu_Duel"),
+			Condition = function(self)
+				local eCurrentZonePvPRules = GameLib.GetCurrentZonePvpRules();
+				return ((not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and not GameLib.GetDuelOpponent(self.unitPlayer));
+			end,
+		},
+		{
+			Name = "BtnForfeit",
+			Text = Apollo.GetString("ContextMenu_ForfeitDuel"),
+			Condition = function(self)
+				local eCurrentZonePvPRules = GameLib.GetCurrentZonePvpRules();
+				return ((not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and GameLib.GetDuelOpponent(self.unitPlayer));
+			end,
+		},
+		-- Trade
+		{
+			Name = "BtnTrade",
+			Text = Apollo.GetString("ContextMenu_Trade"),
+			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
+			Enabled = function(self)
+				local eCanTradeResult = P2PTrading.CanInitiateTrade(self.unit.__proto__ or self.unit);
+				return (eCanTradeResult == P2PTrading.P2PTradeError_Ok or eCanTradeResult == P2PTrading.P2PTradeError_TargetRangeMax);
+			end,
+		},
+		-- Whisper
+		{
+			Name = "BtnWhisper",
+			Text = Apollo.GetString("ContextMenu_Whisper"),
+			Condition = function(self) return (not self.bIsThePlayer and self.bCanWhisper); end,
+		},
+		{
+			Name = "BtnAccountWhisper",
+			Text = Apollo.GetString("ContextMenu_AccountWhisper"),
+			Condition = function(self) return (not self.bIsThePlayer and self.bCanAccountWisper); end,
+		},
+		{
+			Name = "BtnInvite",
+			Text = Apollo.GetString("ContextMenu_InviteToGroup"),
+			Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer and (not self.bInGroup or (tMyGroupData.bCanInvite and self.bCanWhisper))); end,
+		},
+		{
+			Name = "BtnKick",
+			Text = Apollo.GetString("ContextMenu_Kick"),
+			Condition = function(self) return (not self.bIsThePlayer and self.bIsACharacter and self.bInGroup and self.unit:IsInYourGroup() and self.tMyGroupData.bCanKick); end,
+		},
+		{
+			Name = "BtnLeaveGroup",
+			Text = Apollo.GetString("ContextMenu_LeaveGroup"),
+			Condition = function(self) return (self.bIsThePlayer and self.bInGroup); end,
 		},
 	},
 };
@@ -217,16 +262,10 @@ local tMenuItems = {
 local DropDown = {
 };
 
-function DropDown:Init(strType, oData)
+function DropDown:Init(strType, oData, tItems)
 	-- Cleanup
 	if (self.wndMain and self.wndMain:IsValid()) then
 		self.wndMain:Destroy();
-	end
-
-	for strKey in pairs(self) do
-		if (type(self[strKey]) ~= "function") then
-			self[strKey] = nil;
-		end
 	end
 
 	-- Initialize
@@ -242,20 +281,34 @@ function DropDown:Init(strType, oData)
 		self.tTargetGroupData = (tCharacterData and tCharacterData.nPartyIndex) and GroupLib.GetGroupMember(tCharacterData.nPartyIndex) or nil;
 		self.strTitle = self.unit:GetName();
 		self.tPlayerFaction = self.unitPlayer:GetFaction();
+		self.bIsACharacter = self.unit:IsACharacter();
+		self.bIsThePlayer = self.unit:IsThePlayer();
 
-		local nFriendId = nil;
-		if (nFriendId) then
-			self.tFriend = FriendshipLib.GetById(nFriendId)
+		-- Friend (TODO: Testing)
+		if (self.bIsACharacter) then
+			self.tFriend = self:FindFriend(self.unit); -- bFriend, bRival, bIgnore
 			if (self.tFriend ~= nil) then
 				self.strTarget = self.tFriend.strCharacterName;
 			end
 
-			self.tAccountFriend = FriendshipLib.GetAccountById(nFriendId);
+			self.tAccountFriend = self:FindFriend(self.unit, true);
 			if (self.tAccountFriend ~= nil) then
 				if (self.tAccountFriend.arCharacters and self.tAccountFriend.arCharacters[1] ~= nil) then
 					self.strTarget = self.tAccountFriend.arCharacters[1].strCharacterName;
 				end
 			end
+
+			self.bCanAccountWisper = (tAccountFriend ~= nil and tAccountFriend.arCharacters and tAccountFriend.arCharacters[1] ~= nil);
+			if (self.bCanAccountWisper) then
+				self.bCanWhisper = (tAccountFriend.arCharacters[1] ~= nil and tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
+			else
+				self.bCanWhisper = (self.unit:GetFaction() == self.tPlayerFaction and (tFriend == nil or (tFriend ~= nil and not tFriend.bIgnore)));
+			end
+
+			self.bIsFriend = (self.tFriend ~= nil and self.tFriend.bFriend) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bFriend);
+			self.bIsRival = (self.tFriend ~= nil and self.tFriend.bRival) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bRival);
+			self.bIsNeighbor = (self.tFriend ~= nil and self.tFriend.bNeighbor) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bNeighbor);
+			self.bIsAccountFriend = (self.tAccountFriend ~= nil or (self.tCharacterData ~= nil and self.tCharacterData.tAccountFriend ~= nil));
 		end
 	else
 		-- Invalid Menu Type
@@ -263,16 +316,32 @@ function DropDown:Init(strType, oData)
 	end
 
 	-- Create Window
-	self.wndMain = GeminiGUI:Create(tWDefDropDownMenu):GetInstance(self, "TooltipStratum");
+	self.wndMain = GeminiGUI:Create(tWDefDropDownMenu):GetInstance(self, self.wndParent or "TooltipStratum");
 	self.wndMain:Invoke();
 	self.wndButtonList = self.wndMain:FindChild("ButtonList");
 	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
+	self.wndMain:AddEventHandler("MouseExit", "HideSubMenu", self);
 
 	-- Set Content
 	self:AddHeader(self.strTitle);
-	self:AddItems(tMenuItems[strType]);
+	self:AddItems(tItems);
 
 	return self.wndMain;
+end
+
+function DropDown:FindFriend(unit, bAccountFriend)
+	-- Untested!
+	local strName = unit:GetName();
+	local tFriends = bAccountFriend and FriendshipLib.GetAccountList() or FriendshipLib.GetList();
+
+	for _, tFriend in ipairs(tFriends) do
+		if (tFriend.strCharacterName == strName) then
+			local unitFriend = FriendshipLib.GetUnitById(tFriend.nId);
+			if (unitFriend:GetId() == unit:GetId()) then
+				return tFriend;
+			end
+		end
+	end
 end
 
 function DropDown:AddHeader(strTitle)
@@ -290,7 +359,7 @@ function DropDown:AddItems(tItems)
 	for _, tButton in ipairs(tItems) do
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text) then
-				local wndButton = GeminiGUI:Create(tWDefDropDownButton):GetInstance(tButton, self.wndButtonList);
+				local wndButton = GeminiGUI:Create(tWDefDropDownButton):GetInstance(self, self.wndButtonList);
 
 				if (tButton.Name) then
 					wndButton:SetName(tButton.Name)
@@ -298,8 +367,24 @@ function DropDown:AddItems(tItems)
 
 				wndButton:SetText(tButton.Text);
 
+				-- Click Event
 				if (tButton.OnClick) then
 					wndButton:AddEventHandler("ButtonSignal", tButton.OnClick, self);
+				end
+
+				-- Enabled State
+				if (tButton.Enabled) then
+					wndButton:Enable(tButton.Enabled(self));
+				end
+
+				-- Children
+				if (tButton.Children and #tButton.Children > 0) then
+					wndButton:SetData(tButton.Children);
+					wndButton:FindChild("BtnCheckboxArrow"):Show(true, true);
+					wndButton:AddEventHandler("MouseEnter", "ShowSubMenu", self);
+				else
+					wndButton:AddEventHandler("MouseEnter", "HideSubMenu", self);
+					wndButton:AddEventHandler("MouseMove", "HideSubMenu", self);
 				end
 			else
 				GeminiGUI:Create(tWDefDropDownSeparator):GetInstance(self, self.wndButtonList);
@@ -312,20 +397,83 @@ function DropDown:Show()
 	self.tAnchorOffsets[4] = self.tAnchorOffsets[2] + self.wndButtonList:ArrangeChildrenVert(0);
 	self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
 
-	local tCursor = Apollo.GetMouse();
-	self.wndMain:Move(tCursor.x - knXCursorOffset, tCursor.y - knYCursorOffset, self.wndMain:GetWidth(), self.wndMain:GetHeight());
+	local nPosX, nPosY;
+
+	if (self.wndParent) then
+		nPosX = self.wndParent:GetWidth();
+		nPosY = 0;
+	else
+		local tCursor = Apollo.GetMouse();
+		nPosX = tCursor.x - knXCursorOffset;
+		nPosY = tCursor.y - knYCursorOffset;
+	end
+
+	self.wndMain:Move(nPosX, nPosY, self.wndMain:GetWidth(), self.wndMain:GetHeight());
 	self:CheckWindowBounds();
+	self.wndMain:Show(true, true);
+	self.wndMain:ToFront();
+end
+
+function DropDown:ShowSubMenu(wndHandler, wndControl)
+	if (not wndHandler or wndHandler ~= wndControl) then return; end
+	local strName = wndHandler:GetName();
+	local tSubMenu = self.tChildren[strName];
+
+	if (not tSubMenu) then
+		tSubMenu = self:New(self, wndHandler);
+		tSubMenu:Init("Unit", self.unit, wndHandler:GetData());
+		self.tChildren[strName] = tSubMenu;
+	end
+
+	tSubMenu:Show();
+	self.tActiveSubMenu = tSubMenu;
+end
+
+function DropDown:HideSubMenu(wndHandler, wndControl)
+	if (self.tActiveSubMenu and not self.tActiveSubMenu.wndMain:ContainsMouse()) then
+		if ((wndHandler == self.wndMain and not wndHandler:ContainsMouse()) or wndHandler ~= self.wndMain) then
+			self.tActiveSubMenu:Close();
+			self.tActiveSubMenu = nil;
+		end
+	elseif (self.wndParent and not self.wndMain:ContainsMouse() and (not self.wndParent:ContainsMouse() or self.tParent.tActiveSubMenu ~= self)) then
+		self:Close();
+	end
+end
+
+function DropDown:Close()
+	self.wndMain:Close();
+	if (self.tParent and self.tParent.tActiveSubMenu == self) then
+		self.tParent.tActiveSubMenu = nil;
+	end
 end
 
 function DropDown:CheckWindowBounds()
-	local tMouse = Apollo.GetMouse();
+	local nPosX, nPosY;
+	if (self.wndParent) then
+		nPosX, nPosY = self.wndParent:GetPos();
+		nPosX = nPosX + self.wndParent:GetWidth();
+
+		local wndParent = self.wndParent:GetParent();
+		while (wndParent) do
+			local nPosXParent, nPosYParent = wndParent:GetPos();
+			nPosX = nPosX + nPosXParent;
+			nPosY = nPosY + nPosYParent;
+
+			wndParent = wndParent:GetParent();
+		end
+	else
+		local tCursor = Apollo.GetMouse();
+		nPosX = tCursor.x - knXCursorOffset + 10; -- Holo border needs about 10px!
+		nPosY = tCursor.y - knYCursorOffset + 10;
+	end
+
 	local nWidth =  self.wndMain:GetWidth();
 	local nHeight = self.wndMain:GetHeight();
 	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
 
 	local nMaxScreenWidth, nMaxScreenHeight = Apollo.GetScreenSize();
-	local nNewX = nWidth + tMouse.x - knXCursorOffset + 10; -- Holo border needs ~10px
-	local nNewY = nHeight + tMouse.y - knYCursorOffset + 10; -- Holo border needs ~10px
+	local nNewX = nWidth + nPosX;
+	local nNewY = nHeight + nPosY;
 
 	local bSafeX = (nNewX <= nMaxScreenWidth);
 	local bSafeY = (nNewY <= nMaxScreenHeight);
@@ -366,77 +514,34 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 	wndDropDown:Close();
 end
 
+function DropDown:New(tParent, wndParent)
+	local self = setmetatable({
+		tParent = tParent,
+		wndParent = wndParent,
+		tChildren = {},
+	}, { __index = DropDown });
+
+	return self;
+end
 
 -----------------------------------------------------------------------------
 
-local function CreateDropDownMenu(strType, oData)
-	-- Destroy old menu
-	if (wndDropDown and wndDropDown:IsValid()) then
-		wndDropDown:Destroy();
-	end
-
-	-- Create Container
-	wndDropDown = GeminiGUI:Create(tWDefDropDownMenu):GetInstance(self, "TooltipStratum");
-	wndDropDown:SetData(oData);
-	wndDropDown:Invoke();
-	local nLeft, nTop, nRight, nBottom = wndDropDown:GetAnchorOffsets();
-
-	-- Create Buttons
-	local wndButtonList = wndDropDown:FindChild("ButtonList");
-
-	-- Title
-	if (tMenuTitles[strType]) then
-		local wndButton = GeminiGUI:Create(tWDefMenuTitle):GetInstance(nil, wndButtonList);
-		local strTitle = type(tMenuTitles[strType]) ~= "function" and tMenuTitles[strType] or tMenuTitles[strType](oData);
-		wndButton:SetText(strTitle);
-		nRight = max(150, Apollo.GetTextWidth(tWDefMenuTitle.Font, strTitle) + 10);
-	end
-
-	-- Buttons
-	for _, tButton in ipairs(tMenuItems[strType]) do
-		if (not tButton.Condition or tButton.Condition(oData)) then
-			if (tButton.Text) then
-				local wndButton = GeminiGUI:Create(tWDefDropDownButton):GetInstance(tButton, wndButtonList);
-
-				if (tButton.Name) then
-					wndButton:SetName(tButton.Name)
-				end
-
-				wndButton:SetText(tButton.Text);
-
-				if (tButton.OnClick) then
-					wndButton:AddEventHandler("ButtonSignal", tButton.OnClick, DropDown);
-				end
-			else
-				GeminiGUI:Create(tWDefDropDownSeparator):GetInstance(self, wndButtonList);
-			end
-		end
-	end
-
-	-- Arrange Buttons
-	local nHeight = wndButtonList:ArrangeChildrenVert(0);
-	wndDropDown:SetAnchorOffsets(nLeft, nTop, nRight, nTop + nHeight);
-
-	-- Set Position to Cursor
-	local tCursor = Apollo.GetMouse();
-	wndDropDown:Move(tCursor.x - knXCursorOffset, tCursor.y - knYCursorOffset, wndDropDown:GetWidth(), wndDropDown:GetHeight());
-	CheckWindowBounds();
-
-	-- Done
-	return wndDropDown;
-end
+local wndDropDown;
 
 function UnitFrameController:ToggleMenu(unit)
 	local bInRaid, bInGroup, nGroupSize = GroupLib.InRaid(), GroupLib.InGroup(), GroupLib.GetMemberCount();
 	local bShowLeaderOptions = ((bInGroup or bInRaid) and unit:IsThePlayer() and GroupLib.GetGroupMember(1).bIsLeader);
 
 	unitPlayer = GameLib.GetPlayerUnit();
---	Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, unit:GetName(), unit.__proto__ or unit);
---	CreateDropDownMenu("Unit", unit);
+	Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, unit:GetName(), unit.__proto__ or unit);
 
+	-- Create Root Drop Down Menu Instance
+	if (not wndDropDown) then
+		wndDropDown = DropDown:New();
+	end
 
-
-	if (DropDown:Init("Unit", unit)) then
-		DropDown:Show();
+	-- Update Items
+	if (wndDropDown:Init("Unit", unit, tMenuItems.Unit)) then
+		wndDropDown:Show();
 	end
 end
