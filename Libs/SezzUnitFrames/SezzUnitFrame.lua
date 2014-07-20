@@ -68,7 +68,7 @@ local OnMouseClick = function(self, wndHandler, wndControl, eMouseButton, x, y)
 		return false;
 	elseif (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
 		-- Right Click
-		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit);
+		Event_FireGenericEvent("GenericEvent_NewContextMenuPlayerDetailed", nil, self.unit:GetName(), self.unit.__proto__ or self.unit);
 		return true;
 	end
 
