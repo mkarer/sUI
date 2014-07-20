@@ -28,6 +28,7 @@ local knYCursorOffset = -6;
 
 local tWDefDropDownMenu = {
 	Name = "DropDownMenu",
+--	Template = "HoloWindowSound", -- Annoying sound!
 	CloseOnExternalClick = true,
 	Escapable = true,
 	NoClip = true,
@@ -299,7 +300,6 @@ function DropDown:ShowSubMenu(wndHandler, wndControl)
 	local tSubMenu = self.tChildren[strName];
 
 	if (not tSubMenu) then
-		log:debug("new submenu %s", strName)
 		tSubMenu = DropDown:New(self, wndHandler);
 		tSubMenu:Init("Unit", self.unit or self.strTarget); -- TODO
 		tSubMenu:AddItems(wndHandler:GetData());
@@ -460,8 +460,8 @@ end
 -----------------------------------------------------------------------------
 
 function DropDown:New(tParent, wndParent)
-
-	 return setmetatable({
+	-- TODO: There should be only ONE root menu, because you can only show one
+	return setmetatable({
 		tParent = tParent,
 		wndParent = wndParent,
 		tChildren = {},
@@ -486,7 +486,7 @@ function DropDown:OnLoad()
 
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 
-	-- Listen to Carbine's Context Menu Events
+	-- Listen to Carbine's Context Menu Events (TEMP)
 	local tDropDown = DropDown:New();
 
 	function tDropDown:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
