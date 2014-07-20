@@ -301,7 +301,7 @@ function DropDown:ShowSubMenu(wndHandler, wndControl)
 	if (not tSubMenu) then
 		log:debug("new submenu %s", strName)
 		tSubMenu = DropDown:New(self, wndHandler);
-		tSubMenu:Init("Unit", self.unit);
+		tSubMenu:Init("Unit", self.unit or self.strTarget); -- TODO
 		tSubMenu:AddItems(wndHandler:GetData());
 		self.tChildren[strName] = tSubMenu;
 	end
@@ -486,12 +486,33 @@ function DropDown:OnLoad()
 	local tDropDown = DropDown:New();
 
 	function tDropDown:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
+log:debug("OnNewContextMenuPlayer");
+		if (self:Init("Unit", unitTarget or strTarget)) then
+			self:Show();
+		end
 	end
 
 	function tDropDown:OnNewContextMenuPlayerDetailed(wndParent, strTarget, unitTarget, nReportId)
+log:debug("OnNewContextMenuPlayerDetailed");
 	end
 
 	function tDropDown:OnNewContextMenuFriend(wndParent, nFriendId)
+log:debug("OnNewContextMenuFriend");
+		local bInitialized = false;
+		local tFriend = FriendshipLib.GetById(nFriendId);
+
+		if (tFriend) then
+			bInitialized = self:Init("Unit", tFriend.strCharacterName);
+		else
+			tFriend = FriendshipLib.GetAccountById(nFriendId);
+			if (tFriend and tFriend.arCharacters and tFriend.arCharacters[1]) then
+				bInitialized = self:Init("Unit", tFriend.arCharacters[1].strCharacterName);
+			end
+		end
+
+		if (bInitialized) then
+			self:Show();
+		end
 	end
 
 	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayer", "OnNewContextMenuPlayer", tDropDown);

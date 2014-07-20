@@ -22,7 +22,7 @@ local tMenuItems = {
 	{
 		Name = "BtnMarkTarget",
 		Text = Apollo.GetString("ContextMenu_MarkTarget"),
-		Condition = function(self) return (self.bInGroup and self.tMyGroupData.bCanMark); end,
+		Condition = function(self) return (self.bInGroup and self.tMyGroupData.bCanMark and self.unit); end,
 --		Condition = function(self) return not self.bInGroup or (self.bInGroup and self.tMyGroupData.bCanMark); end,
 		OnClick = "OnClickUnit",
 		Children = {
@@ -87,7 +87,7 @@ local tMenuItems = {
 	{
 		Name = "BtnAssist",
 		Text = Apollo.GetString("ContextMenu_Assist"),
-		Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
+		Condition = function(self) return (self.unit and self.bIsACharacter and not self.bIsThePlayer); end,
 		Enabled = function(self) return (self.unit:GetTarget() ~= nil); end,
 		OnClick = "OnClickUnit",
 	},
@@ -95,13 +95,13 @@ local tMenuItems = {
 	{
 		Name = "BtnClearFocus",
 		Text = Apollo.GetString("ContextMenu_ClearFocus"),
-		Condition = function(self) return (self.unitPlayer:GetAlternateTarget() and self.unit:GetId() == self.unitPlayer:GetAlternateTarget():GetId()); end,
+		Condition = function(self) return (self.unit and (self.unitPlayer:GetAlternateTarget() and self.unit:GetId() == self.unitPlayer:GetAlternateTarget():GetId())); end,
 		OnClick = "OnClickUnit",
 	},
 	{
 		Name = "BtnSetFocus",
 		Text = Apollo.GetString("ContextMenu_SetFocus"),
-		Condition = function(self) return (not self.unitPlayer:GetAlternateTarget() or self.unit:GetId() ~= self.unitPlayer:GetAlternateTarget():GetId()); end,
+		Condition = function(self) return (self.unit and (not self.unitPlayer:GetAlternateTarget() or self.unit:GetId() ~= self.unitPlayer:GetAlternateTarget():GetId())); end,
 		OnClick = "OnClickUnit",
 	},
 	-- Group (Mentor/Locate/etc.)
@@ -114,7 +114,7 @@ local tMenuItems = {
 				Name = "BtnMentor",
 				Text = Apollo.GetString("ContextMenu_Mentor"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (not self.bIsThePlayer and not bMentoringTarget); end,
+				Condition = function(self) return (self.unit and not self.bIsThePlayer and not bMentoringTarget); end,
 			},
 			{
 				Name = "BtnStopMentor",
@@ -126,43 +126,43 @@ local tMenuItems = {
 				Name = "BtnGroupTakeInvite",
 				Text = Apollo.GetString("ContextMenu_DenyInvites"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader and self.bCanInvite); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.bCanInvite); end,
 			},
 			{
 				Name = "BtnGroupGiveInvite",
 				Text = Apollo.GetString("ContextMenu_AllowInvites"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanInvite); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanInvite); end,
 			},
 			{
 				Name = "BtnGroupTakeKick",
 				Text = Apollo.GetString("ContextMenu_DenyKicks"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader and self.bCanKick); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.bCanKick); end,
 			},
 			{
 				Name = "BtnGroupGiveKick",
 				Text = Apollo.GetString("ContextMenu_AllowKicks"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanKick); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanKick); end,
 			},
 			{
 				Name = "BtnGroupTakeMark",
 				Text = Apollo.GetString("ContextMenu_DenyMarking"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader and self.bCanMark); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.bCanMark); end,
 			},
 			{
 				Name = "BtnGroupGiveMark",
 				Text = Apollo.GetString("ContextMenu_AllowMarking"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanMark); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanMark); end,
 			},
 			{
 				Name = "BtnVoteToKick",
 				Text = Apollo.GetString("ContextMenu_VoteToKick"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bInMatchingGame and not self.bIsMatchingGameFinished); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bInMatchingGame and not self.bIsMatchingGameFinished); end,
 			},
 			{
 				Name = "BtnVoteToDisband",
@@ -175,20 +175,20 @@ local tMenuItems = {
 				Name = "BtnPromote",
 				Text = Apollo.GetString("ContextMenu_Promote"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData and self.bAmIGroupLeader); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader); end,
 			},
 			{
 				Name = "BtnLocate",
 				Text = Apollo.GetString("ContextMenu_Locate"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tTargetGroupData); end,
+				Condition = function(self) return (self.unit and self.tTargetGroupData); end,
 			},
 		},
 	},
 	{
 		Name = "BtnInspect",
 		Text = Apollo.GetString("ContextMenu_Inspect"),
-		Condition = function(self) return (self.bIsACharacter); end,
+		Condition = function(self) return (self.unit and self.bIsACharacter); end,
 		OnClick = "OnClickUnit",
 	},
 	-- Social
@@ -200,7 +200,7 @@ local tMenuItems = {
 			{
 				Name = "BtnAddFriend",
 				Text = Apollo.GetString("ContextMenu_AddFriend"),
-				Condition = function(self) return (not self.bIsFriend and self.unit:GetFaction() == self.unitPlayer:GetFaction()); end,
+				Condition = function(self) return (not self.bIsFriend and (not self.unit or self.unit:GetFaction() == self.unitPlayer:GetFaction())); end,
 				OnClick = "OnClickUnit",
 			},
 			{
@@ -218,7 +218,7 @@ local tMenuItems = {
 			{
 				Name = "BtnUnaccountFriend",
 				Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
-				Condition = function(self) return (self.tAccountFriend ~= nil and self.bIsAccountFriend); end,
+				Condition = function(self) return (self.tAccountFriend and self.bIsAccountFriend); end,
 				OnClick = "OnClickUnit",
 			},
 			{
@@ -230,19 +230,19 @@ local tMenuItems = {
 			{
 				Name = "BtnUnrival",
 				Text = Apollo.GetString("ContextMenu_RemoveRival"),
-				Condition = function(self) return (self.bIsRival and self.tAccountFriend == nil); end,
+				Condition = function(self) return (self.bIsRival and not self.tAccountFriend); end,
 				OnClick = "OnClickUnit",
 			},
 			{
 				Name = "BtnAddNeighbor",
 				Text = Apollo.GetString("ContextMenu_AddNeighbor"),
-				Condition = function(self) return (not self.bIsNeighbor and self.unit:GetFaction() == self.unitPlayer:GetFaction()); end,
+				Condition = function(self) return (not self.bIsNeighbor and (not self.unit or self.unit:GetFaction() == self.unitPlayer:GetFaction())); end,
 				OnClick = "OnClickUnit",
 			},
 			{
 				Name = "BtnUnneighbor",
 				Text = Apollo.GetString("ContextMenu_RemoveNeighbor"),
-				Condition = function(self) return (self.bIsNeighbor and self.tAccountFriend == nil); end,
+				Condition = function(self) return (self.bIsNeighbor and not self.tAccountFriend); end,
 				OnClick = "OnClickUnit",
 			},
 		},
@@ -267,7 +267,7 @@ local tMenuItems = {
 		OnClick = "OnClickUnit",
 		Condition = function(self)
 			local eCurrentZonePvPRules = GameLib.GetCurrentZonePvpRules();
-			return ((not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and not GameLib.GetDuelOpponent(self.unitPlayer));
+			return (self.unit and (not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and not GameLib.GetDuelOpponent(self.unitPlayer));
 		end,
 	},
 	{
@@ -276,14 +276,14 @@ local tMenuItems = {
 		OnClick = "OnClickUnit",
 		Condition = function(self)
 			local eCurrentZonePvPRules = GameLib.GetCurrentZonePvpRules();
-			return ((not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and GameLib.GetDuelOpponent(self.unitPlayer));
+			return (self.unit and (not eCurrentZonePvPRules or eCurrentZonePvPRules ~= GameLib.CodeEnumZonePvpRules.Sanctuary) and self.bIsACharacter and not self.bIsThePlayer and GameLib.GetDuelOpponent(self.unitPlayer));
 		end,
 	},
 	-- Trade
 	{
 		Name = "BtnTrade",
 		Text = Apollo.GetString("ContextMenu_Trade"),
-		Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer); end,
+		Condition = function(self) return (self.unit and self.bIsACharacter and not self.bIsThePlayer); end,
 		OnClick = "OnClickUnit",
 		Enabled = function(self)
 			local eCanTradeResult = P2PTrading.CanInitiateTrade(self.unit.__proto__ or self.unit);
@@ -312,7 +312,7 @@ local tMenuItems = {
 	{
 		Name = "BtnKick",
 		Text = Apollo.GetString("ContextMenu_Kick"),
-		Condition = function(self) return (not self.bIsThePlayer and self.bIsACharacter and self.bInGroup and self.unit:IsInYourGroup() and self.tMyGroupData.bCanKick); end,
+		Condition = function(self) return (not self.bIsThePlayer and self.bIsACharacter and self.bInGroup and self.unit and self.unit:IsInYourGroup() and self.tMyGroupData.bCanKick); end,
 		OnClick = "OnClickUnit",
 	},
 	{
@@ -327,10 +327,9 @@ local tMenuItems = {
 -- Drop Down Menu
 -----------------------------------------------------------------------------
 
-function DropDown:FindFriend(unit, bAccountFriend)
+function DropDown:FindFriend(strName, bAccountFriend)
 	-- Untested!
-	local strName = unit:GetName();
-	local strRealm = GameLib:GetRealmName();
+	local strRealm = GameLib.GetRealmName();
 	local tFriends = bAccountFriend and FriendshipLib.GetAccountList() or FriendshipLib.GetList();
 
 	for _, tFriend in ipairs(tFriends) do
@@ -347,175 +346,187 @@ function DropDown:FindFriend(unit, bAccountFriend)
 end
 
 function DropDown:OnClickUnit(wndControl, wndHandler)
-	if (self.unit and self.unit:IsValid()) then
-		local strButton = wndControl:GetName();
+	local strButton = wndControl:GetName();
 
-		if (not strButton or strButton == "Button") then
-			return;
-		elseif (strButton == "BtnSetFocus") then
-			-- Set Focus
-			self.unitPlayer:SetAlternateTarget(self.unit.__proto__ or self.unit);
-		elseif (strButton == "BtnClearFocus") then
-			-- Clear Focus
-			self.unitPlayer:SetAlternateTarget();
-		elseif (strButton == "BtnMarkTarget") then
-			-- Set First Available Mark
-			local nResult = 8;
-			local nCurrent = self.unit:GetTargetMarker() or 0;
-			local tAvailableMarkers = GameLib.GetAvailableTargetMarkers();
-			for idx = nCurrent, 8 do
-				if (tAvailableMarkers[idx]) then
-					nResult = idx;
-					break;
-				end
+	if (not strButton or strButton == "Button") then
+		return;
+	elseif (strButton == "BtnSetFocus") then
+		-- Set Focus
+		self.unitPlayer:SetAlternateTarget(self.unit.__proto__ or self.unit);
+	elseif (strButton == "BtnClearFocus") then
+		-- Clear Focus
+		self.unitPlayer:SetAlternateTarget();
+	elseif (strButton == "BtnMarkTarget") then
+		-- Set First Available Mark
+		local nResult = 8;
+		local nCurrent = self.unit:GetTargetMarker() or 0;
+		local tAvailableMarkers = GameLib.GetAvailableTargetMarkers();
+		for idx = nCurrent, 8 do
+			if (tAvailableMarkers[idx]) then
+				nResult = idx;
+				break;
 			end
-			self.unit:SetTargetMarker(nResult);
-		elseif (strButton == "BtnAssist") then
-			GameLib.SetTargetUnit(self.unit:GetTarget());
-		elseif (strButton == "BtnInspect") then
-			self.unit:Inspect();
-		elseif (strButton == "BtnAddFriend") then
-			FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Friend, self.strTarget);
-		elseif (strButton == "BtnUnfriend") then
-		FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Friend);
-		elseif (strButton == "BtnAccountFriend") then
-			FriendshipLib.AccountAddByUpgrade(self.tCharacterData.tFriend.nId);
-		elseif (strButton == "BtnUnaccountFriend") then
-			if (self.tAccountFriend and self.tAccountFriend.nId) then
-				Event_FireGenericEvent("EventGeneric_ConfirmRemoveAccountFriend", self.tAccountFriend.nId);
-			end
-		elseif (strButton == "BtnAddRival") then
-			FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Rival, self.strTarget);
-		elseif (strButton == "BtnUnrival") then
-			FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Rival);
-		elseif (strButton == "BtnAddNeighbor") then
-			HousingLib.NeighborInviteByName(self.strTarget);
-		elseif (strButton == "BtnUnneighbor") then
-			Print(Apollo.GetString("ContextMenu_NeighborRemoveFailed")); -- TODO!
-		elseif (strButton == "BtnIgnore") then
-			FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Ignore, self.strTarget);
-		elseif (strButton == "BtnUnignore") then
-			FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Ignore);
-		elseif (strButton == "BtnDuel") then
-			GameLib.InitiateDuel(self.unit);
-		elseif (strButton == "BtnForfeit") then
-			GameLib.ForfeitDuel(self.unit);
-		elseif (strButton == "BtnTrade") then
-			local eCanTradeResult = P2PTrading.CanInitiateTrade(self.unit);
-			if (eCanTradeResult == P2PTrading.P2PTradeError_Ok) then
-				Event_FireGenericEvent("P2PTradeWithTarget", self.unit);
-			elseif (eCanTradeResult == P2PTrading.P2PTradeError_TargetRangeMax) then
-				Event_FireGenericEvent("GenericFloater", self.unitPlayer, Apollo.GetString("ContextMenu_PlayerOutOfRange"));
-				self.unit:ShowHintArrow();
-			else
-				Event_FireGenericEvent("GenericFloater", self.unitPlayer, Apollo.GetString("ContextMenu_TradeFailed"));
-			end
-		elseif (strButton == "BtnWhisper") then
-			Event_FireGenericEvent("GenericEvent_ChatLogWhisper", self.strTarget);
-		elseif (strButton == "BtnAccountWhisper") then
-			if (self.tCharacterData.tAccountFriend ~= nil and self.tCharacterData.tAccountFriend.arCharacters ~= nil and self.tCharacterData.tAccountFriend.arCharacters[1] ~= nil) then
-				local strDisplayName = self.tCharacterData.tAccountFriend.strCharacterName;
-				local strRealmName = self.tCharacterData.tAccountFriend.arCharacters[1].strRealm;
-				Event_FireGenericEvent("Event_EngageAccountWhisper", strDisplayName, self.strTarget, strRealmName);
-			end
-		elseif (strButton == "BtnInvite") then
-			GroupLib.Invite(self.strTarget);
-		elseif (strButton == "BtnKick") then
-			GroupLib.Kick(self.nGroupMemberId);
-		elseif (strButton == "BtnLeaveGroup") then
-			GroupLib.LeaveGroup();
-		-- TODO
-		elseif (strButton == "BtnPromote") then
-			GroupLib.Promote(self.nGroupMemberId, "");
-		elseif (strButton == "BtnGroupGiveMark") then
-			GroupLib.SetCanMark(self.nGroupMemberId, true);
-		elseif (strButton == "BtnGroupTakeMark") then
-			GroupLib.SetCanMark(self.nGroupMemberId, false);
-		elseif (strButton == "BtnGroupGiveKick") then
-			GroupLib.SetKickPermission(self.nGroupMemberId, true);
-		elseif (strButton == "BtnGroupTakeKick") then
-			GroupLib.SetKickPermission(self.nGroupMemberId, false);
-		elseif (strButton == "BtnGroupGiveInvite") then
-			GroupLib.SetInvitePermission(self.nGroupMemberId, true);
-		elseif (strButton == "BtnGroupTakeInvite") then
-			GroupLib.SetInvitePermission(self.nGroupMemberId, false);
-		elseif (strButton == "BtnLocate") then
-			self.unit:ShowHintArrow();
-		elseif (strButton == "BtnMarkClear") then
-			self.unit:ClearTargetMarker();
-		elseif (strButton == "BtnVoteToDisband") then
-			MatchingGame.InitiateVoteToSurrender();
-		elseif (strButton == "BtnVoteToKick") then
-			MatchingGame.InitiateVoteToKick(self.nGroupMemberId);
-		elseif (strButton == "BtnMentor") then
-			GroupLib.AcceptMentoring(self.unit);
-		elseif (strButton == "BtnStopMentor") then
-			GroupLib.CancelMentoring();
-		elseif (strButton == "BtnReportChat" and self.nReportId) then
-			local tResult = ChatSystemLib.PrepareInfractionReport(self.nReportId);
-			self:BuildReportConfirmation(tResult.strDescription, tResult.bSuccess);
-		elseif (strButton and string.find(strButton, "BtnMark") ~= 0) then
-			self.unit:SetTargetMarker(tonumber(string.sub(strButton, string.len("BtnMark_"))));
 		end
+		self.unit:SetTargetMarker(nResult);
+	elseif (strButton == "BtnAssist") then
+		GameLib.SetTargetUnit(self.unit:GetTarget());
+	elseif (strButton == "BtnInspect") then
+		self.unit:Inspect();
+	elseif (strButton == "BtnAddFriend") then
+		FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Friend, self.strTarget);
+	elseif (strButton == "BtnUnfriend") then
+	FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Friend);
+	elseif (strButton == "BtnAccountFriend") then
+		FriendshipLib.AccountAddByUpgrade(self.tCharacterData.tFriend.nId);
+	elseif (strButton == "BtnUnaccountFriend") then
+		if (self.tAccountFriend and self.tAccountFriend.nId) then
+			Event_FireGenericEvent("EventGeneric_ConfirmRemoveAccountFriend", self.tAccountFriend.nId);
+		end
+	elseif (strButton == "BtnAddRival") then
+		FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Rival, self.strTarget);
+	elseif (strButton == "BtnUnrival") then
+		FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Rival);
+	elseif (strButton == "BtnAddNeighbor") then
+		HousingLib.NeighborInviteByName(self.strTarget);
+	elseif (strButton == "BtnUnneighbor") then
+		Print(Apollo.GetString("ContextMenu_NeighborRemoveFailed")); -- TODO!
+	elseif (strButton == "BtnIgnore") then
+		FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Ignore, self.strTarget);
+	elseif (strButton == "BtnUnignore") then
+		FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Ignore);
+	elseif (strButton == "BtnDuel") then
+		GameLib.InitiateDuel(self.unit);
+	elseif (strButton == "BtnForfeit") then
+		GameLib.ForfeitDuel(self.unit);
+	elseif (strButton == "BtnTrade") then
+		local eCanTradeResult = P2PTrading.CanInitiateTrade(self.unit);
+		if (eCanTradeResult == P2PTrading.P2PTradeError_Ok) then
+			Event_FireGenericEvent("P2PTradeWithTarget", self.unit);
+		elseif (eCanTradeResult == P2PTrading.P2PTradeError_TargetRangeMax) then
+			Event_FireGenericEvent("GenericFloater", self.unitPlayer, Apollo.GetString("ContextMenu_PlayerOutOfRange"));
+			self.unit:ShowHintArrow();
+		else
+			Event_FireGenericEvent("GenericFloater", self.unitPlayer, Apollo.GetString("ContextMenu_TradeFailed"));
+		end
+	elseif (strButton == "BtnWhisper") then
+		Event_FireGenericEvent("GenericEvent_ChatLogWhisper", self.strTarget);
+	elseif (strButton == "BtnAccountWhisper") then
+		if (self.tCharacterData.tAccountFriend ~= nil and self.tCharacterData.tAccountFriend.arCharacters ~= nil and self.tCharacterData.tAccountFriend.arCharacters[1] ~= nil) then
+			local strDisplayName = self.tCharacterData.tAccountFriend.strCharacterName;
+			local strRealmName = self.tCharacterData.tAccountFriend.arCharacters[1].strRealm;
+			Event_FireGenericEvent("Event_EngageAccountWhisper", strDisplayName, self.strTarget, strRealmName);
+		end
+	elseif (strButton == "BtnInvite") then
+		GroupLib.Invite(self.strTarget);
+	elseif (strButton == "BtnKick") then
+		GroupLib.Kick(self.nGroupMemberId);
+	elseif (strButton == "BtnLeaveGroup") then
+		GroupLib.LeaveGroup();
+	-- TODO
+	elseif (strButton == "BtnPromote") then
+		GroupLib.Promote(self.nGroupMemberId, "");
+	elseif (strButton == "BtnGroupGiveMark") then
+		GroupLib.SetCanMark(self.nGroupMemberId, true);
+	elseif (strButton == "BtnGroupTakeMark") then
+		GroupLib.SetCanMark(self.nGroupMemberId, false);
+	elseif (strButton == "BtnGroupGiveKick") then
+		GroupLib.SetKickPermission(self.nGroupMemberId, true);
+	elseif (strButton == "BtnGroupTakeKick") then
+		GroupLib.SetKickPermission(self.nGroupMemberId, false);
+	elseif (strButton == "BtnGroupGiveInvite") then
+		GroupLib.SetInvitePermission(self.nGroupMemberId, true);
+	elseif (strButton == "BtnGroupTakeInvite") then
+		GroupLib.SetInvitePermission(self.nGroupMemberId, false);
+	elseif (strButton == "BtnLocate") then
+		self.unit:ShowHintArrow();
+	elseif (strButton == "BtnMarkClear") then
+		self.unit:ClearTargetMarker();
+	elseif (strButton == "BtnVoteToDisband") then
+		MatchingGame.InitiateVoteToSurrender();
+	elseif (strButton == "BtnVoteToKick") then
+		MatchingGame.InitiateVoteToKick(self.nGroupMemberId);
+	elseif (strButton == "BtnMentor") then
+		GroupLib.AcceptMentoring(self.unit);
+	elseif (strButton == "BtnStopMentor") then
+		GroupLib.CancelMentoring();
+	elseif (strButton == "BtnReportChat" and self.nReportId) then
+		local tResult = ChatSystemLib.PrepareInfractionReport(self.nReportId);
+		self:BuildReportConfirmation(tResult.strDescription, tResult.bSuccess);
+	elseif (strButton and string.find(strButton, "BtnMark") ~= 0) then
+		self.unit:SetTargetMarker(tonumber(string.sub(strButton, string.len("BtnMark_"))));
 	end
 
 	self:Close(true);
 end
 
 function DropDown:GenerateUnitMenu(unit)
-	self.unit = unit;
+	if (not unit) then return; end
+
+	-- Player
 	self.unitPlayer = GameLib.GetPlayerUnit();
 	self.bInGroup = GroupLib.InGroup();
 	self.bAmIGroupLeader = GroupLib.AmILeader();
 	self.tMyGroupData = GroupLib.GetGroupMember(1);
-	self.strTarget = unit:GetName();
-	self.tCharacterData = GameLib.SearchRelationshipStatusByCharacterName(self.strTarget);
 	self.tPlayerFaction = self.unitPlayer:GetFaction();
-	self.bIsACharacter = unit:IsACharacter();
-	self.bIsThePlayer = unit:IsThePlayer();
-	self.nGroupMemberId = (self.tCharacterData and self.tCharacterData.nPartyIndex) or nil;
-	self.tTargetGroupData = (not self.bIsThePlayer and self.tCharacterData and self.tCharacterData.nPartyIndex) and GroupLib.GetGroupMember(self.tCharacterData.nPartyIndex) or nil;
 
-	-- Mentoring
-	if (self.bInGroup and not self.bIsThePlayer and self.tTargetGroupData) then
-		local bMentoringTarget = false;
-		for _, nMentorIdx in ipairs(self.tTargetGroupData.tMentoredBy) do
-			if (tMyGroupData.nMemberIdx == nMentorIdx) then
-				bMentoringTarget = true;
-				break
-			end
-		end
-
-		if (self.tTargetGroupData.bIsOnline and not bMentoringTarget and self.tTargetGroupData.nLevel < self.tMyGroupData.nLevel) then
-			self.bMentoringTarget = true;
-		end
+	-- Check if Unitstring is the Player (TODO: Can unit string come from another realm?)
+	if (type(unit) == "string" and unit == self.unitPlayer:GetName()) then
+		unit = self.unitPlayer;
 	end
 
-	-- Friend (TODO: Testing)
-	if (self.bIsACharacter) then
-		self.tFriend = self:FindFriend(unit); -- bFriend, bRival, bIgnore
-		if (self.tFriend ~= nil) then
-			self.strTarget = self.tFriend.strCharacterName;
-		end
+	if (type(unit) == "string") then
+		-- Unitless Properties
+		self.unit = nil;
+		self.strTarget = unit;
+		self.bIsACharacter = true; -- TODO
+		self.bIsThePlayer = false;
+	else
+		-- Unit Properties
+		self.unit = unit;
+		self.strTarget = unit:GetName();
+		self.bIsACharacter = unit:IsACharacter();
+		self.bIsThePlayer = unit:IsThePlayer();
+	end
 
-		self.tAccountFriend = self:FindFriend(unit, true);
-		if (self.tAccountFriend ~= nil) then
-			if (self.tAccountFriend.arCharacters and self.tAccountFriend.arCharacters[1] ~= nil) then
-				self.strTarget = self.tAccountFriend.arCharacters[1].strCharacterName;
+	self.tCharacterData = GameLib.SearchRelationshipStatusByCharacterName(self.strTarget);
+
+	if (type(unit) ~= string) then
+		self.nGroupMemberId = (self.tCharacterData and self.tCharacterData.nPartyIndex) or nil;
+		self.tTargetGroupData = (not self.bIsThePlayer and self.tCharacterData and self.tCharacterData.nPartyIndex) and GroupLib.GetGroupMember(self.tCharacterData.nPartyIndex) or nil;
+
+		-- Mentoring
+		if (self.bInGroup and not self.bIsThePlayer and self.tTargetGroupData) then
+			local bMentoringTarget = false;
+			for _, nMentorIdx in ipairs(self.tTargetGroupData.tMentoredBy) do
+				if (tMyGroupData.nMemberIdx == nMentorIdx) then
+					bMentoringTarget = true;
+					break
+				end
+			end
+
+			if (self.tTargetGroupData.bIsOnline and not bMentoringTarget and self.tTargetGroupData.nLevel < self.tMyGroupData.nLevel) then
+				self.bMentoringTarget = true;
 			end
 		end
 
-		self.bCanAccountWisper = (tAccountFriend ~= nil and tAccountFriend.arCharacters and tAccountFriend.arCharacters[1] ~= nil);
-		if (self.bCanAccountWisper) then
-			self.bCanWhisper = (tAccountFriend.arCharacters[1] ~= nil and tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
-		else
-			self.bCanWhisper = (self.bIsACharacter and unit:GetFaction() == self.tPlayerFaction and (tFriend == nil or (tFriend ~= nil and not tFriend.bIgnore)));
-		end
+		-- Friend (TODO: Testing)
+		if (self.bIsACharacter) then
+			self.tFriend = self:FindFriend(self.strTarget); -- bFriend, bRival, bIgnore
+			self.tAccountFriend = self:FindFriend(self.strTarget, true);
 
-		self.bIsFriend = (self.tFriend ~= nil and self.tFriend.bFriend) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bFriend);
-		self.bIsRival = (self.tFriend ~= nil and self.tFriend.bRival) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bRival);
-		self.bIsNeighbor = (self.tFriend ~= nil and self.tFriend.bNeighbor) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bNeighbor);
-		self.bIsAccountFriend = (self.tAccountFriend ~= nil or (self.tCharacterData ~= nil and self.tCharacterData.tAccountFriend ~= nil));
+			self.bCanAccountWisper = (self.tAccountFriend ~= nil and self.tAccountFriend.arCharacters and self.tAccountFriend.arCharacters[1] ~= nil);
+			if (self.bCanAccountWisper) then
+--				self.bCanWhisper = (self.tAccountFriend.arCharacters[1] ~= nil and self.tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
+				self.bCanWhisper = (self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
+			else
+				self.bCanWhisper = (self.bIsACharacter and (not self.unit or (self.unit and self.unit:GetFaction() == self.tPlayerFaction)) and (tFriend == nil or (tFriend ~= nil and not tFriend.bIgnore)));
+			end
+
+			self.bIsFriend = (self.tFriend ~= nil and self.tFriend.bFriend) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bFriend);
+			self.bIsRival = (self.tFriend ~= nil and self.tFriend.bRival) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bRival);
+			self.bIsNeighbor = (self.tFriend ~= nil and self.tFriend.bNeighbor) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bNeighbor);
+			self.bIsAccountFriend = (self.tAccountFriend ~= nil or (self.tCharacterData ~= nil and self.tCharacterData.tAccountFriend ~= nil));
+		end
 	end
 
 	-- PVP
@@ -526,7 +537,7 @@ function DropDown:GenerateUnitMenu(unit)
 	self:CreateWindow();
 
 	if (not self.tParent) then
-		self:AddHeader(unit:GetName());
+		self:AddHeader(self.strTarget);
 		self:AddItems(tMenuItems);
 	end
 
