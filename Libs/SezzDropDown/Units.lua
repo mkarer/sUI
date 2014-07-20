@@ -211,18 +211,6 @@ local tMenuItems = {
 				OnClick = "OnClickUnit",
 			},
 			{
-				Name = "BtnAccountFriend",
-				Text = Apollo.GetString("ContextMenu_PromoteFriend"),
-				Condition = function(self) return (self.bIsFriend and not self.bIsAccountFriend); end,
-				OnClick = "OnClickUnit",
-			},
-			{
-				Name = "BtnUnaccountFriend",
-				Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
-				Condition = function(self) return (self.tAccountFriend and self.bIsAccountFriend); end,
-				OnClick = "OnClickUnit",
-			},
-			{
 				Name = "BtnAddRival",
 				Text = Apollo.GetString("ContextMenu_AddRival"),
 				Condition = function(self) return (not self.bIsRival); end,
@@ -244,6 +232,18 @@ local tMenuItems = {
 				Name = "BtnUnneighbor",
 				Text = Apollo.GetString("ContextMenu_RemoveNeighbor"),
 				Condition = function(self) return (self.bIsNeighbor and not self.tAccountFriend); end,
+				OnClick = "OnClickUnit",
+			},
+			{
+				Name = "BtnAccountFriend",
+				Text = Apollo.GetString("ContextMenu_PromoteFriend"),
+				Condition = function(self) return (self.bIsFriend and not self.bIsAccountFriend); end,
+				OnClick = "OnClickUnit",
+			},
+			{
+				Name = "BtnUnaccountFriend",
+				Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
+				Condition = function(self) return (self.tAccountFriend and self.bIsAccountFriend); end,
 				OnClick = "OnClickUnit",
 			},
 		},
