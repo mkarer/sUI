@@ -29,8 +29,11 @@ S.DB = {
 			Filter = {
 				[70391] = true, -- Authentication Dividends
 			}
-		}
-
+		},
+		-- Auction House
+		AutoLootMail = {
+			bEnabled = true,
+		},
 	},
 
 	-- Hide Windows from Window Management
