@@ -15,7 +15,7 @@ local NAME = string.match(MAJOR, ":(%a+)\-");
 local DropDown = APkg and APkg.tPackage or {};
 local GeminiGUI, GeminiLogging, log;
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading;
-local max, strlen = math.max, string.len;
+local max, strlen, ceil = math.max, string.len, math.ceil;
 
 -----------------------------------------------------------------------------
 
@@ -88,6 +88,36 @@ local tWDefDropDownButton = {
 	},
 };
 
+local tWDefDropDownIconCheckbox = {
+	WidgetType = "CheckBox",
+	Name = "IconCheckbox",
+	Base = "BK3:btnHolo_ListView_Mid",
+	RadioGroup = "ContextMenuPlayer_MarkerIcons_GlobalRadioGroup", -- TODO
+	NormalTextColor = "UI_BtnTextGrayListNormal",
+	AnchorPoints = { 0, 0, 0, 0 },
+	AnchorOffsets = { 0, 0, 37, 37 },
+	Overlapped = true,
+	Border = false,
+	DrawAsCheckbox = false,
+	Children = {
+		{
+			Name = "ZIndexFix", -- TODO
+			AnchorPoints = { 0, 0, 1, 1 },
+			AnchorOffsets = { 0, 0, 0, 0 },
+			IgnoreMouse = true,
+			Children = {
+				{
+					Name = "Icon",
+					AnchorPoints = { 0, 0, 1, 1 },
+					AnchorOffsets = { 4, 4, -4, -4 },
+					Picture = true,
+					IgnoreMouse = true,
+				},
+			},
+		},
+	},
+};
+
 local tWDefDropDownSeparator = {
 	Name = "Separator",
 	Picture = true,
@@ -116,11 +146,14 @@ end
 
 function DropDown:Init(strType, oData)
 	-- Cleanup
+	self.bIsIconList = false;
+	self.bUpdatedPosition = false;
+
 	if (self.wndMain and self.wndMain:IsValid()) then
 		self.wndMain:Destroy();
 	end
 
-	-- Initialize
+	-- Initialize Data
 	if (strType == "Unit" and oData) then
 		self:GenerateUnitMenu(oData);
 	end
@@ -132,9 +165,10 @@ function DropDown:AddHeader(strTitle)
 	if (not strTitle or strlen(strTitle) == 0) then return; end
 
 	local wndTitle = GeminiGUI:Create(tWDefMenuTitle):GetInstance(self, self.wndButtonList);
-	
+
 	self.tAnchorOffsets[3] = max(150, Apollo.GetTextWidth(tWDefMenuTitle.Font, strTitle) + 10);
 	wndTitle:SetText(strTitle);
+	self.bHasHeader = true;
 end
 
 function DropDown:AddItems(tItems)
@@ -142,17 +176,26 @@ function DropDown:AddItems(tItems)
 	if (type(tItems) ~= "table") then return; end
 
 	for _, tButton in ipairs(tItems) do
---log:debug(tButton.Name)
+log:debug(tButton.Name)
 
 		if (not tButton.Condition or tButton.Condition(self)) then
-			if (tButton.Text) then
-				local wndButton = GeminiGUI:Create(tWDefDropDownButton):GetInstance(self, self.wndButtonList);
+			if (tButton.Text or tButton.Icon) then
+				local wndButton = GeminiGUI:Create(tButton.Icon and tWDefDropDownIconCheckbox or tWDefDropDownButton):GetInstance(self, self.wndButtonList);
 
 				if (tButton.Name) then
 					wndButton:SetName(tButton.Name)
 				end
 
-				wndButton:SetText(tButton.Text);
+				if (tButton.Text) then
+					wndButton:SetText(tButton.Text);
+				end
+
+				-- Icon Checkbox
+				if (tButton.Icon) then
+					wndButton:FindChild("Icon"):SetSprite(tButton.Icon);
+					wndButton:SetCheck(tButton.Checked and tButton.Checked(self));
+					self.bIsIconList = true;
+				end
 
 				-- Click Event
 				if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
@@ -184,9 +227,26 @@ function DropDown:AddItems(tItems)
 	end
 end
 
-function DropDown:Show()
-	self.tAnchorOffsets[4] = self.tAnchorOffsets[2] + self.wndButtonList:ArrangeChildrenVert(0);
-	self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
+function DropDown:Position()
+	-- Resize
+	if (self.bIsIconList) then
+		-- Checkbox Icons
+		local nHeight = ceil(#self.wndButtonList:GetChildren() / 3) * tWDefDropDownIconCheckbox.AnchorOffsets[4];
+
+		if (self.bHasHeader) then
+			nHeight = nHeight + tWDefMenuTitle.AnchorOffsets[4];
+		else
+			self.tAnchorOffsets[3] = 3 * tWDefDropDownIconCheckbox.AnchorOffsets[3];
+		end
+
+		self.tAnchorOffsets[4] = nHeight;
+		self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
+		self.wndButtonList:ArrangeChildrenTiles(0);
+	else
+		-- Default Menu
+		self.tAnchorOffsets[4] = self.tAnchorOffsets[2] + self.wndButtonList:ArrangeChildrenVert(0);
+		self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
+	end
 
 	local nPosX, nPosY;
 
@@ -201,6 +261,15 @@ function DropDown:Show()
 
 	self.wndMain:Move(nPosX, nPosY, self.wndMain:GetWidth(), self.wndMain:GetHeight());
 	self:CheckWindowBounds();
+
+	self.bUpdatedPosition = true;
+end
+
+function DropDown:Show()
+	if (not self.bUpdatedPosition) then
+		self:Position();
+	end
+
 	self.wndMain:Show(true, true);
 	self.wndMain:ToFront();
 	self.wndMain:Enable(true)
