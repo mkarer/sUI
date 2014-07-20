@@ -494,6 +494,9 @@ log:debug("OnNewContextMenuPlayer");
 
 	function tDropDown:OnNewContextMenuPlayerDetailed(wndParent, strTarget, unitTarget, nReportId)
 log:debug("OnNewContextMenuPlayerDetailed");
+		if (self:Init("Unit", unitTarget or strTarget)) then
+			self:Show();
+		end
 	end
 
 	function tDropDown:OnNewContextMenuFriend(wndParent, nFriendId)

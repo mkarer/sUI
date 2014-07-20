@@ -104,6 +104,13 @@ local tMenuItems = {
 		Condition = function(self) return (self.unit and (not self.unitPlayer:GetAlternateTarget() or self.unit:GetId() ~= self.unitPlayer:GetAlternateTarget():GetId())); end,
 		OnClick = "OnClickUnit",
 	},
+	-- Inspect
+	{
+		Name = "BtnInspect",
+		Text = Apollo.GetString("ContextMenu_Inspect"),
+		Condition = function(self) return (self.unit and self.bIsACharacter); end,
+		OnClick = "OnClickUnit",
+	},
 	-- Group (Mentor/Locate/etc.)
 	{
 		Name = "BtnGroupList",
@@ -184,12 +191,6 @@ local tMenuItems = {
 				Condition = function(self) return (self.unit and self.tTargetGroupData); end,
 			},
 		},
-	},
-	{
-		Name = "BtnInspect",
-		Text = Apollo.GetString("ContextMenu_Inspect"),
-		Condition = function(self) return (self.unit and self.bIsACharacter); end,
-		OnClick = "OnClickUnit",
 	},
 	-- Social
 	{
