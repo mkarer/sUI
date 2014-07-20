@@ -373,7 +373,6 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 			GameLib.SetTargetUnit(self.unit:GetTarget());
 		elseif (strButton == "BtnInspect") then
 			self.unit:Inspect();
-		elseif (strButton == "BtnSocialList") then
 		elseif (strButton == "BtnAddFriend") then
 			FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Friend, self.strTarget);
 		elseif (strButton == "BtnUnfriend") then

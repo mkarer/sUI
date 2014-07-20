@@ -184,9 +184,11 @@ log:debug(tButton.Name)
 				local bCreateButton = true;
 				local bHasVisibleChildren = (tButton.Children and #tButton.Children > 0);
 				if (bHasVisibleChildren) then
+					bHasVisibleChildren = false;
+
 					for _, tChild in ipairs(tButton.Children) do
-						if (tChild.Condition and not tChild.Condition(self)) then
-							bHasVisibleChildren = false;
+						if (tChild.Condition and tChild.Condition(self)) then
+							bHasVisibleChildren = true;
 							break;
 						end
 					end
