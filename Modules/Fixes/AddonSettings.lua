@@ -127,29 +127,70 @@ function M:UpdateDatachronForms()
 			local tXml = self.xmlDoc:ToTable();
 			S:UpdateElementInXml(tXml, "Framing", { Sprite = "" });
 			S:UpdateElementInXml(tXml, "Datachron", { Sprite = "" });
-			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
-		end
-	end
+			S:UpdateElementInXml(tXml, "QueuedCallsContainer", { Template = "Default" });
 
-	local tDatachronScientist = Apollo.GetAddon("PathScientistContent");
-
-	if (tDatachronScientist and not tDatachronScientist._OnLoad) then
-		tDatachronScientist._OnLoad = tDatachronScientist.OnLoad;
-		tDatachronScientist.OnLoad = function(self)
-			self:_OnLoad();
-
-			local tXml = self.xmlDoc:ToTable();
-			S:UpdateElementInXml(tXml, "ScientistDatachron", { Template = "Default" });
-			S:UpdateElementInXml(tXml, "DatachronScientistBottom", { Sprite = "" });
 			self.xmlDoc = XmlDoc.CreateFromTable(tXml);
 		end
 
-		tDatachronScientist._OnLoadFromDatachron = tDatachronScientist.OnLoadFromDatachron;
-		tDatachronScientist.OnLoadFromDatachron = function(self)
-			tDatachronScientist:_OnLoadFromDatachron();
-			self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+		tDatachron._OnDocumentReady = tDatachron.OnDocumentReady;
+		tDatachron.OnDocumentReady = function(self)
+			self:_OnDocumentReady();
+			g_wndDatachron:DestroyAllPixies();
+			g_wndDatachron:FindChild("QueuedCallsContainer"):DestroyPixie(1);
 		end
 	end
+
+	local StylePath = function(strPathName)
+		local tDatachronPath = Apollo.GetAddon(string.format("Path%sContent", strPathName));
+
+		if (tDatachronPath and not tDatachronPath._OnLoad) then
+			tDatachronPath._OnLoad = tDatachronPath.OnLoad;
+			tDatachronPath.OnLoad = function(self)
+				self:_OnLoad();
+
+				local tXml = self.xmlDoc:ToTable();
+				S:UpdateElementInXml(tXml, string.format("%sDatachron", strPathName), { Template = "Default" });
+				S:UpdateElementInXml(tXml, string.format("Path%sMain", strPathName), { Template = "Default" });
+				S:UpdateElementInXml(tXml, "MissionList", { Template = "Default" });
+				S:UpdateElementInXml(tXml, "DatachronScientistBottom", { Sprite = "" });
+				S:UpdateElementInXml(tXml, "MissionsRemainingScreen", { Sprite = "" });
+				S:UpdateElementInXml(tXml, "BGGlow", { Sprite = "" });
+				S:UpdateElementInXml(tXml, "BGRunner", { Sprite = "" });
+				S:UpdateElementInXml(tXml, "Framing", { Sprite = "" });
+
+				-- Soldier
+				if (strPathName == "Soldier") then
+					S:UpdateElementInXml(tXml, "SolResult", { Template = "Default" });
+
+					local tXmlNewMissions = S:FindElementInXml(tXml, "ActiveMissionsHeader");
+					if (tXmlNewMissions) then
+						S:UpdateElementInXml(tXmlNewMissions, "Pixie2", { Sprite = "" });
+						S:UpdateElementInXml(tXmlNewMissions, "Pixie3", { Sprite = "" });
+					end
+
+					local tXmlAvailableMissions = S:FindElementInXml(tXml, "AvailableMissionsHeader");
+					if (tXmlAvailableMissions) then
+						S:UpdateElementInXml(tXmlAvailableMissions, "Pixie2", { Sprite = "" });
+						S:UpdateElementInXml(tXmlAvailableMissions, "Pixie3", { Sprite = "" });
+					end
+				end
+
+
+				self.xmlDoc = XmlDoc.CreateFromTable(tXml);
+			end
+
+			tDatachronPath._OnLoadFromDatachron = tDatachronPath.OnLoadFromDatachron;
+			tDatachronPath.OnLoadFromDatachron = function(self)
+				tDatachronPath:_OnLoadFromDatachron();
+				self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+			end
+		end
+	end
+
+	StylePath("Scientist");
+	StylePath("Explorer");
+	StylePath("Soldier");
+	StylePath("Settler");
 end
 
 -----------------------------------------------------------------------------
