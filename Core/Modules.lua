@@ -27,6 +27,9 @@ local tModulePrototype = {
 		end
 
 		self.xmlDoc = XmlDoc.CreateFromFile(strModulePath.."/"..self:GetName()..".xml");
+		if (self.OnDocumentReady) then
+			self.xmlDoc:RegisterCallback("OnDocumentReady", self);
+		end
 	end,
 	-- Callback when external addon is fully loaded
 	-- Supports only one function at the moment
