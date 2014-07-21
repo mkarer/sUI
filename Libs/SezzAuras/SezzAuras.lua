@@ -218,12 +218,16 @@ end
 -----------------------------------------------------------------------------
 
 function Auras:OnLoad()
-	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
-	log = GeminiLogging:GetLogger({
-		level = GeminiLogging.DEBUG,
-		pattern = "%d %n %c %l - %m",
-		appender = "GeminiConsole"
-	});
+	local GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2") and Apollo.GetAddon("GeminiConsole") and Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
+	if (GeminiLogging) then
+		log = GeminiLogging:GetLogger({
+			level = GeminiLogging.DEBUG,
+			pattern = "%d %n %c %l - %m",
+			appender ="GeminiConsole"
+		});
+	else
+		log = setmetatable({}, { __index = function() return function(self, ...) local args = #{...}; if (args > 1) then Print(string.format(...)); elseif (args == 1) then Print(tostring(...)); end; end; end });
+	end
 end
 
 function Auras:OnDependencyError(strDep, strError)
@@ -232,4 +236,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(Auras, MAJOR, MINOR, { "Gemini:Logging-1.2" });
+Apollo.RegisterPackage(Auras, MAJOR, MINOR, {});

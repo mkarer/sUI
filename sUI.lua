@@ -18,12 +18,11 @@ local kstrAddon = "SezzUI";
 local kiVersionData = { 0, 0, 1 };
 local kstrVersion = "v"..kiVersionData[1].."."..kiVersionData[2].."."..kiVersionData[3];
 local ktDependencies = {
-	"GeminiConsole",
+	"GameExit", -- Adding a dependency makes the addon load sooner, required to hook Carbine addons' OnLoad...
 };
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, true, ktDependencies, "Gemini:Hook-1.0", "Gemini:Event-1.0", "Gemini:Timer-1.0");
 local log;
-local GeminiLogging;
 
 -----------------------------------------------------------------------------------------------
 -- Initialization
@@ -54,15 +53,21 @@ end
 
 function S:OnInitialize()
 	-- Libraries
-	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
-	S.Log = GeminiLogging:GetLogger({
-		level = GeminiLogging.DEBUG,
-		pattern = "%d %n %c %l - %m",
-		appender = "GeminiConsole"
-	});
+	local GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2") and Apollo.GetAddon("GeminiConsole") and Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
+	if (GeminiLogging) then
+		S.Log = GeminiLogging:GetLogger({
+			level = GeminiLogging.DEBUG,
+			pattern = "%d %n %c %l - %m",
+			appender ="GeminiConsole"
+		});
+
+		S.Log._debug = S.Log.debug;
+		S.Log.debug = logDebug;
+	else
+		S.Log = setmetatable({debug = logDebug}, { __index = function(t, k) local f = rawget(t, k); if (f) then return f; else return function(self, ...) local args = #{...}; if (args > 1) then Print(string.format(...)); elseif (args == 1) then Print(tostring(...)); end; end; end; end });
+	end
+
 	log = S.Log;
-	log._debug = log.debug;
-	log.debug = logDebug;
 	log:debug(kstrAddon.." "..kstrVersion);
 
 	-- Media

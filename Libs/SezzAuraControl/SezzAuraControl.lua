@@ -252,12 +252,16 @@ end
 -----------------------------------------------------------------------------
 
 function AuraControl:OnLoad()
-	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
-	log = GeminiLogging:GetLogger({
-		level = GeminiLogging.DEBUG,
-		pattern = "%d %n %c %l - %m",
-		appender = "GeminiConsole"
-	});
+	local GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2") and Apollo.GetAddon("GeminiConsole") and Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
+	if (GeminiLogging) then
+		log = GeminiLogging:GetLogger({
+			level = GeminiLogging.DEBUG,
+			pattern = "%d %n %c %l - %m",
+			appender ="GeminiConsole"
+		});
+	else
+		log = setmetatable({}, { __index = function() return function(self, ...) local args = #{...}; if (args > 1) then Print(string.format(...)); elseif (args == 1) then Print(tostring(...)); end; end; end });
+	end
 
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 	Apollo.GetPackage("Gemini:Timer-1.0").tPackage:Embed(self);
@@ -269,4 +273,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(AuraControl, MAJOR, MINOR, { "Gemini:Logging-1.2", "Gemini:GUI-1.0", "Gemini:Timer-1.0" });
+Apollo.RegisterPackage(AuraControl, MAJOR, MINOR, { "Gemini:GUI-1.0", "Gemini:Timer-1.0" });

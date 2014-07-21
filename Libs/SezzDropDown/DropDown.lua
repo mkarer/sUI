@@ -473,15 +473,15 @@ end
 -----------------------------------------------------------------------------
 
 function DropDown:OnLoad()
-	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
-	if (GeminiLogging and Apollo.GetAddon("GeminiConsole")) then
+	local GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2") and Apollo.GetAddon("GeminiConsole") and Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
+	if (GeminiLogging) then
 		log = GeminiLogging:GetLogger({
 			level = GeminiLogging.DEBUG,
 			pattern = "%d %n %c %l - %m",
-			appender = "GeminiConsole"
+			appender ="GeminiConsole"
 		});
 	else
-		log = setmetatable({}, { __index = function() return function(o) Print(tostring(o)); end; end });
+		log = setmetatable({}, { __index = function() return function(self, ...) local args = #{...}; if (args > 1) then Print(string.format(...)); elseif (args == 1) then Print(tostring(...)); end; end; end });
 	end
 
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;

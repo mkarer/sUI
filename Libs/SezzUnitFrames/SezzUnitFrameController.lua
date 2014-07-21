@@ -281,12 +281,16 @@ function UnitFrameController:New(tCustomColors)
 end
 
 function UnitFrameController:OnLoad()
-	GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
-	log = GeminiLogging:GetLogger({
-		level = GeminiLogging.DEBUG,
-		pattern = "%d %n %c %l - %m",
-		appender = "GeminiConsole"
-	});
+	local GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2") and Apollo.GetAddon("GeminiConsole") and Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
+	if (GeminiLogging) then
+		log = GeminiLogging:GetLogger({
+			level = GeminiLogging.DEBUG,
+			pattern = "%d %n %c %l - %m",
+			appender ="GeminiConsole"
+		});
+	else
+		log = setmetatable({}, { __index = function() return function(self, ...) local args = #{...}; if (args > 1) then Print(string.format(...)); elseif (args == 1) then Print(tostring(...)); end; end; end });
+	end
 
 	UnitFrame = Apollo.GetPackage("Sezz:UnitFrame-0.2").tPackage;
 end
@@ -297,4 +301,4 @@ end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Sezz:UnitFrame-0.2", "Gemini:Logging-1.2", "Gemini:Event-1.0", "Gemini:GUI-1.0" });
+Apollo.RegisterPackage(UnitFrameController, MAJOR, MINOR, { "Sezz:UnitFrame-0.2", "Gemini:Event-1.0", "Gemini:GUI-1.0" });
