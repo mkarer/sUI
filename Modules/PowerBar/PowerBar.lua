@@ -100,7 +100,6 @@ function M:ReloadConfiguration()
 	if (cfg.numButtons > 0) then
 		for i = 1, cfg.numButtons do
 			local button = Apollo.LoadForm(self.xmlDoc, "PowerButton", self.wndAnchor, self);
-			button:SetName("PowerButton"..i);
 
 			if (i > 1) then
 				local nAnchorOffsetLeft = (i - 1) * (self.DB.buttonSize + self.DB.buttonPadding);
@@ -114,12 +113,12 @@ function M:ReloadConfiguration()
 	-- Create Bar
 	if (cfg.barEnabled) then
 		local bar = Apollo.LoadForm(self.xmlDoc, "PowerBar", self.wndAnchor, self);
-		bar:SetName("PowerBar1");
 
 		local nAnchorOffsetTop = self.DB.buttonSize + self.DB.buttonPadding;
 		bar:SetAnchorOffsets(0, nAnchorOffsetTop, 0, nAnchorOffsetTop + self.DB.barHeight);
 
-		self.PowerBar = bar;
+		self.wndPowerBar = bar;
+		self.wndPowerBarProgress = bar:FindChild("Progress");
 	end
 
 	-- Add Events
@@ -145,7 +144,6 @@ end
 
 function M:UpdatePower()
 	if (not S.inCombat and not self.DB.alwaysVisible) then return; end
-	log:debug("UpdatePower");
 
 	-- Buttons
 	if (cfg.numButtons > 0) then
@@ -163,18 +161,15 @@ function M:UpdatePower()
 	end
 
 	-- Bar
-	if (cfg.barEnabled) then
+	if (cfg.barEnabled and self.wndPowerBarProgress) then
 		local powerCurrent, powerMax = cfg.barPowerFunc();
 		log:debug("Power Bar: %d/%d", powerCurrent, powerMax);
-		self.PowerBar:FindChild("Progress"):SetMax(powerMax);
-		self.PowerBar:FindChild("Progress"):SetProgress(powerCurrent);
+		self.wndPowerBarProgress:SetMax(powerMax);
+		self.wndPowerBarProgress:SetProgress(powerCurrent);
 	end
-
-	log:debug("UpdatePower Done");
 end
 
 function M:ChangeVisibility()
-	log:debug("ChangeVisibility: %s", S.inCombat and "TRUE" or "FALSE")
 	self.wndAnchor:Show(S.inCombat, false, S.inCombat and 0.2 or 0.5);
 end
 
