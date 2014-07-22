@@ -1,6 +1,8 @@
 --[[
 
-	s:UI Drop Down Menu: Units
+	s:UI Context Menu: Units (and Friends)
+
+	TODO: BIG FAT conditions cleanup. (Took most of them from ContextMenuPlayer)
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
@@ -13,9 +15,6 @@ if (DropDown and (DropDown.nVersion or 0) > MINOR) then return; end
 
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame;
 local strfind, tonumber = string.find, tonumber;
-
---local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
---local log = S.Log;
 
 -----------------------------------------------------------------------------
 -- Menu Items
@@ -117,7 +116,7 @@ local tMenuItems = {
 	{
 		Name = "BtnGroupList",
 		Text = Apollo.GetString("ChatType_Party"),
-		Condition = function(self) return (self.bInGroup and self.bIsACharacter); end,
+		Condition = function(self) return (self.bInGroup and self.bIsACharacter and not self.bIsOfflineAccountFriend); end,
 		Children = {
 			{
 				Name = "BtnLocate",
@@ -252,7 +251,7 @@ local tMenuItems = {
 			{
 				Name = "BtnUnaccountFriend",
 				Text = Apollo.GetString("ContextMenu_UnaccountFriend"),
-				Condition = function(self) return (self.tAccountFriend and self.bIsAccountFriend); end,
+				Condition = function(self) return (self.tAccountFriend ~= nil); end,
 				OnClick = "OnClickUnit",
 			},
 		},
@@ -502,6 +501,26 @@ function DropDown:GenerateUnitMenu(unit)
 		unit = self.unitPlayer;
 	end
 
+	-- Friend IDs
+	if (type(unit) == "number") then
+		self.bFriendMenu = true;
+		self.nFriendId = unit;
+		self.tFriend = FriendshipLib.GetById(unit);
+		self.tAccountFriend = FriendshipLib.GetAccountById(unit);
+
+		if (self.tFriend) then
+			unit = self.tFriend.strCharacterName;
+		elseif (self.tAccountFriend) then
+			if (self.tAccountFriend.arCharacters and self.tAccountFriend.arCharacters[1]) then
+				unit = self.tAccountFriend.arCharacters[1].strCharacterName;
+			else
+				-- Offline Account Friend
+				self.bIsOfflineAccountFriend = true;
+				unit = self.tAccountFriend.strCharacterName;
+			end
+		end
+	end
+
 	if (type(unit) == "string") then
 		-- Unitless Properties
 		self.unit = nil;
@@ -517,44 +536,44 @@ function DropDown:GenerateUnitMenu(unit)
 	end
 
 	self.tCharacterData = GameLib.SearchRelationshipStatusByCharacterName(self.strTarget);
+	self.nGroupMemberId = (self.tCharacterData and self.tCharacterData.nPartyIndex) or nil;
+	self.tTargetGroupData = (not self.bIsThePlayer and self.tCharacterData and self.tCharacterData.nPartyIndex) and GroupLib.GetGroupMember(self.tCharacterData.nPartyIndex) or nil;
 
-	if (type(unit) ~= string) then
-		self.nGroupMemberId = (self.tCharacterData and self.tCharacterData.nPartyIndex) or nil;
-		self.tTargetGroupData = (not self.bIsThePlayer and self.tCharacterData and self.tCharacterData.nPartyIndex) and GroupLib.GetGroupMember(self.tCharacterData.nPartyIndex) or nil;
-
-		-- Mentoring
-		if (self.bInGroup and not self.bIsThePlayer and self.tTargetGroupData) then
-			local bMentoringTarget = false;
-			for _, nMentorIdx in ipairs(self.tTargetGroupData.tMentoredBy) do
-				if (tMyGroupData.nMemberIdx == nMentorIdx) then
-					bMentoringTarget = true;
-					break
-				end
-			end
-
-			if (self.tTargetGroupData.bIsOnline and not bMentoringTarget and self.tTargetGroupData.nLevel < self.tMyGroupData.nLevel) then
-				self.bMentoringTarget = true;
+	-- Mentoring
+	if (self.bInGroup and not self.bIsThePlayer and self.tTargetGroupData) then
+		local bMentoringTarget = false;
+		for _, nMentorIdx in ipairs(self.tTargetGroupData.tMentoredBy) do
+			if (tMyGroupData.nMemberIdx == nMentorIdx) then
+				bMentoringTarget = true;
+				break
 			end
 		end
 
-		-- Friend (TODO: Testing)
-		if (self.bIsACharacter) then
+		if (self.tTargetGroupData.bIsOnline and not bMentoringTarget and self.tTargetGroupData.nLevel < self.tMyGroupData.nLevel) then
+			self.bMentoringTarget = true;
+		end
+	end
+
+	-- Friend (TODO: Testing)
+	if (self.bIsACharacter) then
+		if (not self.bFriendMenu) then
 			self.tFriend = self:FindFriend(self.strTarget); -- bFriend, bRival, bIgnore
 			self.tAccountFriend = self:FindFriend(self.strTarget, true);
-
-			self.bCanAccountWisper = (self.tAccountFriend ~= nil and self.tAccountFriend.arCharacters and self.tAccountFriend.arCharacters[1] ~= nil);
-			if (self.bCanAccountWisper) then
---				self.bCanWhisper = (self.tAccountFriend.arCharacters[1] ~= nil and self.tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
-				self.bCanWhisper = (self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
-			else
-				self.bCanWhisper = (self.bIsACharacter and (not self.unit or (self.unit and self.unit:GetFaction() == self.tPlayerFaction)) and (self.tFriend == nil or (self.tFriend ~= nil and not self.tFriend.bIgnore)));
-			end
-
-			self.bIsFriend = (self.tFriend ~= nil and self.tFriend.bFriend) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bFriend);
-			self.bIsRival = (self.tFriend ~= nil and self.tFriend.bRival) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bRival);
-			self.bIsNeighbor = (self.tFriend ~= nil and self.tFriend.bNeighbor) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bNeighbor);
-			self.bIsAccountFriend = (self.tAccountFriend ~= nil or (self.tCharacterData ~= nil and self.tCharacterData.tAccountFriend ~= nil));
+			self.nFriendId = (self.tFriend and self.tFriend.nId) or (self.tAccountFriend and self.tAccountFriend.nId) or nil;
 		end
+
+		self.bCanAccountWisper = not self.bIsOfflineAccountFriend and (self.tAccountFriend ~= nil and self.tAccountFriend.arCharacters and self.tAccountFriend.arCharacters[1] ~= nil);
+		if (self.bCanAccountWisper) then
+--			self.bCanWhisper = (self.tAccountFriend.arCharacters[1] ~= nil and self.tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
+			self.bCanWhisper = (self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
+		else
+			self.bCanWhisper = not self.bIsOfflineAccountFriend and (self.bIsACharacter and (not self.unit or (self.unit and self.unit:GetFaction() == self.tPlayerFaction)) and (self.tFriend == nil or (self.tFriend ~= nil and not self.tFriend.bIgnore)));
+		end
+
+		self.bIsFriend = (self.tFriend ~= nil and self.tFriend.bFriend) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bFriend);
+		self.bIsRival = (self.tFriend ~= nil and self.tFriend.bRival) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bRival);
+		self.bIsNeighbor = (self.tFriend ~= nil and self.tFriend.bNeighbor) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bNeighbor);
+		self.bIsAccountFriend = (self.tAccountFriend ~= nil or (self.tCharacterData ~= nil and self.tCharacterData.tAccountFriend ~= nil));
 	end
 
 	-- PVP
@@ -571,3 +590,8 @@ function DropDown:GenerateUnitMenu(unit)
 
 	return self;
 end
+
+--[[
+local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
+local log = S.Log;
+]]
