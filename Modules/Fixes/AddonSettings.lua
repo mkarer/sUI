@@ -151,6 +151,7 @@ function M:UpdateDatachronForms()
 				local tXml = self.xmlDoc:ToTable();
 				S:UpdateElementInXml(tXml, string.format("%sDatachron", strPathName), { Template = "Default" });
 				S:UpdateElementInXml(tXml, string.format("Path%sMain", strPathName), { Template = "Default" });
+				S:UpdateElementInXml(tXml, string.format("%sMain", strPathName), { Template = "Default" });
 				S:UpdateElementInXml(tXml, "MissionList", { Template = "Default" });
 				S:UpdateElementInXml(tXml, "DatachronScientistBottom", { Sprite = "" });
 				S:UpdateElementInXml(tXml, "MissionsRemainingScreen", { Sprite = "" });
@@ -158,20 +159,37 @@ function M:UpdateDatachronForms()
 				S:UpdateElementInXml(tXml, "BGRunner", { Sprite = "" });
 				S:UpdateElementInXml(tXml, "Framing", { Sprite = "" });
 
-				-- Soldier
-				if (strPathName == "Soldier") then
-					S:UpdateElementInXml(tXml, "SolResult", { Template = "Default" });
+				local tXmlNewMissions = S:FindElementInXml(tXml, "ActiveMissionsHeader");
+				if (tXmlNewMissions) then
+					S:UpdateElementInXml(tXmlNewMissions, "Pixie2", { Sprite = "" });
+					S:UpdateElementInXml(tXmlNewMissions, "Pixie3", { Sprite = "" });
+				end
 
-					local tXmlNewMissions = S:FindElementInXml(tXml, "ActiveMissionsHeader");
-					if (tXmlNewMissions) then
-						S:UpdateElementInXml(tXmlNewMissions, "Pixie2", { Sprite = "" });
-						S:UpdateElementInXml(tXmlNewMissions, "Pixie3", { Sprite = "" });
+				local tXmlAvailableMissions = S:FindElementInXml(tXml, "AvailableMissionsHeader");
+				if (tXmlAvailableMissions) then
+					S:UpdateElementInXml(tXmlAvailableMissions, "Pixie2", { Sprite = "" });
+					S:UpdateElementInXml(tXmlAvailableMissions, "Pixie3", { Sprite = "" });
+				end
+
+				-- Path-specific
+				if (strPathName == "Soldier") then
+					-- Soldier
+					S:UpdateElementInXml(tXml, "SolResult", { Template = "Default" });
+				elseif (strPathName == "Explorer") then
+					-- Explorer
+					local tXmlMissionsNotification = S:FindElementInXml(tXml, "MissionNotification");
+					if (tXmlMissionsNotification) then
+						S:UpdateElementInXml(tXmlMissionsNotification, "LootEpBG", { Sprite = "" });
 					end
 
-					local tXmlAvailableMissions = S:FindElementInXml(tXml, "AvailableMissionsHeader");
-					if (tXmlAvailableMissions) then
-						S:UpdateElementInXml(tXmlAvailableMissions, "Pixie2", { Sprite = "" });
-						S:UpdateElementInXml(tXmlAvailableMissions, "Pixie3", { Sprite = "" });
+					local tXmlMissionsRemaining = S:FindElementInXml(tXml, "MissionsRemainingScreen");
+					if (tXmlMissionsRemaining) then
+						S:UpdateElementInXml(tXmlMissionsRemaining, "LootEpBG", { Sprite = "" });
+					end
+
+					local tXmlMissionsCompleted = S:FindElementInXml(tXml, "CompletedScreen");
+					if (tXmlMissionsCompleted) then
+						S:UpdateElementInXml(tXmlMissionsCompleted, "LootEpBG", { Sprite = "" });
 					end
 				end
 
@@ -182,7 +200,9 @@ function M:UpdateDatachronForms()
 			tDatachronPath._OnLoadFromDatachron = tDatachronPath.OnLoadFromDatachron;
 			tDatachronPath.OnLoadFromDatachron = function(self)
 				tDatachronPath:_OnLoadFromDatachron();
-				self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+				if (self.wndMain) then
+					self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+				end
 			end
 		end
 	end
