@@ -178,7 +178,6 @@ function DropDown:AddItems(tItems)
 
 	for _, tButton in ipairs(tItems) do
 --log:debug(tButton.Name)
-
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text or tButton.Icon) then
 				-- Children
@@ -304,7 +303,7 @@ function DropDown:ShowSubMenu(wndHandler, wndControl)
 
 	if (not tSubMenu) then
 		tSubMenu = DropDown:New(self, wndHandler);
-		tSubMenu:Init("Unit", self.unit or self.strTarget); -- TODO
+		tSubMenu:Init("Unit", self.nFriendId or self.unit or self.strTarget); -- TODO
 		tSubMenu:AddItems(wndHandler:GetData());
 		self.tChildren[strName] = tSubMenu;
 	end
@@ -507,20 +506,8 @@ log:debug("OnNewContextMenuPlayerDetailed");
 	end
 
 	function tDropDown:OnNewContextMenuFriend(wndParent, nFriendId)
-log:debug("OnNewContextMenuFriend");
-		local bInitialized = false;
-		local tFriend = FriendshipLib.GetById(nFriendId);
-
-		if (tFriend) then
-			bInitialized = self:Init("Unit", tFriend.strCharacterName);
-		else
-			tFriend = FriendshipLib.GetAccountById(nFriendId);
-			if (tFriend and tFriend.arCharacters and tFriend.arCharacters[1]) then
-				bInitialized = self:Init("Unit", tFriend.arCharacters[1].strCharacterName);
-			end
-		end
-
-		if (bInitialized) then
+log:debug("OnNewContextMenuFriend (ID: %d)", nFriendId or 0);
+		if (self:Init("Unit", nFriendId)) then
 			self:Show();
 		end
 	end
