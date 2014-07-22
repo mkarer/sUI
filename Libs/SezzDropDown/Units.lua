@@ -24,10 +24,8 @@ local tMenuItems = {
 		Name = "BtnMarkTarget",
 		Text = Apollo.GetString("ContextMenu_MarkTarget"),
 		Condition = function(self) return (self.bInGroup and self.tMyGroupData.bCanMark and self.unit); end,
---		Condition = function(self) return not self.bInGroup or (self.bInGroup and self.tMyGroupData.bCanMark); end,
 		OnClick = "OnClickUnit",
 		Children = {
-			-- TODO
 			{
 				Name = "BtnMark1",
 				Icon = "Icon_Windows_UI_CRB_Marker_Bomb",
@@ -119,58 +117,17 @@ local tMenuItems = {
 		Condition = function(self) return (self.bInGroup and self.bIsACharacter); end,
 		Children = {
 			{
-				Name = "BtnMentor",
-				Text = Apollo.GetString("ContextMenu_Mentor"),
+				Name = "BtnLocate",
+				Text = Apollo.GetString("ContextMenu_Locate"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.unit and not self.bIsThePlayer and not bMentoringTarget); end,
+				Condition = function(self) return (self.unit and self.tTargetGroupData and self.tTargetGroupData.bIsOnline and not self.tTargetGroupData.bDisconnected); end, -- Additional tTargetGroupData checks for sUF!
 			},
 			{
-				Name = "BtnStopMentor",
-				Text = Apollo.GetString("ContextMenu_StopMentor"),
+				Name = "BtnPromote",
+				Text = Apollo.GetString("ContextMenu_Promote"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.tMyGroupData.bIsMentoring or self.tMyGroupData.bIsMentored); end,
-			},
-			{
-				Name = "BtnGroupTakeInvite",
-				Text = Apollo.GetString("ContextMenu_DenyInvites"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.bCanInvite); end,
-			},
-			{
-				Name = "BtnGroupGiveInvite",
-				Text = Apollo.GetString("ContextMenu_AllowInvites"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanInvite); end,
-			},
-			{
-				Name = "BtnGroupTakeKick",
-				Text = Apollo.GetString("ContextMenu_DenyKicks"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.bCanKick); end,
-			},
-			{
-				Name = "BtnGroupGiveKick",
-				Text = Apollo.GetString("ContextMenu_AllowKicks"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanKick); end,
-			},
-			{
-				Name = "BtnGroupTakeMark",
-				Text = Apollo.GetString("ContextMenu_DenyMarking"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.bCanMark); end,
-			},
-			{
-				Name = "BtnGroupGiveMark",
-				Text = Apollo.GetString("ContextMenu_AllowMarking"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.bCanMark); end,
-			},
-			{
-				Name = "BtnVoteToKick",
-				Text = Apollo.GetString("ContextMenu_VoteToKick"),
-				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bInMatchingGame and not self.bIsMatchingGameFinished); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader); end,
+				Enabled = function(self) return (self.tTargetGroupData.bIsOnline and not self.tTargetGroupData.bDisconnected); end, -- We don't want a leader who is offline...
 			},
 			{
 				Name = "BtnVoteToDisband",
@@ -180,16 +137,64 @@ local tMenuItems = {
 				Enabled = function(self) return (not MatchingGame.IsVoteSurrenderActive()); end,
 			},
 			{
-				Name = "BtnPromote",
-				Text = Apollo.GetString("ContextMenu_Promote"),
+				Name = "BtnVoteToKick",
+				Text = Apollo.GetString("ContextMenu_VoteToKick"),
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader); end,
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bInMatchingGame and not self.bIsMatchingGameFinished); end,
 			},
 			{
-				Name = "BtnLocate",
-				Text = Apollo.GetString("ContextMenu_Locate"),
+				Name = "BtnKick",
+				Text = Apollo.GetString("ContextMenu_Kick"),
+				Condition = function(self) return (not self.bIsThePlayer and self.nGroupMemberId and self.tMyGroupData.bCanKick); end,
 				OnClick = "OnClickUnit",
-				Condition = function(self) return (self.unit and self.tTargetGroupData); end,
+			},
+			{
+				Name = "BtnGroupGiveKick",
+				Text = Apollo.GetString("ContextMenu_AllowKicks"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.tTargetGroupData.bCanKick); end,
+			},
+			{
+				Name = "BtnGroupTakeKick",
+				Text = Apollo.GetString("ContextMenu_DenyKicks"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.tTargetGroupData.bCanKick); end,
+			},
+			{
+				Name = "BtnGroupGiveInvite",
+				Text = Apollo.GetString("ContextMenu_AllowInvites"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.tTargetGroupData.bCanInvite); end,
+			},
+			{
+				Name = "BtnGroupTakeInvite",
+				Text = Apollo.GetString("ContextMenu_DenyInvites"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.tTargetGroupData.bCanInvite); end,
+			},
+			{
+				Name = "BtnGroupGiveMark",
+				Text = Apollo.GetString("ContextMenu_AllowMarking"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and not self.tTargetGroupData.bCanMark); end,
+			},
+			{
+				Name = "BtnGroupTakeMark",
+				Text = Apollo.GetString("ContextMenu_DenyMarking"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.nGroupMemberId and self.tTargetGroupData and self.bAmIGroupLeader and self.tTargetGroupData.bCanMark); end,
+			},
+			{
+				Name = "BtnMentor",
+				Text = Apollo.GetString("ContextMenu_Mentor"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.unit and not self.bIsThePlayer and not bMentoringTarget and self.tTargetGroupData and self.tTargetGroupData.bIsOnline and not self.tTargetGroupData.bDisconnected); end, -- Additional tTargetGroupData checks for sUF!
+			},
+			{
+				Name = "BtnStopMentor",
+				Text = Apollo.GetString("ContextMenu_StopMentor"),
+				OnClick = "OnClickUnit",
+				Condition = function(self) return (self.tMyGroupData.bIsMentoring or self.tMyGroupData.bIsMentored); end,
 			},
 		},
 	},
@@ -308,13 +313,7 @@ local tMenuItems = {
 	{
 		Name = "BtnInvite",
 		Text = Apollo.GetString("ContextMenu_InviteToGroup"),
-		Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer and (not self.bInGroup or (self.tMyGroupData.bCanInvite and self.bCanWhisper))); end,
-		OnClick = "OnClickUnit",
-	},
-	{
-		Name = "BtnKick",
-		Text = Apollo.GetString("ContextMenu_Kick"),
-		Condition = function(self) return (not self.bIsThePlayer and self.bIsACharacter and self.bInGroup and self.unit and self.unit:IsInYourGroup() and self.tMyGroupData.bCanKick); end,
+		Condition = function(self) return (self.bIsACharacter and not self.bIsThePlayer and not self.nGroupMemberId and (not self.bInGroup or (self.tMyGroupData.bCanInvite and self.bCanWhisper))); end,
 		OnClick = "OnClickUnit",
 	},
 	{
@@ -328,24 +327,6 @@ local tMenuItems = {
 -----------------------------------------------------------------------------
 -- Drop Down Menu
 -----------------------------------------------------------------------------
-
-function DropDown:FindFriend(strName, bAccountFriend)
-	-- Untested!
-	local strRealm = GameLib.GetRealmName();
-	local tFriends = bAccountFriend and FriendshipLib.GetAccountList() or FriendshipLib.GetList();
-
-	for _, tFriend in ipairs(tFriends) do
-		if (not bAccountFriend and tFriend.strCharacterName == strName and tFriend.strRealmName == strRealm) then
-			return tFriend;
-		elseif (bAccountFriend and tFriend.arCharacters) then
-			for _, tCharacter in ipairs(tFriend.arCharacters) do
-				if (tCharacter.strCharacterName == strName and tCharacter.strRealm == strRealm) then
-					return tFriend;
-				end
-			end
-		end
-	end
-end
 
 function DropDown:OnClickUnit(wndControl, wndHandler)
 	local strButton = wndControl:GetName();
@@ -390,18 +371,22 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 			end
 		end
 	elseif (strButton == "BtnAssist") then
-		GameLib.SetTargetUnit(self.unit:GetTarget());
+		if (self.unit) then
+			GameLib.SetTargetUnit(self.unit:GetTarget());
+		end
 	elseif (strButton == "BtnInspect") then
-		self.unit:Inspect();
+		if (self.unit) then
+			self.unit:Inspect();
+		end
 	elseif (strButton == "BtnAddFriend") then
 		FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Friend, self.strTarget);
 	elseif (strButton == "BtnUnfriend") then
-	FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Friend);
+		FriendshipLib.Remove(self.tCharacterData.tFriend.nId, FriendshipLib.CharacterFriendshipType_Friend);
 	elseif (strButton == "BtnAccountFriend") then
 		FriendshipLib.AccountAddByUpgrade(self.tCharacterData.tFriend.nId);
 	elseif (strButton == "BtnUnaccountFriend") then
 		if (self.tAccountFriend and self.tAccountFriend.nId) then
-			Event_FireGenericEvent("EventGeneric_ConfirmRemoveAccountFriend", self.tAccountFriend.nId);
+			Event_FireGenericEvent("EventGeneric_ConfirmRemoveAccountFriend", self.tAccountFriend.nId); -- TODO
 		end
 	elseif (strButton == "BtnAddRival") then
 		FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Rival, self.strTarget);
@@ -410,7 +395,7 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 	elseif (strButton == "BtnAddNeighbor") then
 		HousingLib.NeighborInviteByName(self.strTarget);
 	elseif (strButton == "BtnUnneighbor") then
-		Print(Apollo.GetString("ContextMenu_NeighborRemoveFailed")); -- TODO!
+		Print(Apollo.GetString("ContextMenu_NeighborRemoveFailed")); -- TODO
 	elseif (strButton == "BtnIgnore") then
 		FriendshipLib.AddByName(FriendshipLib.CharacterFriendshipType_Ignore, self.strTarget);
 	elseif (strButton == "BtnUnignore") then
@@ -459,7 +444,9 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 	elseif (strButton == "BtnGroupTakeInvite") then
 		GroupLib.SetInvitePermission(self.nGroupMemberId, false);
 	elseif (strButton == "BtnLocate") then
-		self.unit:ShowHintArrow();
+		if (self.unit) then
+			self.unit:ShowHintArrow();
+		end
 	elseif (strButton == "BtnMarkClear") then
 		self.unit:ClearTargetMarker();
 	elseif (strButton == "BtnVoteToDisband") then
@@ -478,6 +465,23 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 	end
 
 	self:Close(true);
+end
+
+function DropDown:FindFriend(strName, bAccountFriend)
+	local strRealm = GameLib.GetRealmName();
+	local tFriends = bAccountFriend and FriendshipLib.GetAccountList() or FriendshipLib.GetList();
+
+	for _, tFriend in ipairs(tFriends) do
+		if (not bAccountFriend and tFriend.strCharacterName == strName and tFriend.strRealmName == strRealm) then
+			return tFriend;
+		elseif (bAccountFriend and tFriend.arCharacters) then
+			for _, tCharacter in ipairs(tFriend.arCharacters) do
+				if (tCharacter.strCharacterName == strName and tCharacter.strRealm == strRealm) then
+					return tFriend;
+				end
+			end
+		end
+	end
 end
 
 function DropDown:GenerateUnitMenu(unit)
