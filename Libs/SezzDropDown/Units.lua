@@ -12,6 +12,7 @@ local DropDown = Apollo.GetPackage(MAJOR).tPackage;
 if (DropDown and (DropDown.nVersion or 0) > MINOR) then return; end
 
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame;
+local strfind, tonumber = string.find, tonumber;
 
 -----------------------------------------------------------------------------
 -- Menu Items
@@ -353,22 +354,41 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 		return;
 	elseif (strButton == "BtnSetFocus") then
 		-- Set Focus
-		self.unitPlayer:SetAlternateTarget(self.unit.__proto__ or self.unit);
+		if (self.unit) then
+			self.unitPlayer:SetAlternateTarget(self.unit.__proto__ or self.unit);
+		end
 	elseif (strButton == "BtnClearFocus") then
 		-- Clear Focus
 		self.unitPlayer:SetAlternateTarget();
 	elseif (strButton == "BtnMarkTarget") then
 		-- Set First Available Mark
-		local nResult = 8;
-		local nCurrent = self.unit:GetTargetMarker() or 0;
-		local tAvailableMarkers = GameLib.GetAvailableTargetMarkers();
-		for idx = nCurrent, 8 do
-			if (tAvailableMarkers[idx]) then
-				nResult = idx;
-				break;
+		if (self.unit) then
+			local nResult = 8;
+			local nCurrent = self.unit:GetTargetMarker() or 0;
+			local tAvailableMarkers = GameLib.GetAvailableTargetMarkers();
+			for idx = nCurrent, 8 do
+				if (tAvailableMarkers[idx]) then
+					nResult = idx;
+					break;
+				end
+			end
+			self.unit:SetTargetMarker(nResult);
+		end
+	elseif (strButton == "BtnMarkClear") then
+		if (self.unit) then
+			self.unit:ClearTargetMarker();
+		end
+	elseif (strfind(strButton, "BtnMark(%d)")) then
+		if (self.unit) then
+			local _, _, strMark = strfind(strButton, "BtnMark(%d)");
+			strMark = tonumber(strMark);
+
+			if (wndControl:IsChecked() and strMark < 8) then
+				self.unit:SetTargetMarker(strMark);
+			else
+				self.unit:ClearTargetMarker();
 			end
 		end
-		self.unit:SetTargetMarker(nResult);
 	elseif (strButton == "BtnAssist") then
 		GameLib.SetTargetUnit(self.unit:GetTarget());
 	elseif (strButton == "BtnInspect") then
