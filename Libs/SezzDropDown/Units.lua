@@ -14,6 +14,9 @@ if (DropDown and (DropDown.nVersion or 0) > MINOR) then return; end
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame;
 local strfind, tonumber = string.find, tonumber;
 
+--local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
+--local log = S.Log;
+
 -----------------------------------------------------------------------------
 -- Menu Items
 -----------------------------------------------------------------------------
@@ -544,7 +547,7 @@ function DropDown:GenerateUnitMenu(unit)
 --				self.bCanWhisper = (self.tAccountFriend.arCharacters[1] ~= nil and self.tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
 				self.bCanWhisper = (self.tAccountFriend.arCharacters[1].nFactionId == self.tPlayerFaction);
 			else
-				self.bCanWhisper = (self.bIsACharacter and (not self.unit or (self.unit and self.unit:GetFaction() == self.tPlayerFaction)) and (tFriend == nil or (tFriend ~= nil and not tFriend.bIgnore)));
+				self.bCanWhisper = (self.bIsACharacter and (not self.unit or (self.unit and self.unit:GetFaction() == self.tPlayerFaction)) and (self.tFriend == nil or (self.tFriend ~= nil and not self.tFriend.bIgnore)));
 			end
 
 			self.bIsFriend = (self.tFriend ~= nil and self.tFriend.bFriend) or (self.tCharacterData ~= nil and self.tCharacterData.tFriend ~= nil and self.tCharacterData.tFriend.bFriend);
