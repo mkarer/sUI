@@ -9,9 +9,9 @@
 
 --]]
 
-local MAJOR, MINOR = "Sezz:Controls:DropDown-0.1", 1;
-local DropDown = Apollo.GetPackage(MAJOR).tPackage;
-if (DropDown and (DropDown.nVersion or 0) > MINOR) then return; end
+local MAJOR, MINOR = "Sezz:Controls:ContextMenu-0.1", 1;
+local ContextMenu = Apollo.GetPackage(MAJOR).tPackage;
+if (ContextMenu and (ContextMenu.nVersion or 0) > MINOR) then return; end
 
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading, MatchingGame;
 local strfind, tonumber = string.find, tonumber;
@@ -327,10 +327,10 @@ local tMenuItems = {
 };
 
 -----------------------------------------------------------------------------
--- Drop Down Menu
+-- Context Menu
 -----------------------------------------------------------------------------
 
-function DropDown:OnClickUnit(wndControl, wndHandler)
+function ContextMenu:OnClickUnit(wndControl, wndHandler)
 	local strButton = wndControl:GetName();
 
 	if (not strButton or strButton == "Button") then
@@ -469,7 +469,7 @@ function DropDown:OnClickUnit(wndControl, wndHandler)
 	self:Close(true);
 end
 
-function DropDown:FindFriend(strName, bAccountFriend)
+function ContextMenu:FindFriend(strName, bAccountFriend)
 	local strRealm = GameLib.GetRealmName();
 	local tFriends = bAccountFriend and FriendshipLib.GetAccountList() or FriendshipLib.GetList();
 
@@ -486,7 +486,7 @@ function DropDown:FindFriend(strName, bAccountFriend)
 	end
 end
 
-function DropDown:GenerateUnitMenu(unit)
+function ContextMenu:GenerateUnitMenu(unit)
 	if (not unit) then return; end
 
 	-- Player

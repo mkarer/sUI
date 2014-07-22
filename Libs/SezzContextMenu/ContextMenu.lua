@@ -1,18 +1,18 @@
 --[[
 
-	s:UI Drop Down Menu
+	s:UI Context Menu
 
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
 --]]
 
-local MAJOR, MINOR = "Sezz:Controls:DropDown-0.1", 1;
+local MAJOR, MINOR = "Sezz:Controls:ContextMenu-0.1", 1;
 local APkg = Apollo.GetPackage(MAJOR);
 if (APkg and (APkg.nVersion or 0) >= MINOR) then return; end
 
 local NAME = string.match(MAJOR, ":(%a+)\-");
-local DropDown = APkg and APkg.tPackage or {};
+local ContextMenu = APkg and APkg.tPackage or {};
 local GeminiGUI, GeminiLogging, log;
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading;
 local max, strlen, ceil = math.max, string.len, math.ceil;
@@ -26,8 +26,8 @@ local knYCursorOffset = -6;
 -- Window Definitions
 -----------------------------------------------------------------------------
 
-local tWDefDropDownMenu = {
-	Name = "DropDownMenu",
+local tWDefContextMenu = {
+	Name = "ContextMenu",
 --	Template = "HoloWindowSound", -- Annoying sound!
 	CloseOnExternalClick = true,
 	Escapable = true,
@@ -63,7 +63,7 @@ local tWDefMenuTitle = {
 	Font = "CRB_Header10",
 };
 
-local tWDefDropDownButton = {
+local tWDefContextMenuButton = {
 	WidgetType = "PushButton",
 	Name = "Button",
 	Base = "BK3:btnHolo_ListView_Mid",
@@ -89,7 +89,7 @@ local tWDefDropDownButton = {
 	},
 };
 
-local tWDefDropDownIconCheckbox = {
+local tWDefContextMenuIconCheckbox = {
 	WidgetType = "CheckBox",
 	Name = "IconCheckbox",
 	Base = "BK3:btnHolo_ListView_Mid",
@@ -119,7 +119,7 @@ local tWDefDropDownIconCheckbox = {
 	},
 };
 
-local tWDefDropDownSeparator = {
+local tWDefContextMenuSeparator = {
 	Name = "Separator",
 	Picture = true,
 	AnchorPoints = { 0, 0, 1, 0 },
@@ -129,15 +129,15 @@ local tWDefDropDownSeparator = {
 };
 
 -----------------------------------------------------------------------------
--- Drop Down Menu
+-- Context Menu
 -----------------------------------------------------------------------------
 
-function DropDown:CreateWindow()
+function ContextMenu:CreateWindow()
 	if (self.wndMain and self.wndMain:IsValid()) then
 		self.wndMain:Destroy();
 	end
 
-	self.wndMain = GeminiGUI:Create(tWDefDropDownMenu):GetInstance(self, self.wndParent or "TooltipStratum");
+	self.wndMain = GeminiGUI:Create(tWDefContextMenu):GetInstance(self, self.wndParent or "TooltipStratum");
 	self.wndMain:Invoke();
 	self.wndButtonList = self.wndMain:FindChild("ButtonList");
 	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
@@ -145,7 +145,7 @@ function DropDown:CreateWindow()
 	self.wndMain:AddEventHandler("WindowClosed", "OnWindowClosed", self);
 end
 
-function DropDown:Init(strType, oData)
+function ContextMenu:Init(strType, oData)
 	-- Cleanup
 	self.bIsIconList = false;
 	self.bUpdatedPosition = false;
@@ -162,7 +162,7 @@ function DropDown:Init(strType, oData)
 	return self;
 end
 
-function DropDown:AddHeader(strTitle)
+function ContextMenu:AddHeader(strTitle)
 	if (not strTitle or strlen(strTitle) == 0) then return; end
 
 	local wndTitle = GeminiGUI:Create(tWDefMenuTitle):GetInstance(self, self.wndButtonList);
@@ -172,7 +172,7 @@ function DropDown:AddHeader(strTitle)
 	self.bHasHeader = true;
 end
 
-function DropDown:AddItems(tItems)
+function ContextMenu:AddItems(tItems)
 	if (type(tItems) == "string") then tItems = tMenuItems[tItems]; end
 	if (type(tItems) ~= "table") then return; end
 
@@ -197,7 +197,7 @@ function DropDown:AddItems(tItems)
 				end
 
 				if (bCreateButton) then
-					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefDropDownIconCheckbox or tWDefDropDownButton):GetInstance(self, self.wndButtonList);
+					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefContextMenuIconCheckbox or tWDefContextMenuButton):GetInstance(self, self.wndButtonList);
 
 					if (tButton.Name) then
 						wndButton:SetName(tButton.Name)
@@ -242,22 +242,22 @@ function DropDown:AddItems(tItems)
 					end
 				end
 			else
-				GeminiGUI:Create(tWDefDropDownSeparator):GetInstance(self, self.wndButtonList);
+				GeminiGUI:Create(tWDefContextMenuSeparator):GetInstance(self, self.wndButtonList);
 			end
 		end
 	end
 end
 
-function DropDown:Position()
+function ContextMenu:Position()
 	-- Resize
 	if (self.bIsIconList) then
 		-- Checkbox Icons
-		local nHeight = ceil(#self.wndButtonList:GetChildren() / 3) * tWDefDropDownIconCheckbox.AnchorOffsets[4];
+		local nHeight = ceil(#self.wndButtonList:GetChildren() / 3) * tWDefContextMenuIconCheckbox.AnchorOffsets[4];
 
 		if (self.bHasHeader) then
 			nHeight = nHeight + tWDefMenuTitle.AnchorOffsets[4];
 		else
-			self.tAnchorOffsets[3] = 3 * tWDefDropDownIconCheckbox.AnchorOffsets[3];
+			self.tAnchorOffsets[3] = 3 * tWDefContextMenuIconCheckbox.AnchorOffsets[3];
 		end
 
 		self.tAnchorOffsets[4] = nHeight;
@@ -286,7 +286,7 @@ function DropDown:Position()
 	self.bUpdatedPosition = true;
 end
 
-function DropDown:Show()
+function ContextMenu:Show()
 	if (not self.bUpdatedPosition) then
 		self:Position();
 	end
@@ -296,13 +296,13 @@ function DropDown:Show()
 	self.wndMain:Enable(true)
 end
 
-function DropDown:ShowSubMenu(wndHandler, wndControl)
+function ContextMenu:ShowSubMenu(wndHandler, wndControl)
 	if (not wndHandler or wndHandler ~= wndControl) then return; end
 	local strName = wndHandler:GetName();
 	local tSubMenu = self.tChildren[strName];
 
 	if (not tSubMenu) then
-		tSubMenu = DropDown:New(self, wndHandler);
+		tSubMenu = ContextMenu:New(self, wndHandler);
 		tSubMenu:Init("Unit", self.nFriendId or self.unit or self.strTarget); -- TODO
 		tSubMenu:AddItems(wndHandler:GetData());
 		self.tChildren[strName] = tSubMenu;
@@ -317,7 +317,7 @@ function DropDown:ShowSubMenu(wndHandler, wndControl)
 	wndHandler:SetCheck(true);
 end
 
-function DropDown:HideSubMenu(wndHandler, wndControl)
+function ContextMenu:HideSubMenu(wndHandler, wndControl)
 	if (self.tActiveSubMenu and not self.tActiveSubMenu.wndMain:ContainsMouse()) then
 		if ((wndHandler == self.wndMain and not wndHandler:ContainsMouse()) or wndHandler ~= self.wndMain) then
 			self.tActiveSubMenu:Close();
@@ -332,13 +332,13 @@ function DropDown:HideSubMenu(wndHandler, wndControl)
 	end
 end
 
-function DropDown:OnClickIgnore(wndHandler, wndControl)
+function ContextMenu:OnClickIgnore(wndHandler, wndControl)
 	if (wndHandler:GetData()) then
 		self:ShowSubMenu(wndHandler, wndControl);
 	end
 end
 
-function DropDown:Close(bCloseParent)
+function ContextMenu:Close(bCloseParent)
 	self.wndMain:Close();
 	if (self.tParent and self.tParent.tActiveSubMenu == self) then
 		self.wndParent:SetCheck(false);
@@ -350,7 +350,7 @@ function DropDown:Close(bCloseParent)
 	end
 end
 
-function DropDown:Destroy()
+function ContextMenu:Destroy()
 	for _, tSubMenu in pairs(self.tChildren) do
 		tSubMenu:Destroy();
 	end
@@ -363,13 +363,13 @@ function DropDown:Destroy()
 	return self;
 end
 
-function DropDown:OnWindowClosed()
+function ContextMenu:OnWindowClosed()
 	self.wndMain:Show(false, true);
 
 	if (not self.tParent) then
 		-- Root menu closed!
-		for strName, tDropDown in pairs(self.tChildren) do
-			self.tChildren[strName] = tDropDown:Destroy();
+		for strName, tContextMenu in pairs(self.tChildren) do
+			self.tChildren[strName] = tContextMenu:Destroy();
 		end
 
 		-- TODO
@@ -397,7 +397,7 @@ function DropDown:OnWindowClosed()
 	end
 end
 
-function DropDown:CheckWindowBounds()
+function ContextMenu:CheckWindowBounds()
 	local nWidth =  self.wndMain:GetWidth();
 	local nHeight = self.wndMain:GetHeight();
 	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
@@ -461,7 +461,7 @@ end
 -- Constructor
 -----------------------------------------------------------------------------
 
-function DropDown:New(tParent, wndParent)
+function ContextMenu:New(tParent, wndParent)
 	-- TODO: There should be only ONE root menu, because you can only show one
 	return setmetatable({
 		tParent = tParent,
@@ -474,7 +474,7 @@ end
 -- Apollo Registration
 -----------------------------------------------------------------------------
 
-function DropDown:OnLoad()
+function ContextMenu:OnLoad()
 	local GeminiLogging = Apollo.GetPackage("Gemini:Logging-1.2") and Apollo.GetAddon("GeminiConsole") and Apollo.GetPackage("Gemini:Logging-1.2").tPackage;
 	if (GeminiLogging) then
 		log = GeminiLogging:GetLogger({
@@ -489,38 +489,38 @@ function DropDown:OnLoad()
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 
 	-- Listen to Carbine's Context Menu Events (TEMP)
-	local tDropDown = DropDown:New();
+	local tContextMenu = ContextMenu:New();
 
-	function tDropDown:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
+	function tContextMenu:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
 log:debug("OnNewContextMenuPlayer");
 		if (self:Init("Unit", unitTarget or strTarget)) then
 			self:Show();
 		end
 	end
 
-	function tDropDown:OnNewContextMenuPlayerDetailed(wndParent, strTarget, unitTarget, nReportId)
+	function tContextMenu:OnNewContextMenuPlayerDetailed(wndParent, strTarget, unitTarget, nReportId)
 log:debug("OnNewContextMenuPlayerDetailed");
 		if (self:Init("Unit", unitTarget or strTarget)) then
 			self:Show();
 		end
 	end
 
-	function tDropDown:OnNewContextMenuFriend(wndParent, nFriendId)
+	function tContextMenu:OnNewContextMenuFriend(wndParent, nFriendId)
 log:debug("OnNewContextMenuFriend (ID: %d)", nFriendId or 0);
 		if (self:Init("Unit", nFriendId)) then
 			self:Show();
 		end
 	end
 
-	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayer", "OnNewContextMenuPlayer", tDropDown);
-	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayerDetailed", "OnNewContextMenuPlayerDetailed", tDropDown);
-	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuFriend", "OnNewContextMenuFriend", tDropDown);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayer", "OnNewContextMenuPlayer", tContextMenu);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayerDetailed", "OnNewContextMenuPlayerDetailed", tContextMenu);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuFriend", "OnNewContextMenuFriend", tContextMenu);
 end
 
-function DropDown:OnDependencyError(strDep, strError)
+function ContextMenu:OnDependencyError(strDep, strError)
 	return false;
 end
 
 -----------------------------------------------------------------------------
 
-Apollo.RegisterPackage(DropDown, MAJOR, MINOR, { "Gemini:GUI-1.0" });
+Apollo.RegisterPackage(ContextMenu, MAJOR, MINOR, { "Gemini:GUI-1.0" });

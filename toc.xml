@@ -11,9 +11,9 @@
 	<Script Name="Libs\GeminiTimer\GeminiTimer-1.0.lua" />
 	<Script Name="Libs\XmlDocument\XmlDocument.lua" />
 	<Script Name="Libs\GeminiGUI\GeminiGUI.lua" />
-	<!-- Drop Down Menu Library -->
-	<Script Name="Libs\SezzDropDown\DropDown.lua" />
-	<Script Name="Libs\SezzDropDown\Units.lua" />
+	<!-- Context Menu Library -->
+	<Script Name="Libs\SezzContextMenu\ContextMenu.lua" />
+	<Script Name="Libs\SezzContextMenu\Units.lua" />
 	<!-- Auras Library -->
 	<Script Name="Libs\SezzAuras\SezzAuras.lua" />
 	<Script Name="Libs\SezzAuraControl\SezzAuraControl.lua" />
