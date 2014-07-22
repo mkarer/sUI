@@ -177,7 +177,7 @@ function DropDown:AddItems(tItems)
 	if (type(tItems) ~= "table") then return; end
 
 	for _, tButton in ipairs(tItems) do
-log:debug(tButton.Name)
+--log:debug(tButton.Name)
 
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text or tButton.Icon) then
@@ -188,7 +188,7 @@ log:debug(tButton.Name)
 					bHasVisibleChildren = false;
 
 					for _, tChild in ipairs(tButton.Children) do
-						if (tChild.Condition and tChild.Condition(self)) then
+						if (not tChild.Condition or (tChild.Condition and tChild.Condition(self))) then
 							bHasVisibleChildren = true;
 							break;
 						end
@@ -217,10 +217,13 @@ log:debug(tButton.Name)
 
 					-- Click Event
 					if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
-						if (tButton.Children and #tButton.Children > 0) then
-							wndButton:AddEventHandler("ButtonSignal", "OnClickIgnore");
+						local strEventHandler = (not tButton.OnClick and tButton.Children and #tButton.Children > 0) and "OnClickIgnore" or tButton.OnClick;
+
+						if (tButton.Icon) then
+							wndButton:AddEventHandler("ButtonCheck", strEventHandler);
+							wndButton:AddEventHandler("ButtonUncheck", strEventHandler);
 						else
-							wndButton:AddEventHandler("ButtonSignal", tButton.OnClick);
+							wndButton:AddEventHandler("ButtonSignal", strEventHandler);
 						end
 					end
 
