@@ -496,6 +496,9 @@ end
 function ContextMenu:GenerateUnitMenu(unit, nReportId)
 	if (not unit) then return; end
 
+	-- Cleanup
+	self:Initialize();
+
 	-- Chat
 	self.tData.nReportId = nReportId;
 
@@ -605,9 +608,6 @@ function ContextMenu:GenerateUnitMenu(unit, nReportId)
 	-- PVP
 	self.tData.bInMatchingGame = MatchingGame.IsInMatchingGame();
 	self.tData.bIsMatchingGameFinished = MatchingGame.IsMatchingGameFinished();
-
-	-- Create Window
-	self:CreateWindow();
 
 	if (not self.tParent) then
 		self:AddHeader(self.tData.strTarget);
