@@ -66,6 +66,7 @@
 	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />
 	<Script Name="Modules\ReadyCheck\ReadyCheck.lua" />
 	<Script Name="Modules\PVPTelegraphs\PVPTelegraphs.lua" />
+	<Script Name="Modules\NPCScan\NPCScan.lua" />
 	<!-- Buffs & Debuffs -->
 	<Script Name="Modules\Buffs\Core.lua" />
 	<!-- Unit Frames -->
