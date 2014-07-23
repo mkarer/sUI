@@ -189,10 +189,51 @@ function M:OnEnable()
 	-- Settings
 	-----------------------------------------------------------------------------
 	local tButtonSettings = self.tButtonContainer:CreateButton("Settings", "IconSettings", true, "SezzMiniMapButtonPush");
-	tButtonSettings.wndMain:SetTooltip("s:UI "..Apollo.GetString("GuildRegistration_SettingsLabel"));
+	tButtonSettings.wndMain:SetTooltip("s:UI");
 
 	tButtonSettings.ToggleConfiguration = function(self)
-		S:ToggleConfiguration();
+		local tMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage:GetRootMenu();
+		tMenu:Initialize(); -- Remove old data/windows/etc.
+		tMenu:AddHeader("s:UI");
+		tMenu:AddItems({
+			-- One Children
+			{
+				Name = "Test1",
+				Text = "Test with 1 Child",
+						Condition = function() return true; end,
+				Children = {
+					{
+						Name = "Test11",
+						Text = "Hey, I'm a child 1!",
+						Condition = function() return true; end,
+					},
+					{
+						Name = "Test12",
+						Text = "Hey, I'm a child 2!",
+						Condition = function() return true; end,
+					},
+					{
+						Name = "Test13",
+						Text = "Hey, I'm a child 3!",
+						Condition = function() return true; end,
+					},
+				},
+			},
+			{
+				Name = "BtnSettings",
+				Text = Apollo.GetString("GuildRegistration_SettingsLabel"),
+				OnClick = { "ToggleConfiguration", S },
+				CloseOnClick = true,
+			},
+			{
+			},
+			{
+				Name = "BtnReloadUI",
+				Text = "Reload UI",
+				OnClick = { "RequestReloadUI", _G },
+			},
+		});
+		tMenu:Show();
 	end
 
 	tButtonSettings.wndMain:AddEventHandler("ButtonSignal", "ToggleConfiguration", tButtonSettings);
@@ -241,12 +282,6 @@ function M:UpdateDatachronButton()
 	Apollo.GetAddon("Datachron").wndMinimized:Show(false, false);
 
 	g_wndDatachron:SetAnchorOffsets(-549, -322, -160, -18);
-
-	-- Removing Artwork only works while logging in.
-	-- I don't care currently...
---	g_wndDatachron:DestroyAllPixies();
---	g_wndDatachron:FindChild("Framing"):SetSprite("SezzUIBorder");
---	g_wndDatachron:FindChild("Framing"):SetSprite(nil);
 end
 
 -----------------------------------------------------------------------------
