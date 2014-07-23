@@ -44,7 +44,7 @@ local tWatchedUnits = {
 function M:UnitCreated(event, unit)
 	if (unit and unit:IsValid() and not unit:IsACharacter()) then
 		local strName = unit:GetName();
-		if (strName and tWatchedUnits[strName] and S.bCharacterLoaded) then
+		if (strName and tWatchedUnits[strName] and S.bCharacterLoaded and unit ~= S.myCharacter:GetAlternateTarget()) then
 			Print(string.format("Found Unit: %s", strName));
 			S.myCharacter:SetAlternateTarget(unit);
 
