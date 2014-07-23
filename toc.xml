@@ -67,6 +67,7 @@
 	<Script Name="Modules\ReadyCheck\ReadyCheck.lua" />
 	<Script Name="Modules\PVPTelegraphs\PVPTelegraphs.lua" />
 	<Script Name="Modules\NPCScan\NPCScan.lua" />
+	<Script Name="Modules\SoundToggle\SoundToggle.lua" />
 	<!-- Buffs & Debuffs -->
 	<Script Name="Modules\Buffs\Core.lua" />
 	<!-- Unit Frames -->
