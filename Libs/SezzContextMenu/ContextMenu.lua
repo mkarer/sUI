@@ -25,7 +25,7 @@ local ContextMenuRoot;
 
 -----------------------------------------------------------------------------
 
-local knXCursorOffset = -20 -200;
+local knXCursorOffset = -20;-- -220
 local knYCursorOffset = -6;
 
 ----------------------------------------------------------------------------
@@ -135,26 +135,66 @@ local tWDefContextMenuSeparator = {
 -- Item Events
 -----------------------------------------------------------------------------
 
-local ktDefaultEvents = {};
+local tDefaultEvents = {};
 
-function ktDefaultEvents:HideSubMenu(wndHandler, wndControl)
-	local tMenu = wndHandler:GetData().ContextMenu;
+function tDefaultEvents:HideSubMenu(wndHandler, wndControl)
+	local tRoot = wndHandler:GetData().ContextMenu;
+	while (tRoot.tParent) do
+		tRoot = tRoot.tParent;
+	end
 
-	if (tMenu.tActiveSubMenu and not tMenu.tActiveSubMenu.wndMain:ContainsMouse()) then
-		if ((wndHandler == tMenu.wndMain and not wndHandler:ContainsMouse()) or wndHandler ~= tMenu.wndMain) then
-			tMenu.tActiveSubMenu:Close();
-			tMenu.tActiveSubMenu = nil;
-		end
-	elseif (tMenu.wndParent and not tMenu.wndMain:ContainsMouse() and (not tMenu.wndParent:ContainsMouse() or tMenu.tParent.tActiveSubMenu ~= tMenu)) then
-		tMenu:Close();
-
-		if (tMenu.tParent.tActiveSubMenu == tMenu) then
-			tMenu.tParent.tActiveSubMenu = nil;
+	local tActive = tRoot;
+	while (tActive) do
+		if (tActive.wndMain:ContainsMouse()) then
+			if (tActive.tActiveSubMenu) then
+				-- menu has an open submenu
+				if (tActive.tActiveSubMenu.tActiveSubMenu and wndHandler:GetName() ~= "ContextMenu" and tActive.tActiveSubMenu.tActiveSubMenu ~= tActive.tActiveSubMenu.tChildren[wndHandler]) then
+					-- open child menu, opening another menu from another level, close active one
+					tActive.tActiveSubMenu.tActiveSubMenu = tActive.tActiveSubMenu:Close();
+				elseif (tActive.tActiveSubMenu.tActiveSubMenu) then
+					-- child with active submenu, check next level
+					tActive = tActive.tActiveSubMenu;
+				else
+					-- child doesnt have an active submenu
+					if (wndHandler:GetName() ~= "ContextMenu" and tActive.tActiveSubMenu ~= tActive.tChildren[wndHandler]) then
+						-- active submenu shouldn't be visible anymore
+						tActive.tActiveSubMenu = tActive.tActiveSubMenu:Close();
+					end
+					break;
+				end
+			else
+				-- no active submenu
+				break;
+			end
+		elseif (tActive.tActiveSubMenu) then
+			-- menu doesn have mouse, check child
+			tActive = tActive.tActiveSubMenu;
+		else
+			-- doesn't has mouse, no children, close if not root
+			if (tActive.tParent) then
+				tRoot.tActiveSubMenu = tRoot.tActiveSubMenu:Close();
+			end
+			break;
 		end
 	end
+
+--[[
+	if (self.tActiveSubMenu and not self.tActiveSubMenu.wndMain:ContainsMouse()) then
+		if ((wndHandler == self.wndMain and not wndHandler:ContainsMouse()) or wndHandler ~= self.wndMain) then
+			self.tActiveSubMenu:Close();
+			self.tActiveSubMenu = nil;
+		end
+	elseif (self.wndParent and not self.wndMain:ContainsMouse() and (not self.wndParent:ContainsMouse() or self.tParent.tActiveSubMenu ~= self)) then
+		self:Close();
+
+		if (self.tParent.tActiveSubMenu == self) then
+			self.tParent.tActiveSubMenu = nil;
+		end
+	end
+--]]
 end
 
-function ktDefaultEvents:ShowSubMenu(wndHandler, wndControl)
+function tDefaultEvents:ShowSubMenu(wndHandler, wndControl)
 	if (not wndHandler or wndHandler ~= wndControl) then return; end
 	local tMenu = wndHandler:GetData().ContextMenu;
 	local tSubMenu = tMenu.tChildren[wndHandler];
@@ -181,6 +221,7 @@ end
 
 function ContextMenu:CreateWindow()
 	self.wndMain = GeminiGUI:Create(tWDefContextMenu):GetInstance(self, self.wndParent or "TooltipStratum");
+	self.wndMain:SetData({ ContextMenu = self });
 	self.wndMain:Invoke();
 	self.wndButtonList = self.wndMain:FindChild("ButtonList");
 	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
@@ -330,44 +371,6 @@ function ContextMenu:AddItems(tItems)
 	end
 end
 
-function ContextMenu:Position()
-	-- Resize
-	if (self.bIsIconList) then
-		-- Checkbox Icons
-		local nHeight = ceil(#self.wndButtonList:GetChildren() / 3) * tWDefContextMenuIconCheckbox.AnchorOffsets[4];
-
-		if (self.bHasHeader) then
-			nHeight = nHeight + tWDefMenuTitle.AnchorOffsets[4];
-		else
-			self.tAnchorOffsets[3] = 3 * tWDefContextMenuIconCheckbox.AnchorOffsets[3];
-		end
-
-		self.tAnchorOffsets[4] = nHeight;
-		self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
-		self.wndButtonList:ArrangeChildrenTiles(0);
-	else
-		-- Default Menu
-		self.tAnchorOffsets[4] = self.tAnchorOffsets[2] + self.wndButtonList:ArrangeChildrenVert(0);
-		self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
-	end
-
-	local nPosX, nPosY;
-
-	if (self.wndParent) then
-		nPosX = self.wndParent:GetWidth();
-		nPosY = 0;
-	else
-		local tCursor = Apollo.GetMouse();
-		nPosX = tCursor.x - knXCursorOffset;
-		nPosY = tCursor.y - knYCursorOffset;
-	end
-
-	self.wndMain:Move(nPosX, nPosY, self.wndMain:GetWidth(), self.wndMain:GetHeight());
-	self:CheckWindowBounds();
-
-	self.bUpdatedPosition = true;
-end
-
 function ContextMenu:Show()
 	if (not self.bUpdatedPosition) then
 		self:Position();
@@ -378,52 +381,11 @@ function ContextMenu:Show()
 	self.wndMain:Enable(true)
 end
 
-function ContextMenu:ShowSubMenu(wndHandler, wndControl)
-	if (not wndHandler or wndHandler ~= wndControl) then return; end
-	local tSubMenu = self.tChildren[wndHandler];
-
-	if (not tSubMenu) then
-		tSubMenu = ContextMenu:New(self, wndHandler);
-		tSubMenu:CreateWindow();
-		tSubMenu:AddItems(wndHandler:GetData().Children);
-		self.tChildren[wndHandler] = tSubMenu;
-	end
-
-	if (self.tActiveSubMenu and self.tActiveSubMenu ~= tSubMenu) then
-		self:HideSubMenu(wndHandler, wndControl);
-	end
-
-	tSubMenu:Show();
-	self.tActiveSubMenu = tSubMenu;
-	wndHandler:SetCheck(true);
-end
-
 function ContextMenu:ContainsMouse()
 	if (self.tActiveSubMenu) then
 		return self.tActiveSubMenu:ContainsMouse();
 	else
 		return self.wndMain:ContainsMouse();
-	end
-end
-
-function ContextMenu:HideSubMenu(wndHandler, wndControl)
-	if (self.tActiveSubMenu and not self.tActiveSubMenu.wndMain:ContainsMouse()) then
-		if ((wndHandler == self.wndMain and not wndHandler:ContainsMouse()) or wndHandler ~= self.wndMain) then
-			self.tActiveSubMenu:Close();
-			self.tActiveSubMenu = nil;
-		end
-	elseif (self.wndParent and not self.wndMain:ContainsMouse() and (not self.wndParent:ContainsMouse() or self.tParent.tActiveSubMenu ~= self)) then
-		self:Close();
-
-		if (self.tParent.tActiveSubMenu == self) then
-			self.tParent.tActiveSubMenu = nil;
-		end
-	end
-end
-
-function ContextMenu:OnClickIgnore(wndHandler, wndControl)
-	if (wndHandler:GetData().Children) then
-		self:ShowSubMenu(wndHandler, wndControl);
 	end
 end
 
@@ -457,7 +419,7 @@ function ContextMenu:Destroy(bSkipSelf, bKeepWindow)
 	elseif (not bKeepWindow) then
 		self.bIsIconList = false;
 		self.bUpdatedPosition = false;
-		self.tEventHandlers = setmetatable({}, { __index = ktDefaultEvents });
+		self.tEventHandlers = setmetatable({}, { __index = tDefaultEvents });
 	end
 
 	return self;
@@ -472,8 +434,14 @@ function ContextMenu:OnWindowClosed()
 	self:Destroy(true, true);
 end
 
+function ContextMenu:OnClickIgnore(wndHandler, wndControl)
+	if (wndHandler:GetData().Children) then
+		self:ShowSubMenu(wndHandler, wndControl);
+	end
+end
+
 -----------------------------------------------------------------------------
--- GUI
+-- Positioning
 -----------------------------------------------------------------------------
 
 function ContextMenu:CheckWindowBounds()
@@ -524,7 +492,18 @@ function ContextMenu:CheckWindowBounds()
 	end
 
 	if (not bSafeY) then
-		self.tAnchorOffsets[4] = self.tAnchorOffsets[2] + knYCursorOffset;
+		local nBottom = self.tAnchorOffsets[2] + knYCursorOffset;
+
+		if (self.wndParent) then
+			for wndItem, tMenu in pairs(self.tParent.tChildren) do
+				if (tMenu == self) then
+					nBottom = wndItem:GetHeight();
+					break;
+				end
+			end
+		end
+
+		self.tAnchorOffsets[4] = nBottom;
 		self.tAnchorOffsets[2] = self.tAnchorOffsets[4] - nHeight;
 	end
 
@@ -534,6 +513,44 @@ function ContextMenu:CheckWindowBounds()
 	end
 
 	return true;
+end
+
+function ContextMenu:Position()
+	-- Resize
+	if (self.bIsIconList) then
+		-- Checkbox Icons
+		local nHeight = ceil(#self.wndButtonList:GetChildren() / 3) * tWDefContextMenuIconCheckbox.AnchorOffsets[4];
+
+		if (self.bHasHeader) then
+			nHeight = nHeight + tWDefMenuTitle.AnchorOffsets[4];
+		else
+			self.tAnchorOffsets[3] = 3 * tWDefContextMenuIconCheckbox.AnchorOffsets[3];
+		end
+
+		self.tAnchorOffsets[4] = nHeight;
+		self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
+		self.wndButtonList:ArrangeChildrenTiles(0);
+	else
+		-- Default Menu
+		self.tAnchorOffsets[4] = self.tAnchorOffsets[2] + self.wndButtonList:ArrangeChildrenVert(0);
+		self.wndMain:SetAnchorOffsets(unpack(self.tAnchorOffsets));
+	end
+
+	local nPosX, nPosY;
+
+	if (self.wndParent) then
+		nPosX = self.wndParent:GetWidth();
+		nPosY = 0;
+	else
+		local tCursor = Apollo.GetMouse();
+		nPosX = tCursor.x - knXCursorOffset;
+		nPosY = tCursor.y - knYCursorOffset;
+	end
+
+	self.wndMain:Move(nPosX, nPosY, self.wndMain:GetWidth(), self.wndMain:GetHeight());
+	self:CheckWindowBounds();
+
+	self.bUpdatedPosition = true;
 end
 
 -----------------------------------------------------------------------------
@@ -546,9 +563,14 @@ function ContextMenu:New(tParent, wndParent)
 		tParent = tParent,
 		wndParent = wndParent,
 		tChildren = {},
-		tEventHandlers = setmetatable({}, { __index = ktDefaultEvents }),
+		tEventHandlers = setmetatable({}, { __index = tDefaultEvents }),
 		tData = tParent and tParent.tData or {},
+		nLevel = tParent and tParent.nLevel + 1 or 1,
 	}, { __index = self });
+
+	-- Events
+	tMenu.ShowSubMenu = tMenu.tEventHandlers.ShowSubMenu;
+	tMenu.HideSubMenu = tMenu.tEventHandlers.HideSubMenu;
 
 	return tMenu;
 end
