@@ -455,8 +455,7 @@ function ContextMenu:CheckWindowBounds()
 	local nPosX, nPosY;
 	if (self.wndParent) then
 		nPosX, nPosY = self.wndParent:GetPos();
-		nPosX = nPosX + self.wndParent:GetWidth();
-
+		nPosX = self.bSpawnLeft and nPosX - self.wndParent:GetWidth() or nPosX + self.wndParent:GetWidth();
 		local wndParent = self.wndParent:GetParent();
 		while (wndParent) do
 			local nPosXParent, nPosYParent = wndParent:GetPos();
@@ -485,6 +484,7 @@ function ContextMenu:CheckWindowBounds()
 		else
 			-- Child Menu: Anchor to the left of it's parent
 			nRightOffset = self.wndParent:GetWidth() + self.wndMain:GetWidth();
+			self.bSpawnLeft = true;
 		end
 
 		self.tAnchorOffsets[1] = self.tAnchorOffsets[1] - nRightOffset;
@@ -541,6 +541,10 @@ function ContextMenu:Position()
 	if (self.wndParent) then
 		nPosX = self.wndParent:GetWidth();
 		nPosY = 0;
+
+		if (self.bSpawnLeft) then
+			nPosX = -nPosX;
+		end
 	else
 		local tCursor = Apollo.GetMouse();
 		nPosX = tCursor.x - knXCursorOffset;
@@ -566,6 +570,7 @@ function ContextMenu:New(tParent, wndParent)
 		tEventHandlers = setmetatable({}, { __index = tDefaultEvents }),
 		tData = tParent and tParent.tData or {},
 		nLevel = tParent and tParent.nLevel + 1 or 1,
+		bSpawnLeft = tParent and tParent.bSpawnLeft or false,
 	}, { __index = self });
 
 	-- Events
