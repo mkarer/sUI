@@ -76,9 +76,6 @@ local tWDefContextMenuButton = {
 	AnchorPoints = { 0, 0, 1, 0 },
 	AnchorOffsets = { 0, 0, 0, 25 },
 	Overlapped = true,
---	Events = {
---		ButtonSignal = function(self, wndControl, wndHandler) Print("Clicked: "..wndControl:GetName()); end,
---	},
 	DT_CENTER = false,
 	Font = "CRB_InterfaceSmall",
 	Children = {
@@ -158,7 +155,6 @@ function ktDefaultEvents:HideSubMenu(wndHandler, wndControl)
 end
 
 function ktDefaultEvents:ShowSubMenu(wndHandler, wndControl)
-Print("ShowSub-DEF")
 	if (not wndHandler or wndHandler ~= wndControl) then return; end
 	local tMenu = wndHandler:GetData().ContextMenu;
 
@@ -211,7 +207,7 @@ function ContextMenu:AddItems(tItems)
 	if (type(tItems) ~= "table") then return; end
 
 	for _, tButton in ipairs(tItems) do
---log:debug(tButton.Name)
+--Print(tButton.Name)
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text or tButton.Icon) then
 				-- Determine if the item has visible children
@@ -232,7 +228,8 @@ function ContextMenu:AddItems(tItems)
 
 				if (bCreateButton) then
 					-- Events
-					local tEventHandler, strEventHandler, fnEventHandler;
+					-- TODO
+					local tEventHandler, strEventHandler, fnEventHandler = self;
 
 					if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
 						if (not tButton.OnClick and bHasVisibleChildren) then
@@ -247,28 +244,38 @@ function ContextMenu:AddItems(tItems)
 								tEventHandler = self;
 							elseif (type(tButton.OnClick) == "function") then
 								-- Function
-								fnEventHandler = tButton.OnClick;
+								fnEventHandler = function(self, wndHandler, wndControl, ...)
+									if (wndHandler ~= wndControl) then return; end
+									return tButton.OnClick(wndHandler, wndControl, ...);
+								end;
+
 								tEventHandler = self.tEventHandlers;
 							elseif (type(tButton.OnClick) == "table") then
 								-- Function, Event Handler
-								-- TODO
 								fnEventHandler = function(self, wndHandler, wndControl, ...)
+									if (wndHandler ~= wndControl) then return; end
 									local strFunction = tButton.OnClick[1];
 									local tEventHandler = tButton.OnClick[2];
 
-									tEventHandler[strFunction](tEventHandler, wndHandler, wndControl, ...);
-									if (tButton.CloseOnClick) then
-										wndHandler:GetData().ContextMenu:Close(true);
-									end
+									return tEventHandler[strFunction](tEventHandler, wndHandler, wndControl, ...);
 								end;
 								tEventHandler = self.tEventHandlers;
 							end
+						end
 
+						if (tButton.CloseMenuOnClick) then
+							local fnEventHandlerBeforeClose = fnEventHandler or function() end;
+							fnEventHandler = function(self, wndHandler, wndControl, ...)
+								if (wndHandler ~= wndControl) then return; end
+								local retVal = fnEventHandlerBeforeClose(self, wndHandler, wndControl, ...)
+								wndHandler:GetData().ContextMenu:Close(true);
+								return retVal;
+							end
 						end
 					end
 
 					-- Create Button
-					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefContextMenuIconCheckbox or tWDefContextMenuButton):GetInstance(tEventHandler or self, self.wndButtonList);
+					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefContextMenuIconCheckbox or tWDefContextMenuButton):GetInstance(tEventHandler, self.wndButtonList);
 					wndButton:SetData({
 						ContextMenu = self,
 						Children = bHasVisibleChildren and tButton.Children or nil,
@@ -295,11 +302,13 @@ function ContextMenu:AddItems(tItems)
 						tEventHandler[strEventHandler] = fnEventHandler;
 					end
 
-					if (tButton.Icon) then
-						wndButton:AddEventHandler("ButtonCheck", strEventHandler, tEventHandler);
-						wndButton:AddEventHandler("ButtonUncheck", strEventHandler, tEventHandler);
-					else
-						wndButton:AddEventHandler("ButtonSignal", strEventHandler, tEventHandler);
+					if (strEventHandler) then
+						if (tButton.Icon) then
+							wndButton:AddEventHandler("ButtonCheck", strEventHandler, tEventHandler);
+							wndButton:AddEventHandler("ButtonUncheck", strEventHandler, tEventHandler);
+						else
+							wndButton:AddEventHandler("ButtonSignal", strEventHandler, tEventHandler);
+						end
 					end
 
 					-- Enabled State
@@ -310,10 +319,10 @@ function ContextMenu:AddItems(tItems)
 					-- Submenu Indicator/Events
 					if (bHasVisibleChildren) then
 						wndButton:FindChild("BtnCheckboxArrow"):Show(true, true);
-						wndButton:AddEventHandler("MouseEnter", "ShowSubMenu");
+						wndButton:AddEventHandler("MouseEnter", "ShowSubMenu", tEventHandler);
 					else
-						wndButton:AddEventHandler("MouseEnter", "HideSubMenu");
-						wndButton:AddEventHandler("MouseMove", "HideSubMenu");
+						wndButton:AddEventHandler("MouseEnter", "HideSubMenu", tEventHandler);
+						wndButton:AddEventHandler("MouseMove", "HideSubMenu", tEventHandler);
 					end
 				end
 			else
@@ -387,7 +396,6 @@ function ContextMenu:ShowSubMenu(wndHandler, wndControl)
 		self:HideSubMenu(wndHandler, wndControl);
 	end
 
-Print("Show")
 	tSubMenu:Show();
 	self.tActiveSubMenu = tSubMenu;
 	wndHandler:SetCheck(true);
