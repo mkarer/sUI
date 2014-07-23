@@ -25,7 +25,7 @@ local ContextMenuRoot;
 
 -----------------------------------------------------------------------------
 
-local knXCursorOffset = -20;-- -220
+local knXCursorOffset = -20;
 local knYCursorOffset = -6;
 
 ----------------------------------------------------------------------------
@@ -600,6 +600,25 @@ function ContextMenu:OnLoad()
 	-- Create Root Menu
 	ContextMenuRoot = ContextMenu:New();
 
+	-- Disable ContextMenuPlayer
+	local bDisableCarbineMenu = true;
+
+	if (bDisableCarbineMenu) then
+		local tContextMenuPlayer = Apollo.GetAddon("ContextMenuPlayer");
+		if (tContextMenuPlayer and not tContextMenuPlayer._OnDocumentReady) then
+			tContextMenuPlayer._OnDocumentReady = tContextMenuPlayer.OnDocumentReady;
+			tContextMenuPlayer.OnDocumentReady = function(self)
+				self:_OnDocumentReady();
+				Apollo.RemoveEventHandler("GenericEvent_NewContextMenuPlayer", self);
+				Apollo.RemoveEventHandler("GenericEvent_NewContextMenuPlayerDetailed", self);
+				Apollo.RemoveEventHandler("GenericEvent_NewContextMenuFriend", self);
+			end
+		end
+	else
+		knXCursorOffset = knXCursorOffset - 200;
+	end
+
+	-- Register Events used by ContextMenuPlayer
 	function ContextMenuRoot:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
 		if (self:GenerateUnitMenu(unitTarget or strTarget, nReportId)) then
 			self:Show();
