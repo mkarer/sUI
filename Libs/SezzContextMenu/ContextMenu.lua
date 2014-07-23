@@ -2,6 +2,11 @@
 
 	s:UI Context Menu
 
+	How to add a context menu:
+
+		local tMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage:GetRootMenu();
+		tMenu:Initialize(); -- Remove old data/windows/etc. and create a new empty window
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -16,6 +21,7 @@ local ContextMenu = APkg and APkg.tPackage or {};
 local GeminiGUI, GeminiLogging, log;
 local Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading = Apollo, GameLib, GroupLib, FriendshipLib, P2PTrading;
 local max, strlen, ceil = math.max, string.len, math.ceil;
+local ContextMenuRoot;
 
 -----------------------------------------------------------------------------
 
@@ -129,35 +135,63 @@ local tWDefContextMenuSeparator = {
 };
 
 -----------------------------------------------------------------------------
+-- Item Events
+-----------------------------------------------------------------------------
+
+local ktDefaultEvents = {};
+
+function ktDefaultEvents:HideSubMenu(wndHandler, wndControl)
+	local tMenu = wndHandler:GetData().ContextMenu;
+
+	if (tMenu.tActiveSubMenu and not tMenu.tActiveSubMenu.wndMain:ContainsMouse()) then
+		if ((wndHandler == tMenu.wndMain and not wndHandler:ContainsMouse()) or wndHandler ~= tMenu.wndMain) then
+			tMenu.tActiveSubMenu:Close();
+			tMenu.tActiveSubMenu = nil;
+		end
+	elseif (tMenu.wndParent and not tMenu.wndMain:ContainsMouse() and (not tMenu.wndParent:ContainsMouse() or tMenu.tParent.tActiveSubMenu ~= tMenu)) then
+		tMenu:Close();
+
+		if (tMenu.tParent.tActiveSubMenu == tMenu) then
+			tMenu.tParent.tActiveSubMenu = nil;
+		end
+	end
+end
+
+function ktDefaultEvents:ShowSubMenu(wndHandler, wndControl)
+Print("ShowSub-DEF")
+	if (not wndHandler or wndHandler ~= wndControl) then return; end
+	local tMenu = wndHandler:GetData().ContextMenu;
+
+	local strName = wndHandler:GetName();
+	local tSubMenu = tMenu.tChildren[strName];
+
+	if (not tSubMenu) then
+		tSubMenu = ContextMenu:New(tMenu, wndHandler);
+		tSubMenu:CreateWindow();
+		tSubMenu:AddItems(wndHandler:GetData().Children);
+		tMenu.tChildren[strName] = tSubMenu;
+	end
+
+	if (tMenu.tActiveSubMenu and tMenu.tActiveSubMenu ~= tSubMenu) then
+		tMenu:HideSubMenu(wndHandler, wndControl);
+	end
+
+	tSubMenu:Show();
+	tMenu.tActiveSubMenu = tSubMenu;
+	wndHandler:SetCheck(true);
+end
+
+-----------------------------------------------------------------------------
 -- Context Menu
 -----------------------------------------------------------------------------
 
 function ContextMenu:CreateWindow()
-	if (self.wndMain and self.wndMain:IsValid()) then
-		self.wndMain:Destroy();
-	end
-
 	self.wndMain = GeminiGUI:Create(tWDefContextMenu):GetInstance(self, self.wndParent or "TooltipStratum");
 	self.wndMain:Invoke();
 	self.wndButtonList = self.wndMain:FindChild("ButtonList");
 	self.tAnchorOffsets = { self.wndMain:GetAnchorOffsets() };
 	self.wndMain:AddEventHandler("MouseExit", "HideSubMenu", self);
 	self.wndMain:AddEventHandler("WindowClosed", "OnWindowClosed", self);
-end
-
-function ContextMenu:Init(strType, oData)
-	-- Cleanup
-	self.bIsIconList = false;
-	self.bUpdatedPosition = false;
-
-	if (self.wndMain and self.wndMain:IsValid()) then
-		self.wndMain:Destroy();
-	end
-
-	-- Initialize Data
-	if (strType == "Unit" and oData) then
-		self:GenerateUnitMenu(oData);
-	end
 
 	return self;
 end
@@ -180,7 +214,7 @@ function ContextMenu:AddItems(tItems)
 --log:debug(tButton.Name)
 		if (not tButton.Condition or tButton.Condition(self)) then
 			if (tButton.Text or tButton.Icon) then
-				-- Children
+				-- Determine if the item has visible children
 				local bCreateButton = true;
 				local bHasVisibleChildren = (tButton.Children and #tButton.Children > 0);
 				if (bHasVisibleChildren) then
@@ -197,7 +231,48 @@ function ContextMenu:AddItems(tItems)
 				end
 
 				if (bCreateButton) then
-					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefContextMenuIconCheckbox or tWDefContextMenuButton):GetInstance(self, self.wndButtonList);
+					-- Events
+					local tEventHandler, strEventHandler, fnEventHandler;
+
+					if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
+						if (not tButton.OnClick and bHasVisibleChildren) then
+							-- No custom event but children - ignore clicks
+							strEventHandler = "OnClickIgnore";
+							tEventHandler = self;
+						elseif (tButton.OnClick) then
+							-- Custom event handler
+							if (type(tButton.OnClick) == "string") then
+								-- One of the ContextMenu event handlers
+								strEventHandler = tButton.OnClick;
+								tEventHandler = self;
+							elseif (type(tButton.OnClick) == "function") then
+								-- Function
+								fnEventHandler = tButton.OnClick;
+								tEventHandler = self.tEventHandlers;
+							elseif (type(tButton.OnClick) == "table") then
+								-- Function, Event Handler
+								-- TODO
+								fnEventHandler = function(self, wndHandler, wndControl, ...)
+									local strFunction = tButton.OnClick[1];
+									local tEventHandler = tButton.OnClick[2];
+
+									tEventHandler[strFunction](tEventHandler, wndHandler, wndControl, ...);
+									if (tButton.CloseOnClick) then
+										wndHandler:GetData().ContextMenu:Close(true);
+									end
+								end;
+								tEventHandler = self.tEventHandlers;
+							end
+
+						end
+					end
+
+					-- Create Button
+					local wndButton = GeminiGUI:Create(tButton.Icon and tWDefContextMenuIconCheckbox or tWDefContextMenuButton):GetInstance(tEventHandler or self, self.wndButtonList);
+					wndButton:SetData({
+						ContextMenu = self,
+						Children = bHasVisibleChildren and tButton.Children or nil,
+					});
 
 					if (tButton.Name) then
 						wndButton:SetName(tButton.Name)
@@ -215,15 +290,16 @@ function ContextMenu:AddItems(tItems)
 					end
 
 					-- Click Event
-					if (tButton.OnClick or (tButton.Children and #tButton.Children > 0)) then
-						local strEventHandler = (not tButton.OnClick and tButton.Children and #tButton.Children > 0) and "OnClickIgnore" or tButton.OnClick;
+					if (fnEventHandler) then
+						strEventHandler = tostring(wndButton);
+						tEventHandler[strEventHandler] = fnEventHandler;
+					end
 
-						if (tButton.Icon) then
-							wndButton:AddEventHandler("ButtonCheck", strEventHandler);
-							wndButton:AddEventHandler("ButtonUncheck", strEventHandler);
-						else
-							wndButton:AddEventHandler("ButtonSignal", strEventHandler);
-						end
+					if (tButton.Icon) then
+						wndButton:AddEventHandler("ButtonCheck", strEventHandler, tEventHandler);
+						wndButton:AddEventHandler("ButtonUncheck", strEventHandler, tEventHandler);
+					else
+						wndButton:AddEventHandler("ButtonSignal", strEventHandler, tEventHandler);
 					end
 
 					-- Enabled State
@@ -233,7 +309,6 @@ function ContextMenu:AddItems(tItems)
 
 					-- Submenu Indicator/Events
 					if (bHasVisibleChildren) then
-						wndButton:SetData(tButton.Children);
 						wndButton:FindChild("BtnCheckboxArrow"):Show(true, true);
 						wndButton:AddEventHandler("MouseEnter", "ShowSubMenu");
 					else
@@ -303,8 +378,8 @@ function ContextMenu:ShowSubMenu(wndHandler, wndControl)
 
 	if (not tSubMenu) then
 		tSubMenu = ContextMenu:New(self, wndHandler);
-		tSubMenu:Init("Unit", self.nFriendId or self.unit or self.strTarget); -- TODO
-		tSubMenu:AddItems(wndHandler:GetData());
+		tSubMenu:CreateWindow();
+		tSubMenu:AddItems(wndHandler:GetData().Children);
 		self.tChildren[strName] = tSubMenu;
 	end
 
@@ -312,6 +387,7 @@ function ContextMenu:ShowSubMenu(wndHandler, wndControl)
 		self:HideSubMenu(wndHandler, wndControl);
 	end
 
+Print("Show")
 	tSubMenu:Show();
 	self.tActiveSubMenu = tSubMenu;
 	wndHandler:SetCheck(true);
@@ -333,7 +409,7 @@ function ContextMenu:HideSubMenu(wndHandler, wndControl)
 end
 
 function ContextMenu:OnClickIgnore(wndHandler, wndControl)
-	if (wndHandler:GetData()) then
+	if (wndHandler:GetData().Children) then
 		self:ShowSubMenu(wndHandler, wndControl);
 	end
 end
@@ -350,52 +426,42 @@ function ContextMenu:Close(bCloseParent)
 	end
 end
 
-function ContextMenu:Destroy()
-	for _, tSubMenu in pairs(self.tChildren) do
-		tSubMenu:Destroy();
+function ContextMenu:Initialize()
+	return self:Destroy(true):CreateWindow();
+end
+
+function ContextMenu:Destroy(bSkipSelf, bKeepWindow)
+	for strName, tContextMenu in pairs(self.tChildren) do
+		self.tChildren[strName] = tContextMenu:Destroy();
 	end
 
-	if (self.wndMain and self.wndMain:IsValid()) then
+	if (not bKeepWindow and self.wndMain and self.wndMain:IsValid()) then
 		self.wndMain:Destroy();
 	end
 
-	self = nil;
+	if (not bSkipSelf) then
+		self = nil;
+	elseif (not bKeepWindow) then
+		self.bIsIconList = false;
+		self.bUpdatedPosition = false;
+		self.tEventHandlers = setmetatable({}, { __index = ktDefaultEvents });
+	end
+
 	return self;
 end
 
+-----------------------------------------------------------------------------
+-- Events
+-----------------------------------------------------------------------------
+
 function ContextMenu:OnWindowClosed()
 	self.wndMain:Show(false, true);
-
-	if (not self.tParent) then
-		-- Root menu closed!
-		for strName, tContextMenu in pairs(self.tChildren) do
-			self.tChildren[strName] = tContextMenu:Destroy();
-		end
-
-		-- TODO
-		self.unit = nil;
-		self.unitPlayer = nil;
-		self.bInGroup = nil;
-		self.bAmIGroupLeader = nil;
-		self.tMyGroupData = nil;
-		self.strTarget = nil;
-		self.tCharacterData = nil;
-		self.tPlayerFaction = nil;
-		self.bIsACharacter = nil;
-		self.bIsThePlayer = nil;
-		self.nGroupMemberId = nil;
-		self.tTargetGroupData = nil;
-		self.tFriend = nil;
-		self.tAccountFriend = nil;
-		self.bCanAccountWisper = nil;
-		self.bCanWhisper = nil;
-		self.bIsFriend = nil;
-		self.bIsRival = nil;
-		self.bIsNeighbor = nil;
-		self.bIsAccountFriend = nil;
-		self.bMentoringTarget = nil;
-	end
+	self:Destroy(true, true);
 end
+
+-----------------------------------------------------------------------------
+-- GUI
+-----------------------------------------------------------------------------
 
 function ContextMenu:CheckWindowBounds()
 	local nWidth =  self.wndMain:GetWidth();
@@ -463,11 +529,19 @@ end
 
 function ContextMenu:New(tParent, wndParent)
 	-- TODO: There should be only ONE root menu, because you can only show one
-	return setmetatable({
+	local tMenu = setmetatable({
 		tParent = tParent,
 		wndParent = wndParent,
 		tChildren = {},
+		tEventHandlers = setmetatable({}, { __index = ktDefaultEvents }),
+		tData = tParent and tParent.tData or {},
 	}, { __index = self });
+
+	return tMenu;
+end
+
+function ContextMenu:GetRootMenu()
+	return ContextMenuRoot;
 end
 
 -----------------------------------------------------------------------------
@@ -488,33 +562,24 @@ function ContextMenu:OnLoad()
 
 	GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 
-	-- Listen to Carbine's Context Menu Events (TEMP)
-	local tContextMenu = ContextMenu:New();
+	-- Create Root Menu
+	ContextMenuRoot = ContextMenu:New();
 
-	function tContextMenu:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
-log:debug("OnNewContextMenuPlayer");
-		if (self:Init("Unit", unitTarget or strTarget)) then
+	function ContextMenuRoot:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
+		if (self:GenerateUnitMenu(unitTarget or strTarget, nReportId)) then
 			self:Show();
 		end
 	end
 
-	function tContextMenu:OnNewContextMenuPlayerDetailed(wndParent, strTarget, unitTarget, nReportId)
-log:debug("OnNewContextMenuPlayerDetailed");
-		if (self:Init("Unit", unitTarget or strTarget)) then
+	function ContextMenuRoot:OnNewContextMenuFriend(wndParent, nFriendId)
+		if (self:GenerateUnitMenu(nFriendId)) then
 			self:Show();
 		end
 	end
 
-	function tContextMenu:OnNewContextMenuFriend(wndParent, nFriendId)
-log:debug("OnNewContextMenuFriend (ID: %d)", nFriendId or 0);
-		if (self:Init("Unit", nFriendId)) then
-			self:Show();
-		end
-	end
-
-	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayer", "OnNewContextMenuPlayer", tContextMenu);
-	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayerDetailed", "OnNewContextMenuPlayerDetailed", tContextMenu);
-	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuFriend", "OnNewContextMenuFriend", tContextMenu);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayer", "OnNewContextMenuPlayer", ContextMenuRoot);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuPlayerDetailed", "OnNewContextMenuPlayer", ContextMenuRoot);
+	Apollo.RegisterEventHandler("GenericEvent_NewContextMenuFriend", "OnNewContextMenuFriend", ContextMenuRoot);
 end
 
 function ContextMenu:OnDependencyError(strDep, strError)
