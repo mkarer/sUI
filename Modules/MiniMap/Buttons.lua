@@ -196,34 +196,62 @@ function M:OnEnable()
 		tMenu:Initialize(); -- Remove old data/windows/etc.
 		tMenu:AddHeader("s:UI");
 		tMenu:AddItems({
-			-- One Children
+			-- One Level
 			{
 				Name = "Test1",
-				Text = "Test with 1 Child",
-						Condition = function() return true; end,
+				Text = "Test 1",
+				OnClick = { "ToggleConfiguration", S },
 				Children = {
 					{
 						Name = "Test11",
-						Text = "Hey, I'm a child 1!",
-						Condition = function() return true; end,
+						Text = "Test 1-1",
 					},
 					{
 						Name = "Test12",
-						Text = "Hey, I'm a child 2!",
-						Condition = function() return true; end,
+						Text = "Test 1-2",
 					},
 					{
 						Name = "Test13",
-						Text = "Hey, I'm a child 3!",
-						Condition = function() return true; end,
+						Text = "Test 1-3",
 					},
 				},
 			},
+			-- Multiple Levels
+			{
+				Name = "Test2",
+				Text = "Test 2",
+				OnClick = { "ToggleConfiguration", S },
+				Children = {
+					{
+						Name = "Test21",
+						Text = "Test 2-1",
+						Children = {
+							{ Name = "Test31", Text = "Test 3-1", Children = {
+								{ Name = "Test41", Text = "Test 4-1", Children = {
+									{ Name = "Test51", Text = "Test 5-1" },
+									},
+								},
+
+								},
+							},
+						},
+					},
+					{
+						Name = "Test22",
+						Text = "Test 2-2",
+					},
+					{
+						Name = "Test23",
+						Text = "Test 2-3",
+					},
+				},
+			},
+			-- Settings
 			{
 				Name = "BtnSettings",
 				Text = Apollo.GetString("GuildRegistration_SettingsLabel"),
 				OnClick = { "ToggleConfiguration", S },
-				CloseOnClick = true,
+				CloseMenuOnClick = true,
 			},
 			{
 			},
