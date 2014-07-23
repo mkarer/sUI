@@ -157,15 +157,13 @@ end
 function ktDefaultEvents:ShowSubMenu(wndHandler, wndControl)
 	if (not wndHandler or wndHandler ~= wndControl) then return; end
 	local tMenu = wndHandler:GetData().ContextMenu;
-
-	local strName = wndHandler:GetName();
-	local tSubMenu = tMenu.tChildren[strName];
+	local tSubMenu = tMenu.tChildren[wndHandler];
 
 	if (not tSubMenu) then
 		tSubMenu = ContextMenu:New(tMenu, wndHandler);
 		tSubMenu:CreateWindow();
 		tSubMenu:AddItems(wndHandler:GetData().Children);
-		tMenu.tChildren[strName] = tSubMenu;
+		tMenu.tChildren[wndHandler] = tSubMenu;
 	end
 
 	if (tMenu.tActiveSubMenu and tMenu.tActiveSubMenu ~= tSubMenu) then
@@ -382,14 +380,13 @@ end
 
 function ContextMenu:ShowSubMenu(wndHandler, wndControl)
 	if (not wndHandler or wndHandler ~= wndControl) then return; end
-	local strName = wndHandler:GetName();
-	local tSubMenu = self.tChildren[strName];
+	local tSubMenu = self.tChildren[wndHandler];
 
 	if (not tSubMenu) then
 		tSubMenu = ContextMenu:New(self, wndHandler);
 		tSubMenu:CreateWindow();
 		tSubMenu:AddItems(wndHandler:GetData().Children);
-		self.tChildren[strName] = tSubMenu;
+		self.tChildren[wndHandler] = tSubMenu;
 	end
 
 	if (self.tActiveSubMenu and self.tActiveSubMenu ~= tSubMenu) then
@@ -399,6 +396,14 @@ function ContextMenu:ShowSubMenu(wndHandler, wndControl)
 	tSubMenu:Show();
 	self.tActiveSubMenu = tSubMenu;
 	wndHandler:SetCheck(true);
+end
+
+function ContextMenu:ContainsMouse()
+	if (self.tActiveSubMenu) then
+		return self.tActiveSubMenu:ContainsMouse();
+	else
+		return self.wndMain:ContainsMouse();
+	end
 end
 
 function ContextMenu:HideSubMenu(wndHandler, wndControl)
@@ -439,8 +444,8 @@ function ContextMenu:Initialize()
 end
 
 function ContextMenu:Destroy(bSkipSelf, bKeepWindow)
-	for strName, tContextMenu in pairs(self.tChildren) do
-		self.tChildren[strName] = tContextMenu:Destroy();
+	for strKey, tContextMenu in pairs(self.tChildren) do
+		self.tChildren[strKey] = tContextMenu:Destroy();
 	end
 
 	if (not bKeepWindow and self.wndMain and self.wndMain:IsValid()) then
