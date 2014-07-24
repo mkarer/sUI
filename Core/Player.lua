@@ -472,3 +472,22 @@ function S:CheckMailEvent()
 		self:RaiseEvent(strEvent);
 	end
 end
+
+-----------------------------------------------------------------------------
+-- Misc
+-----------------------------------------------------------------------------
+
+function S:HasPendingCalls()
+	local tCallbackList = Quest:GetCallbackList(true); -- Boolean is to show out leveled quests or not
+	if (tCallbackList == nil or #tCallbackList <= 0) then
+		return false;
+	end
+
+	for _, queCurr in ipairs(tCallbackList) do
+		if (queCurr:GetState() == Quest.QuestState_Mentioned) then
+			return true;
+		end
+	end
+
+	return false;
+end
