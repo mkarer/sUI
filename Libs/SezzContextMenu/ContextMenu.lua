@@ -624,8 +624,8 @@ function ContextMenu:OnLoad()
 	end
 
 	-- Register Events used by ContextMenuPlayer
-	function ContextMenuRoot:OnNewContextMenuPlayer(wndParent, strTarget, unitTarget, nReportId)
-		if (self:GenerateUnitMenu(unitTarget or strTarget, nReportId)) then
+	function ContextMenuRoot:OnNewContextMenuPlayer(wndParent, strUnit, unit, nReportId)
+		if (self:GenerateUnitMenu(unit or strUnit, nReportId)) then
 			self:Show();
 		end
 	end
