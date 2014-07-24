@@ -81,9 +81,34 @@ end
 -- Initialization
 -----------------------------------------------------------------------------
 
+function M:ShowCallMissed()
+	log:debug("SHOW")
+	self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(true);
+end
+
+function M:HideCallMissed(event)
+	log:debug("HIDE");
+	log:debug(event);
+	self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(false);
+end
+
+function M:OnCharacterLoaded()
+	log:debug(S:HasPendingCalls());
+	self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(S:HasPendingCalls());
+end
+
+function M:OnDatachronDrawCallSystem(tDatachron, strNewState)
+	self:OnCharacterLoaded();
+end
+
 function M:OnInitialize()
 	log = S.Log;
 	self:InitializeForms();
+
+	local tDatachron = Apollo.GetAddon("Datachron");
+	if (tDatachron) then
+		self:PostHook(tDatachron, "DrawCallSystem", "OnDatachronDrawCallSystem");
+	end
 end
 
 function M:OnEnable()
@@ -122,11 +147,22 @@ function M:OnEnable()
 	-----------------------------------------------------------------------------
 	self.tButtonContainer:CreateButton("Datachron", "IconDatachron");
 	if (g_wndDatachron) then
-		self:OnAddonAvailable(nil, "Datachron");
+		self:OnAddonAvailable(nil, "Datachron", Apollo.GetAddon("Datachron"));
 	else
 		self:RegisterEvent("Sezz_AddonAvailable", "OnAddonAvailable");
 	end
+	
+	self:RegisterEvent("DatachronCallCleared", "HideCallMissed");
+	self:RegisterEvent("StopTalkingCommDisplay", "HideCallMissed");
+	self:RegisterEvent("DatachronCallIncoming", "ShowCallMissed");
+	self:RegisterEvent("DatachronCallMissed", "ShowCallMissed");
 
+	if (S.bCharacterLoaded) then
+		self:OnAddonAvailable();
+	else
+		self:RegisterEvent("Sezz_CharacterLoaded", "OnCharacterLoaded");
+	end
+	
 	-----------------------------------------------------------------------------
 	-- Dash Indicator
 	-----------------------------------------------------------------------------
@@ -274,7 +310,7 @@ end
 
 -----------------------------------------------------------------------------
 
-function M:OnAddonAvailable(strEvent, strAddon)
+function M:OnAddonAvailable(strEvent, strAddon, tAddon)
 	if (strAddon == "Datachron") then
 		self:UpdateDatachronButton();
 	elseif (strAddon == "Inventory") then
