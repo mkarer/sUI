@@ -339,6 +339,35 @@ function M:SetupActionBars()
 	end
 end
 
+-- Gadget Button Visibility
+local function OnUpdateInventory(self)
+	local bHasGadget = false;
+
+	if (S.bCharacterLoaded) then
+		for _, itemEquipped in ipairs(S.myCharacter:GetEquippedItems()) do
+			if (itemEquipped:GetSlot() == 11) then
+				bHasGadget = true;
+			end
+		end
+	end
+
+	self.wndMain:Show(bHasGadget, true);
+end
+
+-- Path Button Visibility
+local function OnXPChanged(self)
+	local bShow = false;
+	if (S.bCharacterLoaded) then
+		bShow = (PlayerPathLib.GetPathLevel() >= 4);
+	end
+
+	self.wndMain:Show(bShow, true);
+
+	if (bShow) then
+		Apollo.RemoveEventHandler("UI_XPChanged", self);
+	end
+end
+
 function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, buttonIdTo, enableFading, buttonSize)
 	-- Calculate Size
 	local buttonSize = buttonSize or self.DB.buttonSize;
@@ -393,6 +422,20 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 		-- Custom Icon
 		if (buttonAttributes.icon) then
 			buttonContainer.wndButton:FindChild("Icon"):SetSprite(buttonAttributes.icon);
+		end
+
+		-- Button Visibility
+		if (buttonAttributes.type == "LAS" and buttonAttributes.id == 8) then
+			-- Gadget
+			buttonContainer.OnUpdateInventory = OnUpdateInventory;
+			Apollo.RegisterEventHandler("UpdateInventory", "OnUpdateInventory", buttonContainer);
+			Apollo.RegisterEventHandler("Sezz_CharacterLoaded", "OnUpdateInventory", buttonContainer);
+			buttonContainer:OnUpdateInventory();
+		elseif (buttonAttributes.type == "LAS" and buttonAttributes.id == 9) then
+			-- Path
+			buttonContainer.OnXPChanged = OnXPChanged;
+			Apollo.RegisterEventHandler("UI_XPChanged", "OnXPChanged", buttonContainer);
+			buttonContainer:OnXPChanged();
 		end
 
 		-- Enable Menu
