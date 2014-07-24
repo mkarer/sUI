@@ -168,6 +168,13 @@ function M:UpdateDatachronForms()
 				S:UpdateElementInXml(tXml, "BGRunner", { Sprite = "" });
 				S:UpdateElementInXml(tXml, "Framing", { Sprite = "" });
 
+				local tElement = S:FindElementInXml(tXml, "CompletedScreen");
+				if (tElement) then
+					S:UpdateElementInXml(tElement, "CompletedScreen", { Sprite = "" });
+					S:UpdateElementInXml(tElement, "Framing", { Sprite = "" });
+					S:UpdateElementInXml(tElement, "LootEpBG", { Sprite = "" });
+				end
+
 				local tXmlNewMissions = S:FindElementInXml(tXml, "ActiveMissionsHeader");
 				if (tXmlNewMissions) then
 					S:UpdateElementInXml(tXmlNewMissions, "Pixie2", { Sprite = "" });
@@ -195,22 +202,19 @@ function M:UpdateDatachronForms()
 					if (tXmlMissionsRemaining) then
 						S:UpdateElementInXml(tXmlMissionsRemaining, "LootEpBG", { Sprite = "" });
 					end
-
-					local tXmlMissionsCompleted = S:FindElementInXml(tXml, "CompletedScreen");
-					if (tXmlMissionsCompleted) then
-						S:UpdateElementInXml(tXmlMissionsCompleted, "LootEpBG", { Sprite = "" });
-					end
 				end
 
 
 				self.xmlDoc = XmlDoc.CreateFromTable(tXml);
 			end
 
-			tDatachronPath._OnLoadFromDatachron = tDatachronPath.OnLoadFromDatachron;
-			tDatachronPath.OnLoadFromDatachron = function(self)
-				tDatachronPath:_OnLoadFromDatachron();
-				if (self.wndMain) then
-					self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+			if (strPathName ~= "Soldier") then
+				tDatachronPath._OnLoadFromDatachron = tDatachronPath.OnLoadFromDatachron;
+				tDatachronPath.OnLoadFromDatachron = function(self)
+					tDatachronPath:_OnLoadFromDatachron();
+					if (self.wndMain) then
+						self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
+					end
 				end
 			end
 		end
