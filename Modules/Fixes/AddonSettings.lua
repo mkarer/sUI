@@ -109,6 +109,15 @@ function M:OverrideNameplatesSettings()
 			tNameplate.bSpeechBubble = false;
 			self:_UpdateNameplateVisibility(tNameplate);
 		end
+
+		-- Hide Player Title
+		tNameplates._DrawName = tNameplates.DrawName;
+		tNameplates.DrawName = function(self, tNameplate)
+			local bShowTitle = self.bShowTitle;
+			self.bShowTitle = false;
+			self:_DrawName(tNameplate);
+			self.bShowTitle = bShowTitle;
+		end
 	end
 end
 
