@@ -35,6 +35,6 @@ end
 function M:OnApplyCCState(code, userdata)
 	if (unitPlayer == userdata and code == Unit.CodeEnumCCState.DisableCinematic) then
 		log:debug("CC Applied: DisableCinematic");
-		GameLib.UIExitCinematics();
+--		GameLib.UIExitCinematics();
 	end
 end
