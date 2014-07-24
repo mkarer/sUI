@@ -476,7 +476,7 @@ function ContextMenu:OnClickUnit(wndControl, wndHandler)
 	self:Close(true);
 end
 
-function ContextMenu:FindFriend(strName, bAccountFriend)
+local function FindFriend(strName, bAccountFriend)
 	local strRealm = GameLib.GetRealmName();
 	local tFriends = bAccountFriend and FriendshipLib.GetAccountList() or FriendshipLib.GetList();
 
@@ -509,7 +509,7 @@ function ContextMenu:GenerateUnitMenu(unit, nReportId)
 	self.tData.tMyGroupData = GroupLib.GetGroupMember(1);
 	self.tData.tPlayerFaction = self.tData.unitPlayer:GetFaction();
 
-	-- Check if Unitstring is the Player (TODO: Can unit string come from another realm?)
+	-- Check if Unitstring is the Player (TODO: Can unit string come from another realm? Need to test this in PVP)
 	if (type(unit) == "string" and unit == self.tData.unitPlayer:GetName()) then
 		unit = self.tData.unitPlayer;
 	end
@@ -575,18 +575,17 @@ function ContextMenu:GenerateUnitMenu(unit, nReportId)
 		self.tData.bMentoringTarget = false;
 	end
 
-	-- Friend (TODO: Testing)
+	-- Friend
 	if (self.tData.bIsACharacter) then
 		if (not self.tData.bFriendMenu) then
-			self.tData.tFriend = self:FindFriend(self.tData.strTarget); -- bFriend, bRival, bIgnore
-			self.tData.tAccountFriend = self:FindFriend(self.tData.strTarget, true);
+			self.tData.tFriend = FindFriend(self.tData.strTarget); -- bFriend, bRival, bIgnore
+			self.tData.tAccountFriend = FindFriend(self.tData.strTarget, true);
 			self.tData.nFriendId = (self.tData.tFriend and self.tData.tFriend.nId) or (self.tData.tAccountFriend and self.tData.tAccountFriend.nId) or nil;
 		end
 
 		self.tData.bCanAccountWisper = not self.tData.bIsOfflineAccountFriend and (self.tData.tAccountFriend ~= nil and self.tData.tAccountFriend.arCharacters and self.tData.tAccountFriend.arCharacters[1] ~= nil);
 		if (self.tData.bCanAccountWisper) then
 --			self.tData.bCanWhisper = (self.tData.tAccountFriend.arCharacters[1] ~= nil and self.tData.tAccountFriend.arCharacters[1].strRealm == GameLib.GetRealmName() and self.tData.tAccountFriend.arCharacters[1].nFactionId == self.tData.tPlayerFaction);
-
 			self.tData.bCanWhisper = (self.tData.tAccountFriend.arCharacters[1].nFactionId == self.tData.tPlayerFaction);
 		else
 			self.tData.bCanWhisper = not self.tData.bIsOfflineAccountFriend and (self.tData.bIsACharacter and (not self.tData.unit or (self.tData.unit and self.tData.unit:GetFaction() == self.tData.tPlayerFaction)) and (self.tData.tFriend == nil or (self.tData.tFriend ~= nil and not self.tData.tFriend.bIgnore)));
