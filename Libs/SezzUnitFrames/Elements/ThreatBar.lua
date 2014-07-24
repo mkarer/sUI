@@ -42,7 +42,7 @@ function Element:UpdateThreat(...)
 	local wndThreat = self.tUnitFrame.tControls.ThreatBar;
 	local tColors = self.tUnitFrame.tColors;
 
-	if (UnitIsFriend(unit)) then
+	if (UnitIsFriend(unit) or unit:IsACharacter()) then
 		return;
 	end
 
@@ -108,7 +108,7 @@ function Element:Update()
 	-- Update() is only called when the element is enabled/target has changed
 	local unit = self.tUnitFrame.unit;
 
-	if (UnitIsFriend(unit) or unit:IsDead()) then
+	if (UnitIsFriend(unit) or unit:IsACharacter() or unit:IsDead()) then
 		self.tUnitFrame.tControls.ThreatBar:Show(false, true);
 		-- Not sure if friendly NPCs can turn into enemies, won't disable the element until someone can confirm.
 		-- self:Disable();
