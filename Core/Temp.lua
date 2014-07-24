@@ -51,6 +51,9 @@ function M:OnEnable()
 --	self:RegisterEvent("Group_Updated", "EventHandler"); -- happens all the time, no args
 --	self:RegisterEvent("Group_UpdatePosition", "EventHandler"); -- also all the time, table with tables with nIndex to associate unit and coords
 --	self:RegisterEvent("UnitNameChanged", "EventHandler"); -- tUnit, strNewName (quest mobs etc)
+
+	self:RegisterEvent("Communicator_EndIncoming", "EventHandler")
+	self:RegisterEvent("DatachronCallMissed", "EventHandler")
 end
 
 function S:Test()
