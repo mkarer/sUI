@@ -93,8 +93,9 @@ function M:HideCallMissed(event)
 end
 
 function M:OnCharacterLoaded()
-	log:debug(S:HasPendingCalls());
-	self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(S:HasPendingCalls());
+	if (self.tButtonContainer) then
+		self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(S:HasPendingCalls());
+	end
 end
 
 function M:OnDatachronDrawCallSystem(tDatachron, strNewState)
