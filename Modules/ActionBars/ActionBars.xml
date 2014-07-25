@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <Forms>
+	<!-- TODO: Define them in Lua, add stuff as needed (based on button type) -->
 	<!-- Action Bar Container -->
 	<Form Class="Window" LAnchorPoint="0.5" LAnchorOffset="-200" TAnchorPoint="1" TAnchorOffset="-200" RAnchorPoint="0.5" RAnchorOffset="200" BAnchorPoint="1" BAnchorOffset="-120" RelativeToClient="1" Font="Default" Text="" Template="Default" TooltipType="OnCursor" Name="SezzActionBarContainer" BGColor="ffffffff" TextColor="ffffffff" TooltipColor="" HideInEditor="0" IgnoreMouse="1"/>
 	<!-- Action Bar Button: LAS -->
