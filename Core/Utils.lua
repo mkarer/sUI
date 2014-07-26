@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
 -- Lua API
-local mod, format, floor = math.mod, string.format, math.floor;
+local mod, format, floor, format, strlen = math.mod, string.format, math.floor, string.format, string.len;
 
 -----------------------------------------------------------------------------
 -- Table Utilities
@@ -69,6 +69,53 @@ end
 
 function S:GetMoneySplitted(nAmount)
 	return floor(nAmount / 1000000), floor(mod(nAmount / 10000, 100)), floor(mod(nAmount / 100, 100)), mod(nAmount, 100);
+end
+
+local strColorCopper	= "ffeda55f";
+local strColorSilver	= "ffc7c7cf";
+local strColorGold		= "ffffd700";
+local strColorPlatin	= "ffffffff";
+
+function S:GetMoneyAML(nAmount)
+	local nPlatin, nGold, nSilver, nCopper = self:GetMoneySplitted(nAmount);
+
+	local strAML = "";
+	local strNumberFormat = "%d";
+
+	-- Platin
+	if (nPlatin > 0) then
+		strAML = format(strNumberFormat .. '<T TextColor="%s">p</T> ', nPlatin, strColorPlatin);
+	end
+
+	-- Gold
+	if (nPlatin > 0 or nGold > 0) then
+		if (strlen(strAML) > 0) then
+			strAML = strAML.." ";
+			strNumberFormat = "%02d";
+		end
+
+		strAML = strAML..format(strNumberFormat .. '<T TextColor="%s">g</T>', nGold, strColorGold);
+	end
+
+	-- Silver
+	if (nPlatin > 0 or nGold > 0 or nSilver > 0) then
+		if (strlen(strAML) > 0) then
+			strAML = strAML.." ";
+			strNumberFormat = "%02d";
+		end
+
+		strAML = strAML..format(strNumberFormat .. '<T TextColor="%s">s</T>', nSilver, strColorSilver);
+	end
+
+	-- Copper
+	if (strlen(strAML) > 0) then
+		strAML = strAML.." ";
+		strNumberFormat = "%02d";
+	end
+
+	strAML = strAML..format(strNumberFormat .. '<T TextColor="%s">c</T>', nCopper, strColorCopper);
+
+	return '<P Font="Nameplates" Align="Right" TextColor="ffffffff">'..strAML..'</P>';
 end
 
 -----------------------------------------------------------------------------
