@@ -122,6 +122,12 @@ local function OnSearch(self)
 	self:Search();
 end
 
+local function OnSearchLostFocus(self, wndHandler, wndControl)
+	if (strlen(wndControl:GetText()) == 0) then
+		wndControl:SetText(strSearchLocalized);
+	end
+end
+
 function M:CreateWindow()
 	if (not self.wndMain) then
 		local nWidthCategories = 250;
@@ -200,6 +206,10 @@ function M:CreateWindow()
 											BGColor = "11ffffff",
 											Text = "Search",
 											DT_VCENTER = true,
+											Events = {
+												EditBoxReturn = OnSearch,
+												WindowLostFocus = OnSearchLostFocus,
+											},
 										},
 										-- Button: Search
 										{
@@ -238,15 +248,15 @@ function M:CreateWindow()
 								},
 								-- Search Results
 								{
-									BGColor = "aa000000",
+--									BGColor = "aa000000",
 									Name = "Results",
 									Border = false,
-									Picture = true,
-									Sprite = "ClientSprites:WhiteFill",
+--									Picture = true,
+--									Sprite = "ClientSprites:WhiteFill",
 									AnchorPoints = { 0, 0, 1, 1, },
 									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
 									VScroll = true,
-									AutoHideScroll = true,
+									AutoHideScroll = false,
 									Template = "Holo_ScrollList",
 								},
 								-- Search Filter
@@ -298,6 +308,37 @@ end
 -- Items
 -----------------------------------------------------------------------------
 
+local OpacityFix = {
+	tWindows = {},
+};
+
+Apollo.RegisterTimerHandler("SezzUITimer_OpacityFix", "ShowWindows", OpacityFix);
+Apollo.CreateTimer("SezzUITimer_OpacityFix", 1 / 1000, false);
+
+function OpacityFix:FixWindow(wndControl)
+	self.tWindows[wndControl] = GameLib.GetTickCount();
+	Apollo.StartTimer("SezzUITimer_OpacityFix");
+end
+
+function OpacityFix:ShowWindows()
+	local nTicks = GameLib.GetTickCount();
+
+	for wndControl, nTicksAdded in pairs(self.tWindows) do
+		if (nTicks > nTicksAdded) then
+			wndControl:Show(true, true);
+			self.tWindows[wndControl] = nil;
+		end
+	end
+end
+
+local function OnWindowShow(self, wndHandler, wndControl)
+	-- Background Opacity Fix
+	if (wndHandler:GetOpacity() == 1) then
+		wndHandler:Show(false, true);
+		OpacityFix:FixWindow(wndHandler); 
+	end
+end
+
 local function ShowItemTooltip(self, wndHandler, wndControl) -- Build on mouse enter and not every hit to save computation time
 	local aucCurr = wndHandler == wndControl and wndHandler:GetParent() and wndHandler:GetParent():GetData() or nil;
 
@@ -337,17 +378,17 @@ function M:CreateListItem(aucCurr)
 	-- Bids
 	local tBidMinimum = aucCurr:GetMinBid();
 	local tBidCurrent = aucCurr:GetCurrentBid();
-	local bHasBids, strBid = tBidCurrent:GetAmount() > 0, "";
+	local bHasBids, nBidAmount = tBidCurrent:GetAmount() > 0, 0;
 
 	if (bHasBids) then
-		strBid = tBidCurrent:GetMoneyString();
+		nBidAmount = tBidCurrent:GetAmount();
 	else
-		strBid = tBidMinimum:GetMoneyString();
+		nBidAmount = tBidMinimum:GetAmount();
 	end
 
 	-- Create Control
 	local wndItem = self.GeminiGUI:Create({
-		BGColor = bIsKnownSchematic and "1eff0000" or "11ffffff",
+		BGColor = bIsKnownSchematic and "1eff0000" or "aa000000",
 		Border = false,
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",
@@ -369,28 +410,31 @@ function M:CreateListItem(aucCurr)
 				},
 				Children = {
 					{
-						Name = "Count",
-						AnchorPoints = { 0, 0, 1, 1 },
-						AnchorOffsets = { 0, 0, -1, -1 },
-						Text = strCount,
-						DT_RIGHT = true,
-						Font = "CRB_Interface9_O",
-					},
-					{
-						Name = "Icon",
-						AnchorPoints = { 0, 0, 1, 1 },
-						AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
-						Picture = true,
-						BGColor = "white",
-						Sprite = itemCurr:GetIcon(),
-					},
-					{
 						Name = "IconBackground",
 						AnchorPoints = { 0, 0, 1, 1 },
 						AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
 						Picture = true,
 						BGColor = "black",
 						Sprite = "ClientSprites:WhiteFill",
+						Children = {
+							{
+								Name = "Count",
+								AnchorPoints = { 0, 0, 1, 1 },
+								AnchorOffsets = { 0, 0, -2, -1 },
+								Text = strCount,
+								DT_RIGHT = true,
+								DT_BOTTOM = true,
+								Font = "CRB_Interface9_O",
+							},
+							{
+								Name = "Icon",
+								AnchorPoints = { 0, 0, 1, 1 },
+								AnchorOffsets = { 0, 0, 0, 0 },
+								Picture = true,
+								BGColor = "white",
+								Sprite = itemCurr:GetIcon(),
+							},
+						},
 					},
 				},
 			},
@@ -398,32 +442,46 @@ function M:CreateListItem(aucCurr)
 			{
 				AnchorPoints = { 0, 0, 0.5, 1 },
 				AnchorOffsets = { nItemSize + 4, 0, 0, 0 },
-				Text = "["..(#self.wndResults:GetChildren() + 1).."] "..itemCurr:GetName(),
+				Text = itemCurr:GetName(),
 				TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
 				DT_VCENTER = true,
+				Font = "Nameplates",
 			},
 			-- Bid
 			{
+				Class = "MLWindow",
+				Name = "Bid",
 				AnchorPoints = { 0.5, 0, 0.7, 1 },
-				AnchorOffsets = { 0, 0, 0, 0 },
-				Text = strBid,
+				AnchorOffsets = { 0, 8, 0, 0 },
 				TextColor = bHasBids and "white" or "darkgray",
-				DT_VCENTER = true,
-				DT_RIGHT = true,
+				Events = {
+					WindowShow = not bHasBids and OnWindowShow or nil,
+				},
+				Visible = false,
 			},
 			-- Buyout
 			{
+				Class = "MLWindow",
+				Name = "Buyout",
 				AnchorPoints = { 0.7, 0, 0.9, 1 },
-				AnchorOffsets = { 0, 0, 0, 0 },
-				Text = aucCurr:GetBuyoutPrice():GetMoneyString(),
-				DT_VCENTER = true,
-				DT_RIGHT = true,
+				AnchorOffsets = { 0, 8, 0, 0 },
 			},
 		},
 		UserData = aucCurr,
+		Visible = false,
 	}):GetInstance(self, self.wndResults);
 
+	wndItem:FindChild("Bid"):SetText(S:GetMoneyAML(nBidAmount));
+	wndItem:FindChild("Buyout"):SetText(S:GetMoneyAML(aucCurr:GetBuyoutPrice():GetAmount()));
+
+	if (not bHasBids) then
+		wndItem:FindChild("Bid"):SetOpacity(0.5, 5e+20);
+	end
+
 	SendVarToRover("AHCurrentAuction", aucCurr);
+
+	wndItem:Show(true, true);
+	wndItem:FindChild("Bid"):Show(true, true);
 
 	return wndItem;
 end

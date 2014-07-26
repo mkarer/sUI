@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch, tinsert = string.len, string.find, string.gmatch, table.insert;
+local strlen, strfind, tinsert, gsub, strlower = string.len, string.find, table.insert, string.gsub, string.lower;
 local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 
 -----------------------------------------------------------------------------
@@ -19,12 +19,43 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 
 local strSearchLocalized = Apollo.GetString("CRB_Search");
 
+local EscapePattern
+do
+	local matches = {
+		["^"] = "%^",
+		["$"] = "%$",
+		["("] = "%(",
+		[")"] = "%)",
+		["%"] = "%%",
+		["."] = "%.",
+		["["] = "%[",
+		["]"] = "%]",
+		["*"] = "%*",
+		["+"] = "%+",
+		["-"] = "%-",
+		["?"] = "%?",
+		["\0"] = "%z",
+	};
+
+	EscapePattern = function(s)
+		return (gsub(s, ".", matches));
+	end
+end
+
 local tCustomFilter = {
-	KnownSchematics = function(aucCurrent)
-		local itemCurr = aucCurrent:GetItem();
-		return (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
-	end,
-	
+	-- fnFilter returns true when the auction is filtered and false when it should be displayed.
+	KnownSchematics = {
+		fnFilter = function(self, aucCurrent)
+			local itemCurr = aucCurrent:GetItem();
+			return (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
+		end,
+	},
+	Name = {
+		fnFilter = function(self, aucCurrent)
+			local itemCurr = aucCurrent:GetItem();
+			return (strfind(itemCurr:GetName(), self.tFilter.strSearchQueryEscaped) == nil);
+		end,
+	},
 };
 
 function M:BuildFilter()
@@ -35,6 +66,7 @@ function M:BuildFilter()
 		nCategoryId = nCategoryId,
 		nTypeId = nTypeId,
 		strSearchQuery = strSearchQuery,
+		strSearchQueryEscaped = strSearchQuery and EscapePattern(strSearchQuery) or "",
 		tFilter = tFilter,
 		tCustomFilter = tCustomFilter,
 	};
@@ -72,7 +104,7 @@ end
 
 function M:IsFiltered(aucCurrent)
 	for _, strFilter in ipairs(self.tFilter.tCustomFilter) do
-		if (tCustomFilter[strFilter] and tCustomFilter[strFilter](aucCurrent)) then
+		if (tCustomFilter[strFilter] and tCustomFilter[strFilter].fnFilter(self, aucCurrent)) then
 			return true;
 		end
 	end

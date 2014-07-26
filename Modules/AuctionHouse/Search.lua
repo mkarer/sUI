@@ -32,16 +32,15 @@ function M:Search(nPage)
 	end
 
 	-- Initiate new Search
-	local nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilters = self:GetCurrentFilter();
 	local nPage = nPage or 0; -- nPage is zero-based
 	local eAuctionSort = MarketplaceLib.AuctionSort.TimeLeft;
 	local bReverseSort = false;
 	local nPropertySort = false;
 
-	if (strSearchQuery) then
+	if (self.tFilter.strSearchQuery) then
 		-- Exit early if too many items in the search
 		local tPackagedData = {};
-		for _, tData in pairs(MarketplaceLib.SearchAuctionableItems(strSearchQuery, nFamilyId, nCategoryId, nTypeId)) do
+		for _, tData in pairs(MarketplaceLib.SearchAuctionableItems(self.tFilter.strSearchQuery, self.tFilter.nFamilyId, self.tFilter.nCategoryId, self.tFilter.nTypeId)) do
 			if (#tPackagedData > MarketplaceLib.kAuctionSearchMaxIds) then
 				break;
 			else
@@ -50,20 +49,25 @@ function M:Search(nPage)
 		end
 
 		if (#tPackagedData > MarketplaceLib.kAuctionSearchMaxIds) then
+			-- Too many results for MarketplaceLib, filter manually
 			Print(Apollo.GetString("MarketplaceAuction_TooManyResults"));
-			self:SetSearchState(false);
+--			self:SetSearchState(false);
+			self.tFilter.strSearchQuery = nil;
+			tinsert(self.tFilter.tCustomFilter, "Name");
+			Print(self.tFilter.strSearchQueryEscaped);
+			self:Search(nPage);
 		elseif (#tPackagedData > 0) then
-			MarketplaceLib.RequestItemAuctionsByItems(tPackagedData, nPage, eAuctionSort, bReverseSort, tFilters, nil, nil, nPropertySort);
+			MarketplaceLib.RequestItemAuctionsByItems(tPackagedData, nPage, eAuctionSort, bReverseSort, self.tFilter.tFilter, nil, nil, nPropertySort);
 		else
 			Print(Apollo.GetString("MarketplaceAuction_SearchNotPossible"));
 			self:SetSearchState(false);
 		end
-	elseif (nFamilyId > 0) then
-		MarketplaceLib.RequestItemAuctionsByFamily(nFamilyId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
-	elseif (nCategoryId > 0) then
-		MarketplaceLib.RequestItemAuctionsByCategory(nCategoryId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
-	elseif (nTypeId > 0) then
-		MarketplaceLib.RequestItemAuctionsByType(nTypeId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
+	elseif (self.tFilter.nFamilyId > 0) then
+		MarketplaceLib.RequestItemAuctionsByFamily(self.tFilter.nFamilyId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
+	elseif (self.tFilter.nCategoryId > 0) then
+		MarketplaceLib.RequestItemAuctionsByCategory(self.tFilter.nCategoryId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
+	elseif (self.tFilter.nTypeId > 0) then
+		MarketplaceLib.RequestItemAuctionsByType(self.tFilter.nTypeId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
 	else
 		self:SetSearchState(false);
 	end
