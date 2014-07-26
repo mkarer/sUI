@@ -62,9 +62,6 @@
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
 	<Script Name="Modules\CritLine\CritLine.lua" />
-	<Script Name="Modules\AuctionHouse\AuctionHouse.lua" />
-	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
-	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />
 	<Script Name="Modules\ReadyCheck\ReadyCheck.lua" />
 	<Script Name="Modules\PVPTelegraphs\PVPTelegraphs.lua" />
 	<Script Name="Modules\NPCScan\NPCScan.lua" />
@@ -113,6 +110,14 @@
 	<!-- Proc Bar -->
 	<Script Name="Modules\ProcBar\Core.lua" />
 	<Script Name="Modules\ProcBar\Anchor.lua" />
+	<!-- Auction House -->
+	<Script Name="Modules\AuctionHouse\AuctionHouse.lua" />
+	<Script Name="Modules\AuctionHouse\GUI.lua" />
+	<Script Name="Modules\AuctionHouse\Filter.lua" />
+	<Script Name="Modules\AuctionHouse\Search.lua" />
+	<!-- Auction House (Carbine) -->
+	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
+	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />
 	<!-- Misc -->
 	<Script Name="Modules\DataText\DataText.lua" />
 
