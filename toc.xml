@@ -62,6 +62,7 @@
 	<Script Name="Modules\Fixes\NoCinematics.lua" />
 	<Script Name="Modules\Tooltips\Tooltips.lua" />
 	<Script Name="Modules\CritLine\CritLine.lua" />
+	<Script Name="Modules\AuctionHouse\AuctionHouse.lua" />
 	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
 	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />
 	<Script Name="Modules\ReadyCheck\ReadyCheck.lua" />
