@@ -30,11 +30,6 @@ local ktQualityColors = {
 local strSearchLocalized = Apollo.GetString("CRB_Search");
 local nPadding = 2;
 
-function M:ToggleWindow()
-	self:CreateWindow();
-	self.wndMain:Show(not self.wndMain:IsVisible());
-end
-
 local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	local nNodeIdRoot = wndControl:AddNode(0, "Auctions");
 	local nNodeIdSelected, nNodeIdSelectedCategory;
@@ -94,6 +89,13 @@ end
 
 local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, hPrevSelected)
 	self.tSelectedCategory = wndControl:GetNodeData(hSelected);
+
+	local nParentId = wndControl:GetParentNode(hSelected);
+	while (wndControl:GetParentNode(nParentId) and wndControl:GetParentNode(nParentId) > 1) do
+		nParentId = wndControl:GetParentNode(nParentId);
+	end
+
+	self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
 end
 
 local function OnShowFilters(self, wndHandler, wndControl)
@@ -129,7 +131,7 @@ local function OnSearchLostFocus(self, wndHandler, wndControl)
 end
 
 function M:CreateWindow()
-	if (not self.wndMain) then
+	if (not self.wndMain or not self.wndMain:IsValid()) then
 		local nWidthCategories = 250;
 		local nWidthSearchButton = 100;
 		local nPaddingSearchControl = 4;
@@ -148,6 +150,11 @@ function M:CreateWindow()
 			BGColor = "black",
 			Sizable = true,
 			Visible = false,
+			Events = {
+				WindowClosed = self.Close,
+				WindowKeyEscape = self.Close,
+				WindowShow = self.Open,
+			},
 			Children = {
 				{
 					Name = "Title",

@@ -34,13 +34,33 @@ function M:OnEnable()
 		self.MarketplaceAuction._OnToggleAuctionWindow = self.MarketplaceAuction.OnToggleAuctionWindow;
 		self.MarketplaceAuction.OnToggleAuctionWindow = function(tMarketplaceAuction)
 			tMarketplaceAuction:_OnToggleAuctionWindow();
-			self:ToggleWindow();
+			self:Open();
 		end
 	end
-
-	self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
 end
 
 function M:OnDisable()
 	log:debug("%s disabled.", self:GetName());
+end
+
+-----------------------------------------------------------------------------
+
+function M:Open()
+	self:CreateWindow();
+	self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
+	self.wndMain:Show(true);
+end
+
+function M:Close()
+	self:UnregisterEvent("ItemAuctionSearchResults");
+
+	if (self.wndMain and self.wndMain:IsValid()) then
+		self.wndMain:Destroy();
+	end
+
+	self.tFilter = nil;
+	self.tSelectedCategory = nil;
+	self.nSelectedFamily = nil;
+	self.tAuctions = nil;
+	self.bIsSearching = false;
 end
