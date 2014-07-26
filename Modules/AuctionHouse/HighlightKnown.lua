@@ -26,6 +26,29 @@ local HighlightKnownSchematics = function(self, aucCurr, wndParent, bBuyTab)
 			wndAuction:SetSprite("BasicSprites:WhiteFill");
 			wndAuction:SetBGColor("33ff0000");
 			wndAuction:SetOpacity(0.6);
+		else
+			local tInfo = itemCurr:GetDetailedInfo();--.tPrimary.tSigils.arSigils
+			local nRuneSlots = 0;
+			for _, tData in pairs(tInfo) do
+				if (tData.tSigils and tData.tSigils.arSigils) then
+					nRuneSlots = nRuneSlots + #tData.tSigils.arSigils;
+				end
+
+				if (nRuneSlots > 0) then
+--					log:debug("%s: %d Runeslot(s)", itemCurr:GetName(), nRuneSlots);
+
+					if (nRuneSlots >= 3) then
+						local tAuctions = wndParent:GetChildren();
+						local wndAuction = tAuctions[#tAuctions];
+						wndAuction:SetSprite("BasicSprites:WhiteFill");
+						wndAuction:SetBGColor("3300aa00");
+
+						if (nRuneSlots > 3) then
+							wndAuction:SetBGColor("33F200FF");
+						end
+					end
+				end
+			end
 		end
 	end
 end
@@ -33,6 +56,7 @@ end
 function M:OnInitialize()
 	local tMarketplaceAuction = Apollo.GetAddon("MarketplaceAuction");
 	if (not tMarketplaceAuction) then return; end
+	log = S.Log;
 
 	-- Cannot hook BuildListItem now, so we'll hook it when Initialize() is called...
 	tMarketplaceAuction._Initialize = tMarketplaceAuction.Initialize;
