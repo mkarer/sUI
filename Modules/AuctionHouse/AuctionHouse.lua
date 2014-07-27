@@ -89,6 +89,8 @@ function M:Close()
 	self.wndFilters = nil;
 	self.wndResults = nil;
 	self.wndResultsGrid = nil;
+	self.wndCurrentItem = nil;
+	self.wndSelectedItem = nil;
 	self.tFilter = nil;
 	self.tSelectedCategory = nil;
 	self.nSelectedFamily = nil;
