@@ -111,7 +111,7 @@ local strColorSilver	= "ffc7c7cf";
 local strColorGold		= "ffffd700";
 local strColorPlatin	= "ffffffff";
 
-function S:GetMoneyAML(nAmount)
+function S:GetMoneyAML(nAmount, strFont)
 	local nPlatin, nGold, nSilver, nCopper = self:GetMoneySplitted(nAmount);
 
 	local strAML = "";
@@ -119,7 +119,7 @@ function S:GetMoneyAML(nAmount)
 
 	-- Platin
 	if (nPlatin > 0) then
-		strAML = format(strNumberFormat .. '<T TextColor="%s">p</T> ', nPlatin, strColorPlatin);
+		strAML = format(strNumberFormat .. '<T TextColor="%s">p</T>', nPlatin, strColorPlatin);
 	end
 
 	-- Gold
@@ -150,7 +150,7 @@ function S:GetMoneyAML(nAmount)
 
 	strAML = strAML..format(strNumberFormat .. '<T TextColor="%s">c</T>', nCopper, strColorCopper);
 
-	return '<P Font="Nameplates" Align="Right" TextColor="ffffffff">'..strAML..'</P>';
+	return '<P Font="' .. (strFont or "CRB_Pixel") .. '" Align="Right" TextColor="ffffffff">'..strAML..'</P>';
 end
 
 -----------------------------------------------------------------------------
