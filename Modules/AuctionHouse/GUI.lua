@@ -259,6 +259,8 @@ function M:CreateWindow()
 									VScroll = true,
 									AutoHideScroll = false,
 									Template = "Holo_ScrollListSmall",
+									SelectedBG = "BK3:UI_BK3_Holo_InsetDivider",
+									MinimumNodeHeight = 18,
 									Events = {
 										WindowLoad = OnTreeWindowLoad,
 										TreeSelectionChanged = OnTreeSelectionChanged,
@@ -715,6 +717,7 @@ function M:UpdateListHeaders()
 	local fWidthName = 1;
 	local fPosition = 0;
 	local tHeaders = { "Name", "Bid", "Buyout", "TimeRemaining" };
+	local bSortHeaderValid = false;
 
 	-- Add additional headers (as defined by current category/family)
 	if (self.nSelectedFamily and ktAdditionalColumns[self.nSelectedFamily]) then
@@ -727,11 +730,19 @@ function M:UpdateListHeaders()
 
 	-- Calculate "name" width
 	for _, strName in ipairs(tHeaders) do
+		if (self.strSortHeader == strName) then
+			bSortHeaderValid = true;
+		end
+
 		if (strName ~= "Name") then
 			fWidthName = fWidthName - ktListColumns[strName].Width;
 		end
 	end
 	ktListColumns.Name.Width = fWidthName;
+
+	if (not bSortHeaderValid) then
+		self:SetSortOrder("Name", "ASC");
+	end
 
 	-- Add all headers
 	wndHeader:DestroyChildren();
