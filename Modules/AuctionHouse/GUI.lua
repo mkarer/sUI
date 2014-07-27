@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch, format, tinsert = string.len, string.find, string.gmatch, string.format, table.insert;
+local strlen, strfind, gmatch, format, tinsert, floor = string.len, string.find, string.gmatch, string.format, table.insert, math.floor;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
 -----------------------------------------------------------------------------
@@ -128,6 +128,11 @@ local function OnShowFilters(self, wndHandler, wndControl)
 	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
 	nT = self.wndSearch:GetHeight() + self.wndFilters:GetHeight() + 2 * nPadding;
 	self.wndResults:SetAnchorOffsets(nL, nT, nR, nB);
+
+	local wndMessage = self.wndMain:FindChild("Message");
+	local nL, nT, nR, nB = wndMessage:GetAnchorOffsets();
+	nT = self.wndSearch:GetHeight() + self.wndFilters:GetHeight() + 2 * nPadding;
+	wndMessage:SetAnchorOffsets(nL, nT, nR, nB);
 end
 
 local function OnHideFilters(self, wndHandler, wndControl)
@@ -137,6 +142,11 @@ local function OnHideFilters(self, wndHandler, wndControl)
 	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
 	nT = self.wndSearch:GetHeight() + nPadding;
 	self.wndResults:SetAnchorOffsets(nL, nT, nR, nB);
+
+	local wndMessage = self.wndMain:FindChild("Message");
+	local nL, nT, nR, nB = wndMessage:GetAnchorOffsets();
+	nT = self.wndSearch:GetHeight() + nPadding;
+	wndMessage:SetAnchorOffsets(nL, nT, nR, nB);
 end
 
 local function OnSearch(self)
@@ -391,6 +401,13 @@ end
 -- Items
 -----------------------------------------------------------------------------
 
+local function OnWindowShow(self, wndHandler, wndControl)
+	-- Background Opacity Fix
+	if (wndHandler:GetOpacity() == 1) then
+		S:ShowDelayed(wndHandler); 
+	end
+end
+
 local ktAdditionalColumns = {
 	[1] = { "Level", "ItemLevel", "RuneSlots" }, -- Armor
 	[15] = { "Level", "ItemLevel", "RuneSlots" }, -- Gear
@@ -399,6 +416,7 @@ local ktAdditionalColumns = {
 };
 
 local ktListColumns = {
+	-- Generic
 	Name = {
 		Text = "Item",
 		-- Width will be calculated (takes all available space)
@@ -406,54 +424,258 @@ local ktListColumns = {
 	},
 	Bid = {
 		Text = "Current Bid",
-		Width = 0.17,
+		Width = 0.12,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local nBid = aucCurr:GetCurrentBid():GetAmount();
+			local bHasBids = (nBid > 0);
+			if (nBid == 0) then
+				nBid = aucCurr:GetMinBid():GetAmount();
+			end
+
+			return {
+				Class = "MLWindow",
+				Name = "Bid",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 9, 0, 0 },
+				Text = S:GetMoneyAML(nBid, kstrFont),
+				TextColor = bHasBids and "white" or "darkgray",
+				Events = {
+					WindowShow = not bHasBids and OnWindowShow or nil,
+				},
+				UserData = nBid,
+			};
+		end,
 	},
 	Buyout = {
 		Text = "Buyout Price",
-		Width = 0.17,
+		Width = 0.12,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local nBuyout = aucCurr:GetBuyoutPrice():GetAmount();
+
+			return {
+				Class = "MLWindow",
+				Name = "Buyout",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 9, 0, 0 },
+				Text = S:GetMoneyAML(nBuyout, kstrFont),
+				UserData = nBuyout,
+			};
+		end,
 	},
 	TimeRemaining = {
 		Text = "Time\nLeft",
 		Width = 0.08,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local eTimeRemaining = aucCurr:GetTimeRemainingEnum();
+
+			return {
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = ktDurationStrings[eTimeRemaining],
+				TextColor = ktDurationColors[eTimeRemaining];
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				UserData = eTimeRemaining,
+			};
+		end,
 	},
 	-- Bags
 	BagSlots = {
 		Text = "Slots",
 		Width = 0.07,
-		Get = function(self, aucCurr, itemCurr)
-			return itemCurr:GetBagSlots();
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local nBagSlots = itemCurr:GetBagSlots();
+
+			return {
+				Name = "BagSlots",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = nBagSlots,
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				UserData = nBagSlots,
+			};
 		end,
 	},
 	-- Armor
 	Level = {
 		Text = "Level",
 		Width = 0.07,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local nLevel = itemCurr:GetRequiredLevel();
+
+			return {
+				Name = "Level",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = nLevel,
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				UserData = nLevel,
+			};
+		end,
 	},
 	ItemLevel = {
-		Text = "Item\nLevel",
+--		Text = "Item\nLevel",
+		Text = "Power",
 		Width = 0.07,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local tInfo = itemCurr:GetDetailedInfo();
+			-- TODO: Custom Calculations
+			--[[
+			local nItemPower = 1;
+			for _, tData in pairs(tInfo) do
+				if (tData.arInnateProperties) then
+					for _, tInnateProperty in ipairs(tData.arInnateProperties) do
+						nItemPower = nItemPower + tInnateProperty.nValue * 0.61;
+					end
+				end
+
+				if (tData.arBudgetBasedProperties) then
+					for _, tProperty in ipairs(tData.arBudgetBasedProperties) do
+						if (tProperty.eProperty == Unit.CodeEnumProperties.BaseHealth) then
+							nItemPower = nItemPower + tProperty.nValue / 27.595238;
+						elseif (tProperty.eProperty == Unit.CodeEnumProperties.ShieldCapacityMax) then
+							nItemPower = nItemPower + tProperty.nValue / 41.392857;
+							Print(tProperty.nValue);
+						elseif (tProperty.eProperty == Unit.CodeEnumProperties.Armor) then
+							nItemPower = nItemPower + tProperty.nValue / 8;
+						elseif (tProperty.eProperty ~= Unit.CodeEnumProperties.PvPDefensiveRating and tProperty.eProperty ~= Unit.CodeEnumProperties.PvPOffensiveRating) then
+							nItemPower = nItemPower + tProperty.nValue;
+						end 
+
+						if tProperty.nValue > 100 then
+							Print(tProperty.eProperty);
+						end
+					end
+				end
+
+				if (tData.tSigils and tData.tSigils.arSigils) then
+					for _, tSigil in ipairs(tData.tSigils.arSigils) do
+						nItemPower = nItemPower + 20 * tSigil.nPercent;
+					end
+				end
+			end
+
+			nItemPower = floor((nItemPower / 2) * (itemCurr:GetItemPower() / 800) / 36) + itemCurr:GetRequiredLevel();
+			--]]
+
+			local nItemPower = itemCurr:GetItemPower();
+
+			return {
+				Name = "ItemLevel",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = nItemPower,
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				UserData = nItemPower,
+			};
+		end,
 	},
 	RuneSlots = {
 		Text = "Rune\nSlots",
 		Width = 0.07,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local tInfo = itemCurr:GetDetailedInfo();
+			local nRuneSlots = 0;
+			for _, tData in pairs(tInfo) do
+				if (tData.tSigils and tData.tSigils.arSigils) then
+					nRuneSlots = nRuneSlots + #tData.tSigils.arSigils;
+				end
+			end
+
+			return {
+				Name = "RuneSlots",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = nRuneSlots,
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				TextColor = ktQualityColors[nRuneSlots + 1];
+				UserData = nRuneSlots,
+			};
+		end,
 	},
 	-- Weapons
 	AssaultPower = {
 		Text = "AP",
 		Description = "Assault Power",
 		Width = 0.07,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local tInfo = itemCurr:GetDetailedInfo();
+			local nAssaultPower = 0;
+			for _, tData in pairs(tInfo) do
+				if (tData.arInnateProperties) then
+					for _, tInnateProperty in ipairs(tData.arInnateProperties) do
+						if (tInnateProperty.eProperty == Unit.CodeEnumProperties.AssaultPower) then
+							nAssaultPower = floor(tInnateProperty.nValue + 0.05);
+							break;
+						end
+					end
+				end
+			end
+
+			return {
+				Name = "AssaultPower",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = nAssaultPower,
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				UserData = nAssaultPower,
+			};
+		end,
 	},
 	SupportPower = {
 		Text = "SP",
 		Description = "Support Power",
 		Width = 0.08,
+		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
+			local tInfo = itemCurr:GetDetailedInfo();
+			local nSupportPower = 0;
+			for _, tData in pairs(tInfo) do
+				if (tData.arInnateProperties) then
+					for _, tInnateProperty in ipairs(tData.arInnateProperties) do
+						if (tInnateProperty.eProperty == Unit.CodeEnumProperties.SupportPower) then
+							nSupportPower = floor(tInnateProperty.nValue + 0.05);
+							break;
+						end
+					end
+				end
+			end
+
+			return {
+				Name = "SupportPower",
+				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = nSupportPower,
+				Font = kstrFont,
+				DT_CENTER = true,
+				DT_VCENTER = true,
+				AutoScaleTextOff = true,
+				UserData = nSupportPower,
+			};
+		end,
 	},
 };
 
 local function CreateHeader(self, strName, strText, fPosition, fWidth)
 	local wndHeader = self.wndResults:FindChild("Header");
 
-	self.GeminiGUI:Create({
+	return self.GeminiGUI:Create({
 		Class = "Button",
 		ButtonType = "Check",
 		RadioGroup = "ResultSorting",
@@ -498,18 +720,16 @@ function M:UpdateListHeaders()
 	-- Add all headers
 	wndHeader:DestroyChildren();
 	for _, strName in ipairs(tHeaders) do
-		CreateHeader(self, strName, ktListColumns[strName].Text, fPosition, ktListColumns[strName].Width);
+		local wndHeader = CreateHeader(self, strName, ktListColumns[strName].Text, fPosition, ktListColumns[strName].Width);
+
+		if (self.strSortHeader and self.strSortHeader == strName and self.strSortDirection == "ASC") then
+			wndHeader:SetCheck(true);
+		end
+
 		fPosition = fPosition + ktListColumns[strName].Width;
 	end
 
 	self.tHeaders = tHeaders;
-end
-
-local function OnWindowShow(self, wndHandler, wndControl)
-	-- Background Opacity Fix
-	if (wndHandler:GetOpacity() == 1) then
-		S:ShowDelayed(wndHandler); 
-	end
 end
 
 local function ShowItemTooltip(self, wndHandler, wndControl) -- Build on mouse enter and not every hit to save computation time
@@ -547,10 +767,12 @@ end
 function M:CreateListItem(aucCurr)
 	local nItemSize = 30;
 	local nIconBorder = 1;
+	local fPosition = ktListColumns.Name.Width;
 
 	local itemCurr = aucCurr:GetItem();
 	local bIsKnownSchematic = (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
 	local strCount = aucCurr:GetCount() ~= 1 and aucCurr:GetCount() or "";
+	local strName = itemCurr:GetName();
 
 	-- Bids
 	local tBidMinimum = aucCurr:GetMinBid();
@@ -624,47 +846,17 @@ function M:CreateListItem(aucCurr)
 					},
 					-- Name
 					{
+						Name = "Name",
 						AnchorPoints = { 0, 0, 1, 1 },
 						AnchorOffsets = { nItemSize + 4, 0, 0, 0 },
-						Text = itemCurr:GetName(),
+						Text = strName,
 						TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
 						DT_VCENTER = true,
 						Font = kstrFont,
 						AutoScaleTextOff = true,
+						UserData = strName,
 					},
 				},
-			},
-			-- Bid
-			{
-				Class = "MLWindow",
-				Name = "Bid",
-				AnchorPoints = { 0.5, 0, 0.7, 1 },
-				AnchorOffsets = { 0, 9, 0, 0 },
-				TextColor = bHasBids and "white" or "darkgray",
-				Events = {
-					WindowShow = not bHasBids and OnWindowShow or nil,
-				},
-				Visible = false,
-				Text = S:GetMoneyAML(nBidAmount, kstrFont),
-			},
-			-- Buyout
-			{
-				Class = "MLWindow",
-				Name = "Buyout",
-				AnchorPoints = { 0.7, 0, 0.9, 1 },
-				AnchorOffsets = { 0, 9, 0, 0 },
-				Text = S:GetMoneyAML(aucCurr:GetBuyoutPrice():GetAmount(), kstrFont),
-			},
-			-- Remaining Time
-			{
-				AnchorPoints = { 0.9, 0, 1, 1 },
-				AnchorOffsets = { 0, 0, 0, 0 },
-				Text = ktDurationStrings[aucCurr:GetTimeRemainingEnum()],
-				TextColor = ktDurationColors[aucCurr:GetTimeRemainingEnum()];
-				Font = kstrFont,
-				DT_CENTER = true,
-				DT_VCENTER = true,
-				AutoScaleTextOff = true,
 			},
 		},
 		UserData = aucCurr,
@@ -672,9 +864,11 @@ function M:CreateListItem(aucCurr)
 	};
 
 	for _, strName in ipairs(self.tHeaders) do
-		if (strName ~= "Name") then
-			tinsert(tWindowDefinitions.Children, {
-			});
+		if (strName ~= "Name" and ktListColumns[strName].GetWindowDefinitions) then
+			local tDefinitions = ktListColumns[strName].GetWindowDefinitions(self, aucCurr, itemCurr, fPosition, ktListColumns[strName].Width); -- TOOD
+
+			tinsert(tWindowDefinitions.Children, tDefinitions);
+			fPosition = fPosition + ktListColumns[strName].Width;
 		end
 	end
 
