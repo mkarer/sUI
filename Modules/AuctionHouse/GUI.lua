@@ -10,6 +10,13 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
+require "Window";
+require "GameLib";
+require "Item";
+require "Unit";
+require "MarketplaceLib";
+require "ItemAuction";
+
 local strlen, strfind, gmatch, format, tinsert, floor = string.len, string.find, string.gmatch, string.format, table.insert, math.floor;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
@@ -469,6 +476,7 @@ local ktListColumns = {
 			local eTimeRemaining = aucCurr:GetTimeRemainingEnum();
 
 			return {
+				Name = "TimeRemaining",
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = ktDurationStrings[eTimeRemaining],
