@@ -195,3 +195,11 @@ function S:ChatOutput(arMessageSegments)
 	tChatLog.bQueuedMessages = true;
 	tChatLog.tChatWindows[1]:GetData().tMessageQueue:Push({ xml = xml });
 end
+
+-----------------------------------------------------------------------------
+-- Misc
+-----------------------------------------------------------------------------
+
+function S:Round(nValue)
+	return floor(nValue + 0.5);
+end
