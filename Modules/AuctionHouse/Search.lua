@@ -102,7 +102,7 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 		end
 
 		local nResultsFiltered = nTotalResults - #self.wndResultsGrid:GetChildren();
-		self.wndResultsGrid:ArrangeChildrenVert(0);
+		self.wndResultsGrid:ArrangeChildrenVert(0, self.fnSortResults);
 		self:SetSearchState(false);
 
 		if (#self.tAuctions == 0) then
@@ -113,8 +113,17 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 	end
 end
 
-function M:SetSorting(strHeader, strDirection)
+local tSorters = {
+	Name = function(wndAucA, wndAucB)
+		local itemA = wndAucA:GetData():GetItem();
+		local itemB = wndAucB:GetData():GetItem();
+
+		return (itemA:GetName() < itemB:GetName());
+	end,
+};
+
+function M:SetSortOrder(strHeader, strDirection)
 	self.strSortHeader = strHeader;
 	self.strSortDirection = strDirection;
-	self.fnSortResults = nil;
+	self.fnSortResults = tSorters.Name;
 end
