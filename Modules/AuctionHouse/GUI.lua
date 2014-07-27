@@ -229,6 +229,14 @@ function M:CreateWindow()
 					DT_CENTER = true,
 				},
 				{
+					Name = "BtnClose",
+					AnchorPoints = { 1, 0, 1, 0 },
+					Class = "Button",
+					Base = "CRB_ChallengeTrackerSprites:btnChallengeClose",
+					AnchorOffsets = { -30, 8, -10, 30 },
+					Events = { ButtonSignal = self.Close },
+				},
+				{
 					Name = "Framing",
 					AnchorPoints = { 0, 0, 1, 1 },
 					AnchorOffsets = { 0, 0, 0, 0 },
