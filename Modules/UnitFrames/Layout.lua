@@ -145,34 +145,10 @@ end
 -- Root Element
 -----------------------------------------------------------------------------
 
-local OpacityFix = {
-	tWindows = {},
-};
-
-Apollo.RegisterTimerHandler("SezzUITimer_UnitFrameOpacityFix", "ShowWindows", OpacityFix);
-Apollo.CreateTimer("SezzUITimer_UnitFrameOpacityFix", 1 / 1000, false);
-
-function OpacityFix:FixWindow(wndControl)
-	self.tWindows[wndControl] = GameLib.GetTickCount();
-	Apollo.StartTimer("SezzUITimer_UnitFrameOpacityFix");
-end
-
-function OpacityFix:ShowWindows()
-	local nTicks = GameLib.GetTickCount();
-
-	for wndControl, nTicksAdded in pairs(self.tWindows) do
-		if (nTicks > nTicksAdded) then
-			wndControl:Show(true, true);
-			self.tWindows[wndControl] = nil;
-		end
-	end
-end
-
 local function OnWindowShow(self, wndHandler, wndControl)
 	-- Background Opacity Fix
 	if (wndHandler:GetBGOpacity() == 1) then
-		wndHandler:Show(false, true);
-		OpacityFix:FixWindow(wndHandler); 
+		S:ShowDelayed(wndHandler);
 	end
 end
 

@@ -11,7 +11,7 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
 local strlen, strfind, gmatch, format = string.len, string.find, string.gmatch, string.format;
-local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
+local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
 -----------------------------------------------------------------------------
 -- GUI
@@ -434,34 +434,10 @@ end
 -- Items
 -----------------------------------------------------------------------------
 
-local OpacityFix = {
-	tWindows = {},
-};
-
-Apollo.RegisterTimerHandler("SezzUITimer_OpacityFix", "ShowWindows", OpacityFix);
-Apollo.CreateTimer("SezzUITimer_OpacityFix", 1 / 1000, false);
-
-function OpacityFix:FixWindow(wndControl)
-	self.tWindows[wndControl] = GameLib.GetTickCount();
-	Apollo.StartTimer("SezzUITimer_OpacityFix");
-end
-
-function OpacityFix:ShowWindows()
-	local nTicks = GameLib.GetTickCount();
-
-	for wndControl, nTicksAdded in pairs(self.tWindows) do
-		if (nTicks > nTicksAdded) then
-			wndControl:Show(true, true);
-			self.tWindows[wndControl] = nil;
-		end
-	end
-end
-
 local function OnWindowShow(self, wndHandler, wndControl)
 	-- Background Opacity Fix
 	if (wndHandler:GetOpacity() == 1) then
-		wndHandler:Show(false, true);
-		OpacityFix:FixWindow(wndHandler); 
+		S:ShowDelayed(wndHandler); 
 	end
 end
 

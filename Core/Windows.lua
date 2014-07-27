@@ -136,3 +136,37 @@ end
 function S:EnhanceControl(wndControl)
 	return tUserDataWrapper:New(wndControl);
 end
+
+-----------------------------------------------------------------------------
+-- Opacity Fix
+-----------------------------------------------------------------------------
+
+local OpacityFix = {
+	tWindows = {},
+};
+
+Apollo.RegisterTimerHandler("SezzUITimer_OpacityFix", "ShowWindows", OpacityFix);
+Apollo.CreateTimer("SezzUITimer_OpacityFix", 1 / 1000, false);
+
+function OpacityFix:FixWindow(wndControl)
+	self.tWindows[wndControl] = GameLib.GetTickCount();
+	Apollo.StartTimer("SezzUITimer_OpacityFix");
+end
+
+function OpacityFix:ShowWindows()
+	local nTicks = GameLib.GetTickCount();
+
+	for wndControl, nTicksAdded in pairs(self.tWindows) do
+		if (nTicks > nTicksAdded) then
+			wndControl:Show(true, true);
+			self.tWindows[wndControl] = nil;
+		else
+			Apollo.StartTimer("SezzUITimer_OpacityFix");
+		end
+	end
+end
+
+function S:ShowDelayed(wndControl)
+	wndControl:Show(false, true);
+	OpacityFix:FixWindow(wndControl);
+end
