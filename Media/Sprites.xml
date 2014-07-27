@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Sprites>
+    <AutoButton Name="SimpleButton" Texture="sUI\Media\SimpleButton.tga" x0="0" x1="1" x2="1" x3="1" x4="22" x5="23" y0="0" y1="1" y2="1" y3="1" y4="22" y5="23" Stretchy="1" StateBits="31" Direction="Down"/>
     <Sprite Name="HoloWindowBackdrop" Cycle="1">
         <Frame Texture="sUI\Media\HoloWindowBackdrop.png" x0="0" x1="0" x2="0" x3="14" x4="51" x5="65" y0="0" y1="0" y2="0" y3="48" y4="96" y5="103" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
     </Sprite>

@@ -352,11 +352,11 @@ function M:CreateWindow()
 										},
 										-- Items
 										{
---											BGColor = "aa000000",
+											BGColor = "aa000000",
 											Name = "Grid",
 --											Border = false,
---											Picture = true,
---											Sprite = "ClientSprites:WhiteFill",
+											Picture = true,
+											Sprite = "ClientSprites:WhiteFill",
 											AnchorPoints = { 0, 0, 1, 1, },
 											AnchorOffsets = { 0, nHeightHeader + nPadding, 0, 0 },
 											VScroll = true,
@@ -380,11 +380,32 @@ function M:CreateWindow()
 										{
 											Name = "KnownSchematics",
 											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 8, 210, 30 },
+											AnchorOffsets = { 4, 8, 222, 30 },
 											Text = "Filter known Schematics",
 											Base = "HologramSprites:HoloCheckBoxBtn",
 											Font = kstrFont,
 										},
+										-- Rune Slots
+										{
+											Name = "RuneSlots",
+											WidgetType = "CheckBox",
+											AnchorOffsets = { 4, 38, 222, 60 },
+											Text = "Minimum Rune Slots",
+											Base = "HologramSprites:HoloCheckBoxBtn",
+											Font = kstrFont,
+											Children = {
+												{
+													Class = "EditBox",
+													Name = "RuneSlotsAmount",
+													AnchorPoints = { 1, 0, 1, 1 },
+													AnchorOffsets = { -40, 0, 0, 0 },
+													Text = "0",
+													DT_VCENTER = true,
+													Font = kstrFont,
+												},
+											}
+										},
+
 									},
 								},
 								-- CONTENT
@@ -696,7 +717,7 @@ local function CreateHeader(self, strName, strText, fPosition, fWidth)
 	return self.GeminiGUI:Create({
 		Class = "Button",
 		ButtonType = "Check",
-		RadioGroup = "ResultSorting",
+		RadioGroup = "SezzUI_AH_ResultSorting",
 		Text = strText,
 		Name = strName,
 		Base = "BK3:btnHolo_ListView_Mid",
@@ -888,6 +909,11 @@ function M:CreateListItem(aucCurr)
 		},
 		UserData = aucCurr,
 		Visible = false,
+		Base = "sUI:SimpleButton",
+		Class = "Button",
+		ButtonType = "Check",
+		RadioGroup = "SezzUI_AH_ResultItem",
+		Border = false,
 	};
 
 	for _, strName in ipairs(self.tHeaders) do
