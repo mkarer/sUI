@@ -119,8 +119,8 @@ function M:DisplaySearchResults()
 	end
 
 	local nResultsFiltered = nTotalResults - #self.wndResultsGrid:GetChildren();
-	self.wndResultsGrid:ArrangeChildrenVert(0, self.fnSortResults);
 	self:SetSearchState(false);
+	self:SortResults();
 
 	if (nTotalResults == 0) then
 		self:SetStatusMessage(kstrNoResults, true);
@@ -167,53 +167,25 @@ do
  end
 end
 
-local tSorters = {
-	Name = function(wndAucA, wndAucB)
-		local itemA = wndAucA:GetData():GetItem();
-		local itemB = wndAucB:GetData():GetItem();
-
-		return (itemA:GetName() < itemB:GetName());
-	end,
-	Bid = function(wndAucA, wndAucB)
-		local aucA = wndAucA:GetData();
-		local nBidA = aucA:GetCurrentBid():GetAmount();
-		if (nBidA == 0) then
-			nBidA = aucA:GetMinBid():GetAmount();
-		end
-
-		local aucB = wndAucB:GetData();
-		local nBidB = aucB:GetCurrentBid():GetAmount();
-		if (nBidB == 0) then
-			nBidB = aucB:GetMinBid():GetAmount();
-		end
-
-		return (nBidA < nBidB);
-	end,
-	Buyout = function(wndAucA, wndAucB)
-		return (wndAucA:GetData():GetBuyoutPrice():GetAmount() < wndAucB:GetData():GetBuyoutPrice():GetAmount());
-	end,
-	TimeRemaining = function(wndAucA, wndAucB)
-		return (wndAucA:GetData():GetTimeRemainingEnum() < wndAucB:GetData():GetTimeRemainingEnum()); -- ItemAuction.CodeEnumAuctionRemaining is currently sorted by duration :)
-	end,
-	BagSlots = function(wndAucA, wndAucB)
-		return (wndAucA:GetData():GetItem():GetBagSlots() < wndAucB:GetData():GetItem():GetBagSlots());
-	end,
-};
-
 function M:SetSortOrder(strHeader, strDirection)
-	if (tSorters[strHeader]) then
-		self.strSortHeader = strHeader;
-		self.strSortDirection = strDirection;
-		self.fnSortResults = tSorters[strHeader];
-		return true;
-	else
-		self:SetSortOrder("Name", "ASC");
-		return false;
-	end
+	self.strSortHeader = strHeader;
+	self.strSortDirection = strDirection;
 end
 
 function M:SortResults()
 	if (not self.bIsSearching) then
-		self.wndResultsGrid:ArrangeChildrenVert(0, self.fnSortResults);
+		local fnSortResults;
+
+		if (self.strSortDirection ~= "DESC") then
+			fnSortResults = function(wndAucA, wndAucB)
+				return (wndAucA:FindChild(self.strSortHeader):GetData() < wndAucB:FindChild(self.strSortHeader):GetData()); 
+			end
+		else
+			fnSortResults = function(wndAucA, wndAucB)
+				return (wndAucA:FindChild(self.strSortHeader):GetData() >= wndAucB:FindChild(self.strSortHeader):GetData()); 
+			end
+		end
+
+		self.wndResultsGrid:ArrangeChildrenVert(0, fnSortResults);
 	end
 end
