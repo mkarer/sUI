@@ -49,6 +49,9 @@ end
 
 -----------------------------------------------------------------------------
 
+function M:OnItemAuctionBidResult(self, aucCurrent)
+end
+
 function M:Open()
 	if (AccountItemLib.CodeEnumEntitlement.EconomyParticipation and AccountItemLib.GetEntitlementCount(AccountItemLib.CodeEnumEntitlement.EconomyParticipation) == 0) then
 		Event_FireGenericEvent("GenericEvent_SystemChannelMessage", Apollo.GetString("CRB_FeatureDisabledForGuests"));
@@ -59,6 +62,8 @@ function M:Open()
 		self:SetSortOrder("Name", "ASC");
 		self:CreateWindow();
 		self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
+		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionBidResult");
+		self:RegisterEvent("ItemAuctionWon", "OnItemAuctionWon");
 		self.wndMain:Show(true);
 
 		-- Hide Carbine AH
@@ -101,3 +106,16 @@ function M:Close()
 	self.bFilterChanged = nil;
 	self.tHeaders = nil;
 end
+
+-----------------------------------------------------------------------------
+
+function M:OnItemAuctionWon(event, aucCurrent)
+	local bValidItem = aucCurrent and aucCurrent:GetItem();
+	local strItemName = bValidItem and aucCurrent:GetItem():GetName() or "";
+	Event_FireGenericEvent("GenericEvent_LootChannelMessage", String_GetWeaselString(Apollo.GetString("MarketplaceAuction_WonMessage"), strItemName));
+
+	if (self.wndSelectedItem and self.wndSelectedItem:GetData() and self.wndSelectedItem:GetData() == aucCurrent) then
+		self:RemoveAuction(aucCurrent);
+	end
+end
+
