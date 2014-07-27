@@ -46,7 +46,7 @@ end
 
 function M:CheckMail()
 	local nUnreadMessages, nReadMessages = S:GetMailAmount();
-Print("CheckMail")
+
 	if (nUnreadMessages + nReadMessages > 0) then
 		self:GetMail();
 
