@@ -31,11 +31,11 @@ function M:SetSearchState(bSearching)
 end
 
 function M:Search(nPage)
-	Print("Searching...");
+	S.Log:debug("Searching...");
 
 	if (self.bFilterChanged == false) then
 		-- Don't forget to call BuildFilter() before searching!
-		Print("Filters didn't change!")
+		S.Log:debug("Filters didn't change!")
 		self:DisplaySearchResults();
 		return;
 	end
@@ -96,7 +96,7 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 		tinsert(self.tAuctions, aucCurr);
 	end
 
-	Print("Total: "..nTotalResults.." Processed: "..nListedResults);
+	S.Log:debug("Total: "..nTotalResults.." Processed: "..nListedResults);
 	if (nListedResults < nTotalResults) then
 		-- Process next Page
 		self:Search(nPage + 1);

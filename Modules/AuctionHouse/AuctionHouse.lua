@@ -70,4 +70,5 @@ function M:Close()
 	self.strSortDirection = nil;
 	self.fnSortResults = nil;
 	self.bFilterChanged = nil;
+	self.tHeaders = nil;
 end

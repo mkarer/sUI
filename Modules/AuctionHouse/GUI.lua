@@ -96,10 +96,11 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 --		end
 	end
 
-	if (nNodeIdSelected) then
+	if (nNodeIdSelected) then -- TEMP
 		wndControl:ExpandNode(nNodeIdSelectedCategory);
 		wndControl:SelectNode(nNodeIdSelected);
 		self.tSelectedCategory = wndControl:GetNodeData(nNodeIdSelected);
+		self.nSelectedFamily = 15;
 	end
 
 	SendVarToRover("AHCategories", wndControl);
@@ -248,7 +249,7 @@ function M:CreateWindow()
 										-- Textbox
 										{
 											AnchorPoints = { 0, 0, 1, 1 },
-											AnchorOffsets = { nPaddingSearchControl, nPaddingSearchControl, 2 * (-nPaddingSearchControl - nWidthSearchButton) - nPaddingSearchControl, -nPaddingSearchControl },
+											AnchorOffsets = { nPadding, 0, 2 * (-nPadding - nWidthSearchButton) - nPadding, -nPadding },
 											Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 											Picture = true,
 											Children = {
@@ -272,7 +273,7 @@ function M:CreateWindow()
 											Class = "Button",
 											Name = "BtnSearch",
 											AnchorPoints = { 1, 0, 1, 1 },
-											AnchorOffsets = { 2 * (-nPaddingSearchControl - nWidthSearchButton), nPaddingSearchControl, 2 * -nPaddingSearchControl - nWidthSearchButton, -nPaddingSearchControl },
+											AnchorOffsets = { 2 * (-nPadding - nWidthSearchButton), 0, 2 * -nPadding - nWidthSearchButton, -nPadding },
 											Base = "BK3:btnHolo_ListView_Mid",
 											Text = kstrSearch,
 											DT_VCENTER = true,
@@ -286,7 +287,7 @@ function M:CreateWindow()
 										{
 											Class = "Button",
 											AnchorPoints = { 1, 0, 1, 1 },
-											AnchorOffsets = { -nPaddingSearchControl - nWidthSearchButton, nPaddingSearchControl, -nPaddingSearchControl, -nPaddingSearchControl },
+											AnchorOffsets = { -nPadding - nWidthSearchButton, 0, -nPadding, -nPadding },
 											Base = "BK3:btnHolo_ListView_Mid",
 											Text = "Filters [+]",
 											ButtonType = "Check",
@@ -500,6 +501,8 @@ function M:UpdateListHeaders()
 		CreateHeader(self, strName, ktListColumns[strName].Text, fPosition, ktListColumns[strName].Width);
 		fPosition = fPosition + ktListColumns[strName].Width;
 	end
+
+	self.tHeaders = tHeaders;
 end
 
 local function OnWindowShow(self, wndHandler, wndControl)
@@ -510,12 +513,13 @@ local function OnWindowShow(self, wndHandler, wndControl)
 end
 
 local function ShowItemTooltip(self, wndHandler, wndControl) -- Build on mouse enter and not every hit to save computation time
-	local aucCurr = wndHandler == wndControl and wndHandler:GetParent() and wndHandler:GetParent():GetData() or nil;
+	if (wndHandler ~= wndControl) then return; end
 
-	if (aucCurr) then
-		local itemCurr = aucCurr:GetItem();
-		Tooltip.GetItemTooltipForm(self, wndHandler, itemCurr, { bPrimary = true, bSelling = false, itemModData = nil, itemCompare = itemCurr:GetEquippedItemForItemType() });
-	end
+	local aucCurr = wndHandler:GetParent():GetParent():GetData();
+	if (not aucCurr) then return; end
+
+	local itemCurr = aucCurr:GetItem();
+	Tooltip.GetItemTooltipForm(self, wndHandler, itemCurr, { bPrimary = true, bSelling = false, itemModData = nil, itemCompare = itemCurr:GetEquippedItemForItemType() });
 end
 
 local function HideItemTooltip(self, wndHandler, wndControl)
@@ -525,11 +529,11 @@ end
 
 local function ShowItemPreview(self, wndHandler, wndControl, eMouseButton)
 	if (wndHandler ~= wndControl) then return; end
-	local aucCurr = wndHandler:GetParent():GetData();
+
+	local aucCurr = wndHandler:GetParent():GetParent():GetData();
 	if (not aucCurr) then return; end
 
 	local itemCurr = aucCurr:GetItem();
-	if (not itemCurr) then return; end
 
 	if (Apollo.IsControlKeyDown() and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
 		if (itemCurr:GetHousingDecorInfoId() ~= nil and itemCurr:GetHousingDecorInfoId() ~= 0) then
@@ -566,62 +570,69 @@ function M:CreateListItem(aucCurr)
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",
 		AnchorPoints = { 0, 0, 1, 0, },
-		AnchorOffsets = { 0, 0, 0, nItemSize },
+		AnchorOffsets = { 0, 0, 0, nItemSize + 1 },
 		Children = {
-			-- Icon
+			-- Icon + Name
 			{
-				Name = "IconContainer",
-				AnchorPoints = { 0, 0, 0, 0 },
-				AnchorOffsets = { 1, 1, nItemSize - 2, nItemSize - 2 },
-				Picture = true,
-				BGColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
-				Sprite = "ClientSprites:WhiteFill",
-				Events = {
-					MouseEnter = ShowItemTooltip,
-					MouseExit = HideItemTooltip,
-					MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
-				},
+				AnchorPoints = { 0, 0, ktListColumns.Name.Width, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
 				Children = {
+					-- Icon
 					{
-						Name = "IconBackground",
-						AnchorPoints = { 0, 0, 1, 1 },
-						AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
+						Name = "IconContainer",
+						AnchorPoints = { 0, 0, 0, 0 },
+						AnchorOffsets = { 1, 1, nItemSize - 2, nItemSize - 2 },
 						Picture = true,
-						BGColor = "black",
+						BGColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
 						Sprite = "ClientSprites:WhiteFill",
+						Events = {
+							MouseEnter = ShowItemTooltip,
+							MouseExit = HideItemTooltip,
+							MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
+						},
 						Children = {
 							{
-								Name = "Icon",
+								Name = "IconBackground",
 								AnchorPoints = { 0, 0, 1, 1 },
-								AnchorOffsets = { 0, 0, 0, 0 },
+								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
 								Picture = true,
-								BGColor = "white",
-								Sprite = itemCurr:GetIcon(),
+								BGColor = "black",
+								Sprite = "ClientSprites:WhiteFill",
 								Children = {
 									{
-										Name = "Count",
+										Name = "Icon",
 										AnchorPoints = { 0, 0, 1, 1 },
-										AnchorOffsets = { 0, 0, -2, -1 },
-										Text = strCount,
-										DT_RIGHT = true,
-										DT_BOTTOM = true,
-										Font = "CRB_Interface9_O",
+										AnchorOffsets = { 0, 0, 0, 0 },
+										Picture = true,
+										BGColor = "white",
+										Sprite = itemCurr:GetIcon(),
+										Children = {
+											{
+												Name = "Count",
+												AnchorPoints = { 0, 0, 1, 1 },
+												AnchorOffsets = { 0, 0, -2, -1 },
+												Text = strCount,
+												DT_RIGHT = true,
+												DT_BOTTOM = true,
+												Font = "CRB_Interface9_O",
+											},
+										},
 									},
 								},
 							},
 						},
 					},
+					-- Name
+					{
+						AnchorPoints = { 0, 0, 1, 1 },
+						AnchorOffsets = { nItemSize + 4, 0, 0, 0 },
+						Text = itemCurr:GetName(),
+						TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
+						DT_VCENTER = true,
+						Font = kstrFont,
+						AutoScaleTextOff = true,
+					},
 				},
-			},
-			-- Name
-			{
-				AnchorPoints = { 0, 0, 0.5, 1 },
-				AnchorOffsets = { nItemSize + 4, 0, 0, 0 },
-				Text = itemCurr:GetName(),
-				TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
-				DT_VCENTER = true,
-				Font = kstrFont,
-				AutoScaleTextOff = true,
 			},
 			-- Bid
 			{
@@ -659,6 +670,13 @@ function M:CreateListItem(aucCurr)
 		UserData = aucCurr,
 		Visible = false,
 	};
+
+	for _, strName in ipairs(self.tHeaders) do
+		if (strName ~= "Name") then
+			tinsert(tWindowDefinitions.Children, {
+			});
+		end
+	end
 
 	local wndItem = self.GeminiGUI:Create(tWindowDefinitions):GetInstance(self, self.wndResultsGrid);
 
