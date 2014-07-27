@@ -8,6 +8,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
+local Apollo = Apollo;
 
 -----------------------------------------------------------------------------
 
@@ -42,6 +43,7 @@ S.DB = {
 		[Apollo.GetString("MiniMap_Title")] = true,
 		[Apollo.GetString("CRB_QuestTracker")] = true,
 		[Apollo.GetString("HUDAlert_VacuumLoot")] = true,
+		[Apollo.GetString("MarketplaceAuction_AuctionHouse")] = true,
 	},
 
 	-- Module Debugging
