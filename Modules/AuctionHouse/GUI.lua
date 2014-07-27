@@ -162,6 +162,7 @@ function M:CreateWindow()
 		local nPaddingSearchControl = 4;
 		local nHeightSearch = 40;
 		local nHeightFilters = 200;
+		local nHeightHeader = 40;
 
 		self.wndMain = self.GeminiGUI:Create({
 			Name = "SezzAuctionHouse",
@@ -219,11 +220,8 @@ function M:CreateWindow()
 								},
 								-- Search Box
 								{
-									BGColor = "aa000000",
 									Name = "Search",
 									Border = false,
-									Picture = true,
-									Sprite = "ClientSprites:WhiteFill",
 									AnchorPoints = { 0, 0, 1, 0, },
 									AnchorOffsets = { nWidthCategories + nPadding, 0, 0, nHeightSearch },
 									Children = {
@@ -233,9 +231,9 @@ function M:CreateWindow()
 											Name = "Text",
 											AnchorPoints = { 0, 0, 1, 1 },
 											AnchorOffsets = { nPaddingSearchControl, nPaddingSearchControl, 2 * (-nPaddingSearchControl - nWidthSearchButton) - nPaddingSearchControl, -nPaddingSearchControl },
-											Picture = true,
-											Sprite = "ClientSprites:WhiteFill",
-											BGColor = "11ffffff",
+											Template = "Holo_InputBox",
+											UseTemplateBG = true,
+											Border = true,
 											Text = "Search",
 											DT_VCENTER = true,
 											Events = {
@@ -249,9 +247,7 @@ function M:CreateWindow()
 											Name = "BtnSearch",
 											AnchorPoints = { 1, 0, 1, 1 },
 											AnchorOffsets = { 2 * (-nPaddingSearchControl - nWidthSearchButton), nPaddingSearchControl, 2 * -nPaddingSearchControl - nWidthSearchButton, -nPaddingSearchControl },
-											Picture = true,
-											Sprite = "ClientSprites:WhiteFill",
-											BGColor = "11ffffff",
+											Base = "BK3:btnHolo_ListView_Mid",
 											Text = strSearchLocalized,
 											DT_VCENTER = true,
 											DT_CENTER = true,
@@ -264,9 +260,7 @@ function M:CreateWindow()
 											Class = "Button",
 											AnchorPoints = { 1, 0, 1, 1 },
 											AnchorOffsets = { -nPaddingSearchControl - nWidthSearchButton, nPaddingSearchControl, -nPaddingSearchControl, -nPaddingSearchControl },
-											Picture = true,
-											Sprite = "ClientSprites:WhiteFill",
-											BGColor = "11ffffff",
+											Base = "BK3:btnHolo_ListView_Mid",
 											Text = "Filters [+]",
 											ButtonType = "Check",
 											DT_VCENTER = true,
@@ -289,24 +283,73 @@ function M:CreateWindow()
 									Font = "Nameplates",
 								},
 								{
---									BGColor = "aa000000",
 									Name = "Results",
-									Border = false,
---									Picture = true,
---									Sprite = "ClientSprites:WhiteFill",
 									AnchorPoints = { 0, 0, 1, 1, },
 									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
-									VScroll = true,
-									AutoHideScroll = false,
-									Template = "Holo_ScrollList",
+									Children = {
+										-- Header
+										{
+											Name = "Header",
+											AnchorPoints = { 0, 0, 1, 0 },
+											AnchorOffsets = { 0, 0, 0, nHeightHeader },
+											Children = {
+												{
+													Class = "Button",
+													ButtonType = "Check",
+													RadioGroup = "ResultSorting",
+													Text = "Item",
+													Base = "BK3:btnHolo_ListView_Mid",
+													DT_VCENTER = true,
+													DT_CENTER = true,
+													AnchorPoints = { 0, 0, 0.5, 1 },
+													AnchorOffsets = { 0, 0, 0, 0 },
+												},
+												{
+													Class = "Button",
+													ButtonType = "Check",
+													RadioGroup = "ResultSorting",
+													Text = "Bid",
+													Base = "BK3:btnHolo_ListView_Mid",
+													DT_VCENTER = true,
+													DT_CENTER = true,
+													AnchorPoints = { 0.5, 0, 0.7, 1 },
+													AnchorOffsets = { 0, 0, 0, 0 },
+												},
+												{
+													Class = "Button",
+													ButtonType = "Check",
+													RadioGroup = "ResultSorting",
+													Text = "Buyout",
+													Base = "BK3:btnHolo_ListView_Mid",
+													DT_VCENTER = true,
+													DT_CENTER = true,
+													AnchorPoints = { 0.7, 0, 0.9, 1 },
+													AnchorOffsets = { 0, 0, 0, 0 },
+												},
+											},
+										},
+										-- Items
+										{
+--											BGColor = "aa000000",
+											Name = "Grid",
+--											Border = false,
+--											Picture = true,
+--											Sprite = "ClientSprites:WhiteFill",
+											AnchorPoints = { 0, 0, 1, 1, },
+											AnchorOffsets = { 0, nHeightHeader + nPadding, 0, 0 },
+											VScroll = true,
+											AutoHideScroll = false,
+											Template = "Holo_ScrollList",
+										},
+									},
 								},
 								-- Search Filter
 								{
-									BGColor = "aa000000",
+--									BGColor = "aa000000",
 									Name = "Filters",
-									Border = false,
+									Border = true,
 									Picture = true,
-									Sprite = "ClientSprites:WhiteFill",
+									Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 									AnchorPoints = { 0, 0, 1, 0, },
 									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, nHeightFilters },
 									Visible = false,
@@ -342,6 +385,7 @@ function M:CreateWindow()
 		self.wndSearch = self.wndMain:FindChild("Search");
 		self.wndFilters = self.wndMain:FindChild("Filters");
 		self.wndResults = self.wndMain:FindChild("Results");
+		self.wndResultsGrid = self.wndResults:FindChild("Grid");
 	end
 end
 
@@ -510,7 +554,7 @@ function M:CreateListItem(aucCurr)
 		},
 		UserData = aucCurr,
 		Visible = false,
-	}):GetInstance(self, self.wndResults);
+	}):GetInstance(self, self.wndResultsGrid);
 
 	wndItem:FindChild("Bid"):SetText(S:GetMoneyAML(nBidAmount));
 	wndItem:FindChild("Buyout"):SetText(S:GetMoneyAML(aucCurr:GetBuyoutPrice():GetAmount()));

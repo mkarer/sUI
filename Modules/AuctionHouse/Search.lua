@@ -35,8 +35,8 @@ function M:Search(nPage)
 
 	if (not nPage or nPage == 0) then
 		self.tAuctions = {};
-		self.wndResults:SetVScrollPos(0);
-		self.wndResults:DestroyChildren();
+		self.wndResultsGrid:SetVScrollPos(0);
+		self.wndResultsGrid:DestroyChildren();
 	end
 
 	-- Initiate new Search
@@ -101,8 +101,8 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 			end
 		end
 
-		local nResultsFiltered = nTotalResults - #self.wndResults:GetChildren();
-		self.wndResults:ArrangeChildrenVert(0);
+		local nResultsFiltered = nTotalResults - #self.wndResultsGrid:GetChildren();
+		self.wndResultsGrid:ArrangeChildrenVert(0);
 		self:SetSearchState(false);
 
 		if (#self.tAuctions == 0) then
@@ -111,4 +111,10 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 			self:SetStatusMessage(strNoResults .. " " .. nResultsFiltered .. " result"..(nResultsFiltered ~= 1 and "s" or "").." filtered." .. "\n" .. strTryClearingFilter, true);
 		end
 	end
+end
+
+function M:SetSorting(strHeader, strDirection)
+	self.strSortHeader = strHeader;
+	self.strSortDirection = strDirection;
+	self.fnSortResults = nil;
 end
