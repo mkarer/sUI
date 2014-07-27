@@ -10,20 +10,14 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch, format = string.len, string.find, string.gmatch, string.format;
+local strlen, strfind, gmatch, format, tinsert = string.len, string.find, string.gmatch, string.format, table.insert;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
 -----------------------------------------------------------------------------
 -- GUI
 -----------------------------------------------------------------------------
 
-local ktColumnsEquippable = { "Level", "Item Level", "Rune Slots" };
-local ktAdditionalColumns = {
-	[1] = ktColumnsEquippable, -- Armor
-	[16] = ktColumnsEquippable, -- Gear
-	[2] = { "Level", "Item Level", "Rune Slots", "Assault Power", "Support Power" }, -- Weapon
-	[5] = { "Slots" }, -- Bag
-};
+local kstrFont = "CRB_Pixel"; -- Nameplates (update MLWindow top offset when changing font as it doesn't support DT_VCENTER)
 
 local ktQualityColors = {
 	[Item.CodeEnumItemQuality.Inferior] 		= "ItemQuality_Inferior",
@@ -119,11 +113,14 @@ local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, h
 		nParentId = wndControl:GetParentNode(nParentId);
 	end
 
-	self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
+	if (nParentId <= 1 and self.tSelectedCategory.Type == "Family") then
+		self.nSelectedFamily = self.tSelectedCategory.Id;
+	else
+		self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
+	end
 end
 
 local function OnShowFilters(self, wndHandler, wndControl)
-	Print("Show Filters")
 	wndControl:SetText("Filters [-]");
 	self.wndFilters:Show(true, true);
 
@@ -133,7 +130,6 @@ local function OnShowFilters(self, wndHandler, wndControl)
 end
 
 local function OnHideFilters(self, wndHandler, wndControl)
-	Print("Hide Filters")
 	wndControl:SetText("Filters [+]");
 	self.wndFilters:Show(false, true);
 
@@ -145,6 +141,7 @@ end
 local function OnSearch(self)
 	self:SetSearchState(true);
 	self:BuildFilter();
+	self:UpdateListHeaders();
 	self:Search();
 end
 
@@ -179,7 +176,7 @@ end
 
 function M:CreateWindow()
 	if (not self.wndMain or not self.wndMain:IsValid()) then
-		local nWidthCategories = 250;
+		local nWidthCategories = 220;
 		local nWidthSearchButton = 100;
 		local nPaddingSearchControl = 4;
 		local nHeightSearch = 40;
@@ -230,7 +227,7 @@ function M:CreateWindow()
 								-- Categories
 								{
 									Class = "TreeControl",
-									Font = "CRB_Interface9_BO",
+									Font = kstrFont,
 									AnchorPoints = { 0, 0, 0, 1 },
 									AnchorOffsets = { 0, 0, nWidthCategories, 0 },
 									VScroll = true,
@@ -262,6 +259,7 @@ function M:CreateWindow()
 													AnchorOffsets = { 8, 0, -8, 0 },
 													Text = "Search",
 													DT_VCENTER = true,
+													Font = kstrFont,
 													Events = {
 														EditBoxReturn = OnSearch,
 														WindowLostFocus = OnSearchLostFocus,
@@ -279,6 +277,7 @@ function M:CreateWindow()
 											Text = kstrSearch,
 											DT_VCENTER = true,
 											DT_CENTER = true,
+											Font = kstrFont,
 											Events = {
 												ButtonSignal = OnSearch,
 											},
@@ -293,6 +292,7 @@ function M:CreateWindow()
 											ButtonType = "Check",
 											DT_VCENTER = true,
 											DT_CENTER = true,
+											Font = kstrFont,
 											Events = {
 												ButtonCheck = OnShowFilters,
 												ButtonUncheck = OnHideFilters,
@@ -308,7 +308,7 @@ function M:CreateWindow()
 									DT_VCENTER = true,
 									DT_CENTER = true,
 									Visible = false,
-									Font = "Nameplates",
+									Font = kstrFont,
 								},
 								{
 									Name = "Results",
@@ -320,60 +320,7 @@ function M:CreateWindow()
 											Name = "Header",
 											AnchorPoints = { 0, 0, 1, 0 },
 											AnchorOffsets = { 0, 0, -20, nHeightHeader },
-											Children = {
-												{
-													Class = "Button",
-													ButtonType = "Check",
-													RadioGroup = "ResultSorting",
-													Text = "Item",
-													Name = "Name",
-													Base = "BK3:btnHolo_ListView_Mid",
-													DT_VCENTER = true,
-													DT_CENTER = true,
-													AnchorPoints = { 0, 0, 0.5, 1 },
-													AnchorOffsets = { 0, 0, 0, 0 },
-													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
-												},
-												{
-													Class = "Button",
-													ButtonType = "Check",
-													RadioGroup = "ResultSorting",
-													Text = "Bid",
-													Name = "Bid",
-													Base = "BK3:btnHolo_ListView_Mid",
-													DT_VCENTER = true,
-													DT_CENTER = true,
-													AnchorPoints = { 0.5, 0, 0.7, 1 },
-													AnchorOffsets = { 0, 0, 0, 0 },
-													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
-												},
-												{
-													Class = "Button",
-													ButtonType = "Check",
-													RadioGroup = "ResultSorting",
-													Text = "Buyout",
-													Name = "Buyout",
-													Base = "BK3:btnHolo_ListView_Mid",
-													DT_VCENTER = true,
-													DT_CENTER = true,
-													AnchorPoints = { 0.7, 0, 0.9, 1 },
-													AnchorOffsets = { 0, 0, 0, 0 },
-													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
-												},
-												{
-													Class = "Button",
-													ButtonType = "Check",
-													RadioGroup = "ResultSorting",
-													Text = "Time\nLeft",
-													Name = "TimeRemaining",
-													Base = "BK3:btnHolo_ListView_Mid",
-													DT_VCENTER = true,
-													DT_CENTER = true,
-													AnchorPoints = { 0.9, 0, 1, 1 },
-													AnchorOffsets = { 0, 0, 0, 0 },
-													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
-												},
-											},
+											Children = {}, -- Will be generated later.
 										},
 										-- Items
 										{
@@ -408,6 +355,7 @@ function M:CreateWindow()
 											AnchorOffsets = { 4, 8, 210, 30 },
 											Text = "Filter known Schematics",
 											Base = "HologramSprites:HoloCheckBoxBtn",
+											Font = kstrFont,
 										},
 									},
 								},
@@ -433,12 +381,124 @@ function M:CreateWindow()
 		self.wndFilters = self.wndMain:FindChild("Filters");
 		self.wndResults = self.wndMain:FindChild("Results");
 		self.wndResultsGrid = self.wndResults:FindChild("Grid");
+
+		self:UpdateListHeaders();
 	end
 end
 
 -----------------------------------------------------------------------------
 -- Items
 -----------------------------------------------------------------------------
+
+local ktAdditionalColumns = {
+	[1] = { "Level", "ItemLevel", "RuneSlots" }, -- Armor
+	[15] = { "Level", "ItemLevel", "RuneSlots" }, -- Gear
+	[2] = { "Level", "ItemLevel", "RuneSlots", "AssaultPower", "SupportPower" }, -- Weapon
+	[5] = { "BagSlots" }, -- Bag
+};
+
+local ktListColumns = {
+	Name = {
+		Text = "Item",
+		-- Width will be calculated (takes all available space)
+		-- Method is also hardcoded currently, because we also display the icon
+	},
+	Bid = {
+		Text = "Current Bid",
+		Width = 0.17,
+	},
+	Buyout = {
+		Text = "Buyout Price",
+		Width = 0.17,
+	},
+	TimeRemaining = {
+		Text = "Time\nLeft",
+		Width = 0.08,
+	},
+	-- Bags
+	BagSlots = {
+		Text = "Slots",
+		Width = 0.07,
+		Get = function(self, aucCurr, itemCurr)
+			return itemCurr:GetBagSlots();
+		end,
+	},
+	-- Armor
+	Level = {
+		Text = "Level",
+		Width = 0.07,
+	},
+	ItemLevel = {
+		Text = "Item\nLevel",
+		Width = 0.07,
+	},
+	RuneSlots = {
+		Text = "Rune\nSlots",
+		Width = 0.07,
+	},
+	-- Weapons
+	AssaultPower = {
+		Text = "AP",
+		Description = "Assault Power",
+		Width = 0.07,
+	},
+	SupportPower = {
+		Text = "SP",
+		Description = "Support Power",
+		Width = 0.08,
+	},
+};
+
+local function CreateHeader(self, strName, strText, fPosition, fWidth)
+	local wndHeader = self.wndResults:FindChild("Header");
+
+	self.GeminiGUI:Create({
+		Class = "Button",
+		ButtonType = "Check",
+		RadioGroup = "ResultSorting",
+		Text = strText,
+		Name = strName,
+		Base = "BK3:btnHolo_ListView_Mid",
+		Font = kstrFont,
+		DT_VCENTER = true,
+		DT_CENTER = true,
+		AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
+		AnchorOffsets = { 0, 0, 0, 0 },
+		Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
+	}):GetInstance(self, wndHeader);
+end
+
+function M:UpdateListHeaders()
+	local wndHeader = self.wndResults:FindChild("Header");
+
+	local fWidthName = 1;
+	local fPosition = 0;
+	local tHeaders = { "Name", "Bid", "Buyout", "TimeRemaining" };
+
+	-- Add additional headers (as defined by current category/family)
+	if (self.nSelectedFamily and ktAdditionalColumns[self.nSelectedFamily]) then
+		local nInsertPos = 2;
+		for _, strName in ipairs(ktAdditionalColumns[self.nSelectedFamily]) do
+			tinsert(tHeaders, nInsertPos, strName);
+			nInsertPos = nInsertPos + 1;
+		end
+	end
+
+	-- Calculate "name" width
+	for _, strName in ipairs(tHeaders) do
+		if (strName ~= "Name") then
+			fWidthName = fWidthName - ktListColumns[strName].Width;
+		end
+	end
+	ktListColumns.Name.Width = fWidthName;
+
+	-- Add all headers
+	wndHeader:DestroyChildren();
+	for _, strName in ipairs(tHeaders) do
+		CreateHeader(self, strName, ktListColumns[strName].Text, fPosition, ktListColumns[strName].Width);
+		fPosition = fPosition + ktListColumns[strName].Width;
+	end
+end
 
 local function OnWindowShow(self, wndHandler, wndControl)
 	-- Background Opacity Fix
@@ -498,7 +558,7 @@ function M:CreateListItem(aucCurr)
 	end
 
 	-- Create Control
-	local wndItem = self.GeminiGUI:Create({
+	local tWindowDefinitions = {
 		BGColor = bIsKnownSchematic and "aa381010" or "aa000000",
 		Border = false,
 		Picture = true,
@@ -529,21 +589,23 @@ function M:CreateListItem(aucCurr)
 						Sprite = "ClientSprites:WhiteFill",
 						Children = {
 							{
-								Name = "Count",
-								AnchorPoints = { 0, 0, 1, 1 },
-								AnchorOffsets = { 0, 0, -2, -1 },
-								Text = strCount,
-								DT_RIGHT = true,
-								DT_BOTTOM = true,
-								Font = "CRB_Interface9_O",
-							},
-							{
 								Name = "Icon",
 								AnchorPoints = { 0, 0, 1, 1 },
 								AnchorOffsets = { 0, 0, 0, 0 },
 								Picture = true,
 								BGColor = "white",
 								Sprite = itemCurr:GetIcon(),
+								Children = {
+									{
+										Name = "Count",
+										AnchorPoints = { 0, 0, 1, 1 },
+										AnchorOffsets = { 0, 0, -2, -1 },
+										Text = strCount,
+										DT_RIGHT = true,
+										DT_BOTTOM = true,
+										Font = "CRB_Interface9_O",
+									},
+								},
 							},
 						},
 					},
@@ -556,26 +618,28 @@ function M:CreateListItem(aucCurr)
 				Text = itemCurr:GetName(),
 				TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
 				DT_VCENTER = true,
-				Font = "Nameplates",
+				Font = kstrFont,
 			},
 			-- Bid
 			{
 				Class = "MLWindow",
 				Name = "Bid",
 				AnchorPoints = { 0.5, 0, 0.7, 1 },
-				AnchorOffsets = { 0, 8, 0, 0 },
+				AnchorOffsets = { 0, 9, 0, 0 },
 				TextColor = bHasBids and "white" or "darkgray",
 				Events = {
 					WindowShow = not bHasBids and OnWindowShow or nil,
 				},
 				Visible = false,
+				Text = S:GetMoneyAML(nBidAmount, kstrFont),
 			},
 			-- Buyout
 			{
 				Class = "MLWindow",
 				Name = "Buyout",
 				AnchorPoints = { 0.7, 0, 0.9, 1 },
-				AnchorOffsets = { 0, 8, 0, 0 },
+				AnchorOffsets = { 0, 9, 0, 0 },
+				Text = S:GetMoneyAML(aucCurr:GetBuyoutPrice():GetAmount(), kstrFont),
 			},
 			-- Remaining Time
 			{
@@ -583,26 +647,25 @@ function M:CreateListItem(aucCurr)
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = ktDurationStrings[aucCurr:GetTimeRemainingEnum()],
 				TextColor = ktDurationColors[aucCurr:GetTimeRemainingEnum()];
-				Font = "Nameplates",
+				Font = kstrFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 			},
 		},
 		UserData = aucCurr,
 		Visible = false,
-	}):GetInstance(self, self.wndResultsGrid);
+	};
 
-	wndItem:FindChild("Bid"):SetText(S:GetMoneyAML(nBidAmount));
-	wndItem:FindChild("Buyout"):SetText(S:GetMoneyAML(aucCurr:GetBuyoutPrice():GetAmount()));
+	local wndItem = self.GeminiGUI:Create(tWindowDefinitions):GetInstance(self, self.wndResultsGrid);
 
 	if (not bHasBids) then
 		wndItem:FindChild("Bid"):SetOpacity(0.5, 5e+20);
 	end
 
-	SendVarToRover("AHCurrentAuction", aucCurr);
-
 	wndItem:Show(true, true);
 	wndItem:FindChild("Bid"):Show(true, true);
+
+	SendVarToRover("AHCurrentAuction", aucCurr);
 
 	return wndItem;
 end
