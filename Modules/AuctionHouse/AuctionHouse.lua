@@ -46,10 +46,12 @@ end
 -----------------------------------------------------------------------------
 
 function M:Open()
-	self:CreateWindow();
-	self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
-	self.wndMain:Show(true);
-	self:SetSortOrder("Name", "ASC");
+	if (not self.wndMain or not self.wndMain:IsValid()) then
+		self:CreateWindow();
+		self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
+		self.wndMain:Show(true);
+		self:SetSortOrder("Name", "ASC");
+	end
 end
 
 function M:Close()
@@ -67,4 +69,5 @@ function M:Close()
 	self.strSortHeader = nil;
 	self.strSortDirection = nil;
 	self.fnSortResults = nil;
+	self.bFilterChanged = nil;
 end
