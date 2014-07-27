@@ -1014,8 +1014,19 @@ function M:CreateListItem(aucCurr)
 
 	local itemCurr = aucCurr:GetItem();
 	local bIsKnownSchematic = (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
+	local bIsOwned = aucCurr:IsOwned();
+	local bIsTopBidder = aucCurr:IsTopBidder();
 	local strCount = aucCurr:GetCount() ~= 1 and aucCurr:GetCount() or "";
 	local strName = itemCurr:GetName();
+
+	local strBGColor = "aa000000";
+	if (bIsOwned) then
+		strBGColor = "aa002938";
+	elseif (bIsTopBidder) then
+		strBGColor = "aa102D00";
+	elseif (bIsKnownSchematic) then
+		strBGColor = "aa381010";
+	end
 
 	-- Bids
 	local tBidMinimum = aucCurr:GetMinBid();
@@ -1030,7 +1041,7 @@ function M:CreateListItem(aucCurr)
 
 	-- Create Control
 	local tWindowDefinitions = {
-		BGColor = bIsKnownSchematic and "aa381010" or "aa000000",
+		BGColor = strBGColor,
 		Border = false,
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",
