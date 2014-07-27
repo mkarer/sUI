@@ -17,7 +17,7 @@ require "Unit";
 require "MarketplaceLib";
 require "ItemAuction";
 
-local strlen, strfind, gmatch, format, tinsert, floor = string.len, string.find, string.gmatch, string.format, table.insert, math.floor;
+local strlen, strfind, gmatch, format, tinsert, floor, max = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
 -----------------------------------------------------------------------------
@@ -54,6 +54,8 @@ local ktDurationColors = {
 
 local kstrSearch = Apollo.GetString("CRB_Search");
 local nPadding = 2;
+local nItemSize = 30;
+local nIconBorder = 1;
 
 local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	local nNodeIdRoot = wndControl:AddNode(0, "Auctions");
@@ -163,9 +165,107 @@ local function OnSearch(self)
 	self:Search();
 end
 
+local function OnChangeBidAmount(self, wndHandler, wndControl)
+	local aucCurr = wndControl:GetParent():GetParent():GetData();
+	self.wndCurrentItem:FindChild("BtnBid"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, false, wndControl:GetCurrency());
+end
+
+local function OnSelectItem(self, wndHandler, wndControl)
+	self.wndSelectedItem = wndHandler;
+
+	-- Resize Results
+	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
+	nB = -self.wndCurrentItem:GetHeight() - nPadding;
+	self.wndResults:SetAnchorOffsets(nL, nT, nR, nB);
+
+	-- Icon/Name
+	local aucCurr = wndHandler:GetData();
+	local itemCurr = aucCurr:GetItem();
+	self.wndCurrentItem:SetData(aucCurr);
+
+	self.wndCurrentItem:FindChild("Name"):SetText(itemCurr:GetName());
+	self.wndCurrentItem:FindChild("IconContainer"):SetBGColor(ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior]);
+	self.wndCurrentItem:FindChild("Icon"):SetSprite(itemCurr:GetIcon());
+	self.wndCurrentItem:FindChild("Name"):SetTextColor(ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior]);
+
+	-- Bid/Buyout
+	local nBuyoutPrice = aucCurr:GetBuyoutPrice():GetAmount();
+	local bBidOnly = (nBuyoutPrice == 0);
+	local nPlayerCash = GameLib.GetPlayerCurrency(Money.CodeEnumCurrencyType.Credits):GetAmount();
+	local bCanBuyout = (not bBidOnly and not aucCurr:IsOwned() and nBuyoutPrice <= nPlayerCash);
+	local nMinBidPrice = aucCurr:GetMinBid():GetAmount();
+	local nCurrBidPrice = aucCurr:GetCurrentBid():GetAmount();
+	local nDefaultBid = max(nMinBidPrice, nCurrBidPrice);
+	local bBuyoutOnly = (not bBidOnly and nDefaultBid >= nBuyoutPrice);
+	local bCanBid = (not bBuyoutOnly and not aucCurr:IsTopBidder() and not aucCurr:IsOwned());
+	local nBidAmount = nCurrBidPrice == 0 and nMinBidPrice or nCurrBidPrice + 1;
+
+	-- Bid
+	self.wndCurrentItem:FindChild("Bid"):Enable(bCanBid);
+	self.wndCurrentItem:FindChild("Bid"):SetAmount(nBidAmount);
+	self.wndCurrentItem:FindChild("BtnBid"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, false, nBidAmount);
+
+	-- Buyout
+	self.wndCurrentItem:FindChild("Price"):SetText(S:GetMoneyAML(nBuyoutPrice, kstrFont));
+	self.wndCurrentItem:FindChild("BtnBuyout"):Enable(bCanBuyout);
+	self.wndCurrentItem:FindChild("BtnBuyout"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, true);
+
+	-- Display
+	self.wndCurrentItem:Show(true, true);
+end
+
+local function OnDeselectItem(self, wndHandler, wndControl)
+	self:ClearSelection();
+end
+
+function M:ClearSelection()
+	if (self.wndSelectedItem) then
+		self.wndSelectedItem:SetCheck(false);
+	end
+
+	self.wndSelectedItem = nil;
+
+	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
+	self.wndResults:SetAnchorOffsets(nL, nT, nR, 0);
+
+	self.wndCurrentItem:Show(false, true);
+end
+
 local function OnSearchLostFocus(self, wndHandler, wndControl)
 	if (strlen(wndControl:GetText()) == 0) then
 		wndControl:SetText(kstrSearch);
+	end
+end
+
+local function ShowItemTooltip(self, wndHandler, wndControl) -- Build on mouse enter and not every hit to save computation time
+	if (wndHandler ~= wndControl) then return; end
+	local aucCurr = wndHandler:GetParent():GetParent():GetData();
+
+	if (not aucCurr) then return; end
+
+	local itemCurr = aucCurr:GetItem();
+	Tooltip.GetItemTooltipForm(self, wndHandler, itemCurr, { bPrimary = true, bSelling = false, itemModData = nil, itemCompare = itemCurr:GetEquippedItemForItemType() });
+end
+
+local function HideItemTooltip(self, wndHandler, wndControl)
+	if (wndHandler ~= wndControl) then return; end
+	wndHandler:SetTooltipDoc(nil);
+end
+
+local function ShowItemPreview(self, wndHandler, wndControl, eMouseButton)
+	if (wndHandler ~= wndControl) then return; end
+
+	local aucCurr = wndHandler:GetParent():GetParent():GetData();
+	if (not aucCurr) then return; end
+
+	local itemCurr = aucCurr:GetItem();
+
+	if (Apollo.IsControlKeyDown() and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+		if (itemCurr:GetHousingDecorInfoId() ~= nil and itemCurr:GetHousingDecorInfoId() ~= 0) then
+			Event_FireGenericEvent("DecorPreviewOpen", itemCurr:GetHousingDecorInfoId());
+		else
+			self.ItemPreviewImproved:OnShowItemInDressingRoom(itemCurr);
+		end
 	end
 end
 
@@ -200,6 +300,7 @@ function M:CreateWindow()
 		local nHeightSearch = 40;
 		local nHeightFilters = 200;
 		local nHeightHeader = 40;
+		local nHeightCurrentItem = 40;
 
 		self.wndMain = self.GeminiGUI:Create({
 			Name = "SezzAuctionHouse",
@@ -380,7 +481,7 @@ function M:CreateWindow()
 										{
 											Name = "KnownSchematics",
 											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 8, 222, 30 },
+											AnchorOffsets = { 4, 8, 300, 30 },
 											Text = "Filter known Schematics",
 											Base = "HologramSprites:HoloCheckBoxBtn",
 											Font = kstrFont,
@@ -389,23 +490,149 @@ function M:CreateWindow()
 										{
 											Name = "RuneSlots",
 											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 38, 222, 60 },
+											AnchorOffsets = { 4, 38, 180, 60 },
 											Text = "Minimum Rune Slots",
 											Base = "HologramSprites:HoloCheckBoxBtn",
 											Font = kstrFont,
+										},
+										{
+											Class = "EditBox",
+											Name = "RuneSlotsAmount",
+											AnchorOffsets = { 180, 38, 300, 54 },
+											Text = "0",
+											DT_VCENTER = true,
+											DT_CENTER = true,
+											Font = kstrFont,
+										},
+										-- Maximum Price
+										{
+											Name = "MaxPrice",
+											WidgetType = "CheckBox",
+											AnchorOffsets = { 4, 68, 180, 90 },
+											Text = "Maximum Price",
+											Base = "HologramSprites:HoloCheckBoxBtn",
+											Font = kstrFont,
+										},
+										{
+											Class = "CashWindow",
+											Name = "MaxPriceAmount",
+											AnchorOffsets = { 180, 68, 300, 86 },
+											Text = "0",
+											DT_VCENTER = true,
+											DT_RIGHT = true,
+											Font = kstrFont,
+											AllowEditing = true,
+										},
+									},
+								},
+								-- Current Item (Buy/Bid)
+								{
+									Name = "CurrentItem",
+									Border = true,
+									Picture = true,
+									Sprite = "BK3:UI_BK3_Holo_InsetDivider",
+									AnchorPoints = { 0, 1, 1, 1, },
+									AnchorOffsets = { nWidthCategories + nPadding, -nHeightCurrentItem, 0, 0 },
+									Visible = false,
+									Children = {
+										{
+											AnchorPoints = { 0, 0, 1, 1, },
+											AnchorOffsets = { 0, 0, 0, 0 },
 											Children = {
+												-- Icon
 												{
-													Class = "EditBox",
-													Name = "RuneSlotsAmount",
-													AnchorPoints = { 1, 0, 1, 1 },
-													AnchorOffsets = { -40, 0, 0, 0 },
-													Text = "0",
+													Name = "IconContainer",
+													AnchorPoints = { 0, 0, 0, 1 },
+													AnchorOffsets = { 4, 4, nHeightCurrentItem - 8, -4 },
+													Picture = true,
+													Sprite = "ClientSprites:WhiteFill",
+													Events = {
+														MouseEnter = ShowItemTooltip,
+														MouseExit = HideItemTooltip,
+														MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
+													},
+													Children = {
+														{
+															Name = "IconBackground",
+															AnchorPoints = { 0, 0, 1, 1 },
+															AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
+															Picture = true,
+															BGColor = "black",
+															Sprite = "ClientSprites:WhiteFill",
+															Children = {
+																{
+																	Name = "Icon",
+																	AnchorPoints = { 0, 0, 1, 1 },
+																	AnchorOffsets = { 0, 0, 0, 0 },
+																	Picture = true,
+																	BGColor = "white",
+																	Children = {
+																		{
+																			Name = "Count",
+																			AnchorPoints = { 0, 0, 1, 1 },
+																			AnchorOffsets = { 0, 0, -2, -1 },
+																			DT_RIGHT = true,
+																			DT_BOTTOM = true,
+																			Font = "CRB_Interface9_O",
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+												-- Name
+												{
+													Name = "Name",
+													AnchorPoints = { 0, 0, 1, 1 },
+													AnchorOffsets = { nHeightCurrentItem - 2, 0, 0, 0 },
 													DT_VCENTER = true,
 													Font = kstrFont,
+													AutoScaleTextOff = true,
 												},
-											}
+												-- Bid
+												{
+													Class = "CashWindow",
+													Name = "Bid",
+													AnchorPoints = { 1, 0, 1, 1 },
+													AnchorOffsets = { -410, 0, -284, 0 },
+													DT_RIGHT = true,
+													DT_VCENTER = true,
+													Font = kstrFont,
+													AllowEditing = true,
+													Events = { CashWindowAmountChanged = OnChangeBidAmount },
+												},
+												{
+													Class = "ActionConfirmButton",
+													Name = "BtnBid",
+													AnchorPoints = { 1, 0, 1, 1 },
+													AnchorOffsets = { -284, nPadding, -204, -nPadding },
+													Base = "BK3:btnHolo_ListView_Mid",
+													Text = Apollo.GetString("MarketplaceAuction_BidBtn"),
+													DT_VCENTER = true,
+													DT_CENTER = true,
+													Font = kstrFont,
+												},
+												-- Buyout
+												{
+													Class = "MLWindow",
+													Name = "Price",
+													AnchorPoints = { 1, 0, 1, 1 },
+													AnchorOffsets = { -200, 12, -84, 0 },
+												},
+												{
+													Class = "ActionConfirmButton",
+													Name = "BtnBuyout",
+													AnchorPoints = { 1, 0, 1, 1 },
+													AnchorOffsets = { -80, nPadding, -nPadding, -nPadding },
+													Base = "BK3:btnHolo_ListView_Mid",
+													Text = Apollo.GetString("MarketplaceAuction_BuyoutHeader"),
+													DT_VCENTER = true,
+													DT_CENTER = true,
+													Font = kstrFont,
+												},
+											},
 										},
-
 									},
 								},
 								-- CONTENT
@@ -430,6 +657,7 @@ function M:CreateWindow()
 		self.wndFilters = self.wndMain:FindChild("Filters");
 		self.wndResults = self.wndMain:FindChild("Results");
 		self.wndResultsGrid = self.wndResults:FindChild("Grid");
+		self.wndCurrentItem = self.wndMain:FindChild("CurrentItem");
 
 		self:UpdateListHeaders();
 	end
@@ -449,6 +677,7 @@ end
 local ktAdditionalColumns = {
 	[1] = { "Level", "ItemLevel", "RuneSlots" }, -- Armor
 	[15] = { "Level", "ItemLevel", "RuneSlots" }, -- Gear
+	[20] = { "Level" }, -- Housing
 	[2] = { "Level", "ItemLevel", "RuneSlots", "AssaultPower", "SupportPower" }, -- Weapon
 	[5] = { "BagSlots" }, -- Bag
 };
@@ -780,41 +1009,7 @@ function M:UpdateListHeaders()
 	self.tHeaders = tHeaders;
 end
 
-local function ShowItemTooltip(self, wndHandler, wndControl) -- Build on mouse enter and not every hit to save computation time
-	if (wndHandler ~= wndControl) then return; end
-
-	local aucCurr = wndHandler:GetParent():GetParent():GetData();
-	if (not aucCurr) then return; end
-
-	local itemCurr = aucCurr:GetItem();
-	Tooltip.GetItemTooltipForm(self, wndHandler, itemCurr, { bPrimary = true, bSelling = false, itemModData = nil, itemCompare = itemCurr:GetEquippedItemForItemType() });
-end
-
-local function HideItemTooltip(self, wndHandler, wndControl)
-	if (wndHandler ~= wndControl) then return; end
-	wndHandler:SetTooltipDoc(nil);
-end
-
-local function ShowItemPreview(self, wndHandler, wndControl, eMouseButton)
-	if (wndHandler ~= wndControl) then return; end
-
-	local aucCurr = wndHandler:GetParent():GetParent():GetData();
-	if (not aucCurr) then return; end
-
-	local itemCurr = aucCurr:GetItem();
-
-	if (Apollo.IsControlKeyDown() and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
-		if (itemCurr:GetHousingDecorInfoId() ~= nil and itemCurr:GetHousingDecorInfoId() ~= 0) then
-			Event_FireGenericEvent("DecorPreviewOpen", itemCurr:GetHousingDecorInfoId());
-		else
-			self.ItemPreviewImproved:OnShowItemInDressingRoom(itemCurr);
-		end
-	end
-end
-
 function M:CreateListItem(aucCurr)
-	local nItemSize = 30;
-	local nIconBorder = 1;
 	local fPosition = ktListColumns.Name.Width;
 
 	local itemCurr = aucCurr:GetItem();
@@ -840,12 +1035,13 @@ function M:CreateListItem(aucCurr)
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",
 		AnchorPoints = { 0, 0, 1, 0, },
-		AnchorOffsets = { 0, 0, 0, nItemSize + 1 },
+		AnchorOffsets = { -5, 0, 0, nItemSize + 1 },
+		Name = "ListItem",
 		Children = {
 			-- Icon + Name
 			{
 				AnchorPoints = { 0, 0, ktListColumns.Name.Width, 1 },
-				AnchorOffsets = { 0, 0, 0, 0 },
+				AnchorOffsets = { 6, 0, 0, 0 },
 				Children = {
 					-- Icon
 					{
@@ -914,6 +1110,10 @@ function M:CreateListItem(aucCurr)
 		ButtonType = "Check",
 		RadioGroup = "SezzUI_AH_ResultItem",
 		Border = false,
+		Events = {
+			ButtonCheck = OnSelectItem,
+			ButtonUncheck = OnDeselectItem,
+		},
 	};
 
 	for _, strName in ipairs(self.tHeaders) do
