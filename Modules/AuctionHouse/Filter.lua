@@ -53,7 +53,7 @@ local tCustomFilter = {
 	Name = {
 		fnFilter = function(self, aucCurrent)
 			local itemCurr = aucCurrent:GetItem();
-			return (strfind(itemCurr:GetName(), self.tFilter.strSearchQueryEscaped) == nil);
+			return (strfind(strlower(itemCurr:GetName()), self.tFilter.strSearchQueryEscaped) == nil);
 		end,
 	},
 };
@@ -66,7 +66,7 @@ function M:BuildFilter()
 		nCategoryId = nCategoryId,
 		nTypeId = nTypeId,
 		strSearchQuery = strSearchQuery,
-		strSearchQueryEscaped = strSearchQuery and EscapePattern(strSearchQuery) or "",
+		strSearchQueryEscaped = strSearchQuery and EscapePattern(strlower(strSearchQuery)) or "",
 		tFilter = tFilter,
 		tCustomFilter = tCustomFilter,
 	};

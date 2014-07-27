@@ -17,6 +17,14 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 -- GUI
 -----------------------------------------------------------------------------
 
+local ktColumnsEquippable = { "Level", "Item Level", "Rune Slots" };
+local ktAdditionalColumns = {
+	[1] = ktColumnsEquippable, -- Armor
+	[16] = ktColumnsEquippable, -- Gear
+	[2] = ktColumnsEquippable, -- Weapon
+	[5] = { "Slots" }, -- Bag
+};
+
 local ktQualityColors = {
 	[Item.CodeEnumItemQuality.Inferior] 		= "ItemQuality_Inferior",
 	[Item.CodeEnumItemQuality.Average] 			= "ItemQuality_Average",
@@ -127,6 +135,23 @@ end
 local function OnSearchLostFocus(self, wndHandler, wndControl)
 	if (strlen(wndControl:GetText()) == 0) then
 		wndControl:SetText(strSearchLocalized);
+	end
+end
+
+function M:SetStatusMessage(strMessage, bIsError)
+	local wndMessage = self.wndMain:FindChild("Message");
+
+	if (type(strMessage) == "string" and strlen(strMessage) > 0) then
+		if (bIsError) then
+			wndMessage:SetTextColor("red");
+		else
+			wndMessage:SetTextColor("UI_TextHoloTitle");
+		end
+
+		wndMessage:SetText(strMessage);
+		wndMessage:Show(true);
+	else
+		wndMessage:Show(false);
 	end
 end
 
@@ -254,6 +279,15 @@ function M:CreateWindow()
 									},
 								},
 								-- Search Results
+								{
+									Name = "Message",
+									AnchorPoints = { 0, 0, 1, 0.5, },
+									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
+									DT_VCENTER = true,
+									DT_CENTER = true,
+									Visible = false,
+									Font = "Nameplates",
+								},
 								{
 --									BGColor = "aa000000",
 									Name = "Results",

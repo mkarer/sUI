@@ -17,9 +17,17 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 -- Search
 -----------------------------------------------------------------------------
 
+local strNoResults = Apollo.GetString("Tradeskills_NoResults");
+local strTryClearingFilter = Apollo.GetString("MarketplaceAuction_TryClearingFilter");
+
 function M:SetSearchState(bSearching)
 	self.bIsSearching = bSearching;
 	self.wndSearch:FindChild("BtnSearch"):Enable(not bSearching);
+	if (bSearching) then
+		self:SetStatusMessage("Searching...");
+	else
+		self:SetStatusMessage();
+	end
 end
 
 function M:Search(nPage)
@@ -50,17 +58,14 @@ function M:Search(nPage)
 
 		if (#tPackagedData > MarketplaceLib.kAuctionSearchMaxIds) then
 			-- Too many results for MarketplaceLib, filter manually
-			Print(Apollo.GetString("MarketplaceAuction_TooManyResults"));
---			self:SetSearchState(false);
 			self.tFilter.strSearchQuery = nil;
 			tinsert(self.tFilter.tCustomFilter, "Name");
-			Print(self.tFilter.strSearchQueryEscaped);
 			self:Search(nPage);
 		elseif (#tPackagedData > 0) then
 			MarketplaceLib.RequestItemAuctionsByItems(tPackagedData, nPage, eAuctionSort, bReverseSort, self.tFilter.tFilter, nil, nil, nPropertySort);
 		else
-			Print(Apollo.GetString("MarketplaceAuction_SearchNotPossible"));
 			self:SetSearchState(false);
+			self:SetStatusMessage(Apollo.GetString("MarketplaceAuction_SearchNotPossible"), true);
 		end
 	elseif (self.tFilter.nFamilyId > 0) then
 		MarketplaceLib.RequestItemAuctionsByFamily(self.tFilter.nFamilyId, nPage, eAuctionSort, bReverseSort, arFilters, nil, nil, nPropertySort);
@@ -96,7 +101,14 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 			end
 		end
 
+		local nResultsFiltered = nTotalResults - #self.wndResults:GetChildren();
 		self.wndResults:ArrangeChildrenVert(0);
 		self:SetSearchState(false);
+
+		if (#self.tAuctions == 0) then
+			self:SetStatusMessage(strNoResults, true);
+		elseif (nResultsFiltered == nTotalResults) then
+			self:SetStatusMessage(strNoResults .. " " .. nResultsFiltered .. " result"..(nResultsFiltered ~= 1 and "s" or "").." filtered." .. "\n" .. strTryClearingFilter, true);
+		end
 	end
 end
