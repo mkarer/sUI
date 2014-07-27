@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch, tinsert = string.len, string.find, string.gmatch, table.insert;
+local strlen, strfind, gmatch, tinsert, tremove = string.len, string.find, string.gmatch, table.insert, table.remove;
 local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 
 -----------------------------------------------------------------------------
@@ -104,6 +104,26 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 	else
 		-- Done
 		self:DisplaySearchResults();
+	end
+end
+
+function M:RemoveAuction(aucCached)
+	if (self.bIsSearching or not self.tAuctions) then return; end
+
+	for i, aucCurr in ipairs(self.tAuctions) do
+		if (aucCurr == aucCached) then
+			tremove(self.tAuctions, i);
+			break;
+		end
+	end
+
+	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
+		if (wndAuction:GetData() == aucCached) then
+			wndAuction:Destroy();
+			self:ClearSelection();
+			self:SortResults();
+			break;
+		end
 	end
 end
 

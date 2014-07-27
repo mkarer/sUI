@@ -298,7 +298,7 @@ function M:CreateWindow()
 		local nWidthSearchButton = 100;
 		local nPaddingSearchControl = 4;
 		local nHeightSearch = 40;
-		local nHeightFilters = 200;
+		local nHeightFilters = 140;
 		local nHeightHeader = 40;
 		local nHeightCurrentItem = 40;
 
@@ -499,7 +499,7 @@ function M:CreateWindow()
 											Class = "EditBox",
 											Name = "RuneSlotsAmount",
 											AnchorOffsets = { 180, 38, 300, 54 },
-											Text = "0",
+											Text = "4",
 											DT_VCENTER = true,
 											DT_CENTER = true,
 											Font = kstrFont,
@@ -517,7 +517,7 @@ function M:CreateWindow()
 											Class = "CashWindow",
 											Name = "MaxPriceAmount",
 											AnchorOffsets = { 180, 68, 300, 86 },
-											Text = "0",
+											Amount = 10000,
 											DT_VCENTER = true,
 											DT_RIGHT = true,
 											Font = kstrFont,
