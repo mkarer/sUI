@@ -56,10 +56,24 @@ local tCustomFilter = {
 			return (strfind(strlower(itemCurr:GetName()), self.tFilter.strSearchQueryEscaped) == nil);
 		end,
 	},
+	RuneSlots = {
+		fnFilter = function(self, aucCurrent, nAmount)
+			local itemCurr = aucCurrent:GetItem();
+			local tInfo = itemCurr:GetDetailedInfo();
+			local nRuneSlots = 0;
+			for _, tData in pairs(tInfo) do
+				if (tData.tSigils and tData.tSigils.arSigils) then
+					nRuneSlots = nRuneSlots + #tData.tSigils.arSigils;
+				end
+			end
+
+			return (nRuneSlots < nAmount);
+		end,
+	},
 };
 
 function M:BuildFilter()
-	local nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter = self:GetCurrentFilter();
+	local nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter, tCustomFilterValues = self:GetCurrentFilter();
 
 	self.bFilterChanged = (not self.tFilter or self.tFilter.nFamilyId ~= nFamilyId or self.tFilter.nCategoryId ~= nCategoryId or self.tFilter.nTypeId ~= nTypeId or self.tFilter.strSearchQuery ~= strSearchQuery or not S:Compare(self.tFilter.tFilter, tFilter));
 	self.tFilter = {
@@ -70,12 +84,14 @@ function M:BuildFilter()
 		strSearchQueryEscaped = strSearchQuery and EscapePattern(strlower(strSearchQuery)) or "",
 		tFilter = tFilter,
 		tCustomFilter = tCustomFilter,
+		tCustomFilterValues = tCustomFilterValues,
 	};
 end
 
 function M:GetCurrentFilter()
 	local tFilter = {};
 	local tCustomFilter = {};
+	local tCustomFilterValues = {};
 
 	-- Search String
 	local strSearchQuery = self.wndMain:FindChild("Search"):FindChild("Text"):GetText();
@@ -99,13 +115,20 @@ function M:GetCurrentFilter()
 	if (self.wndFilters:FindChild("KnownSchematics"):IsChecked()) then
 		tinsert(tCustomFilter, "KnownSchematics");
 	end
+	if (self.wndFilters:FindChild("RuneSlots"):IsChecked()) then
+		tinsert(tCustomFilter, "RuneSlots");
+		tCustomFilterValues["RuneSlots"] = tonumber(self.wndFilters:FindChild("RuneSlotsAmount"):GetText());
+		if (type(tCustomFilterValues["RuneSlots"]) ~= "number" or tCustomFilterValues["RuneSlots"] < 0) then
+			tCustomFilterValues["RuneSlots"] = 0;
+		end
+	end
 
-	return nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter;
+	return nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter, tCustomFilterValues;
 end
 
 function M:IsFiltered(aucCurrent)
 	for _, strFilter in ipairs(self.tFilter.tCustomFilter) do
-		if (tCustomFilter[strFilter] and tCustomFilter[strFilter].fnFilter(self, aucCurrent)) then
+		if (tCustomFilter[strFilter] and tCustomFilter[strFilter].fnFilter(self, aucCurrent, self.tFilter.tCustomFilterValues[strFilter])) then
 			return true;
 		end
 	end
