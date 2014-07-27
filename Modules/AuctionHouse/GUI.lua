@@ -465,6 +465,8 @@ local function CreateHeader(self, strName, strText, fPosition, fWidth)
 		AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 		AnchorOffsets = { 0, 0, 0, 0 },
 		Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
+		AutoScaleTextOff = true,
+		DT_WORDBREAK = true,
 	}):GetInstance(self, wndHeader);
 end
 
@@ -619,6 +621,7 @@ function M:CreateListItem(aucCurr)
 				TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
 				DT_VCENTER = true,
 				Font = kstrFont,
+				AutoScaleTextOff = true,
 			},
 			-- Bid
 			{
@@ -650,6 +653,7 @@ function M:CreateListItem(aucCurr)
 				Font = kstrFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
+				AutoScaleTextOff = true,
 			},
 		},
 		UserData = aucCurr,
