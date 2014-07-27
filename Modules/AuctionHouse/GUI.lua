@@ -194,8 +194,8 @@ function M:CreateWindow()
 			AnchorCenter = { 1000, 800 },
 			Picture = true,
 			Border = true,
-			Sprite = "BK3:UI_BK3_Holo_Snippet",
-			BGColor = "black",
+			Sprite = "BK3:UI_BK3_Holo_InsetHeader",
+			BGColor = "xkcdBabyPink",
 			Sizable = true,
 			Visible = false,
 			Events = {
@@ -207,8 +207,8 @@ function M:CreateWindow()
 				{
 					Name = "Title",
 					AnchorPoints = { 0, 0, 1, 0 },
-					AnchorOffsets = { 10, 10, -12, 39 },
-					Font = "CRB_Header10_O",
+					AnchorOffsets = { 5, 5, -5, 34 },
+					Font = "CRB_Header12_O",
 					Text = Apollo.GetString("MarketplaceAuction_AuctionHouse"),
 					DT_VCENTER = true,
 					DT_CENTER = true,
@@ -216,7 +216,7 @@ function M:CreateWindow()
 				{
 					Name = "Framing",
 					AnchorPoints = { 0, 0, 1, 1 },
-					AnchorOffsets = { 5, 5, -5, -5 },
+					AnchorOffsets = { 0, 0, 0, 0 },
 					Picture = true,
 					Border = false,
 					Sprite = "BK3:UI_BK3_Holo_InsetHeader",
@@ -230,6 +230,7 @@ function M:CreateWindow()
 								-- Categories
 								{
 									Class = "TreeControl",
+									Font = "CRB_Interface9_BO",
 									AnchorPoints = { 0, 0, 0, 1 },
 									AnchorOffsets = { 0, 0, nWidthCategories, 0 },
 									VScroll = true,
@@ -249,18 +250,23 @@ function M:CreateWindow()
 									Children = {
 										-- Textbox
 										{
-											Class = "EditBox",
-											Name = "Text",
 											AnchorPoints = { 0, 0, 1, 1 },
 											AnchorOffsets = { nPaddingSearchControl, nPaddingSearchControl, 2 * (-nPaddingSearchControl - nWidthSearchButton) - nPaddingSearchControl, -nPaddingSearchControl },
-											Template = "Holo_InputBox",
-											UseTemplateBG = true,
-											Border = true,
-											Text = "Search",
-											DT_VCENTER = true,
-											Events = {
-												EditBoxReturn = OnSearch,
-												WindowLostFocus = OnSearchLostFocus,
+											Sprite = "BK3:UI_BK3_Holo_InsetDivider",
+											Picture = true,
+											Children = {
+												{
+													Class = "EditBox",
+													Name = "Text",
+													AnchorPoints = { 0, 0, 1, 1 },
+													AnchorOffsets = { 8, 0, -8, 0 },
+													Text = "Search",
+													DT_VCENTER = true,
+													Events = {
+														EditBoxReturn = OnSearch,
+														WindowLostFocus = OnSearchLostFocus,
+													},
+												},
 											},
 										},
 										-- Button: Search
@@ -413,11 +419,11 @@ function M:CreateWindow()
 				{
 					Name = "Backdrop",
 					AnchorPoints = { 0, 0, 1, 1 },
-					AnchorOffsets = { 5, 5, -5, -5 },
+					AnchorOffsets = { 0, 0, 0, 0 },
 					Picture = true,
-					Border = true,
-					Sprite = "ClientSprites:WhiteFill",
-					BGColor = "77000000",
+					Border = false,
+					Sprite = "sUI:HoloWindowBackdrop",
+					BGColor = "cc222326",
 					Children = {},
 				},
 			},
@@ -456,10 +462,13 @@ local function HideItemTooltip(self, wndHandler, wndControl)
 end
 
 local function ShowItemPreview(self, wndHandler, wndControl, eMouseButton)
-	local aucCurr = wndHandler == wndControl and wndHandler:GetParent() and wndHandler:GetParent():GetData() or nil;
+	if (wndHandler ~= wndControl) then return; end
+	local aucCurr = wndHandler:GetParent():GetData();
 	if (not aucCurr) then return; end
 
 	local itemCurr = aucCurr:GetItem();
+	if (not itemCurr) then return; end
+
 	if (Apollo.IsControlKeyDown() and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
 		if (itemCurr:GetHousingDecorInfoId() ~= nil and itemCurr:GetHousingDecorInfoId() ~= 0) then
 			Event_FireGenericEvent("DecorPreviewOpen", itemCurr:GetHousingDecorInfoId());
@@ -490,7 +499,7 @@ function M:CreateListItem(aucCurr)
 
 	-- Create Control
 	local wndItem = self.GeminiGUI:Create({
-		BGColor = bIsKnownSchematic and "1eff0000" or "aa000000",
+		BGColor = bIsKnownSchematic and "aa381010" or "aa000000",
 		Border = false,
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",

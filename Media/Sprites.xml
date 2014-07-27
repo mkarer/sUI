@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Sprites>
+    <Sprite Name="HoloWindowBackdrop" Cycle="1">
+        <Frame Texture="sUI\Media\HoloWindowBackdrop.png" x0="0" x1="0" x2="0" x3="14" x4="51" x5="65" y0="0" y1="0" y2="0" y3="48" y4="96" y5="103" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
+    </Sprite>
 	<Sprite Name="PowerBarButtonBG" Cycle="1">
 		<Frame Texture="sUI\media\PowerButton.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="white" EndColor="white"/>
 	</Sprite>
@@ -102,5 +105,4 @@
     <Sprite Name="sprTooltip_SquareFrame_Silver" Cycle="1">
 		<Frame Texture="sUI\media\ActionButtonWhite.png" x0="0" x1="0" x2="0" x3="2" x4="34" x5="36" y0="0" y1="0" y2="0" y3="2" y4="34" y5="36" Stretchy="1" HotspotX="0" HotspotY="0" Duration="1.000" StartColor="ff7d7d7d" EndColor="ff7d7d7d"/>
     </Sprite>
-
 </Sprites>
