@@ -41,6 +41,7 @@ function M:Search(nPage)
 	end
 
 	if (not nPage or nPage == 0) then
+		self:ClearSelection();
 		self.tAuctions = {};
 		self.wndResultsGrid:SetVScrollPos(0);
 		self.wndResultsGrid:DestroyChildren();
@@ -109,6 +110,7 @@ end
 function M:DisplaySearchResults()
 	local nTotalResults = #self.tAuctions;
 
+	self:ClearSelection();
 	self.wndResultsGrid:SetVScrollPos(0);
 	self.wndResultsGrid:DestroyChildren();
 
