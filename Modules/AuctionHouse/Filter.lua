@@ -61,6 +61,7 @@ local tCustomFilter = {
 function M:BuildFilter()
 	local nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter = self:GetCurrentFilter();
 
+	self.bFilterChanged = (not self.tFilter or self.tFilter.nFamilyId ~= nFamilyId or self.tFilter.nCategoryId ~= nCategoryId or self.tFilter.nTypeId ~= nTypeId or self.tFilter.strSearchQuery ~= strSearchQuery or not S:Compare(self.tFilter.tFilter, tFilter));
 	self.tFilter = {
 		nFamilyId = nFamilyId,
 		nCategoryId = nCategoryId,

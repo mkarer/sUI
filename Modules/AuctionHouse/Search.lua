@@ -17,8 +17,8 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 -- Search
 -----------------------------------------------------------------------------
 
-local strNoResults = Apollo.GetString("Tradeskills_NoResults");
-local strTryClearingFilter = Apollo.GetString("MarketplaceAuction_TryClearingFilter");
+local kstrNoResults = Apollo.GetString("Tradeskills_NoResults");
+local kstrTryClearingFilter = Apollo.GetString("MarketplaceAuction_TryClearingFilter");
 
 function M:SetSearchState(bSearching)
 	self.bIsSearching = bSearching;
@@ -32,6 +32,13 @@ end
 
 function M:Search(nPage)
 	Print("Searching...");
+
+	if (self.bFilterChanged == false) then
+		-- Don't forget to call BuildFilter() before searching!
+		Print("Filters didn't change!")
+		self:DisplaySearchResults();
+		return;
+	end
 
 	if (not nPage or nPage == 0) then
 		self.tAuctions = {};
@@ -95,22 +102,69 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 		self:Search(nPage + 1);
 	else
 		-- Done
-		for _, aucCurr in ipairs(self.tAuctions) do
-			if (not self:IsFiltered(aucCurr)) then
-				self:CreateListItem(aucCurr);
-			end
-		end
+		self:DisplaySearchResults();
+	end
+end
 
-		local nResultsFiltered = nTotalResults - #self.wndResultsGrid:GetChildren();
-		self.wndResultsGrid:ArrangeChildrenVert(0, self.fnSortResults);
-		self:SetSearchState(false);
+function M:DisplaySearchResults()
+	local nTotalResults = #self.tAuctions;
 
-		if (#self.tAuctions == 0) then
-			self:SetStatusMessage(strNoResults, true);
-		elseif (nResultsFiltered == nTotalResults) then
-			self:SetStatusMessage(strNoResults .. " " .. nResultsFiltered .. " result"..(nResultsFiltered ~= 1 and "s" or "").." filtered." .. "\n" .. strTryClearingFilter, true);
+	self.wndResultsGrid:SetVScrollPos(0);
+	self.wndResultsGrid:DestroyChildren();
+
+	for _, aucCurr in ipairs(self.tAuctions) do
+		if (not self:IsFiltered(aucCurr)) then
+			self:CreateListItem(aucCurr);
 		end
 	end
+
+	local nResultsFiltered = nTotalResults - #self.wndResultsGrid:GetChildren();
+	self.wndResultsGrid:ArrangeChildrenVert(0, self.fnSortResults);
+	self:SetSearchState(false);
+
+	if (nTotalResults == 0) then
+		self:SetStatusMessage(kstrNoResults, true);
+	elseif (nResultsFiltered == nTotalResults) then
+		self:SetStatusMessage(kstrNoResults .. " " .. nResultsFiltered .. " result"..(nResultsFiltered ~= 1 and "s" or "").." filtered." .. "\n" .. kstrTryClearingFilter, true);
+	end
+end
+
+-----------------------------------------------------------------------------
+-- Sorting
+-- Credits: Bam
+-- http://forums.curseforge.com/showpost.php?p=165200&postcount=6
+-----------------------------------------------------------------------------
+
+local lexsort
+do
+ local join, sort, select, format = string.join, table.sort, select, string.format
+ local function lexcmp(...)
+  local code = {"local lhs, rhs = ..."}
+  for i = 1, select('#', ...) - 1 do
+   local k = select(i, ...)
+   code[#code+1] = format("local lv, rv = lhs[%q], rhs[%q]", k, k)
+   code[#code+1] = "if lv < rv then return true end"
+   code[#code+1] = "if lv > rv then return false end"
+  end
+  local k = select(-1, ...)
+  code[#code+1] = format("return lhs[%q] < rhs[%q]", k, k)
+  return assert(loadstring(table.concat(code, "\n")))
+ end
+ local lexcmps = {}
+ lexsort = function(t, ...)
+  if select('#', ...) == 0 then
+   sort(t)
+  else
+   local key = join("\0", ...)
+   local cmp = lexcmps[key]
+   if not cmp then
+    cmp = lexcmp(...)
+    lexcmps[key] = cmp
+   end
+   sort(t, cmp)
+  end
+  return t
+ end
 end
 
 local tSorters = {
@@ -120,10 +174,46 @@ local tSorters = {
 
 		return (itemA:GetName() < itemB:GetName());
 	end,
+	Bid = function(wndAucA, wndAucB)
+		local aucA = wndAucA:GetData();
+		local nBidA = aucA:GetCurrentBid():GetAmount();
+		if (nBidA == 0) then
+			nBidA = aucA:GetMinBid():GetAmount();
+		end
+
+		local aucB = wndAucB:GetData();
+		local nBidB = aucB:GetCurrentBid():GetAmount();
+		if (nBidB == 0) then
+			nBidB = aucB:GetMinBid():GetAmount();
+		end
+
+		return (nBidA < nBidB);
+	end,
+	Buyout = function(wndAucA, wndAucB)
+		return (wndAucA:GetData():GetBuyoutPrice():GetAmount() < wndAucB:GetData():GetBuyoutPrice():GetAmount());
+	end,
+	TimeRemaining = function(wndAucA, wndAucB)
+		local aucA = wndAucA:GetData();
+		local aucB = wndAucB:GetData();
+
+		return (aucA:GetTimeRemainingEnum() < aucB:GetTimeRemainingEnum()); -- ItemAuction.CodeEnumAuctionRemaining is currently sorted by duration :)
+	end,
 };
 
 function M:SetSortOrder(strHeader, strDirection)
-	self.strSortHeader = strHeader;
-	self.strSortDirection = strDirection;
-	self.fnSortResults = tSorters.Name;
+	if (tSorters[strHeader]) then
+		self.strSortHeader = strHeader;
+		self.strSortDirection = strDirection;
+		self.fnSortResults = tSorters[strHeader];
+		return true;
+	else
+		self:SetSortOrder("Name", "ASC");
+		return false;
+	end
+end
+
+function M:SortResults()
+	if (not self.bIsSearching) then
+		self.wndResultsGrid:ArrangeChildrenVert(0, self.fnSortResults);
+	end
 end

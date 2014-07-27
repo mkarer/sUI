@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch = string.len, string.find, string.gmatch;
+local strlen, strfind, gmatch, format = string.len, string.find, string.gmatch, string.format;
 local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 
 -----------------------------------------------------------------------------
@@ -21,7 +21,7 @@ local ktColumnsEquippable = { "Level", "Item Level", "Rune Slots" };
 local ktAdditionalColumns = {
 	[1] = ktColumnsEquippable, -- Armor
 	[16] = ktColumnsEquippable, -- Gear
-	[2] = ktColumnsEquippable, -- Weapon
+	[2] = { "Level", "Item Level", "Rune Slots", "Assault Power", "Support Power" }, -- Weapon
 	[5] = { "Slots" }, -- Bag
 };
 
@@ -35,7 +35,23 @@ local ktQualityColors = {
 	[Item.CodeEnumItemQuality.Artifact]		 	= "ItemQuality_Artifact",
 };
 
-local strSearchLocalized = Apollo.GetString("CRB_Search");
+local ktDurationStrings = {
+	[ItemAuction.CodeEnumAuctionRemaining.Expiring]		= Apollo.GetString("MarketplaceAuction_Expiring"),
+	[ItemAuction.CodeEnumAuctionRemaining.LessThanHour]	= Apollo.GetString("MarketplaceAuction_LessThanHour"),
+	[ItemAuction.CodeEnumAuctionRemaining.Short]		= Apollo.GetString("MarketplaceAuction_Short"),
+	[ItemAuction.CodeEnumAuctionRemaining.Long]			= Apollo.GetString("MarketplaceAuction_Long"),
+	[ItemAuction.CodeEnumAuctionRemaining.Very_Long]	= format("<%dh", MarketplaceLib.kItemAuctionListTimeDays * 24);
+};
+
+local ktDurationColors = {
+	[ItemAuction.CodeEnumAuctionRemaining.Expiring]		= "ffff0000",
+	[ItemAuction.CodeEnumAuctionRemaining.LessThanHour]	= "ffff9900",
+	[ItemAuction.CodeEnumAuctionRemaining.Short]		= "ff99ff66",
+	[ItemAuction.CodeEnumAuctionRemaining.Long]			= "ffffffff",
+	[ItemAuction.CodeEnumAuctionRemaining.Very_Long]	= "ffffffff",
+};
+
+local kstrSearch = Apollo.GetString("CRB_Search");
 local nPadding = 2;
 
 local function OnTreeWindowLoad(self, wndHandler, wndControl)
@@ -134,7 +150,7 @@ end
 
 local function OnSearchLostFocus(self, wndHandler, wndControl)
 	if (strlen(wndControl:GetText()) == 0) then
-		wndControl:SetText(strSearchLocalized);
+		wndControl:SetText(kstrSearch);
 	end
 end
 
@@ -153,6 +169,12 @@ function M:SetStatusMessage(strMessage, bIsError)
 	else
 		wndMessage:Show(false);
 	end
+end
+
+local function OnHeaderClick(self, wndHandler, wndControl)
+	if (wndHandler ~= wndControl) then return; end
+	self:SetSortOrder(wndControl:GetName(), wndControl:IsChecked() and "ASC" or "DESC");
+	self:SortResults();
 end
 
 function M:CreateWindow()
@@ -248,7 +270,7 @@ function M:CreateWindow()
 											AnchorPoints = { 1, 0, 1, 1 },
 											AnchorOffsets = { 2 * (-nPaddingSearchControl - nWidthSearchButton), nPaddingSearchControl, 2 * -nPaddingSearchControl - nWidthSearchButton, -nPaddingSearchControl },
 											Base = "BK3:btnHolo_ListView_Mid",
-											Text = strSearchLocalized,
+											Text = kstrSearch,
 											DT_VCENTER = true,
 											DT_CENTER = true,
 											Events = {
@@ -291,40 +313,59 @@ function M:CreateWindow()
 										{
 											Name = "Header",
 											AnchorPoints = { 0, 0, 1, 0 },
-											AnchorOffsets = { 0, 0, 0, nHeightHeader },
+											AnchorOffsets = { 0, 0, -20, nHeightHeader },
 											Children = {
 												{
 													Class = "Button",
 													ButtonType = "Check",
 													RadioGroup = "ResultSorting",
 													Text = "Item",
+													Name = "Name",
 													Base = "BK3:btnHolo_ListView_Mid",
 													DT_VCENTER = true,
 													DT_CENTER = true,
 													AnchorPoints = { 0, 0, 0.5, 1 },
 													AnchorOffsets = { 0, 0, 0, 0 },
+													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
 												},
 												{
 													Class = "Button",
 													ButtonType = "Check",
 													RadioGroup = "ResultSorting",
 													Text = "Bid",
+													Name = "Bid",
 													Base = "BK3:btnHolo_ListView_Mid",
 													DT_VCENTER = true,
 													DT_CENTER = true,
 													AnchorPoints = { 0.5, 0, 0.7, 1 },
 													AnchorOffsets = { 0, 0, 0, 0 },
+													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
 												},
 												{
 													Class = "Button",
 													ButtonType = "Check",
 													RadioGroup = "ResultSorting",
 													Text = "Buyout",
+													Name = "Buyout",
 													Base = "BK3:btnHolo_ListView_Mid",
 													DT_VCENTER = true,
 													DT_CENTER = true,
 													AnchorPoints = { 0.7, 0, 0.9, 1 },
 													AnchorOffsets = { 0, 0, 0, 0 },
+													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
+												},
+												{
+													Class = "Button",
+													ButtonType = "Check",
+													RadioGroup = "ResultSorting",
+													Text = "Time\nLeft",
+													Name = "TimeRemaining",
+													Base = "BK3:btnHolo_ListView_Mid",
+													DT_VCENTER = true,
+													DT_CENTER = true,
+													AnchorPoints = { 0.9, 0, 1, 1 },
+													AnchorOffsets = { 0, 0, 0, 0 },
+													Events = { ButtonCheck = OnHeaderClick, ButtonUncheck = OnHeaderClick },
 												},
 											},
 										},
@@ -550,6 +591,16 @@ function M:CreateListItem(aucCurr)
 				Name = "Buyout",
 				AnchorPoints = { 0.7, 0, 0.9, 1 },
 				AnchorOffsets = { 0, 8, 0, 0 },
+			},
+			-- Remaining Time
+			{
+				AnchorPoints = { 0.9, 0, 1, 1 },
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Text = ktDurationStrings[aucCurr:GetTimeRemainingEnum()],
+				TextColor = ktDurationColors[aucCurr:GetTimeRemainingEnum()];
+				Font = "Nameplates",
+				DT_CENTER = true,
+				DT_VCENTER = true,
 			},
 		},
 		UserData = aucCurr,
