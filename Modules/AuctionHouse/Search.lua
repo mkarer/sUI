@@ -193,10 +193,10 @@ local tSorters = {
 		return (wndAucA:GetData():GetBuyoutPrice():GetAmount() < wndAucB:GetData():GetBuyoutPrice():GetAmount());
 	end,
 	TimeRemaining = function(wndAucA, wndAucB)
-		local aucA = wndAucA:GetData();
-		local aucB = wndAucB:GetData();
-
-		return (aucA:GetTimeRemainingEnum() < aucB:GetTimeRemainingEnum()); -- ItemAuction.CodeEnumAuctionRemaining is currently sorted by duration :)
+		return (wndAucA:GetData():GetTimeRemainingEnum() < wndAucB:GetData():GetTimeRemainingEnum()); -- ItemAuction.CodeEnumAuctionRemaining is currently sorted by duration :)
+	end,
+	BagSlots = function(wndAucA, wndAucB)
+		return (wndAucA:GetData():GetItem():GetBagSlots() < wndAucB:GetData():GetItem():GetBagSlots());
 	end,
 };
 
