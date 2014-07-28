@@ -20,6 +20,24 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 local kstrNoResults = Apollo.GetString("Tradeskills_NoResults");
 local kstrTryClearingFilter = Apollo.GetString("MarketplaceAuction_TryClearingFilter");
 
+function M:RefreshResults()
+	if (not self.bIsSearching and self.tAuctions and self.tFilter) then
+		self:SetSearchState(true);
+		self:Search(0, true);
+	end
+end
+
+function M:UpdateAuction(aucCurr, bIsTopBidder)
+	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
+		if (wndAuction:GetData() == aucCurr) then
+			if (bIsTopBidder) then
+				wndAuction:SetBGColor("aa102D00");
+			end
+			break;
+		end
+	end
+end
+
 function M:SetSearchState(bSearching)
 	self.bIsSearching = bSearching;
 	self.wndSearch:FindChild("BtnSearch"):Enable(not bSearching);
@@ -30,10 +48,10 @@ function M:SetSearchState(bSearching)
 	end
 end
 
-function M:Search(nPage)
+function M:Search(nPage, bForceRefresh)
 	S.Log:debug("Searching...");
 
-	if (self.bFilterChanged == false) then
+	if (self.bFilterChanged == false and not bForceRefresh) then
 		-- Don't forget to call BuildFilter() before searching!
 		S.Log:debug("Filters didn't change!")
 		self:DisplaySearchResults();
@@ -107,24 +125,36 @@ function M:OnItemAuctionSearchResults(event, nPage, nTotalResults, tAuctions)
 	end
 end
 
-function M:RemoveAuction(aucCached)
+function M:RemoveAuction(aucCurr)
 	if (self.bIsSearching or not self.tAuctions) then return; end
 
-	for i, aucCurr in ipairs(self.tAuctions) do
-		if (aucCurr == aucCached) then
+	for i, aucCached in ipairs(self.tAuctions) do
+		if (aucCached == aucCurr) then
 			tremove(self.tAuctions, i);
 			break;
 		end
 	end
 
 	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
-		if (wndAuction:GetData() == aucCached) then
+		if (wndAuction:GetData() == aucCurr) then
 			wndAuction:Destroy();
 			self:ClearSelection();
 			self:SortResults();
 			break;
 		end
 	end
+end
+
+function M:IsAuctionVisible(aucCurr)
+	if (not self.tAuctions) then return false; end
+
+	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
+		if (wndAuction:GetData() == aucCurr) then
+			return true;
+		end
+	end
+
+	return false;
 end
 
 function M:DisplaySearchResults()

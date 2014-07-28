@@ -49,9 +49,6 @@ end
 
 -----------------------------------------------------------------------------
 
-function M:OnItemAuctionBidResult(self, aucCurrent)
-end
-
 function M:Open()
 	if (AccountItemLib.CodeEnumEntitlement.EconomyParticipation and AccountItemLib.GetEntitlementCount(AccountItemLib.CodeEnumEntitlement.EconomyParticipation) == 0) then
 		Event_FireGenericEvent("GenericEvent_SystemChannelMessage", Apollo.GetString("CRB_FeatureDisabledForGuests"));
@@ -109,13 +106,26 @@ end
 
 -----------------------------------------------------------------------------
 
-function M:OnItemAuctionWon(event, aucCurrent)
-	local bValidItem = aucCurrent and aucCurrent:GetItem();
-	local strItemName = bValidItem and aucCurrent:GetItem():GetName() or "";
+function M:OnItemAuctionWon(event, aucCurr)
+	local bValidItem = aucCurr and aucCurr:GetItem();
+	local strItemName = bValidItem and aucCurr:GetItem():GetName() or "";
 	Event_FireGenericEvent("GenericEvent_LootChannelMessage", String_GetWeaselString(Apollo.GetString("MarketplaceAuction_WonMessage"), strItemName));
 
-	if (self.wndSelectedItem and self.wndSelectedItem:GetData() and self.wndSelectedItem:GetData() == aucCurrent) then
-		self:RemoveAuction(aucCurrent);
+	if ((self.wndSelectedItem and self.wndSelectedItem:GetData() and self.wndSelectedItem:GetData() == aucCurr) or self:IsAuctionVisible(aucCurr)) then
+		self:RemoveAuction(aucCurr);
 	end
 end
 
+function M:OnItemAuctionBidResult(event, eAuctionBidResult, aucCurr)
+	local bResultOk = (eAuctionBidResult == MarketplaceLib.AuctionPostResult.Ok);
+	local strMessage = bResultOk and String_GetWeaselString(Apollo.GetString("MarketplaceAuction_BidAccepted"), aucCurr:GetItem():GetName()) or "Error MarketplaceLib.AuctionPostResult: "..eAuctionBidResult;
+	Print(strMessage);
+
+	if (bResultOk or eAuctionBidResult == MarketplaceLib.AuctionPostResult.NotFound) then
+		if ((self.wndSelectedItem and self.wndSelectedItem:GetData() and self.wndSelectedItem:GetData() == aucCurr) or self:IsAuctionVisible(aucCurr)) then
+			self:ClearSelection();
+			self:UpdateAuction(aucCurr, bResultOk);
+--			self:RefreshResults();
+		end
+	end
+end
