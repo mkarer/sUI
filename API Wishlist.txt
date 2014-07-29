@@ -4,6 +4,10 @@ Please note:
 Game Events
 	ADD Shitload of events (http://wowprogramming.com/docs/events)
 
+Controls
+	FIX TreeView Cannot change background sprite/color of the selected item
+	FIX Eventless controls have a huge impact on FPS/performance even when they are not visible, Control:Enable(false) works as a workaround, but this is stuipd when it isn't visible anyways (eg: custom grid/table)
+
 Control Events
 	FIX MouseButtonUp // self.wndMain:AddEventHandler("MouseButtonUp", "OnMouseClick", self);
 	ADD MouseButtonClick
@@ -12,9 +16,11 @@ Control Events
 Unit
 	ADD GetCastingSpell
 	ADD GetCastingSpellId
-	ADD GetCastingSpellIcon
+	ADD GetCastingSpellIcon (but you'll also have to add actual icons :p)
 	FIX GetBuffs - fTimeRemaining doesn't change when a buff is refreshed (tested with Deadly Chain)
-	FIX GetBuffs - Some debuffs aren't in the array (like Frostbitten Chill, Coldburrow Cavern low body temp debuff), same issue with buffs.
+	FIX GetBuffs - Some debuffs aren't in the array (like Frostbitten Chill, Coldburrow Cavern low body temp debuff), same issue with buffs
+	ADD GetBuffs - fTimeGained would be awesome
+	ADD GetBuffs - unitSource would be even more awesome
 
 MLWindow
 	ADD DT_SINGLELINE
