@@ -239,5 +239,6 @@ function M:SortResults()
 		end
 
 		self.wndResultsGrid:ArrangeChildrenVert(0, fnSortResults);
+		self:GridVisibleItemsCheckForced();
 	end
 end

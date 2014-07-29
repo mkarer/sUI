@@ -112,21 +112,31 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 		self.nSelectedFamily = 15;
 	end
 
-	SendVarToRover("AHCategories", wndControl);
+	-- Shopping Lists
+	wndControl:AddNode(0, "Shopping Lists");
+
+	-- My Listings
+	wndControl:AddNode(0, "My Listings");
+
+--	SendVarToRover("AHCategories", wndControl);
 end
 
 local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, hPrevSelected)
 	self.tSelectedCategory = wndControl:GetNodeData(hSelected);
 
-	local nParentId = wndControl:GetParentNode(hSelected);
-	while (wndControl:GetParentNode(nParentId) and wndControl:GetParentNode(nParentId) > 1) do
-		nParentId = wndControl:GetParentNode(nParentId);
-	end
+	if (self.tSelectedCategory and self.tSelectedCategory.Type ~= "Custom") then
+		local nParentId = wndControl:GetParentNode(hSelected);
+		while (wndControl:GetParentNode(nParentId) and wndControl:GetParentNode(nParentId) > 1) do
+			nParentId = wndControl:GetParentNode(nParentId);
+		end
 
-	if (nParentId <= 1 and self.tSelectedCategory.Type == "Family") then
-		self.nSelectedFamily = self.tSelectedCategory.Id;
+		if (nParentId <= 1 and self.tSelectedCategory.Type == "Family") then
+			self.nSelectedFamily = self.tSelectedCategory.Id;
+		else
+			self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
+		end
 	else
-		self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
+		self.nSelectedFamily = nil;
 	end
 end
 
@@ -159,10 +169,12 @@ local function OnHideFilters(self, wndHandler, wndControl)
 end
 
 local function OnSearch(self)
-	self:SetSearchState(true);
-	self:BuildFilter();
-	self:UpdateListHeaders();
-	self:Search();
+	if (self.tSelectedCategory) then
+		self:SetSearchState(true);
+		self:BuildFilter();
+		self:UpdateListHeaders();
+		self:Search();
+	end
 end
 
 local function OnChangeBidAmount(self, wndHandler, wndControl)
@@ -307,7 +319,9 @@ function M:CreateWindow()
 			Moveable = true,
 			Escapable = true,
 			Overlapped = true,
-			AnchorCenter = { 1000, 800 },
+			AnchorPoints = { 0.20, 0.10, 0.75, 0.75 },
+			AnchorOffsets = { 0, 0, 0, 0 },
+--			AnchorCenter = { 1000, 800 },
 			Picture = true,
 			Border = true,
 			Sprite = "BK3:UI_BK3_Holo_InsetHeader",
@@ -481,7 +495,7 @@ function M:CreateWindow()
 										{
 											Name = "KnownSchematics",
 											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 8, 300, 30 },
+											AnchorOffsets = { 4, 8, 350, 30 },
 											Text = "Filter known Schematics",
 											Base = "HologramSprites:HoloCheckBoxBtn",
 											Font = kstrFont,
@@ -498,7 +512,7 @@ function M:CreateWindow()
 										{
 											Class = "EditBox",
 											Name = "RuneSlotsAmount",
-											AnchorOffsets = { 180, 38, 300, 54 },
+											AnchorOffsets = { 180, 38, 350, 54 },
 											Text = "4",
 											DT_VCENTER = true,
 											DT_CENTER = true,
@@ -516,7 +530,7 @@ function M:CreateWindow()
 										{
 											Class = "CashWindow",
 											Name = "MaxPriceAmount",
-											AnchorOffsets = { 180, 68, 300, 86 },
+											AnchorOffsets = { 180, 68, 350, 86 },
 											Amount = 10000,
 											DT_VCENTER = true,
 											DT_RIGHT = true,
@@ -667,13 +681,6 @@ end
 -- Items
 -----------------------------------------------------------------------------
 
-local function OnWindowShow(self, wndHandler, wndControl)
-	-- Background Opacity Fix
-	if (wndHandler:GetOpacity() == 1) then
-		S:ShowDelayed(wndHandler); 
-	end
-end
-
 local ktAdditionalColumns = {
 	[1] = { "Level", "ItemLevel", "RuneSlots" }, -- Armor
 	[15] = { "Level", "ItemLevel", "RuneSlots" }, -- Gear
@@ -700,15 +707,11 @@ local ktListColumns = {
 			end
 
 			return {
-				Class = "MLWindow",
+				Class = "Window",
 				Name = "Bid",
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
-				AnchorOffsets = { 0, 9, 0, 0 },
-				Text = S:GetMoneyAML(nBid, kstrFont),
-				TextColor = bHasBids and "white" or "darkgray",
-				Events = {
-					WindowShow = not bHasBids and OnWindowShow or nil,
-				},
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Pixies = self:CreateCashPixie(nBid, not bHasBids),
 				UserData = nBid,
 			};
 		end,
@@ -720,11 +723,11 @@ local ktListColumns = {
 			local nBuyout = aucCurr:GetBuyoutPrice():GetAmount();
 
 			return {
-				Class = "MLWindow",
+				Class = "Window",
 				Name = "Buyout",
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
-				AnchorOffsets = { 0, 9, 0, 0 },
-				Text = S:GetMoneyAML(nBuyout, kstrFont),
+				AnchorOffsets = { 0, 0, 0, 0 },
+				Pixies = self:CreateCashPixie(nBuyout),
 				UserData = nBuyout,
 			};
 		end,
@@ -794,46 +797,6 @@ local ktListColumns = {
 		Text = "Power",
 		Width = 0.07,
 		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
-			local tInfo = itemCurr:GetDetailedInfo();
-			-- TODO: Custom Calculations
-			--[[
-			local nItemPower = 1;
-			for _, tData in pairs(tInfo) do
-				if (tData.arInnateProperties) then
-					for _, tInnateProperty in ipairs(tData.arInnateProperties) do
-						nItemPower = nItemPower + tInnateProperty.nValue * 0.61;
-					end
-				end
-
-				if (tData.arBudgetBasedProperties) then
-					for _, tProperty in ipairs(tData.arBudgetBasedProperties) do
-						if (tProperty.eProperty == Unit.CodeEnumProperties.BaseHealth) then
-							nItemPower = nItemPower + tProperty.nValue / 27.595238;
-						elseif (tProperty.eProperty == Unit.CodeEnumProperties.ShieldCapacityMax) then
-							nItemPower = nItemPower + tProperty.nValue / 41.392857;
-							Print(tProperty.nValue);
-						elseif (tProperty.eProperty == Unit.CodeEnumProperties.Armor) then
-							nItemPower = nItemPower + tProperty.nValue / 8;
-						elseif (tProperty.eProperty ~= Unit.CodeEnumProperties.PvPDefensiveRating and tProperty.eProperty ~= Unit.CodeEnumProperties.PvPOffensiveRating) then
-							nItemPower = nItemPower + tProperty.nValue;
-						end 
-
-						if tProperty.nValue > 100 then
-							Print(tProperty.eProperty);
-						end
-					end
-				end
-
-				if (tData.tSigils and tData.tSigils.arSigils) then
-					for _, tSigil in ipairs(tData.tSigils.arSigils) do
-						nItemPower = nItemPower + 20 * tSigil.nPercent;
-					end
-				end
-			end
-
-			nItemPower = floor((nItemPower / 2) * (itemCurr:GetItemPower() / 800) / 36) + itemCurr:GetRequiredLevel();
-			--]]
-
 			local nItemPower = itemCurr:GetItemPower();
 
 			return {
@@ -939,6 +902,10 @@ local ktListColumns = {
 		end,
 	},
 };
+
+--for _, strColumn in ipairs( { "SupportPower", "AssaultPower", "RuneSlots", "ItemLevel", "Level", "BagSlots", "TimeRemaining" }) do
+--	ktListColumns[strColumn].GetPixie = ktListColumns[strColumn].GetWindowDefinitions;
+--end
 
 local function CreateHeader(self, strName, strText, fPosition, fWidth)
 	local wndHeader = self.wndResults:FindChild("Header");
@@ -1046,17 +1013,19 @@ function M:CreateListItem(aucCurr)
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",
 		AnchorPoints = { 0, 0, 1, 0, },
-		AnchorOffsets = { -5, 0, 0, nItemSize + 1 },
+		AnchorOffsets = { -5, 0, 5, nItemSize + 1 },
 		Name = "ListItem",
 		Children = {
 			-- Icon + Name
 			{
 				AnchorPoints = { 0, 0, ktListColumns.Name.Width, 1 },
 				AnchorOffsets = { 6, 0, 0, 0 },
+				Name = "ButtonBorderFix",
 				Children = {
 					-- Icon
 					{
-						Name = "IconContainer",
+						Name = "Name", -- TODO: It's actually the IconContainer, but I need the GetData() for sorting.
+						UserData = strName,
 						AnchorPoints = { 0, 0, 0, 0 },
 						AnchorOffsets = { 1, 1, nItemSize - 2, nItemSize - 2 },
 						Picture = true,
@@ -1067,55 +1036,47 @@ function M:CreateListItem(aucCurr)
 							MouseExit = HideItemTooltip,
 							MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
 						},
-						Children = {
+						Pixies = {
+							-- Count
 							{
-								Name = "IconBackground",
+								AnchorPoints = { 0, 0, 1, 1 },
+								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder -2, -nIconBorder -1 },
+								Text = strCount,
+								DT_RIGHT = true,
+								DT_BOTTOM = true,
+								Font = "CRB_Interface9_O",
+							},
+							-- Icon
+							{
 								AnchorPoints = { 0, 0, 1, 1 },
 								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
-								Picture = true,
+								BGColor = "white",
+								Sprite = itemCurr:GetIcon(),
+							},
+							-- Background
+							{
+								AnchorPoints = { 0, 0, 1, 1 },
+								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
 								BGColor = "black",
 								Sprite = "ClientSprites:WhiteFill",
-								Children = {
-									{
-										Name = "Icon",
-										AnchorPoints = { 0, 0, 1, 1 },
-										AnchorOffsets = { 0, 0, 0, 0 },
-										Picture = true,
-										BGColor = "white",
-										Sprite = itemCurr:GetIcon(),
-										Children = {
-											{
-												Name = "Count",
-												AnchorPoints = { 0, 0, 1, 1 },
-												AnchorOffsets = { 0, 0, -2, -1 },
-												Text = strCount,
-												DT_RIGHT = true,
-												DT_BOTTOM = true,
-												Font = "CRB_Interface9_O",
-											},
-										},
-									},
-								},
 							},
 						},
-					},
-					-- Name
-					{
-						Name = "Name",
-						AnchorPoints = { 0, 0, 1, 1 },
-						AnchorOffsets = { nItemSize + 4, 0, 0, 0 },
-						Text = strName,
-						TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
-						DT_VCENTER = true,
-						Font = kstrFont,
-						AutoScaleTextOff = true,
-						UserData = strName,
 					},
 				},
 			},
 		},
+		Pixies = {
+			-- Name
+			{
+				AnchorPoints = { 0, 0, ktListColumns.Name.Width, 1 },
+				AnchorOffsets = { nItemSize + 4 + 6, 0, 0, 0 },
+				Text = strName,
+				TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
+				DT_VCENTER = true,
+				Font = kstrFont,
+			},
+		},
 		UserData = aucCurr,
-		Visible = false,
 		Base = "sUI:SimpleButton",
 		Class = "Button",
 		ButtonType = "Check",
@@ -1128,24 +1089,96 @@ function M:CreateListItem(aucCurr)
 	};
 
 	for _, strName in ipairs(self.tHeaders) do
-		if (strName ~= "Name" and ktListColumns[strName].GetWindowDefinitions) then
-			local tDefinitions = ktListColumns[strName].GetWindowDefinitions(self, aucCurr, itemCurr, fPosition, ktListColumns[strName].Width); -- TOOD
+		if (strName ~= "Name") then
+--			if (ktListColumns[strName].GetPixie) then
+--				local tPixies = { ktListColumns[strName].GetPixie(self, aucCurr, itemCurr, fPosition, ktListColumns[strName].Width) }; -- TOOD
+--
+--				for _, tPixie in ipairs(tPixies) do
+--					tinsert(tWindowDefinitions.Pixies, tPixie);
+--				end
+--
+--				fPosition = fPosition + ktListColumns[strName].Width;
+--			elseif (ktListColumns[strName].GetWindowDefinitions) then
+			if (ktListColumns[strName].GetWindowDefinitions) then
+				local tDefinitions = ktListColumns[strName].GetWindowDefinitions(self, aucCurr, itemCurr, fPosition, ktListColumns[strName].Width); -- TOOD
 
-			tinsert(tWindowDefinitions.Children, tDefinitions);
-			fPosition = fPosition + ktListColumns[strName].Width;
+				tinsert(tWindowDefinitions.Children, tDefinitions);
+				fPosition = fPosition + ktListColumns[strName].Width;
+			end
 		end
 	end
 
 	local wndItem = self.GeminiGUI:Create(tWindowDefinitions):GetInstance(self, self.wndResultsGrid);
+	wndItem:Enable(false); -- GridVisibleItemsCheck enables it!
 
-	if (not bHasBids) then
-		wndItem:FindChild("Bid"):SetOpacity(0.5, 5e+20);
-	end
+--	for _, wndChild in ipairs(wndItem:GetChildren()) do
+--		wndChild:Enable(wndChild:GetName() == "ButtonBorderFix");
+--	end
 
-	wndItem:Show(true, true);
-	wndItem:FindChild("Bid"):Show(true, true);
-
-	SendVarToRover("AHCurrentAuction", aucCurr);
+--	SendVarToRover("AHCurrentAuction", aucCurr);
+--	SendVarToRover("AHCurrentAuctionWindow", wndItem);
 
 	return wndItem;
+end
+
+--[[
+function M:Test()
+	local aucCurr = {};
+	local itemCurr = S:GetInventory()[1].itemInBag;
+
+	local tBidMinimum = { GetAmount = function() return 123456; end };
+	local tBidCurrent = { GetAmount = function() return 0; end };
+	local tBuyoutPrice = { GetAmount = function() return 2345608; end };
+	local eShort = ItemAuction.CodeEnumAuctionRemaining.Short;
+
+	function aucCurr:GetItem() return itemCurr; end
+	function aucCurr:IsOwned() return false; end
+	function aucCurr:IsTopBidder() return false; end
+	function aucCurr:GetCount() return 1; end
+
+	function aucCurr:GetMinBid() return tBidMinimum; end
+	function aucCurr:GetCurrentBid() return tBidCurrent; end
+	function aucCurr:GetBuyoutPrice() return tBuyoutPrice; end
+	function aucCurr:GetTimeRemainingEnum() return eShort; end
+
+	for i = 1, 1000 do
+		self:CreateListItem(aucCurr);
+	end
+
+	self.wndResultsGrid:ArrangeChildrenVert(0);
+
+	self:OnFrameCount();
+end
+--]]
+
+-----------------------------------------------------------------------------
+-- FPS Fix
+-----------------------------------------------------------------------------
+
+local nPrevScrollPos;
+local nPrevHeight;
+
+function M:GridVisibleItemsCheck(strEvent, strVar, nFrameCount)
+--	if (self.bIsSearching or not self.wndMain or not self.wndMain:IsValid() or not self.wndResultsGrid) then return; end
+	if (self.bIsSearching or not self.tAuctions or #self.tAuctions == 0) then return; end
+
+	local wndGrid = self.wndResultsGrid;
+	local nScrollPos = wndGrid:GetVScrollPos();
+	local nHeight = wndGrid:GetHeight();
+
+	if (not nPrevScrollPos or not nPrevHeight or nPrevScrollPos ~= nScrollPos or nPrevHeight ~= nHeight) then
+		nPrevScrollPos = nScrollPos;
+		nPrevHeight = nHeight;
+
+		for _, wndItem in ipairs(wndGrid:GetChildren()) do
+			local _, nPosY = wndItem:GetPos();
+			wndItem:Enable(nPosY < nHeight and nPosY + nItemSize > 0);
+		end
+	end
+end
+
+function M:GridVisibleItemsCheckForced()
+	nPrevHeight = nil;
+	nPrevScrollPos = nil;
+	self:GridVisibleItemsCheck(0,0,0);
 end
