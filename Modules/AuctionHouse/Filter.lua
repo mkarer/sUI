@@ -21,7 +21,7 @@ local strSearchLocalized = Apollo.GetString("CRB_Search");
 
 local EscapePattern
 do
-	local matches = {
+	local tMatches = {
 		["^"] = "%^",
 		["$"] = "%$",
 		["("] = "%(",
@@ -37,8 +37,8 @@ do
 		["\0"] = "%z",
 	};
 
-	EscapePattern = function(s)
-		return (gsub(s, ".", matches));
+	EscapePattern = function(strPattern)
+		return (gsub(strPattern, ".", tMatches));
 	end
 end
 
