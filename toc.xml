@@ -112,9 +112,11 @@
 	<Script Name="Modules\ProcBar\Anchor.lua" />
 	<!-- Auction House -->
 	<Script Name="Modules\AuctionHouse\AuctionHouse.lua" />
+	<Script Name="Modules\AuctionHouse\Utils.lua" />
 	<Script Name="Modules\AuctionHouse\GUI.lua" />
 	<Script Name="Modules\AuctionHouse\Filter.lua" />
 	<Script Name="Modules\AuctionHouse\Search.lua" />
+	<Script Name="Modules\AuctionHouse\ShoppingList.lua" />
 	<!-- Auction House (Carbine) -->
 	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
 	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />
