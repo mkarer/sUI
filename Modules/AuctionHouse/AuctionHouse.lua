@@ -40,6 +40,9 @@ end
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
+	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
+	self.tSearch = self.SearchLib:New();
+
 --	self:RegisterEvent("ToggleAuctionWindow", "Open");
 	self:RegisterEvent("AuctionWindowClose", "Close");
 end
@@ -59,10 +62,10 @@ function M:Open()
 	if (not self.wndMain or not self.wndMain:IsValid()) then
 		self:SetSortOrder("Name", "ASC");
 		self:CreateWindow();
-		self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
 		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionBidResult");
 		self:RegisterEvent("ItemAuctionWon", "OnItemAuctionWon");
 		self:RegisterEvent("VarChange_FrameCount", "GridVisibleItemsCheck");
+		self:RegisterEvent("Sezz_AuctionHouse_SearchCompleted", "OnSearchCompleted");
 		self.wndMain:Show(true);
 
 		-- Hide Carbine AH
@@ -82,10 +85,10 @@ end
 
 function M:Close()
 	Event_CancelAuctionhouse();
-	self:UnregisterEvent("ItemAuctionSearchResults");
 	self:UnregisterEvent("ItemAuctionBidResult");
 	self:UnregisterEvent("ItemAuctionWon");
 	self:UnregisterEvent("VarChange_FrameCount");
+	self:UnregisterEvent("Sezz_AuctionHouse_SearchCompleted");
 
 	if (self.wndMain and self.wndMain:IsValid()) then
 		self.wndMain:Destroy();

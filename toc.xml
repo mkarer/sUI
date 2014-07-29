@@ -115,6 +115,7 @@
 	<Script Name="Modules\AuctionHouse\Utils.lua" />
 	<Script Name="Modules\AuctionHouse\GUI.lua" />
 	<Script Name="Modules\AuctionHouse\Filter.lua" />
+	<Script Name="Modules\AuctionHouse\SearchLibrary.lua" />
 	<Script Name="Modules\AuctionHouse\Search.lua" />
 	<Script Name="Modules\AuctionHouse\ShoppingList.lua" />
 	<!-- Auction House (Carbine) -->
