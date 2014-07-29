@@ -18,6 +18,7 @@ local AccountItemLib = AccountItemLib;
 
 function M:OnInitialize()
 	log = S.Log;
+	self:EnableProfile();
 
 	self.MarketplaceAuction = Apollo.GetAddon("MarketplaceAuction");
 	self.ItemPreviewImproved = Apollo.GetAddon("ItemPreviewImproved");
@@ -61,6 +62,7 @@ function M:Open()
 		self:RegisterEvent("ItemAuctionSearchResults", "OnItemAuctionSearchResults");
 		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionBidResult");
 		self:RegisterEvent("ItemAuctionWon", "OnItemAuctionWon");
+		self:RegisterEvent("VarChange_FrameCount", "GridVisibleItemsCheck");
 		self.wndMain:Show(true);
 
 		-- Hide Carbine AH
@@ -81,6 +83,9 @@ end
 function M:Close()
 	Event_CancelAuctionhouse();
 	self:UnregisterEvent("ItemAuctionSearchResults");
+	self:UnregisterEvent("ItemAuctionBidResult");
+	self:UnregisterEvent("ItemAuctionWon");
+	self:UnregisterEvent("VarChange_FrameCount");
 
 	if (self.wndMain and self.wndMain:IsValid()) then
 		self.wndMain:Destroy();
