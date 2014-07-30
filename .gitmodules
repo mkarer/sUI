@@ -28,3 +28,6 @@
 [submodule "Libs/SezzAuras"]
 	path = Libs/SezzAuras
 	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzAuras.git
+[submodule "Libs/SezzAuraControl"]
+	path = Libs/SezzAuraControl
+	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzAuraControl.git
