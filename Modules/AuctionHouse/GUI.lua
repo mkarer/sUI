@@ -78,6 +78,7 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	for _, tDataRootCategory in ipairs(MarketplaceLib.GetAuctionableFamilies()) do
 --		if (tDataRootCategory.nId > 1) then -- Ignore Armor
 			local nNodeIdRootCategory = wndControl:AddNode(nNodeIdRoot, tDataRootCategory.strName, nil, { Type = "Family", Id = tDataRootCategory.nId });
+			wndControl:CollapseNode(nNodeIdRootCategory);
 
 			for _, tDataCategory in pairs(MarketplaceLib.GetAuctionableCategories(tDataRootCategory.nId) or {}) do
 				local tTypes = MarketplaceLib.GetAuctionableTypes(tDataCategory.nId) or {};
@@ -85,6 +86,7 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 
 				if (tDataRootCategory.nId == 1 or (#tTypes == 0 and strlen(tDataCategory.strName) > 0)) then
 					nNodeIdCategory = wndControl:AddNode(nNodeIdRootCategory, tDataCategory.strName, nil, { Type = "Category", Id = tDataCategory.nId });
+					wndControl:CollapseNode(nNodeIdCategory);
 				end
 
 				for _, tDataType in pairs(tTypes) do
@@ -94,14 +96,13 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 					end
 
 					local nNodeId = wndControl:AddNode(nNodeIdCategory, strName, nil, { Type = "Type", Id = tDataType.nId });
+					wndControl:CollapseNode(nNodeId);
 					if (strName == "Implant") then
 						nNodeIdSelected = nNodeId; -- TEMP
 						nNodeIdSelectedCategory = nNodeIdRootCategory;
 					end
 				end
 			end
-
-			wndControl:CollapseNode(nNodeIdRootCategory);
 --		end
 	end
 
@@ -203,6 +204,12 @@ local function OnSearch(self)
 		self.wndResultsGrid:DestroyChildren();
 		self.tSearch:Search();
 	end
+end
+
+local function OnTreeDoubleClick(self, wndHandler, wndControl, hSelected, hPrevSelected)
+	-- Expand/Collapse
+	-- How? Just search ;)
+	OnSearch(self);
 end
 
 local function OnCustomSearch(self, wndHandler, wndControl, eMouseButton)
@@ -417,6 +424,7 @@ function M:CreateWindow()
 									Events = {
 										WindowLoad = OnTreeWindowLoad,
 										TreeSelectionChanged = OnTreeSelectionChanged,
+										TreeDoubleClick = OnTreeDoubleClick,
 									},
 								},
 								-- Search Box
