@@ -2,6 +2,28 @@
 
 	s:UI Auction House
 
+	Structure:
+
+		Shopping List
+			Node (Category/Family/Type)
+				Search
+					Filter
+					Filter
+				Search
+					Filter
+				Search
+					Filter
+				Search
+					Filter
+					Filter
+					Filter
+			Node (Category/Family/Type)
+				Search
+					Filter
+					Filter
+				Search
+					Filter
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
