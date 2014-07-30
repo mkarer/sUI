@@ -1,9 +1,6 @@
 [submodule "Libs/LibApolloFixes"]
 	path = Libs/LibApolloFixes
 	url = https://github.com/wildstarnasa/LibApolloFixes.git
-[submodule "Libs/CallbackHandler"]
-	path = Libs/CallbackHandler
-	url = https://github.com/wildstarnasa/CallbackHandler.git
 [submodule "Libs/GeminiAddon"]
 	path = Libs/GeminiAddon
 	url = https://github.com/wildstarnasa/GeminiAddon.git
@@ -40,3 +37,6 @@
 [submodule "Libs/GeminiGUI"]
 	path = Libs/GeminiGUI
 	url = https://github.com/wildstarnasa/GeminiGUI.git
+[submodule "Libs/CallbackHandler"]
+	path = Libs/CallbackHandler
+	url = https://github.com/wildstarnasa/CallbackHandler.git
