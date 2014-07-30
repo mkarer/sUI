@@ -1,4 +1,4 @@
-SezzUI
+sUI
 ===============
 
 Minimalistic WildStar User Interface
