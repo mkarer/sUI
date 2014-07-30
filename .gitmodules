@@ -1,26 +1,26 @@
-[submodule "libs/LibApolloFixes"]
-	path = libs/LibApolloFixes
+[submodule "Libs/LibApolloFixes"]
+	path = Libs/LibApolloFixes
 	url = https://github.com/wildstarnasa/LibApolloFixes.git
-[submodule "libs/CallbackHandler"]
-	path = libs/CallbackHandler
+[submodule "Libs/CallbackHandler"]
+	path = Libs/CallbackHandler
 	url = https://github.com/wildstarnasa/CallbackHandler.git
-[submodule "libs/GeminiAddon"]
-	path = libs/GeminiAddon
+[submodule "Libs/GeminiAddon"]
+	path = Libs/GeminiAddon
 	url = https://github.com/wildstarnasa/GeminiAddon.git
-[submodule "libs/GeminiEvent"]
-	path = libs/GeminiEvent
+[submodule "Libs/GeminiEvent"]
+	path = Libs/GeminiEvent
 	url = https://github.com/wildstarnasa/GeminiEvent.git
-[submodule "libs/GeminiHook"]
-	path = libs/GeminiHook
+[submodule "Libs/GeminiHook"]
+	path = Libs/GeminiHook
 	url = https://github.com/wildstarnasa/GeminiHook.git
-[submodule "libs/GeminiLogging"]
-	path = libs/GeminiLogging
+[submodule "Libs/GeminiLogging"]
+	path = Libs/GeminiLogging
 	url = https://github.com/wildstarnasa/GeminiLogging.git
-[submodule "libs/LibError"]
-	path = libs/LibError
+[submodule "Libs/LibError"]
+	path = Libs/LibError
 	url = https://github.com/wildstarnasa/LibError.git
-[submodule "libs/GeminiTimer"]
-	path = libs/GeminiTimer
+[submodule "Libs/GeminiTimer"]
+	path = Libs/GeminiTimer
 	url = https://github.com/wildstarnasa/GeminiTimer.git
 [submodule "Libs/XmlDocument"]
 	path = Libs/XmlDocument
