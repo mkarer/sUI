@@ -19,3 +19,24 @@
 [submodule "Libs/CallbackHandler"]
 	path = Libs/CallbackHandler
 	url = https://github.com/wildstarnasa/CallbackHandler.git
+[submodule "Libs/LibError"]
+	path = Libs/LibError
+	url = https://github.com/wildstarnasa/LibError.git
+[submodule "Libs/LibApolloFixes"]
+	path = Libs/LibApolloFixes
+	url = https://github.com/wildstarnasa/LibApolloFixes.git
+[submodule "Libs/GeminiTimer"]
+	path = Libs/GeminiTimer
+	url = https://github.com/wildstarnasa/GeminiTimer.git
+[submodule "Libs/GeminiLogging"]
+	path = Libs/GeminiLogging
+	url = https://github.com/wildstarnasa/GeminiLogging.git
+[submodule "Libs/GeminiHook"]
+	path = Libs/GeminiHook
+	url = https://github.com/wildstarnasa/GeminiHook.git
+[submodule "Libs/GeminiEvent"]
+	path = Libs/GeminiEvent
+	url = https://github.com/wildstarnasa/GeminiEvent.git
+[submodule "Libs/GeminiAddon"]
+	path = Libs/GeminiAddon
+	url = https://github.com/wildstarnasa/GeminiAddon.git
