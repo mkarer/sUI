@@ -59,13 +59,14 @@ local function Compare(t1, t2, ignore_mt)
 	return true;
 end
 
+-- local tSpecials = {};
 local function ItemHasSpecial(itemCurr, nSpecialSpellId)
 	local tInfo = itemCurr:GetDetailedInfo();
 
 	for _, tData in pairs(tInfo) do
 		if (tData.arSpells) then
 			for _, tSpell in ipairs(tData.arSpells) do
---if (tSpell.splData) then Print(tSpell.splData:GetId().." = "..tSpell.strName.." / "..tSpell.strFlavor); end
+-- if (tSpell.splData) then tSpecials[tSpell.splData:GetId()]= tSpell.strName.." ("..tSpell.strFlavor..")";end
 				if (tSpell.splData and tSpell.splData:GetId() == nSpecialSpellId) then
 					return true;
 				end

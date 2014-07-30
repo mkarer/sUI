@@ -118,6 +118,7 @@
 	<Script Name="Modules\AuctionHouse\SearchLibrary.lua" />
 	<Script Name="Modules\AuctionHouse\Search.lua" />
 	<Script Name="Modules\AuctionHouse\ShoppingList.lua" />
+	<Script Name="Modules\AuctionHouse\ContextMenu.lua" />
 	<!-- Auction House (Carbine) -->
 	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
 	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />

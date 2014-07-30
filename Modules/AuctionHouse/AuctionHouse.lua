@@ -42,6 +42,7 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
+	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
 
 --	self:RegisterEvent("ToggleAuctionWindow", "Open");
 	self:RegisterEvent("AuctionWindowClose", "Close");

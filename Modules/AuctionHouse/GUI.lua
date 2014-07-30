@@ -217,6 +217,12 @@ local function OnCustomSearch(self, wndHandler, wndControl, eMouseButton)
 --	end
 end
 
+local function OnClickItem(self, wndHandler, wndControl, eMouseButton)
+	if (wndHandler == wndControl and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+		self:ShowContextMenu(wndHandler:GetName(), wndHandler:GetData());
+	end
+end
+
 local function OnChangeBidAmount(self, wndHandler, wndControl)
 	local aucCurr = wndControl:GetParent():GetParent():GetData();
 	local nPlayerCash = GameLib.GetPlayerCurrency(Money.CodeEnumCurrencyType.Credits):GetAmount();
@@ -267,8 +273,6 @@ local function OnSelectItem(self, wndHandler, wndControl)
 
 	-- Display
 	self.wndCurrentItem:Show(true, true);
-
-	SendVarToRover("OnSelectItemAucCurr", aucCurr);
 end
 
 local function OnDeselectItem(self, wndHandler, wndControl)
@@ -1063,7 +1067,7 @@ function M:CreateListItem(aucCurr)
 		Sprite = "ClientSprites:WhiteFill",
 		AnchorPoints = { 0, 0, 1, 0, },
 		AnchorOffsets = { -5, 0, 5, nItemSize + 1 },
-		Name = "ListItem",
+		Name = "ListItemBuy",
 		Children = {
 			-- Icon + Name
 			{
@@ -1134,6 +1138,7 @@ function M:CreateListItem(aucCurr)
 		Events = {
 			ButtonCheck = OnSelectItem,
 			ButtonUncheck = OnDeselectItem,
+			MouseButtonUp = OnClickItem,
 		},
 	};
 
