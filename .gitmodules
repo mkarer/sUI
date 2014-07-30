@@ -34,3 +34,6 @@
 [submodule "Libs/SezzContextMenu"]
 	path = Libs/SezzContextMenu
 	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzContextMenu.git
+[submodule "Libs/SezzUnitFrames"]
+	path = Libs/SezzUnitFrames
+	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzUnitFrames.git
