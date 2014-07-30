@@ -26,6 +26,7 @@ function M:OnInitialize()
 
 	if (not self.MarketplaceAuction) then
 		self:SetEnabledState(false);
+		return;
 	end
 
 	if (self.MarketplaceAuction and not self.MarketplaceAuction._OnToggleAuctionWindow) then
@@ -41,7 +42,6 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
-	self.tSearch = self.SearchLib:New();
 
 --	self:RegisterEvent("ToggleAuctionWindow", "Open");
 	self:RegisterEvent("AuctionWindowClose", "Close");
@@ -60,6 +60,7 @@ function M:Open()
 	end
 
 	if (not self.wndMain or not self.wndMain:IsValid()) then
+		self.tSearch = self.SearchLib:New();
 		self:SetSortOrder("Name", "ASC");
 		self:CreateWindow();
 		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionBidResult");
@@ -94,6 +95,7 @@ function M:Close()
 		self.wndMain:Destroy();
 	end
 
+	self.tSearch = nil;
 	self.wndMain = nil;
 	self.wndSearch = nil;
 	self.wndFilters = nil;
@@ -110,6 +112,7 @@ function M:Close()
 	self.strSortDirection = nil;
 	self.bFilterChanged = nil;
 	self.tHeaders = nil;
+	self.strSelectedShoppingList = nil;
 end
 
 -----------------------------------------------------------------------------

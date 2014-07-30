@@ -78,7 +78,7 @@ local tCustomFilter = {
 };
 
 function M:BuildFilter()
-	local nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter, tCustomFilterValues = self:GetCurrentFilter();
+	local nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter = self:GetCurrentFilter();
 
 	self.bFilterChanged = (not self.tFilter or self.tFilter.nFamilyId ~= nFamilyId or self.tFilter.nCategoryId ~= nCategoryId or self.tFilter.nTypeId ~= nTypeId or self.tFilter.strSearchQuery ~= strSearchQuery or not S:Compare(self.tFilter.tFilter, tFilter));
 	self.tFilter = {
@@ -86,17 +86,15 @@ function M:BuildFilter()
 		nCategoryId = nCategoryId,
 		nTypeId = nTypeId,
 		strSearchQuery = strSearchQuery,
-		strSearchQueryEscaped = strSearchQuery and EscapePattern(strlower(strSearchQuery)) or "",
+		strSearchQueryEscaped = strSearchQuery and EscapePattern(strlower(strSearchQuery)),
 		tFilter = tFilter,
 		tCustomFilter = tCustomFilter,
-		tCustomFilterValues = tCustomFilterValues,
 	};
 end
 
 function M:GetCurrentFilter()
 	local tFilter = {};
 	local tCustomFilter = {};
-	local tCustomFilterValues = {};
 
 	-- Search String
 	local strSearchQuery = self.wndMain:FindChild("Search"):FindChild("Text"):GetText();
@@ -118,26 +116,28 @@ function M:GetCurrentFilter()
 
 	-- Custom Filters
 	if (self.wndFilters:FindChild("KnownSchematics"):IsChecked()) then
-		tinsert(tCustomFilter, "KnownSchematics");
-	end
-	if (self.wndFilters:FindChild("RuneSlots"):IsChecked()) then
-		tinsert(tCustomFilter, "RuneSlots");
-		tCustomFilterValues["RuneSlots"] = tonumber(self.wndFilters:FindChild("RuneSlotsAmount"):GetText());
-		if (type(tCustomFilterValues["RuneSlots"]) ~= "number" or tCustomFilterValues["RuneSlots"] < 0) then
-			tCustomFilterValues["RuneSlots"] = 0;
-		end
-	end
-	if (self.wndFilters:FindChild("MaxPrice"):IsChecked()) then
-		tinsert(tCustomFilter, "MaxPrice");
-		tCustomFilterValues["MaxPrice"] = self.wndFilters:FindChild("MaxPriceAmount"):GetAmount();
+		tCustomFilter["KnownSchematics"] = true;
 	end
 
-	return nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter, tCustomFilterValues;
+	if (self.wndFilters:FindChild("RuneSlots"):IsChecked()) then
+		local nValue = tonumber(self.wndFilters:FindChild("RuneSlotsAmount"):GetText());
+		if (type(nValue) ~= "number" or nValue < 0) then
+			nValue = 0;
+		end
+
+		tCustomFilter["RuneSlots"] = nValue;
+
+	end
+	if (self.wndFilters:FindChild("MaxPrice"):IsChecked()) then
+		tCustomFilter["MaxPrice"] = self.wndFilters:FindChild("MaxPriceAmount"):GetAmount();
+	end
+
+	return nFamilyId, nCategoryId, nTypeId, strSearchQuery, tFilter, tCustomFilter;
 end
 
 function M:IsFiltered(aucCurr)
-	for _, strFilter in ipairs(self.tFilter.tCustomFilter) do
-		if (tCustomFilter[strFilter] and tCustomFilter[strFilter].fnFilter(self, aucCurr, self.tFilter.tCustomFilterValues[strFilter])) then
+	for strFilter, oValue in pairs(self.tFilter.tCustomFilter) do
+		if (tCustomFilter[strFilter] and tCustomFilter[strFilter].fnFilter(self, aucCurr, oValue)) then
 			return true;
 		end
 	end

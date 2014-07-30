@@ -15,17 +15,43 @@ local M = S:GetModule("AuctionHouse");
 -----------------------------------------------------------------------------
 
 function M:RestoreProfile()
-	M.P.ShoppingList = {
+	self.P.ShoppingList = {
 		{
-			Name = "Profitable Stuff",
+			Name ="Test",
 			Searches = {
-
-
+				{
+					nTypeId = 3,
+					strSearchQuery = "Epochos' LA-1H Combat Hood",
+					tCustomFilter = {
+						Special = 54123, -- Special: Concentration
+						RuneSlots = 2,
+						MinStats = {
+							[Unit.CodeEnumProperties.Dexterity] = 115,
+						},
+					},
+				},
+				{
+					nCategoryId = 16,
+					strSearchQuery = "Adventus' CW-3 PTL Loamsooth Carbine",
+					tCustomFilter = {
+						RuneSlots = 2,
+						MinStats = {
+							[Unit.CodeEnumProperties.AssaultPower] = 1032,
+							[Unit.CodeEnumProperties.Dexterity] = 90,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name ="4+ Rune Slots",
+			Searches = {
 				-- Armor / 4+ Rune Slots
 				{
 					nFamilyId = 1,
 					tCustomFilter = {
 						RuneSlots = 4,
+						MinLevel = 45,
 					},
 				},
 				-- Weapons / 4+ Rune Slots
@@ -33,8 +59,14 @@ function M:RestoreProfile()
 					nFamilyId = 2,
 					tCustomFilter = {
 						RuneSlots = 4,
+						MinLevel = 45,
 					},
 				},
+			},
+		},
+		{
+			Name = "Spellslinger DPS",
+			Searches = {
 				-- Best in Slot / Spellslinger DPS / Weapons
 				{
 					nCategoryId = 16,
@@ -61,7 +93,7 @@ function M:RestoreProfile()
 					nTypeId = 3,
 					strSearchQuery = "Epochos' LA-1H Combat Hood",
 					tCustomFilter = {
-						-- Special: Concentration
+						Special = 54123, -- Special: Concentration
 						RuneSlots = 2,
 						MinStats = {
 							[Unit.CodeEnumProperties.Dexterity] = 115,
@@ -99,7 +131,7 @@ function M:RestoreProfile()
 					nTypeId = 6,
 					strSearchQuery = "TheUrge Smartfunction Starloom Grips",
 					tCustomFilter = {
-						-- Special: Rage
+						Special = 53844, -- Special: Rage
 						RuneSlots = 2,
 						MinStats = {
 							[Unit.CodeEnumProperties.Dexterity] = 85,
@@ -115,7 +147,7 @@ function M:RestoreProfile()
 					nTypeId = 2,
 					strSearchQuery = "Skurgeborn Darkweave",
 					tCustomFilter = {
-						-- Special: Power Dash
+						Special = 71724, -- Special: Power Dash
 						RuneSlots = 3,
 						MinStats = {
 							[Unit.CodeEnumProperties.Dexterity] = 115,
@@ -127,7 +159,7 @@ function M:RestoreProfile()
 					nTypeId = 5,
 					strSearchQuery = "TheUrge Smartfiber Starloom Boots",
 					tCustomFilter = {
-						-- Special: Calisthenics
+						Special = 54017, -- Special: Calisthenics
 						RuneSlots = 2,
 						MinStats = {
 							[Unit.CodeEnumProperties.Dexterity] = 80,
@@ -144,7 +176,7 @@ function M:RestoreProfile()
 					nTypeId = 299,
 					strSearchQuery = "Adventus' AS-2 SS Battle Support System",
 					tCustomFilter = {
-						RuneSlots = 2,
+						RuneSlots = 3,
 						MinStats = {
 							[Unit.CodeEnumProperties.Dexterity] = 70,
 						},

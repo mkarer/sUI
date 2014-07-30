@@ -64,7 +64,7 @@ end
 function M:OnSearchCompleted(event, tSearch)
 	if (self.tSearch ~= tSearch) then return; end
 
-	self.tAuctions = self.tSearch:GetResults();
+	self.tAuctions = self.tSearch:GetFilteredResults();
 	self:DisplaySearchResults();
 end
 
@@ -101,19 +101,17 @@ function M:IsAuctionVisible(aucCurr)
 end
 
 function M:DisplaySearchResults()
-	local nTotalResults = #self.tAuctions;
+	local nTotalResults = #self.tSearch:GetResults();
+	local nResultsFiltered = nTotalResults - #self.tAuctions;
 
 	self:ClearSelection();
 	self.wndResultsGrid:SetVScrollPos(0);
 	self.wndResultsGrid:DestroyChildren();
 
 	for _, aucCurr in ipairs(self.tAuctions) do
-		if (not self:IsFiltered(aucCurr)) then
-			self:CreateListItem(aucCurr);
-		end
+		self:CreateListItem(aucCurr);
 	end
 
-	local nResultsFiltered = nTotalResults - #self.wndResultsGrid:GetChildren();
 	self:SetSearchState(false);
 	self:SortResults();
 

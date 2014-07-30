@@ -113,7 +113,10 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	end
 
 	-- Shopping Lists
-	wndControl:AddNode(0, "Shopping Lists");
+	local nNodeIdShoppingLists = wndControl:AddNode(0, "Shopping Lists");
+	for _, tList in ipairs(self.P.ShoppingList) do
+		wndControl:AddNode(nNodeIdShoppingLists, tList.Name, nil, { Type = "ShoppingList", Name = tList.Name });
+	end
 
 	-- My Listings
 	wndControl:AddNode(0, "My Listings");
@@ -123,8 +126,12 @@ end
 
 local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, hPrevSelected)
 	self.tSelectedCategory = wndControl:GetNodeData(hSelected);
+	self.strSelectedShoppingList = nil;
+	self.nSelectedFamily = nil;
 
-	if (self.tSelectedCategory and self.tSelectedCategory.Type ~= "Custom") then
+	if (not self.tSelectedCategory) then return; end
+
+	if (self.tSelectedCategory.Type == "Family" or self.tSelectedCategory.Type == "Category" or self.tSelectedCategory.Type == "Type") then
 		local nParentId = wndControl:GetParentNode(hSelected);
 		while (wndControl:GetParentNode(nParentId) and wndControl:GetParentNode(nParentId) > 1) do
 			nParentId = wndControl:GetParentNode(nParentId);
@@ -135,8 +142,8 @@ local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, h
 		else
 			self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
 		end
-	else
-		self.nSelectedFamily = nil;
+	elseif (self.tSelectedCategory.Type == "ShoppingList") then
+		self.strSelectedShoppingList = self.tSelectedCategory.Name;
 	end
 end
 
@@ -169,17 +176,45 @@ local function OnHideFilters(self, wndHandler, wndControl)
 end
 
 local function OnSearch(self)
-	if (self.tSelectedCategory) then
+	if (not self.tSelectedCategory) then return; end
+
+	if (not self.strSelectedShoppingList) then
 		self:SetSearchState(true);
 		self:BuildFilter();
 		self:UpdateListHeaders();
 		self:Search();
+	elseif (self.strSelectedShoppingList) then
+		local nShoppingListIndex;
+
+		for i, tList in ipairs(self.P.ShoppingList) do
+			if (tList.Name == self.strSelectedShoppingList) then
+				nShoppingListIndex = i;
+			end
+		end
+
+		if (not nShoppingListIndex) then return; end
+
+		self:SetSearchState(true);
+		self:UpdateListHeaders();
+		self.tSearch:SetMultipleFilters(self.P.ShoppingList[nShoppingListIndex].Searches);
+		self:ClearSelection();
+		self.tAuctions = {};
+		self.wndResultsGrid:SetVScrollPos(0);
+		self.wndResultsGrid:DestroyChildren();
+		self.tSearch:Search();
 	end
+end
+
+local function OnCustomSearch(self, wndHandler, wndControl, eMouseButton)
+--	if (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+--	end
 end
 
 local function OnChangeBidAmount(self, wndHandler, wndControl)
 	local aucCurr = wndControl:GetParent():GetParent():GetData();
+	local nPlayerCash = GameLib.GetPlayerCurrency(Money.CodeEnumCurrencyType.Credits):GetAmount();
 	self.wndCurrentItem:FindChild("BtnBid"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, false, wndControl:GetCurrency());
+	self.wndCurrentItem:FindChild("BtnBid"):Enable(wndControl:GetAmount() <= nPlayerCash);
 end
 
 local function OnSelectItem(self, wndHandler, wndControl)
@@ -216,6 +251,7 @@ local function OnSelectItem(self, wndHandler, wndControl)
 	self.wndCurrentItem:FindChild("Bid"):Enable(bCanBid);
 	self.wndCurrentItem:FindChild("Bid"):SetAmount(nBidAmount);
 	self.wndCurrentItem:FindChild("BtnBid"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, false, nBidAmount);
+	self.wndCurrentItem:FindChild("BtnBid"):Enable(bCanBid and nMinBidPrice <= nPlayerCash);
 
 	-- Buyout
 	self.wndCurrentItem:FindChild("Price"):SetText(S:GetMoneyAML(nBuyoutPrice, kstrFont));
@@ -224,6 +260,8 @@ local function OnSelectItem(self, wndHandler, wndControl)
 
 	-- Display
 	self.wndCurrentItem:Show(true, true);
+
+	SendVarToRover("OnSelectItemAucCurr", aucCurr);
 end
 
 local function OnDeselectItem(self, wndHandler, wndControl)
@@ -423,6 +461,7 @@ function M:CreateWindow()
 											Font = kstrFont,
 											Events = {
 												ButtonSignal = OnSearch,
+												MouseButtonUp = OnCustomSearch,
 											},
 										},
 										-- Button: Filters
@@ -687,6 +726,7 @@ local ktAdditionalColumns = {
 	[20] = { "Level" }, -- Housing
 	[2] = { "Level", "ItemLevel", "RuneSlots", "AssaultPower", "SupportPower" }, -- Weapon
 	[5] = { "BagSlots" }, -- Bag
+	ShoppingList = { "Level", "ItemLevel", "RuneSlots" },
 };
 
 local ktListColumns = {
@@ -937,9 +977,10 @@ function M:UpdateListHeaders()
 	local bSortHeaderValid = false;
 
 	-- Add additional headers (as defined by current category/family)
-	if (self.nSelectedFamily and ktAdditionalColumns[self.nSelectedFamily]) then
+	local tAdditionalColumns = (self.nSelectedFamily and ktAdditionalColumns[self.nSelectedFamily]) or (self.strSelectedShoppingList and ktAdditionalColumns.ShoppingList) or nil;
+	if (tAdditionalColumns) then
 		local nInsertPos = 2;
-		for _, strName in ipairs(ktAdditionalColumns[self.nSelectedFamily]) do
+		for _, strName in ipairs(tAdditionalColumns) do
 			tinsert(tHeaders, nInsertPos, strName);
 			nInsertPos = nInsertPos + 1;
 		end
