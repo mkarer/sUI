@@ -25,3 +25,6 @@
 [submodule "Libs/XmlDocument"]
 	path = Libs/XmlDocument
 	url = https://github.com/wildstarnasa/XmlDocument.git
+[submodule "Libs/SezzAuras"]
+	path = Libs/SezzAuras
+	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzAuras.git
