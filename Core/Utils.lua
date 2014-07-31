@@ -196,6 +196,10 @@ function S:ChatOutput(arMessageSegments)
 	tChatLog.tChatWindows[1]:GetData().tMessageQueue:Push({ xml = xml });
 end
 
+function S:Print(strMessage)
+	self:ChatOutput({{ strType = "Text", strContent = strMessage }});
+end
+
 -----------------------------------------------------------------------------
 -- Misc
 -----------------------------------------------------------------------------
