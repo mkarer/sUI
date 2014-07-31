@@ -7,10 +7,13 @@
 
 --]]
 
+require "MarketplaceLib";
+
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("AuctionHouse", "Gemini:Hook-1.0");
+
 local log;
-local AccountItemLib = AccountItemLib;
+local AccountItemLib, MarketplaceLib, Apollo = AccountItemLib, MarketplaceLib, Apollo;
 
 -----------------------------------------------------------------------------
 -- Initialization
@@ -128,10 +131,30 @@ function M:OnItemAuctionWon(event, aucCurr)
 	end
 end
 
+local ktBidResultStrings = {
+	[MarketplaceLib.AuctionPostResult.AlreadyHasBid] = Apollo.GetString("MarketplaceAuction_AlreadyBid"),
+	[MarketplaceLib.AuctionPostResult.BidTooHigh] = Apollo.GetString("MarketplaceAuction_BidHigherThanBuyout"),
+	[MarketplaceLib.AuctionPostResult.BidTooLow] = Apollo.GetString("MarketplaceAuction_BidTooLow"),
+--	[MarketplaceLib.AuctionPostResult.CannotFillOrder] = 90,
+	[MarketplaceLib.AuctionPostResult.CommodityDisabled] = Apollo.GetString("MarketplaceAuction_CommodityDisabled"),
+--	[MarketplaceLib.AuctionPostResult.DbFailure] = 5,
+--	[MarketplaceLib.AuctionPostResult.Item_BadId] = 6,
+--	[MarketplaceLib.AuctionPostResult.ItemAuctionDisabled] = 123,
+	[MarketplaceLib.AuctionPostResult.NotEnoughCash] = Apollo.GetString("MarketplaceCredd_NotEnoughCash"),
+--	[MarketplaceLib.AuctionPostResult.NotEnoughToFillQuantity] = 19,
+	[MarketplaceLib.AuctionPostResult.NotFound] = Apollo.GetString("MarketplaceAuction_NotFound"),
+--	[MarketplaceLib.AuctionPostResult.NotReady] = 89,
+--	[MarketplaceLib.AuctionPostResult.Ok] = 0,
+	[MarketplaceLib.AuctionPostResult.OrderTooBig] = Apollo.GetString("MarketplaceAuction_OrderTooBig"),
+--	[MarketplaceLib.AuctionPostResult.OwnItem] = 98,
+	[MarketplaceLib.AuctionPostResult.TooManyOrders] = Apollo.GetString("MarketplaceAuction_MaxOrders"),
+};
+
 function M:OnItemAuctionBidResult(event, eAuctionBidResult, aucCurr)
 	local bResultOk = (eAuctionBidResult == MarketplaceLib.AuctionPostResult.Ok);
-	local strMessage = bResultOk and String_GetWeaselString(Apollo.GetString("MarketplaceAuction_BidAccepted"), aucCurr:GetItem():GetName()) or "Error MarketplaceLib.AuctionPostResult: "..eAuctionBidResult;
-	Print(strMessage);
+	local strMessage = bResultOk and String_GetWeaselString(Apollo.GetString("MarketplaceAuction_BidAccepted"), aucCurr:GetItem():GetName()) or (ktBidResultStrings[eAuctionBidResult] and ktBidResultStrings[eAuctionBidResult] or "MarketplaceLib.AuctionPostResult: "..eAuctionBidResult);
+
+	S:Print(strMessage);
 
 	if (bResultOk or eAuctionBidResult == MarketplaceLib.AuctionPostResult.NotFound) then
 		if ((self.wndSelectedItem and self.wndSelectedItem:GetData() and self.wndSelectedItem:GetData() == aucCurr) or self:IsAuctionVisible(aucCurr)) then
