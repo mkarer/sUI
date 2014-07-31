@@ -27,10 +27,6 @@ function M:OnInitialize()
 	self:UpdateQuestTrackerSorting();
 	self:OverrideNameplatesSettings();
 	self:UpdateDatachronForms();
-	self:HideAythQuestTracker();
-	self:HideTrackMaster();
-	self:UpdateHarvester();
-	self:EnableJunkIt();
 	self:UpdateLootNotificationWindow();
 end
 
@@ -301,92 +297,6 @@ function M:UpdateQuestTrackerSorting()
 
 		if (tQuestTracker.wndMain) then
 			tQuestTracker:ResizeEpisodes();
-		end
-	end
-end
-
------------------------------------------------------------------------------
--- Ayth_Quest
------------------------------------------------------------------------------
-
-function M:HideAythQuestTracker()
-	local tAyth = Apollo.GetAddon("Ayth_Quest");
-	if (tAyth) then
-		if (tAyth.tUserSettings) then
-			tAyth.tUserSettings.showAythTracker = false;
-		end
-
-		if (not tAyth._OnRestore) then
-			tAyth._OnRestore = tAyth.OnRestore;
-			tAyth.OnRestore = function(self, eType, tSavedData)
-				self:_OnRestore(eType, tSavedData);
-				self.tUserSettings.showAythTracker = false;
-			end
-		end
-	end
-end
-
------------------------------------------------------------------------------
--- TrackMaster
------------------------------------------------------------------------------
-
-function M:HideTrackMaster()
-	local tTrackMaster = Apollo.GetAddon("TrackMaster");
-	if (tTrackMaster and not tTrackMaster._OnRestore) then
-		tTrackMaster.pinned = false;
-
-		tTrackMaster._OnRestore = tTrackMaster.OnRestore;
-		tTrackMaster.OnRestore = function(self, eType, tSavedData)
-			if (eType == GameLib.CodeEnumAddonSaveLevel.Character) then
-				if (type(tSavedData) ~= "table") then
-					tSavedData = {};
-				end
-
-				tSavedData.Pinned = false;
-			end
-
-			self:_OnRestore(eType, tSavedData);
-		end
-	end
-end
-
------------------------------------------------------------------------------
--- JunkIt
------------------------------------------------------------------------------
-
-function M:EnableJunkIt()
-	local tJunkIt = Apollo.GetAddon("JunkIt");
-	if (tJunkIt and not tJunkIt._OnRestore) then
-		tJunkIt.config.autoSell = true;
-		tJunkIt.config.autoRepair = true;
-
-		tJunkIt._OnRestore = tJunkIt.OnRestore;
-		tJunkIt.OnRestore = function(self, eType, tSavedData)
-			self:_OnRestore(eType, tSavedData);
-			self.config.autoSell = true;
-			self.config.autoRepair = true;
-		end
-	end
-end
-
-
------------------------------------------------------------------------------
--- Harvester
------------------------------------------------------------------------------
-
-function M:UpdateHarvester()
-	local tHarvester = Apollo.GetAddon("Harvester");
-
-	-- Enable TrackMaster
-	if (tHarvester and not tHarvester._OnRestore) then
-		if (tHarvester.settings) then
-			tHarvester.settings.Options.TrackMaster = (Apollo.GetAddon("TrackMaster") ~= nil);
-		end
-
-		tHarvester._OnRestore = tHarvester.OnRestore;
-		tHarvester.OnRestore = function(self, eType, tSavedData)
-			self:_OnRestore(eType, tSavedData);
-		    self.settings.Options.TrackMaster = (Apollo.GetAddon("TrackMaster") ~= nil);
 		end
 	end
 end
