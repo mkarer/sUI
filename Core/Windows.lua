@@ -70,20 +70,26 @@ end
 -- Window Form XML Manipulation
 -----------------------------------------------------------------------------
 
-function S:FindElementInXml(tXml, strElementName)
+function S:FindElementInXml(tXml, strNode, strValue, ...)
 	-- Check tXml Type
 	if (type(tXml) ~= "table") then return nil; end
 
+	-- strValue is optional for backward compatibility
+	if (strValue == nil) then
+		strValue = strNode;
+		strNode = "Name";
+	end
+
 	-- Check tXml Elements
-	if (tXml.Name and tXml.Name == strElementName) then
+	if (tXml[strNode] and tXml[strNode] == strValue) then
 		return tXml;
 	end
 
 	-- Check Children
 	for _, tNode in ipairs(tXml) do
 		if (type(tNode) == "table") then
-			local tChildNode = self:FindElementInXml(tNode, strElementName);
-			if (tChildNode and tChildNode.Name and tChildNode.Name == strElementName) then
+			local tChildNode = self:FindElementInXml(tNode, strNode, strValue, ...);
+			if (tChildNode and tChildNode[strNode] and tChildNode[strNode] == strValue) then
 				return tChildNode;
 			end
 		end
@@ -103,6 +109,18 @@ function S:UpdateElementInXml(tXml, strElementName, tData)
 	end
 
 	return false;
+end
+
+function S:RemovePixieFromXml(tXml, strSprite, bContinueWhenFound) -- tXml: Parent Xml Data
+	for i, tNode in ipairs(tXml) do
+		if (tNode.__XmlNode and tNode.__XmlNode == "Pixie" and tNode.Sprite == strSprite) then
+			tXml[i] = nil;
+
+			if (not bContinueWhenFound) then
+				break;
+			end
+		end
+	end
 end
 
 -----------------------------------------------------------------------------
