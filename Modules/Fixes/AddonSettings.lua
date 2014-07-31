@@ -213,6 +213,7 @@ function M:UpdateDatachronForms()
 					end
 
 					-- Explorer only (others still have Pixie2/Pixie3)
+					-- TODO: Doesn't work on login, will update my XML modification to include pixies.
 					if (self.wndMain:FindChild("ActiveMissionsHeader")) then
 						self.wndMain:FindChild("ActiveMissionsHeader"):DestroyPixie(2);
 					end
