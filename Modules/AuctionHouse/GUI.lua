@@ -7,15 +7,15 @@
 
 --]]
 
-local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:GetModule("AuctionHouse");
-
 require "Window";
 require "GameLib";
 require "Item";
 require "Unit";
 require "MarketplaceLib";
 require "ItemAuction";
+
+local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
+local M = S:GetModule("AuctionHouse");
 
 local strlen, strfind, gmatch, format, tinsert, floor, max = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
