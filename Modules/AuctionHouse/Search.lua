@@ -78,26 +78,19 @@ function M:RemoveAuction(aucCurr)
 		end
 	end
 
-	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
-		if (wndAuction:GetData() == aucCurr) then
-			wndAuction:Destroy();
-			self:ClearSelection();
-			self:SortResults();
-			break;
-		end
+	local wndAuction = self.wndResultsGrid:FindChildByUserData(aucCurr);
+	if (wndAuction) then
+		wndAuction:Destroy();
+		self:ClearSelection();
+		self:SortResults();
 	end
 end
 
 function M:IsAuctionVisible(aucCurr)
 	if (not self.tAuctions) then return false; end
 
-	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
-		if (wndAuction:GetData() == aucCurr) then
-			return true;
-		end
-	end
-
-	return false;
+	local wndAuction = self.wndResultsGrid:FindChildByUserData(aucCurr);
+	return (wndAuction ~= nil);
 end
 
 function M:DisplaySearchResults()
