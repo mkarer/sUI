@@ -258,12 +258,11 @@ local function OnSelectItem(self, wndHandler, wndControl)
 	local nDefaultBid = max(nMinBidPrice, nCurrBidPrice);
 	local bBuyoutOnly = (not bBidOnly and nDefaultBid >= nBuyoutPrice);
 	local bCanBid = (not bBuyoutOnly and not aucCurr:IsTopBidder() and not aucCurr:IsOwned());
-	local nBidAmount = nCurrBidPrice == 0 and nMinBidPrice or nCurrBidPrice + 1;
 
 	-- Bid
 	self.wndCurrentItem:FindChild("Bid"):Enable(bCanBid);
-	self.wndCurrentItem:FindChild("Bid"):SetAmount(nBidAmount);
-	self.wndCurrentItem:FindChild("BtnBid"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, false, nBidAmount);
+	self.wndCurrentItem:FindChild("Bid"):SetAmount(nMinBidPrice);
+	self.wndCurrentItem:FindChild("BtnBid"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, false, nMinBidPrice);
 	self.wndCurrentItem:FindChild("BtnBid"):Enable(bCanBid and nMinBidPrice <= nPlayerCash);
 
 	-- Buyout
@@ -1029,23 +1028,30 @@ function M:UpdateListHeaders()
 	self.tHeaders = tHeaders;
 end
 
+local kstrItemBGColors = {
+	Default = "aa000000",
+	Owned = "aa002938",
+	TopBidder = "aa102D00",
+	KnownSchematic = "aa381010",
+};
+
 function M:CreateListItem(aucCurr)
 	local fPosition = ktListColumns.Name.Width;
 
 	local itemCurr = aucCurr:GetItem();
 	local bIsKnownSchematic = (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
-	local bIsOwned = aucCurr:IsOwned();
-	local bIsTopBidder = aucCurr:IsTopBidder();
 	local strCount = aucCurr:GetCount() ~= 1 and aucCurr:GetCount() or "";
 	local strName = itemCurr:GetName();
 
-	local strBGColor = "aa000000";
-	if (bIsOwned) then
-		strBGColor = "aa002938";
-	elseif (bIsTopBidder) then
-		strBGColor = "aa102D00";
+	local strBGColor;
+	if (aucCurr:IsOwned()) then
+		strBGColor = kstrItemBGColors.Owned;
+	elseif (aucCurr:IsTopBidder()) then
+		strBGColor = kstrItemBGColors.TopBidder;
 	elseif (bIsKnownSchematic) then
-		strBGColor = "aa381010";
+		strBGColor = kstrItemBGColors.KnownSchematic;
+	else
+		strBGColor = kstrItemBGColors.Default;
 	end
 
 	-- Bids
@@ -1173,6 +1179,43 @@ function M:CreateListItem(aucCurr)
 --	SendVarToRover("AHCurrentAuctionWindow", wndItem);
 
 	return wndItem;
+end
+
+function M:UpdateListItem(wndItem, aucCurr)
+	-- Update a auction list item
+	-- Properties that can change after creating it: bIsKnownSchematic, IsOwned(), IsTopBidder(), GetCurrentBid()
+	-- Maybe also (needs testing): GetCount()
+	wndItem:SetData(aucCurr);
+
+	local itemCurr = aucCurr:GetItem();
+	local bIsKnownSchematic = (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
+
+	-- Background Color
+	local strBGColor;
+	if (aucCurr:IsOwned()) then
+		strBGColor = kstrItemBGColors.Owned;
+	elseif (aucCurr:IsTopBidder()) then
+		strBGColor = kstrItemBGColors.TopBidder;
+	elseif (bIsKnownSchematic) then
+		strBGColor = kstrItemBGColors.KnownSchematic;
+	else
+		strBGColor = kstrItemBGColors.Default;
+	end
+
+	wndItem:SetBGColor(strBGColor);
+
+	-- Current Bid
+	local tBidCurrent = aucCurr:GetCurrentBid();
+	if (tBidCurrent:GetAmount() > 0) then
+		local wndBid = wndItem:FindChild("Bid");
+		local tPixies = self:CreateCashPixie(tBidCurrent:GetAmount(), false);
+
+		wndBid:DestroyAllPixies();
+S.Log:debug(tPixies);
+		for _, tPixie in ipairs(tPixies) do
+			wndBid:AddPixie(tPixie);
+		end
+	end
 end
 
 --[[
