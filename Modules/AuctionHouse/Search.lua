@@ -18,6 +18,7 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 -----------------------------------------------------------------------------
 
 local kstrNoResults = Apollo.GetString("Tradeskills_NoResults");
+local kstrSearching = Apollo.GetString("MarketplaceAuction_FetchingResults").."...";
 local kstrTryClearingFilter = Apollo.GetString("MarketplaceAuction_TryClearingFilter");
 
 function M:RefreshResults()
@@ -42,7 +43,7 @@ function M:SetSearchState(bSearching)
 	self.bIsSearching = bSearching;
 	self.wndSearch:FindChild("BtnSearch"):Enable(not bSearching);
 	if (bSearching) then
-		self:SetStatusMessage("Searching...");
+		self:SetStatusMessage(kstrSearching);
 	else
 		self:SetStatusMessage();
 	end
