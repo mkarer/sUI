@@ -29,13 +29,9 @@ function M:RefreshResults()
 end
 
 function M:UpdateAuction(aucCurr, bIsTopBidder)
-	for _, wndAuction in ipairs(self.wndResultsGrid:GetChildren()) do
-		if (wndAuction:GetData() == aucCurr) then
-			if (bIsTopBidder) then
-				wndAuction:SetBGColor("aa102D00");
-			end
-			break;
-		end
+	local wndAuction = self.wndResultsGrid:FindChildByUserData(aucCurr);
+	if (wndAuction) then
+		self:UpdateListItem(wndAuction, aucCurr);
 	end
 end
 
