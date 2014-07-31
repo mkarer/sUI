@@ -355,16 +355,14 @@ local function OnUpdateInventory(self)
 end
 
 -- Path Button Visibility
-local function OnXPChanged(self)
-	local bShow = false;
-	if (S.bCharacterLoaded) then
-		bShow = (PlayerPathLib.GetPathLevel() >= 4);
+local function OnPathLevelUp(self, nLevel)
+	if (nLevel == nil) then
+		nLevel = S.bCharacterLoaded and PlayerPathLib.GetPathLevel() or 0;
 	end
 
-	self.wndMain:Show(bShow, true);
-
-	if (bShow) then
-		Apollo.RemoveEventHandler("UI_XPChanged", self);
+	self.wndMain:Show((nLevel >= 4), true);
+	if (nLevel >= 4) then
+		Apollo.RemoveEventHandler("PathLevelUp", self);
 	end
 end
 
@@ -433,9 +431,9 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			buttonContainer:OnUpdateInventory();
 		elseif (buttonAttributes.type == "LAS" and buttonAttributes.id == 9) then
 			-- Path
-			buttonContainer.OnXPChanged = OnXPChanged;
-			Apollo.RegisterEventHandler("UI_XPChanged", "OnXPChanged", buttonContainer);
-			buttonContainer:OnXPChanged();
+			buttonContainer.OnPathLevelUp = OnPathLevelUp;
+			Apollo.RegisterEventHandler("PathLevelUp", "OnPathLevelUp", buttonContainer);
+			buttonContainer:OnPathLevelUp();
 		end
 
 		-- Enable Menu
