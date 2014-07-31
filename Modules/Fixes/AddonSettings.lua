@@ -175,12 +175,14 @@ function M:UpdateDatachronForms()
 				if (tXmlNewMissions) then
 					S:UpdateElementInXml(tXmlNewMissions, "Pixie2", { Sprite = "" });
 					S:UpdateElementInXml(tXmlNewMissions, "Pixie3", { Sprite = "" });
+					S:RemovePixieFromXml(tXmlNewMissions, "CRB_CharacterCreateSprites:sprCharC_EnterBackerNameOld");
 				end
 
 				local tXmlAvailableMissions = S:FindElementInXml(tXml, "AvailableMissionsHeader");
 				if (tXmlAvailableMissions) then
 					S:UpdateElementInXml(tXmlAvailableMissions, "Pixie2", { Sprite = "" });
 					S:UpdateElementInXml(tXmlAvailableMissions, "Pixie3", { Sprite = "" });
+					S:RemovePixieFromXml(tXmlAvailableMissions, "CRB_CharacterCreateSprites:sprCharC_EnterBackerNameOld");
 				end
 
 				-- Path-specific
@@ -210,16 +212,6 @@ function M:UpdateDatachronForms()
 					tDatachronPath:_OnLoadFromDatachron();
 					if (self.wndMain) then
 						self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
-					end
-
-					-- Explorer only (others still have Pixie2/Pixie3)
-					-- TODO: Doesn't work on login, will update my XML modification to include pixies.
-					if (self.wndMain:FindChild("ActiveMissionsHeader")) then
-						self.wndMain:FindChild("ActiveMissionsHeader"):DestroyPixie(2);
-					end
-
-					if (self.wndMain:FindChild("AvailableMissionsHeader")) then
-						self.wndMain:FindChild("AvailableMissionsHeader"):DestroyPixie(2);
 					end
 				end
 			end
