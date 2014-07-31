@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
 -- Lua API
-local mod, format, floor, format, strlen = math.mod, string.format, math.floor, string.format, string.len;
+local mod, format, floor, format, strlen, strsub, tonumber = math.mod, string.format, math.floor, string.format, string.len, string.sub, tonumber;
 
 -----------------------------------------------------------------------------
 -- Table Utilities
@@ -206,4 +206,17 @@ end
 
 function S:Round(nValue)
 	return floor(nValue + 0.5);
+end
+
+-----------------------------------------------------------------------------
+-- Color Conversion
+-----------------------------------------------------------------------------
+
+function S:ConvertHexColorToArray(strColorHex)
+	local nA = tonumber("0x"..strsub(strColorHex, 1, 2));
+	local nR = tonumber("0x"..strsub(strColorHex, 3, 4));
+	local nG = tonumber("0x"..strsub(strColorHex, 5, 6));
+	local nB = tonumber("0x"..strsub(strColorHex, 7, 9));
+
+	return { a = nA / 255, r = nR / 255, g = nG / 255, b = nB / 255 };
 end
