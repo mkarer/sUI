@@ -215,6 +215,15 @@ function M:UpdateDatachronForms()
 					if (self.wndMain) then
 						self.wndMain:FindChild("CompletedScreen"):DestroyAllPixies()
 					end
+
+					-- Explorer only (others still have Pixie2/Pixie3)
+					if (self.wndMain:FindChild("ActiveMissionsHeader")) then
+						self.wndMain:FindChild("ActiveMissionsHeader"):DestroyPixie(2);
+					end
+
+					if (self.wndMain:FindChild("AvailableMissionsHeader")) then
+						self.wndMain:FindChild("AvailableMissionsHeader"):DestroyPixie(2);
+					end
 				end
 			end
 		end
