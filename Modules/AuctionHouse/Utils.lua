@@ -10,7 +10,7 @@
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local floor, tinsert, mod, format = math.floor, table.insert, math.mod, string.format;
+local floor, tinsert, mod, format, tostring = math.floor, table.insert, math.mod, string.format, tostring;
 local Apollo = Apollo;
 
 -----------------------------------------------------------------------------
@@ -52,92 +52,126 @@ function M:CreateCashPixie(nAmount, bDarken)
 	-- Platin
 	if (nPlatin > 0) then
 		tinsert(tPixies, {
-			AnchorPoints = { 0, 0, 1, 1 },
-			AnchorOffsets = { 0, 0, -nPosPlatin - nWidthPlatin, 0 },
-			Text = nPlatin,
-			TextColor = bDarken and strColorDarkAmount or strColorAmount,
-			Font = kstrFont,
-			DT_RIGHT = true,
-			DT_VCENTER = true,
+			loc = {
+				fPoints = { 0, 0, 1, 1 },
+				nOffsets = { 0, 0, -nPosPlatin - nWidthPlatin, 0 },
+			},
+			strText = tostring(nPlatin),
+			crText = bDarken and strColorDarkAmount or strColorAmount,
+			strFont = kstrFont,
+			flagsText = {
+				DT_RIGHT = true,
+				DT_VCENTER = true,
+			},
 		});
 
 		tinsert(tPixies, {
-			AnchorPoints = { 1, 0, 1, 1 },
-			AnchorOffsets = { -nPosPlatin - nWidthPlatin, 0, -nPosPlatin, 0 },
-			Text = "p",
-			TextColor = bDarken and strColorDarkPlatin or strColorPlatin,
-			Font = kstrFont,
-			DT_RIGHT = true,
-			DT_VCENTER = true,
+			loc = {
+				fPoints = { 1, 0, 1, 1 },
+				nOffsets = { -nPosPlatin - nWidthPlatin, 0, -nPosPlatin, 0 },
+			},
+			strText = "p",
+			crText = bDarken and strColorDarkPlatin or strColorPlatin,
+			strFont = kstrFont,
+			flagsText = {
+				DT_RIGHT = true,
+				DT_VCENTER = true,
+			},
 		});
 	end
 
 	-- Gold
 	if (nPlatin > 0 or nGold > 0) then
 		tinsert(tPixies, {
-			AnchorPoints = { 1, 0, 1, 1 },
-			AnchorOffsets = { -nWidthNumbers - nPosGold - nWidthGold, 0, -nPosGold - nWidthGold, 0 },
-			Text = #tPixies > 0 and format("%02d", nGold) or nGold,
-			TextColor = bDarken and strColorDarkAmount or strColorAmount,
-			Font = kstrFont,
-			DT_RIGHT = true,
-			DT_VCENTER = true,
+			loc = {
+				fPoints = { 1, 0, 1, 1 },
+				nOffsets = { -nWidthNumbers - nPosGold - nWidthGold, 0, -nPosGold - nWidthGold, 0 },
+			},
+			strText = tostring(#tPixies > 0 and format("%02d", nGold) or nGold),
+			crText = bDarken and strColorDarkAmount or strColorAmount,
+			strFont = kstrFont,
+			flagsText = {
+				DT_RIGHT = true,
+				DT_VCENTER = true,
+			},
 		});
 
 		tinsert(tPixies, {
-			AnchorPoints = { 1, 0, 1, 1 },
-			AnchorOffsets = { -nPosGold - nWidthGold, 0, -nPosGold, 0 },
-			Text = "g",
-			TextColor = bDarken and strColorDarkGold or strColorGold,
-			Font = kstrFont,
-			DT_RIGHT = true,
-			DT_VCENTER = true,
+			loc = {
+				fPoints = { 1, 0, 1, 1 },
+				nOffsets = { -nPosGold - nWidthGold, 0, -nPosGold, 0 },
+			},
+			strText = "g",
+			crText = bDarken and strColorDarkGold or strColorGold,
+			strFont = kstrFont,
+			flagsText = {
+				DT_RIGHT = true,
+				DT_VCENTER = true,
+			},
 		});
 	end
 
 	-- Silver
 	if (nPlatin > 0 or nGold > 0 or nSilver > 0) then
 		tinsert(tPixies, {
-			AnchorPoints = { 1, 0, 1, 1 },
-			AnchorOffsets = { -nWidthNumbers - nPosSilver - nWidthSilver, 0, -nPosSilver - nWidthSilver, 0 },
-			Text = #tPixies > 0 and format("%02d", nSilver) or nSilver,
-			TextColor = bDarken and strColorDarkAmount or strColorAmount,
-			Font = kstrFont,
-			DT_RIGHT = true,
-			DT_VCENTER = true,
+			loc = {
+				fPoints = { 1, 0, 1, 1 },
+				nOffsets = { -nWidthNumbers - nPosSilver - nWidthSilver, 0, -nPosSilver - nWidthSilver, 0 },
+			},
+			strText = tostring(#tPixies > 0 and format("%02d", nSilver) or nSilver),
+			crText = bDarken and strColorDarkAmount or strColorAmount,
+			strFont = kstrFont,
+			flagsText = {
+				DT_RIGHT = true,
+				DT_VCENTER = true,
+			},
 		});
 
 		tinsert(tPixies, {
-			AnchorPoints = { 1, 0, 1, 1 },
-			AnchorOffsets = { -nPosSilver - nWidthSilver, 0, -nPosSilver, 0 },
-			Text = "s",
-			TextColor = bDarken and strColorDarkSilver or strColorSilver,
-			Font = kstrFont,
-			DT_RIGHT = true,
-			DT_VCENTER = true,
+			loc = {
+				fPoints = { 1, 0, 1, 1 },
+				nOffsets = { -nPosSilver - nWidthSilver, 0, -nPosSilver, 0 },
+			},
+			strText = "s",
+			crText = bDarken and strColorDarkSilver or strColorSilver,
+			strFont = kstrFont,
+			flagsText = {
+				DT_RIGHT = true,
+				DT_VCENTER = true,
+			},
 		});
 	end
 
 	-- Copper
 	tinsert(tPixies, {
-		AnchorPoints = { 1, 0, 1, 1 },
-		AnchorOffsets = { -nWidthNumbers - nWidthCopper, 0, -nWidthCopper, 0 },
-		Text = #tPixies > 0 and format("%02d", nCopper) or nCopper,
-		TextColor = bDarken and strColorDarkAmount or strColorAmount,
-		Font = kstrFont,
-		DT_RIGHT = true,
-		DT_VCENTER = true,
+		loc = {
+			fPoints = { 1, 0, 1, 1 },
+			nOffsets = { -nWidthNumbers - nWidthCopper, 0, -nWidthCopper, 0 },
+		},
+		strText = tostring(#tPixies > 0 and format("%02d", nCopper) or nCopper),
+		crText = bDarken and strColorDarkAmount or strColorAmount,
+		strFont = kstrFont,
+		flagsText = {
+			DT_RIGHT = true,
+			DT_VCENTER = true,
+		},
 	});
 
 	tinsert(tPixies, {
-		AnchorPoints = { 1, 0, 1, 1 },
-		AnchorOffsets = { -nWidthCopper, 0, 0, 0 },
-		Text = "c",
-		TextColor = bDarken and strColorDarkCopper or strColorCopper;
-		Font = kstrFont,
-		DT_RIGHT = true,
-		DT_VCENTER = true,
+		loc = {
+			fPoints = { 1, 0, 1, 1 },
+			nOffsets = { -nWidthCopper, 0, 0, 0 },
+		},
+		strText = "c",
+		crText = bDarken and strColorDarkCopper or strColorCopper,
+		strFont = kstrFont,
+		flagsText = {
+			DT_RIGHT = true,
+			DT_VCENTER = true,
+		},
 	});
+
+SendVarToRover("bla", tPixies);
 
 	return tPixies;
 end
