@@ -133,6 +133,7 @@ local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, h
 	if (not self.tSelectedCategory) then return; end
 
 	if (self.tSelectedCategory.Type == "Family" or self.tSelectedCategory.Type == "Category" or self.tSelectedCategory.Type == "Type") then
+--		Print(wndControl:GetNodeText(hSelected).." // "..self.tSelectedCategory.Type.." // "..self.tSelectedCategory.Id);
 		local nParentId = wndControl:GetParentNode(hSelected);
 		while (wndControl:GetParentNode(nParentId) and wndControl:GetParentNode(nParentId) > 1) do
 			nParentId = wndControl:GetParentNode(nParentId);
@@ -218,7 +219,7 @@ local function OnCustomSearch(self, wndHandler, wndControl, eMouseButton)
 end
 
 local function OnClickItem(self, wndHandler, wndControl, eMouseButton)
-	if (wndHandler == wndControl and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+	if (wndHandler == wndControl and eMouseButton == GameLib.CodeEnumInputMouse.Right and not Apollo.IsControlKeyDown()) then
 		self:ShowContextMenu(wndHandler:GetName(), wndHandler:GetData());
 	end
 end
