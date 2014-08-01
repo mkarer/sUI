@@ -43,6 +43,8 @@ end
 
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
+	
+	Apollo.RegisterSlashCommand("ah", "Open", self);
 
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
 	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
