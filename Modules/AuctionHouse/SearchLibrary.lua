@@ -137,6 +137,11 @@ local tCustomFilter = {
 			return aucCurr:GetItem():GetRequiredLevel() < nLevel;
 		end,
 	},
+	MinArmor = {
+		fnFilter = function(aucCurr, nArmor)
+			return aucCurr:GetItem():GetArmor() < nArmor;
+		end,
+	},
 	MaxPrice = {
 		fnFilter = function(aucCurr, nAmount)
 			local nPrice = aucCurr:GetBuyoutPrice():GetAmount();
