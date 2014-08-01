@@ -153,6 +153,10 @@ function M:RestoreProfile()
 					strSearchQuery = "Zen State",
 				},
 				{
+					nTypeId = 215,
+					strSearchQuery = "Regenerative Matrix",
+				},
+				{
 					nTypeId = 301,
 					strSearchQuery = "Dysentery Prevention Pill",
 				},
@@ -463,6 +467,10 @@ function M:RestoreProfile()
 				{
 					nTypeId = 215,
 					strSearchQuery = "Zen State",
+				},
+				{
+					nTypeId = 215,
+					strSearchQuery = "Regenerative Matrix",
 				},
 				{
 					nTypeId = 301,
@@ -964,6 +972,10 @@ function M:RestoreProfile()
 					strSearchQuery = "Zen State",
 				},
 				{
+					nTypeId = 215,
+					strSearchQuery = "Regenerative Matrix",
+				},
+				{
 					nTypeId = 301,
 					strSearchQuery = "Dysentery Prevention Pill",
 				},
@@ -1190,6 +1202,10 @@ function M:RestoreProfile()
 				{
 					nTypeId = 215,
 					strSearchQuery = "Zen State",
+				},
+				{
+					nTypeId = 215,
+					strSearchQuery = "Regenerative Matrix",
 				},
 				{
 					nTypeId = 301,
@@ -1522,6 +1538,10 @@ function M:RestoreProfile()
 				{
 					nTypeId = 215,
 					strSearchQuery = "Zen State",
+				},
+				{
+					nTypeId = 215,
+					strSearchQuery = "Regenerative Matrix",
 				},
 				{
 					nTypeId = 301,
@@ -2051,6 +2071,10 @@ function M:RestoreProfile()
 				{
 					nTypeId = 215,
 					strSearchQuery = "Zen State",
+				},
+				{
+					nTypeId = 215,
+					strSearchQuery = "Regenerative Matrix",
 				},
 				{
 					nTypeId = 301,
