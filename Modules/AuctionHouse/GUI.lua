@@ -17,7 +17,7 @@ require "ItemAuction";
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch, format, tinsert, floor, max = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max;
+local strlen, strfind, gmatch, format, tinsert, floor, max, strmatch = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max, string.match;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
 -----------------------------------------------------------------------------
@@ -182,6 +182,9 @@ local function OnSearch(self)
 	if (self.bIsSearching) then return; end
 
 	if (not self.strSelectedShoppingList) then
+		local strSearchQuery = self.wndSearch:FindChild("Text"):GetText();
+		self.wndSearch:FindChild("Text"):SetText(strfind(strSearchQuery, "^%s*$") and "" or strmatch(strSearchQuery, "^%s*(.*%S)"))
+
 		self:SetSearchState(true);
 		self:BuildFilter();
 		self:UpdateListHeaders();
