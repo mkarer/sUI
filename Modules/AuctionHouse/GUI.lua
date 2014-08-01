@@ -17,7 +17,7 @@ require "ItemAuction";
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
-local strlen, strfind, gmatch, format, tinsert, floor, max, strmatch = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max, string.match;
+local strlen, strfind, gmatch, format, tinsert, floor, max, strmatch, sort = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max, string.match, table.sort;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
 -----------------------------------------------------------------------------
@@ -115,8 +115,14 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 
 	-- Shopping Lists
 	local nNodeIdShoppingLists = wndControl:AddNode(0, "Shopping Lists");
-	for _, tList in ipairs(self.P.ShoppingList) do
-		wndControl:AddNode(nNodeIdShoppingLists, tList.Name, nil, { Type = "ShoppingList", Name = tList.Name });
+	local tShoppingListsSorted = {};
+	for i, tList in ipairs(self.P.ShoppingList) do
+		tinsert(tShoppingListsSorted, { i, tList.Name });
+		sort(tShoppingListsSorted, function(a, b) return a[2] < b[2]; end);
+	end
+
+	for i, tList in pairs(tShoppingListsSorted) do
+		wndControl:AddNode(nNodeIdShoppingLists, tList[2], nil, { Type = "ShoppingList", Name = tList[2] });
 	end
 
 	-- My Listings
