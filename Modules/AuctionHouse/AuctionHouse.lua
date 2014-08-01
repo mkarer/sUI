@@ -10,7 +10,7 @@
 require "MarketplaceLib";
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-local M = S:CreateSubmodule("AuctionHouse", "Gemini:Hook-1.0");
+local M = S:CreateSubmodule("AuctionHouse");
 
 local log;
 local AccountItemLib, MarketplaceLib, Apollo = AccountItemLib, MarketplaceLib, Apollo;
@@ -59,6 +59,7 @@ function M:OnEnable()
 			if (not self.tFamilies[self.nCurrFamilyId + 1]) then
 				self.ma.wndMain:FindChild("BtnSearch"):SetText(Apollo.GetString("CRB_Search")); -- TODO: i18n Table
 				self.ma:SetSearchState(false);
+				self.ma.P.LastAuctionStatsScan = os.time();
 			end
 		end
 	end
