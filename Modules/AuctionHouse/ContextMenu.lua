@@ -14,12 +14,18 @@ local M = S:GetModule("AuctionHouse");
 
 local itemCurr;
 
-local function SendItemToRover()
+local function SendItemToRover(self)
 	local tRover = Apollo.GetAddon("Rover");
 
 	if (tRover and itemCurr) then
 		SendVarToRover(itemCurr:GetName(), itemCurr);
 		tRover.wndMain:Show(true, true);
+	end
+end
+
+function M:ShowCurrentAuctionStats()
+	if (itemCurr) then
+		self.AuctionStats:DrawPlot(itemCurr:GetItemId());
 	end
 end
 
@@ -35,12 +41,19 @@ function M:ShowContextMenu(strId, ...)
 
 		tMenu:AddHeader(itemCurr:GetName());
 		tMenu:AddItems({
-			-- One Level
 			{
 				Name = "Rover",
 				Text = "Send to Rover",
 				OnClick = SendItemToRover,
 				CloseMenuOnClick = true,
+				Enabled = function() return (Apollo.GetAddon("Rover") ~= nil) end,
+			},
+			{
+				Name = "Stats",
+				Text = "Show Price History",
+				OnClick = { "ShowCurrentAuctionStats", self },
+				CloseMenuOnClick = true,
+				Enabled = function() return (self.AuctionStats ~= nil) end,
 			},
 		});
 

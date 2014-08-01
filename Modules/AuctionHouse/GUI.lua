@@ -179,6 +179,7 @@ end
 
 local function OnSearch(self)
 	if (not self.tSelectedCategory) then return; end
+	if (self.bIsSearching) then return; end
 
 	if (not self.strSelectedShoppingList) then
 		self:SetSearchState(true);
@@ -213,9 +214,11 @@ local function OnTreeDoubleClick(self, wndHandler, wndControl, hSelected, hPrevS
 	OnSearch(self);
 end
 
-local function OnCustomSearch(self, wndHandler, wndControl, eMouseButton)
---	if (eMouseButton == GameLib.CodeEnumInputMouse.Right) then
---	end
+local function OnSearchButtonUp(self, wndHandler, wndControl, eMouseButton)
+	if (not self.bIsSearching and eMouseButton == GameLib.CodeEnumInputMouse.Right and self.AuctionStats) then
+		self:SetSearchState(true);
+		self.AuctionStats:OnScanAuctionHouseButtonSignal(wndHandler, wndControl, eMouseButton);
+	end
 end
 
 local function OnClickItem(self, wndHandler, wndControl, eMouseButton)
@@ -473,7 +476,7 @@ function M:CreateWindow()
 											Font = kstrFont,
 											Events = {
 												ButtonSignal = OnSearch,
-												MouseButtonUp = OnCustomSearch,
+												MouseButtonUp = OnSearchButtonUp,
 											},
 										},
 										-- Button: Filters

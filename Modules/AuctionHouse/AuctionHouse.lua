@@ -47,6 +47,22 @@ function M:OnEnable()
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
 	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
 
+	-- Temporary AuctionStats Support
+	self.AuctionStats = Apollo.GetAddon("AuctionStats");
+	if (self.AuctionStats) then
+		self.AuctionStats.ma = self;
+
+		self.AuctionStats._ScanNextFamily = self.AuctionStats.ScanNextFamily;
+		self.AuctionStats.ScanNextFamily = function(self)
+			self:_ScanNextFamily();
+
+			if (not self.tFamilies[self.nCurrFamilyId + 1]) then
+				self.ma.wndMain:FindChild("BtnSearch"):SetText(Apollo.GetString("CRB_Search")); -- TODO: i18n Table
+				self.ma:SetSearchState(false);
+			end
+		end
+	end
+
 --	self:RegisterEvent("ToggleAuctionWindow", "Open");
 	self:RegisterEvent("AuctionWindowClose", "Close");
 end
