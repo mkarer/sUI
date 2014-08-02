@@ -40,3 +40,6 @@
 [submodule "Libs/GeminiAddon"]
 	path = Libs/GeminiAddon
 	url = https://github.com/wildstarnasa/GeminiAddon.git
+[submodule "Libs/SezzTreeView"]
+	path = Libs/SezzTreeView
+	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzTreeView.git
