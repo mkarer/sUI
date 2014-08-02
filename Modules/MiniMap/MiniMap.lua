@@ -21,7 +21,7 @@ function M:OnInitialize()
 	self:InitializeForms();
 
 	tMiniMap = Apollo.GetAddon("MiniMap");
-	if (tMiniMap) then
+	if (tMiniMap and S.myRealm ~= "Nexus") then
 		log:debug("Hooking MiniMap");
 		-- Replace XML Form
 		-- TODO: Load Carbine's XML file and apply changes directly (if possible)
