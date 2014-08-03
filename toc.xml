@@ -127,11 +127,6 @@
 	<!-- Misc -->
 	<Script Name="Modules\DataText\DataText.lua" />
 
-	<!-- Nonworking ideas (because if the WildStar API or me) -->
-<!--
-	<Script Name="Modules\crafting\SlashSalvage.lua" />
--->
-
 	<!-- Disable/Replace Carbine Addons -->
 	<ReplaceAddon Name="ActionBarFrame" />
 	<ReplaceAddon Name="ActionBarShortcut" />
