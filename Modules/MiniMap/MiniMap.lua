@@ -13,21 +13,62 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("MiniMap", "Gemini:Hook-1.0");
 M:SetDefaultModuleState(false);
 local log, tMiniMap;
+local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
+local function UpdateMiniMapXml(xmlDoc)
+	-- Modify XML
+	local tXml = xmlDoc:ToTable();
+	S:UpdateElementInXml(tXml, "Minimap", { LAnchorOffset = -157, TAnchorPoint = 1, TAnchorOffset = -246, RAnchorPoint = 1, RAnchorOffset = -8, BAnchorPoint = 1, BAnchorOffset = -18, RelativeToClient = 0 });
+	S:UpdateElementInXml(tXml, "MinimapMouseCatcher", { Visible = 0 });
+	S:FindElementInXml(tXml, "Name", "MapRingBackground", true);
+	S:UpdateElementInXml(tXml, "ButtonContainer", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 1, TAnchorOffset = -22, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = 0 });
+	S:UpdateElementInXml(tXml, "MapZonePvPFlag", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = -16, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 0, BAnchorOffset = 0, Font = "CRB_Pixel_O", Visible = 0 });
+	S:UpdateElementInXml(tXml, "MapZoneName", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 0, BAnchorOffset = 22, Font = "CRB_Pixel_O" });
+
+	if (GameLib.GetVersionInfo().nBuildNumber < 6800) then
+		S:UpdateElementInXml(tXml, "MinimapOptions", { LAnchorPoint = "Minimap_Right", LAnchorOffset = -380, TAnchorPoint = "Minimap_Top", TAnchorOffset = -422, RAnchorPoint = "Minimap_Right", RAnchorOffset = -130, BAnchorPoint = "Minimap_Top", BAnchorOffset = 227 });
+	end
+
+	local tXmlMapMenuButton = S:FindElementInXml(tXml, "MapMenuButton");
+	tinsert(tXmlMapMenuButton, { __XmlNode = "Event", Name = "ButtonSignal", Function = "OnMenuBtnToggle" });
+	S:UpdateElementInXml(tXml, "MapMenuButton", { Base = "sUI:SezzActionButton", Font = "DefaultButton", LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 0, RAnchorOffset = 22, BAnchorPoint = 1, BAnchorOffset = 0, TransitionShowHide = 0, TestAlpha = 0, Visible = 1 });
+
+	tinsert(tXmlMapMenuButton, { __XmlNode = "Event", Name = "ButtonSignal", Function = "OnMenuBtnToggle" });
+	tinsert(tXmlMapMenuButton, { __XmlNode = "Control", Class = "Window", LAnchorPoint = 0, LAnchorOffset = 2, TAnchorPoint = 0, TAnchorOffset = 2, RAnchorPoint = 1, RAnchorOffset = -2, BAnchorPoint = 1, BAnchorOffset = -2, RelativeToClient = 1, Font = "Default", Text = "", BGColor = "cc000000", TextColor = "UI_WindowTextDefault", Template = "Default", TooltipType = "OnCursor", Name = "Background", TooltipColor = "", Sprite = "sUI:MiniMapButtonBGDark", Picture = 1, IgnoreMouse = 1,
+		{ __XmlNode = "Control", Class = "Window", LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = 0, RelativeToClient = 1, Font = "Default", Text = "", BGColor = "UI_WindowBGDefault", TextColor = "UI_WindowTextDefault", Template = "Default", TooltipType = "OnCursor", Name = "Icon", TooltipColor = "", Picture = 1, IgnoreMouse = 1, Sprite = "sUI:IconFilter" }
+	});
+
+	local tXmlMiniMap = S:FindElementInXml(tXml, "Name", "MapContent", true);
+	S:UpdateElementInXml(tXmlMiniMap, "MapContent", { LAnchorPoint = 0, LAnchorOffset = 2, TAnchorPoint = 0, TAnchorOffset = 2, RAnchorPoint = 1, RAnchorOffset = 95, BAnchorPoint = 1, BAnchorOffset = 95, Mask = "", ItemRadius = 1, Scale = 0.6 });
+	tinsert(tXml[1], 2, { __XmlNode = "Control", Class = Window, LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = 22, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = -57, RelativeToClient = 1, Font = "Default", Text = "", BGColor = "UI_WindowBGDefault", TextColor = "UI_WindowTextDefault", Template = "Default", TooltipType = "OnCursor", Name = "MapContainer", TooltipColor = "", Sprite = "SezzUIBorder", Picture = 1, IgnoreMouse = 1, tXmlMiniMap });
+
+	return XmlDoc.CreateFromTable(tXml);
+end
+
 function M:OnInitialize()
 	log = S.Log;
-	self:InitializeForms();
 
 	tMiniMap = Apollo.GetAddon("MiniMap");
-	if (tMiniMap and S.myRealm ~= "Nexus") then
+	if (tMiniMap) then
 		log:debug("Hooking MiniMap");
 		-- Replace XML Form
 		-- TODO: Load Carbine's XML file and apply changes directly (if possible)
-		tMiniMap.OnLoad = function(self)
-			self.xmlDoc = M.xmlDoc;
-			self.xmlDoc:RegisterCallback("OnDocumentReady", self);
+		tMiniMap._OnDocumentReady = tMiniMap.OnDocumentReady;
+		tMiniMap.OnDocumentReady = function(self)
+			if (self.xmlDoc ~= nil) then
+				self.xmlDoc = UpdateMiniMapXml(self.xmlDoc);
+				self:_OnDocumentReady();
+
+				if (GameLib.GetVersionInfo().nBuildNumber >= 6800) then
+					local nOptionsHeight = self.wndMinimapOptions:GetHeight();
+					local nOptionsWidth = self.wndMinimapOptions:GetWidth();
+					local nScreenWidth, nScreenHeight = Apollo.GetScreenSize();
+
+					self.wndMinimapOptions:Move(nScreenWidth - nOptionsWidth - 157, nScreenHeight - nOptionsHeight, nOptionsHeight, nOptionsWidth);
+				end
+			end
 		end
 
 		-- PVP Flag Update
