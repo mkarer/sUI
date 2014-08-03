@@ -48,6 +48,7 @@ function M:OnEnable()
 
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
 	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
+	self.TreeView = Apollo.GetPackage("Sezz:Controls:TreeView-0.1").tPackage;
 
 	-- Temporary AuctionStats Support
 	self.AuctionStats = Apollo.GetAddon("AuctionStats");

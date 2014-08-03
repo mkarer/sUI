@@ -56,19 +56,44 @@ local kstrSearch = Apollo.GetString("CRB_Search");
 local nPadding = 2;
 local nItemSize = 30;
 local nIconBorder = 1;
+local tTree;
+
+function M:OnNodeSelected(strNode)
+	self.tSelectedCategory = tTree:GetNodeData(strNode);
+	self.strSelectedShoppingList = nil;
+	self.nSelectedFamily = nil;
+
+	if (not self.tSelectedCategory) then return; end
+	if (self.tSelectedCategory.Type == "Family" or self.tSelectedCategory.Type == "Category" or self.tSelectedCategory.Type == "Type") then
+		if (self.tSelectedCategory.Type ~= "Family") then
+			local nParentId = tTree:GetParentNode(strNode);
+			while (tTree:GetParentNode(nParentId) and tTree:GetNodeData(nParentId).Type ~= "Family") do
+				nParentId = tTree:GetParentNode(nParentId);
+			end
+
+			self.nSelectedFamily = tTree:GetNodeData(nParentId).Id;
+		else
+			self.nSelectedFamily = self.tSelectedCategory.Id;
+		end
+	elseif (self.tSelectedCategory.Type == "ShoppingList") then
+		self.strSelectedShoppingList = self.tSelectedCategory.Name;
+	end
+end
 
 local function OnTreeWindowLoad(self, wndHandler, wndControl)
-	local nNodeIdRoot = wndControl:AddNode(0, "Auctions");
+	tTree = self.TreeView:New(wndControl, self);
+
+	local nNodeIdRoot = tTree:AddNode("Auctions");
 	local nNodeIdSelected, nNodeIdSelectedCategory;
 
 	--[[
 	-- Armor
 	for _, tDataRootCategory in ipairs(MarketplaceLib.GetAuctionableCategories(1)) do
-		local nNodeIdRootCategory = wndControl:AddNode(nNodeIdRoot, tDataRootCategory.strName, nil, tDataRootCategory.nId);
+		local nNodeIdRootCategory = tTree:AddNode(nNodeIdRoot, tDataRootCategory.strName, nil, tDataRootCategory.nId);
 
 		for _, tDataType in pairs(MarketplaceLib.GetAuctionableTypes(tDataRootCategory.nId) or {}) do
 			if (strlen(tDataType.strName) > 0) then
-				wndControl:AddNode(nNodeIdRootCategory, tDataType.strName, nil, tDataType.nId);
+				tTree:AddNode(nNodeIdRootCategory, tDataType.strName, nil, tDataType.nId);
 			end
 		end
 	end
@@ -77,16 +102,16 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	-- Others
 	for _, tDataRootCategory in ipairs(MarketplaceLib.GetAuctionableFamilies()) do
 --		if (tDataRootCategory.nId > 1) then -- Ignore Armor
-			local nNodeIdRootCategory = wndControl:AddNode(nNodeIdRoot, tDataRootCategory.strName, nil, { Type = "Family", Id = tDataRootCategory.nId });
-			wndControl:CollapseNode(nNodeIdRootCategory);
+			local nNodeIdRootCategory = tTree:AddChildNode(nNodeIdRoot, tDataRootCategory.strName, nil, { Type = "Family", Id = tDataRootCategory.nId });
+			tTree:CollapseNode(nNodeIdRootCategory);
 
 			for _, tDataCategory in pairs(MarketplaceLib.GetAuctionableCategories(tDataRootCategory.nId) or {}) do
 				local tTypes = MarketplaceLib.GetAuctionableTypes(tDataCategory.nId) or {};
 				local nNodeIdCategory = nNodeIdRootCategory;
 
 				if (tDataRootCategory.nId == 1 or (#tTypes == 0 and strlen(tDataCategory.strName) > 0)) then
-					nNodeIdCategory = wndControl:AddNode(nNodeIdRootCategory, tDataCategory.strName, nil, { Type = "Category", Id = tDataCategory.nId });
-					wndControl:CollapseNode(nNodeIdCategory);
+					nNodeIdCategory = tTree:AddChildNode(nNodeIdRootCategory, tDataCategory.strName, nil, { Type = "Category", Id = tDataCategory.nId });
+					tTree:CollapseNode(nNodeIdCategory);
 				end
 
 				for _, tDataType in pairs(tTypes) do
@@ -95,8 +120,8 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 						strName = gmatch(strName, ".*-(.*)")();
 					end
 
-					local nNodeId = wndControl:AddNode(nNodeIdCategory, strName, nil, { Type = "Type", Id = tDataType.nId });
-					wndControl:CollapseNode(nNodeId);
+					local nNodeId = tTree:AddChildNode(nNodeIdCategory, strName, nil, { Type = "Type", Id = tDataType.nId });
+					tTree:CollapseNode(nNodeId);
 					if (strName == "Implant") then
 						nNodeIdSelected = nNodeId; -- TEMP
 						nNodeIdSelectedCategory = nNodeIdRootCategory;
@@ -107,14 +132,14 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	end
 
 	if (nNodeIdSelected) then -- TEMP
-		wndControl:ExpandNode(nNodeIdSelectedCategory);
-		wndControl:SelectNode(nNodeIdSelected);
-		self.tSelectedCategory = wndControl:GetNodeData(nNodeIdSelected);
+		tTree:SelectNode(nNodeIdSelected);
+		self.tSelectedCategory = tTree:GetNodeData(nNodeIdSelected);
 		self.nSelectedFamily = 15;
 	end
 
 	-- Shopping Lists
-	local nNodeIdShoppingLists = wndControl:AddNode(0, "Shopping Lists");
+	local nNodeIdShoppingLists = tTree:AddNode("Shopping Lists");
+	tTree:CollapseNode(nNodeIdShoppingLists);
 	local tShoppingListsSorted = {};
 	for i, tList in ipairs(self.P.ShoppingList) do
 		tinsert(tShoppingListsSorted, { i, tList.Name });
@@ -122,37 +147,18 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	end
 
 	for i, tList in pairs(tShoppingListsSorted) do
-		wndControl:AddNode(nNodeIdShoppingLists, tList[2], nil, { Type = "ShoppingList", Name = tList[2] });
+		tTree:AddChildNode(nNodeIdShoppingLists, tList[2], nil, { Type = "ShoppingList", Name = tList[2] });
 	end
 
 	-- My Listings
-	wndControl:AddNode(0, "My Listings");
+	tTree:AddNode("My Listings");
 
---	SendVarToRover("AHCategories", wndControl);
-end
+	-- Events
+	tTree:RegisterCallback("NodeSelected", "OnNodeSelected", self);
+	tTree:RegisterCallback("NodeDoubleClick", "OnNodeDoubleClick", self);
 
-local function OnTreeSelectionChanged(self, wndHandler, wndControl, hSelected, hPrevSelected)
-	self.tSelectedCategory = wndControl:GetNodeData(hSelected);
-	self.strSelectedShoppingList = nil;
-	self.nSelectedFamily = nil;
-
-	if (not self.tSelectedCategory) then return; end
-
-	if (self.tSelectedCategory.Type == "Family" or self.tSelectedCategory.Type == "Category" or self.tSelectedCategory.Type == "Type") then
---		Print(wndControl:GetNodeText(hSelected).." // "..self.tSelectedCategory.Type.." // "..self.tSelectedCategory.Id);
-		local nParentId = wndControl:GetParentNode(hSelected);
-		while (wndControl:GetParentNode(nParentId) and wndControl:GetParentNode(nParentId) > 1) do
-			nParentId = wndControl:GetParentNode(nParentId);
-		end
-
-		if (nParentId <= 1 and self.tSelectedCategory.Type == "Family") then
-			self.nSelectedFamily = self.tSelectedCategory.Id;
-		else
-			self.nSelectedFamily = wndControl:GetNodeData(nParentId).Id;
-		end
-	elseif (self.tSelectedCategory.Type == "ShoppingList") then
-		self.strSelectedShoppingList = self.tSelectedCategory.Name;
-	end
+	-- Done
+	tTree:Render();
 end
 
 local function OnShowFilters(self, wndHandler, wndControl)
@@ -217,10 +223,10 @@ local function OnSearch(self)
 	end
 end
 
-local function OnTreeDoubleClick(self, wndHandler, wndControl, hSelected, hPrevSelected)
-	-- Expand/Collapse
-	-- How? Just search ;)
-	OnSearch(self);
+function M:OnNodeDoubleClick(strNode, bTogglingNode)
+	if (not bTogglingNode) then
+		OnSearch(self);
+	end
 end
 
 local function OnSearchButtonUp(self, wndHandler, wndControl, eMouseButton)
@@ -428,20 +434,19 @@ function M:CreateWindow()
 								-- CONTENT
 								-- Categories
 								{
-									Class = "TreeControl",
+									Name = "TreeView",
+									Class = "Window",
 									Font = kstrFont,
 									AnchorPoints = { 0, 0, 0, 1 },
 									AnchorOffsets = { 0, 0, nWidthCategories, 0 },
 									VScroll = true,
 									AutoHideScroll = false,
 									Template = "Holo_ScrollListSmall",
-									SelectedBG = "BK3:UI_BK3_Holo_InsetDivider",
-									MinimumNodeHeight = 18,
-									Events = {
-										WindowLoad = OnTreeWindowLoad,
-										TreeSelectionChanged = OnTreeSelectionChanged,
-										TreeDoubleClick = OnTreeDoubleClick,
-									},
+									Border = true,
+									Sprite = "ClientSprites:WhiteFill",
+									BGColor = "ff121314",
+									Picture = true,
+									UseTemplateBG = false,
 								},
 								-- Search Box
 								{
@@ -729,6 +734,9 @@ function M:CreateWindow()
 				},
 			},
 		}):GetInstance(self);
+
+self.wndTreeView = self.wndMain:FindChild("TreeView");
+pcall(function() OnTreeWindowLoad(self, self.wndTreeView, self.wndTreeView); end, Print)
 
 		self.wndSearch = self.wndMain:FindChild("Search");
 		self.wndFilters = self.wndMain:FindChild("Filters");

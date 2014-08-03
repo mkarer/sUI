@@ -30,6 +30,8 @@
 	<Script Name="Libs\SezzUnitFrames\Elements\Auras.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\Range.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\PowerBar.lua" />
+	<!-- TreeView Control -->
+	<Script Name="Libs\SezzTreeView\SezzTreeView.lua" />
 
 	<!-- Core -->
 	<Script Name="sUI.lua" />
