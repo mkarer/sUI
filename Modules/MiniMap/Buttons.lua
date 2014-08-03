@@ -283,6 +283,13 @@ function M:OnEnable()
 					},
 				},
 			},
+			-- Nexus Meter
+			{
+				Name = "BtnNexusMeterToggle",
+				Text = "Toggle Nexus Meter",
+				OnClick = function() Apollo.GetAddon("NexusMeter"):SlashHandler("", "toggle"); end,
+				Enabled = function() return (Apollo.GetAddon("NexusMeter") ~= nil); end
+			},
 			-- Settings
 			{
 				Name = "BtnSettings",
