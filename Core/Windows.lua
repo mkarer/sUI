@@ -8,7 +8,7 @@
 --]]
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
-
+local tremove = table.remove;
 -----------------------------------------------------------------------------
 
 function S:GetWindowPosition(wndHandler)
@@ -70,7 +70,7 @@ end
 -- Window Form XML Manipulation
 -----------------------------------------------------------------------------
 
-function S:FindElementInXml(tXml, strNode, strValue, ...)
+function S:FindElementInXml(tXml, strNode, strValue, bRemove)
 	-- Check tXml Type
 	if (type(tXml) ~= "table") then return nil; end
 
@@ -82,14 +82,17 @@ function S:FindElementInXml(tXml, strNode, strValue, ...)
 
 	-- Check tXml Elements
 	if (tXml[strNode] and tXml[strNode] == strValue) then
-		return tXml;
+		return tXml, true;
 	end
 
 	-- Check Children
-	for _, tNode in ipairs(tXml) do
+	for i, tNode in ipairs(tXml) do
 		if (type(tNode) == "table") then
-			local tChildNode = self:FindElementInXml(tNode, strNode, strValue, ...);
+			local tChildNode, bIsRoot = self:FindElementInXml(tNode, strNode, strValue, bRemove);
 			if (tChildNode and tChildNode[strNode] and tChildNode[strNode] == strValue) then
+				if (bIsRoot and bRemove) then
+					tremove(tXml, i);
+				end
 				return tChildNode;
 			end
 		end
