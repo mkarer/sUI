@@ -386,7 +386,7 @@ function M:CreateWindow()
 			Moveable = true,
 			Escapable = true,
 			Overlapped = true,
-			AnchorPoints = { 0.20, 0.10, 0.75, 0.75 },
+			AnchorPoints = { 0.225, 0.10, 0.775, 0.75 },
 			AnchorOffsets = { 0, 0, 0, 0 },
 --			AnchorCenter = { 1000, 800 },
 			Picture = true,
