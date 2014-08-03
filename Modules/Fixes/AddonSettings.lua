@@ -248,9 +248,22 @@ end
 
 function M:UpdateQuestTrackerSorting()
 	local tQuestTracker = Apollo.GetAddon("QuestTracker");
+	if (not tQuestTracker) then return; end
+
+	if (g_InterfaceOptions) then
+		g_InterfaceOptions.Carbine.bQuestTrackerAlignBottom = false;
+	end
+
+	if (not tQuestTracker._OnOptionsUpdated) then
+		tQuestTracker._OnOptionsUpdated = tQuestTracker.OnOptionsUpdated;
+		tQuestTracker.OnOptionsUpdated = function(self)
+			self:_OnOptionsUpdated();
+			self.bQuestTrackerAlignBottom = false;
+		end
+	end
 
 	-- Hook ResizeEpisodes
-	if (tQuestTracker and not tQuestTracker._ResizeEpisodes) then
+	if (tQuestTracker.ResizeEpisodes and not tQuestTracker._ResizeEpisodes) then
 		tQuestTracker._ResizeEpisodes = tQuestTracker.ResizeEpisodes;
 		tQuestTracker.ResizeEpisodes = function(self)
 			-- Sort
