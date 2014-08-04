@@ -45,7 +45,11 @@ S.Log = setmetatable({}, { __index = function(t, k)
 			tLogQueue[k] = {};
 		end
 
-		tinsert(tLogQueue[k], {...});
+		if (#{...} == 1 and type(...) == "table") then
+			tinsert(tLogQueue[k], { S:Clone(...) });
+		else
+			tinsert(tLogQueue[k], {...});
+		end
 	end
 end});
 
