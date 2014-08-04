@@ -11,6 +11,9 @@
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
+-- Lua API
+local tinsert, pairs, ipairs = table.insert, pairs, ipairs;
+
 -----------------------------------------------------------------------------
 
 function S:DumpAbility(strName, bCompleteDump)
@@ -28,4 +31,32 @@ function S:DumpAbility(strName, bCompleteDump)
 			return tAbility;
 		end
 	end
+end
+
+-----------------------------------------------------------------------------
+-- Log Messages Queue
+-----------------------------------------------------------------------------
+
+local tLogQueue = {};
+
+S.Log = setmetatable({}, { __index = function(t, k)
+	return function(self, ...)
+		if (not tLogQueue[k]) then
+			tLogQueue[k] = {};
+		end
+
+		tinsert(tLogQueue[k], {...});
+	end
+end});
+
+function S:FlushLogQueue()
+	if (not tLogQueue) then return; end
+
+	for strLogLevel, tQueuedMessages in pairs(tLogQueue) do
+		for _, tData in ipairs(tQueuedMessages) do
+			self.Log[strLogLevel](self.Log, unpack(tData));
+		end
+	end
+
+	tLogQueue = nil;
 end

@@ -69,6 +69,7 @@ function S:OnInitialize()
 
 	log = S.Log;
 	log:debug(kstrAddon.." "..kstrVersion);
+	self:FlushLogQueue();
 
 	-- Media
 	Apollo.LoadSprites("Media/Icons.xml");
