@@ -387,11 +387,11 @@ function M:CreateWindow()
 		self.twndMain.bDestroyOnClose = true;
 
 		self.twndMain:AddTab("Browse", "FAHome", "browse");
-		self.twndMain:AddTab("Sell", "FAGavel", "sell");
-		self.twndMain:AddTab("History", "FAHistory", "history");
-		self.twndMain:AddTab("Settings", "FACog", "settings");
+		self:InitializeTabs();
 
 		self.twndMain:Show();
+		self:CreateTabs();
+
 		self.twndMain:RegisterCallback("WindowClosed", "Close", self);
 	end
 	
