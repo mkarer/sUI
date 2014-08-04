@@ -2,6 +2,8 @@
 
 	s:UI Auction House
 
+	Icons by [Font Awesome](http://fortawesome.github.io) License: [SIL OFL 1.1](http://scripts.sil.org/OFL)
+
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
