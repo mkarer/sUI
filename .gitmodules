@@ -43,3 +43,6 @@
 [submodule "Libs/SezzTreeView"]
 	path = Libs/SezzTreeView
 	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzTreeView.git
+[submodule "Libs/SezzTabWindow"]
+	path = Libs/SezzTabWindow
+	url = ssh://martin@192.168.0.240/volume1/sezz/Source/WildStar/SezzTabWindow.git
