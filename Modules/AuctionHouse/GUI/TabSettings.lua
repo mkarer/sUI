@@ -15,7 +15,9 @@ local M = S:GetModule("AuctionHouse");
 -----------------------------------------------------------------------------
 
 local function CreateTab(self, wndParent)
-	Print("Creating Settings Tab");
+	wndParent:SetSprite("BasicSprites:WhiteFill");
+	wndParent:SetBGColor("110000ff");
+	wndParent:SetStyle("Picture", true);
 end
 
 M:RegisterTab("settings", "Settings", "FACog", CreateTab, 4);

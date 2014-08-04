@@ -15,7 +15,9 @@ local M = S:GetModule("AuctionHouse");
 -----------------------------------------------------------------------------
 
 local function CreateTab(self, wndParent)
-	Print("Creating History Tab");
+	wndParent:SetSprite("BasicSprites:WhiteFill");
+	wndParent:SetBGColor("11ff0000");
+	wndParent:SetStyle("Picture", true);
 end
 
 M:RegisterTab("history", "History", "FAHistory", CreateTab, 3);

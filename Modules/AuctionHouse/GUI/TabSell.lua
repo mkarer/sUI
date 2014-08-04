@@ -15,7 +15,9 @@ local M = S:GetModule("AuctionHouse");
 -----------------------------------------------------------------------------
 
 local function CreateTab(self, wndParent)
-	Print("Creating Sell Tab");
+	wndParent:SetSprite("BasicSprites:WhiteFill");
+	wndParent:SetBGColor("1100ff00");
+	wndParent:SetStyle("Picture", true);
 end
 
 M:RegisterTab("sell", "Sell", "FAGavel", CreateTab, 2);
