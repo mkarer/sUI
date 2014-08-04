@@ -45,10 +45,12 @@ function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 	
 	Apollo.RegisterSlashCommand("ah", "Open", self);
+	Apollo.LoadSprites(Apollo.GetAssetFolder().."\\Modules\\AuctionHouse\\Media\\Icons.xml");
 
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
 	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
 	self.TreeView = Apollo.GetPackage("Sezz:Controls:TreeView-0.1").tPackage;
+	self.TabWindow = Apollo.GetPackage("Sezz:Controls:TabWindow-0.1").tPackage;
 
 	-- Temporary AuctionStats Support
 	self.AuctionStats = Apollo.GetAddon("AuctionStats");
@@ -119,7 +121,12 @@ function M:Close()
 		self.wndMain:Destroy();
 	end
 
+	if (self.twndMain and self.twndMain:IsValid()) then
+		self.twndMain:Destroy();
+	end
+
 	self.tSearch = nil;
+	self.twndMain = nil;
 	self.wndMain = nil;
 	self.wndSearch = nil;
 	self.wndFilters = nil;

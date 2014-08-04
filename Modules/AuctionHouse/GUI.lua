@@ -372,6 +372,29 @@ local function OnHeaderClick(self, wndHandler, wndControl)
 end
 
 function M:CreateWindow()
+	if (not self.twndMain or not self.twndMain:IsValid()) then
+		local tAttributesAutionHouse = {
+			Name = "SezzAuctionHouse",
+			Moveable = 1,
+			Escapable = 1,
+			Overlapped = 1,
+			LAnchorPoint = 0.225, TAnchorPoint = 0.10, RAnchorPoint = 0.775, BAnchorPoint = 0.75,
+			LAnchorOffset = 0, TAnchorOffset = 0, RAnchorOffset = 0, BAnchorOffset = 0,
+			Sizable = 1,
+		};
+
+		self.twndMain = self.TabWindow:New("Auction House", tAttributesAutionHouse);
+		self.twndMain.bDestroyOnClose = true;
+
+		self.twndMain:AddTab("Browse", "FAHome", "browse");
+		self.twndMain:AddTab("Sell", "FAGavel", "sell");
+		self.twndMain:AddTab("History", "FAHistory", "history");
+		self.twndMain:AddTab("Settings", "FACog", "settings");
+
+		self.twndMain:Show();
+		self.twndMain:RegisterCallback("WindowClosed", "Close", self);
+	end
+	
 	if (not self.wndMain or not self.wndMain:IsValid()) then
 		local nWidthCategories = 220;
 		local nWidthSearchButton = 100;
@@ -382,358 +405,297 @@ function M:CreateWindow()
 		local nHeightCurrentItem = 40;
 
 		self.wndMain = self.GeminiGUI:Create({
-			Name = "SezzAuctionHouse",
-			Moveable = true,
-			Escapable = true,
-			Overlapped = true,
-			AnchorPoints = { 0.225, 0.10, 0.775, 0.75 },
-			AnchorOffsets = { 0, 0, 0, 0 },
---			AnchorCenter = { 1000, 800 },
-			Picture = true,
-			Border = true,
-			Sprite = "BK3:UI_BK3_Holo_InsetHeader",
-			BGColor = "xkcdBabyPink",
-			Sizable = true,
-			Visible = false,
-			Events = {
-				WindowClosed = self.Close,
-				WindowKeyEscape = self.Close,
-				WindowShow = self.Open,
-			},
+			AnchorPoints = { 0, 0, 1, 1 },
+			AnchorOffsets = { 4, 4, -4, -4 },
 			Children = {
+				-- CONTENT
+				-- Categories
 				{
-					Name = "Title",
-					AnchorPoints = { 0, 0, 1, 0 },
-					AnchorOffsets = { 5, 5, -5, 34 },
-					Font = "CRB_Header12_O",
-					Text = Apollo.GetString("MarketplaceAuction_AuctionHouse"),
-					DT_VCENTER = true,
-					DT_CENTER = true,
-				},
-				{
-					Name = "BtnClose",
-					AnchorPoints = { 1, 0, 1, 0 },
-					Class = "Button",
-					Base = "CRB_ChallengeTrackerSprites:btnChallengeClose",
-					AnchorOffsets = { -30, 8, -10, 30 },
-					Events = { ButtonSignal = self.Close },
-				},
-				{
-					Name = "Framing",
-					AnchorPoints = { 0, 0, 1, 1 },
-					AnchorOffsets = { 0, 0, 0, 0 },
+					Name = "TreeView",
+					Class = "Window",
+					Font = kstrFont,
+					AnchorPoints = { 0, 0, 0, 1 },
+					AnchorOffsets = { 0, 0, nWidthCategories, 0 },
+					VScroll = true,
+					AutoHideScroll = false,
+					Template = "Holo_ScrollListSmall",
+					Border = true,
+					Sprite = "ClientSprites:WhiteFill",
+					BGColor = "ff121314",
 					Picture = true,
+					UseTemplateBG = false,
+				},
+				-- Search Box
+				{
+					Name = "Search",
 					Border = false,
-					Sprite = "BK3:UI_BK3_Holo_InsetHeader",
-					BGColor = "white",
+					AnchorPoints = { 0, 0, 1, 0, },
+					AnchorOffsets = { nWidthCategories + nPadding, 0, 0, nHeightSearch },
 					Children = {
+						-- Textbox
 						{
 							AnchorPoints = { 0, 0, 1, 1 },
-							AnchorOffsets = { 14, 48, -14, -14 },
+							AnchorOffsets = { nPadding, 0, 2 * (-nPadding - nWidthSearchButton) - nPadding, -nPadding },
+							Sprite = "BK3:UI_BK3_Holo_InsetDivider",
+							Picture = true,
 							Children = {
-								-- CONTENT
-								-- Categories
 								{
-									Name = "TreeView",
-									Class = "Window",
-									Font = kstrFont,
-									AnchorPoints = { 0, 0, 0, 1 },
-									AnchorOffsets = { 0, 0, nWidthCategories, 0 },
-									VScroll = true,
-									AutoHideScroll = false,
-									Template = "Holo_ScrollListSmall",
-									Border = true,
-									Sprite = "ClientSprites:WhiteFill",
-									BGColor = "ff121314",
-									Picture = true,
-									UseTemplateBG = false,
-								},
-								-- Search Box
-								{
-									Name = "Search",
-									Border = false,
-									AnchorPoints = { 0, 0, 1, 0, },
-									AnchorOffsets = { nWidthCategories + nPadding, 0, 0, nHeightSearch },
-									Children = {
-										-- Textbox
-										{
-											AnchorPoints = { 0, 0, 1, 1 },
-											AnchorOffsets = { nPadding, 0, 2 * (-nPadding - nWidthSearchButton) - nPadding, -nPadding },
-											Sprite = "BK3:UI_BK3_Holo_InsetDivider",
-											Picture = true,
-											Children = {
-												{
-													Class = "EditBox",
-													Name = "Text",
-													AnchorPoints = { 0, 0, 1, 1 },
-													AnchorOffsets = { 8, 0, -8, 0 },
-													Text = "Search",
-													DT_VCENTER = true,
-													Font = kstrFont,
-													Events = {
-														EditBoxReturn = OnSearch,
-														WindowLostFocus = OnSearchLostFocus,
-													},
-												},
-											},
-										},
-										-- Button: Search
-										{
-											Class = "Button",
-											Name = "BtnSearch",
-											AnchorPoints = { 1, 0, 1, 1 },
-											AnchorOffsets = { 2 * (-nPadding - nWidthSearchButton), 0, 2 * -nPadding - nWidthSearchButton, -nPadding },
-											Base = "BK3:btnHolo_ListView_Mid",
-											Text = kstrSearch,
-											DT_VCENTER = true,
-											DT_CENTER = true,
-											Font = kstrFont,
-											Events = {
-												ButtonSignal = OnSearch,
-												MouseButtonUp = OnSearchButtonUp,
-											},
-										},
-										-- Button: Filters
-										{
-											Class = "Button",
-											AnchorPoints = { 1, 0, 1, 1 },
-											AnchorOffsets = { -nPadding - nWidthSearchButton, 0, -nPadding, -nPadding },
-											Base = "BK3:btnHolo_ListView_Mid",
-											Text = "Filters [+]",
-											ButtonType = "Check",
-											DT_VCENTER = true,
-											DT_CENTER = true,
-											Font = kstrFont,
-											Events = {
-												ButtonCheck = OnShowFilters,
-												ButtonUncheck = OnHideFilters,
-											},
-										},
-									},
-								},
-								-- Search Results
-								{
-									Name = "Message",
-									AnchorPoints = { 0, 0, 1, 0.5, },
-									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
+									Class = "EditBox",
+									Name = "Text",
+									AnchorPoints = { 0, 0, 1, 1 },
+									AnchorOffsets = { 8, 0, -8, 0 },
+									Text = "Search",
 									DT_VCENTER = true,
-									DT_CENTER = true,
-									Visible = false,
 									Font = kstrFont,
-								},
-								{
-									Name = "Results",
-									AnchorPoints = { 0, 0, 1, 1, },
-									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
-									Children = {
-										-- Header
-										{
-											Name = "Header",
-											AnchorPoints = { 0, 0, 1, 0 },
-											AnchorOffsets = { 0, 0, -20, nHeightHeader },
-											Children = {}, -- Will be generated later.
-										},
-										-- Items
-										{
-											BGColor = "aa000000",
-											Name = "Grid",
---											Border = false,
-											Picture = true,
-											Sprite = "ClientSprites:WhiteFill",
-											AnchorPoints = { 0, 0, 1, 1, },
-											AnchorOffsets = { 0, nHeightHeader + nPadding, 0, 0 },
-											VScroll = true,
-											AutoHideScroll = false,
-											Template = "Holo_ScrollList",
-										},
+									Events = {
+										EditBoxReturn = OnSearch,
+										WindowLostFocus = OnSearchLostFocus,
 									},
 								},
-								-- Search Filter
-								{
---									BGColor = "aa000000",
-									Name = "Filters",
-									Border = true,
-									Picture = true,
-									Sprite = "BK3:UI_BK3_Holo_InsetDivider",
-									AnchorPoints = { 0, 0, 1, 0, },
-									AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, nHeightFilters },
-									Visible = false,
-									Children = {
-										-- Known Schematics
-										{
-											Name = "KnownSchematics",
-											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 8, 350, 30 },
-											Text = "Filter known Schematics",
-											Base = "HologramSprites:HoloCheckBoxBtn",
-											Font = kstrFont,
-										},
-										-- Rune Slots
-										{
-											Name = "RuneSlots",
-											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 38, 180, 60 },
-											Text = "Minimum Rune Slots",
-											Base = "HologramSprites:HoloCheckBoxBtn",
-											Font = kstrFont,
-										},
-										{
-											Class = "EditBox",
-											Name = "RuneSlotsAmount",
-											AnchorOffsets = { 180, 38, 350, 54 },
-											Text = "4",
-											DT_VCENTER = true,
-											DT_CENTER = true,
-											Font = kstrFont,
-										},
-										-- Maximum Price
-										{
-											Name = "MaxPrice",
-											WidgetType = "CheckBox",
-											AnchorOffsets = { 4, 68, 180, 90 },
-											Text = "Maximum Price",
-											Base = "HologramSprites:HoloCheckBoxBtn",
-											Font = kstrFont,
-										},
-										{
-											Class = "CashWindow",
-											Name = "MaxPriceAmount",
-											AnchorOffsets = { 180, 68, 350, 86 },
-											Amount = 10000,
-											DT_VCENTER = true,
-											DT_RIGHT = true,
-											Font = kstrFont,
-											AllowEditing = true,
-										},
-									},
-								},
-								-- Current Item (Buy/Bid)
-								{
-									Name = "CurrentItem",
-									Border = true,
-									Picture = true,
-									Sprite = "BK3:UI_BK3_Holo_InsetDivider",
-									AnchorPoints = { 0, 1, 1, 1, },
-									AnchorOffsets = { nWidthCategories + nPadding, -nHeightCurrentItem, 0, 0 },
-									Visible = false,
-									Children = {
-										{
-											AnchorPoints = { 0, 0, 1, 1, },
-											AnchorOffsets = { 0, 0, 0, 0 },
-											Children = {
-												-- Icon
-												{
-													Name = "IconContainer",
-													AnchorPoints = { 0, 0, 0, 1 },
-													AnchorOffsets = { 4, 4, nHeightCurrentItem - 8, -4 },
-													Picture = true,
-													Sprite = "ClientSprites:WhiteFill",
-													Events = {
-														MouseEnter = ShowItemTooltip,
-														MouseExit = HideItemTooltip,
-														MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
-													},
-													Children = {
-														{
-															Name = "IconBackground",
-															AnchorPoints = { 0, 0, 1, 1 },
-															AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
-															Picture = true,
-															BGColor = "black",
-															Sprite = "ClientSprites:WhiteFill",
-															Children = {
-																{
-																	Name = "Icon",
-																	AnchorPoints = { 0, 0, 1, 1 },
-																	AnchorOffsets = { 0, 0, 0, 0 },
-																	Picture = true,
-																	BGColor = "white",
-																	Children = {
-																		{
-																			Name = "Count",
-																			AnchorPoints = { 0, 0, 1, 1 },
-																			AnchorOffsets = { 0, 0, -2, -1 },
-																			DT_RIGHT = true,
-																			DT_BOTTOM = true,
-																			Font = "CRB_Interface9_O",
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-												-- Name
-												{
-													Name = "Name",
-													AnchorPoints = { 0, 0, 1, 1 },
-													AnchorOffsets = { nHeightCurrentItem - 2, 0, 0, 0 },
-													DT_VCENTER = true,
-													Font = kstrFont,
-													AutoScaleTextOff = true,
-												},
-												-- Bid
-												{
-													Class = "CashWindow",
-													Name = "Bid",
-													AnchorPoints = { 1, 0, 1, 1 },
-													AnchorOffsets = { -410, 0, -284, 0 },
-													DT_RIGHT = true,
-													DT_VCENTER = true,
-													Font = kstrFont,
-													AllowEditing = true,
-													Events = { CashWindowAmountChanged = OnChangeBidAmount },
-												},
-												{
-													Class = "ActionConfirmButton",
-													Name = "BtnBid",
-													AnchorPoints = { 1, 0, 1, 1 },
-													AnchorOffsets = { -284, nPadding, -204, -nPadding },
-													Base = "BK3:btnHolo_ListView_Mid",
-													Text = Apollo.GetString("MarketplaceAuction_BidBtn"),
-													DT_VCENTER = true,
-													DT_CENTER = true,
-													Font = kstrFont,
-												},
-												-- Buyout
-												{
-													Class = "MLWindow",
-													Name = "Price",
-													AnchorPoints = { 1, 0, 1, 1 },
-													AnchorOffsets = { -200, 12, -84, 0 },
-												},
-												{
-													Class = "ActionConfirmButton",
-													Name = "BtnBuyout",
-													AnchorPoints = { 1, 0, 1, 1 },
-													AnchorOffsets = { -80, nPadding, -nPadding, -nPadding },
-													Base = "BK3:btnHolo_ListView_Mid",
-													Text = Apollo.GetString("MarketplaceAuction_BuyoutHeader"),
-													DT_VCENTER = true,
-													DT_CENTER = true,
-													Font = kstrFont,
-												},
-											},
-										},
-									},
-								},
-								-- CONTENT
+							},
+						},
+						-- Button: Search
+						{
+							Class = "Button",
+							Name = "BtnSearch",
+							AnchorPoints = { 1, 0, 1, 1 },
+							AnchorOffsets = { 2 * (-nPadding - nWidthSearchButton), 0, 2 * -nPadding - nWidthSearchButton, -nPadding },
+							Base = "BK3:btnHolo_ListView_Mid",
+							Text = kstrSearch,
+							DT_VCENTER = true,
+							DT_CENTER = true,
+							Font = kstrFont,
+							Events = {
+								ButtonSignal = OnSearch,
+								MouseButtonUp = OnSearchButtonUp,
+							},
+						},
+						-- Button: Filters
+						{
+							Class = "Button",
+							AnchorPoints = { 1, 0, 1, 1 },
+							AnchorOffsets = { -nPadding - nWidthSearchButton, 0, -nPadding, -nPadding },
+							Base = "BK3:btnHolo_ListView_Mid",
+							Text = "Filters [+]",
+							ButtonType = "Check",
+							DT_VCENTER = true,
+							DT_CENTER = true,
+							Font = kstrFont,
+							Events = {
+								ButtonCheck = OnShowFilters,
+								ButtonUncheck = OnHideFilters,
 							},
 						},
 					},
 				},
+				-- Search Results
 				{
-					Name = "Backdrop",
-					AnchorPoints = { 0, 0, 1, 1 },
-					AnchorOffsets = { 0, 0, 0, 0 },
+					Name = "Message",
+					AnchorPoints = { 0, 0, 1, 0.5, },
+					AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
+					DT_VCENTER = true,
+					DT_CENTER = true,
+					Visible = false,
+					Font = kstrFont,
+				},
+				{
+					Name = "Results",
+					AnchorPoints = { 0, 0, 1, 1, },
+					AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
+					Children = {
+						-- Header
+						{
+							Name = "Header",
+							AnchorPoints = { 0, 0, 1, 0 },
+							AnchorOffsets = { 0, 0, -20, nHeightHeader },
+							Children = {}, -- Will be generated later.
+						},
+						-- Items
+						{
+							BGColor = "aa000000",
+							Name = "Grid",
+--											Border = false,
+							Picture = true,
+							Sprite = "ClientSprites:WhiteFill",
+							AnchorPoints = { 0, 0, 1, 1, },
+							AnchorOffsets = { 0, nHeightHeader + nPadding, 0, 0 },
+							VScroll = true,
+							AutoHideScroll = false,
+							Template = "Holo_ScrollList",
+						},
+					},
+				},
+				-- Search Filter
+				{
+--									BGColor = "aa000000",
+					Name = "Filters",
+					Border = true,
 					Picture = true,
-					Border = false,
-					Sprite = "sUI:HoloWindowBackdrop",
-					BGColor = "cc222326",
-					Children = {},
+					Sprite = "BK3:UI_BK3_Holo_InsetDivider",
+					AnchorPoints = { 0, 0, 1, 0, },
+					AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, nHeightFilters },
+					Visible = false,
+					Children = {
+						-- Known Schematics
+						{
+							Name = "KnownSchematics",
+							WidgetType = "CheckBox",
+							AnchorOffsets = { 4, 8, 350, 30 },
+							Text = "Filter known Schematics",
+							Base = "HologramSprites:HoloCheckBoxBtn",
+							Font = kstrFont,
+						},
+						-- Rune Slots
+						{
+							Name = "RuneSlots",
+							WidgetType = "CheckBox",
+							AnchorOffsets = { 4, 38, 180, 60 },
+							Text = "Minimum Rune Slots",
+							Base = "HologramSprites:HoloCheckBoxBtn",
+							Font = kstrFont,
+						},
+						{
+							Class = "EditBox",
+							Name = "RuneSlotsAmount",
+							AnchorOffsets = { 180, 38, 350, 54 },
+							Text = "4",
+							DT_VCENTER = true,
+							DT_CENTER = true,
+							Font = kstrFont,
+						},
+						-- Maximum Price
+						{
+							Name = "MaxPrice",
+							WidgetType = "CheckBox",
+							AnchorOffsets = { 4, 68, 180, 90 },
+							Text = "Maximum Price",
+							Base = "HologramSprites:HoloCheckBoxBtn",
+							Font = kstrFont,
+						},
+						{
+							Class = "CashWindow",
+							Name = "MaxPriceAmount",
+							AnchorOffsets = { 180, 68, 350, 86 },
+							Amount = 10000,
+							DT_VCENTER = true,
+							DT_RIGHT = true,
+							Font = kstrFont,
+							AllowEditing = true,
+						},
+					},
+				},
+				-- Current Item (Buy/Bid)
+				{
+					Name = "CurrentItem",
+					Border = true,
+					Picture = true,
+					Sprite = "BK3:UI_BK3_Holo_InsetDivider",
+					AnchorPoints = { 0, 1, 1, 1, },
+					AnchorOffsets = { nWidthCategories + nPadding, -nHeightCurrentItem, 0, 0 },
+					Visible = false,
+					Children = {
+						{
+							AnchorPoints = { 0, 0, 1, 1, },
+							AnchorOffsets = { 0, 0, 0, 0 },
+							Children = {
+								-- Icon
+								{
+									Name = "IconContainer",
+									AnchorPoints = { 0, 0, 0, 1 },
+									AnchorOffsets = { 4, 4, nHeightCurrentItem - 8, -4 },
+									Picture = true,
+									Sprite = "ClientSprites:WhiteFill",
+									Events = {
+										MouseEnter = ShowItemTooltip,
+										MouseExit = HideItemTooltip,
+										MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
+									},
+									Children = {
+										{
+											Name = "IconBackground",
+											AnchorPoints = { 0, 0, 1, 1 },
+											AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
+											Picture = true,
+											BGColor = "black",
+											Sprite = "ClientSprites:WhiteFill",
+											Children = {
+												{
+													Name = "Icon",
+													AnchorPoints = { 0, 0, 1, 1 },
+													AnchorOffsets = { 0, 0, 0, 0 },
+													Picture = true,
+													BGColor = "white",
+													Children = {
+														{
+															Name = "Count",
+															AnchorPoints = { 0, 0, 1, 1 },
+															AnchorOffsets = { 0, 0, -2, -1 },
+															DT_RIGHT = true,
+															DT_BOTTOM = true,
+															Font = "CRB_Interface9_O",
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								-- Name
+								{
+									Name = "Name",
+									AnchorPoints = { 0, 0, 1, 1 },
+									AnchorOffsets = { nHeightCurrentItem - 2, 0, 0, 0 },
+									DT_VCENTER = true,
+									Font = kstrFont,
+									AutoScaleTextOff = true,
+								},
+								-- Bid
+								{
+									Class = "CashWindow",
+									Name = "Bid",
+									AnchorPoints = { 1, 0, 1, 1 },
+									AnchorOffsets = { -410, 0, -284, 0 },
+									DT_RIGHT = true,
+									DT_VCENTER = true,
+									Font = kstrFont,
+									AllowEditing = true,
+									Events = { CashWindowAmountChanged = OnChangeBidAmount },
+								},
+								{
+									Class = "ActionConfirmButton",
+									Name = "BtnBid",
+									AnchorPoints = { 1, 0, 1, 1 },
+									AnchorOffsets = { -284, nPadding, -204, -nPadding },
+									Base = "BK3:btnHolo_ListView_Mid",
+									Text = Apollo.GetString("MarketplaceAuction_BidBtn"),
+									DT_VCENTER = true,
+									DT_CENTER = true,
+									Font = kstrFont,
+								},
+								-- Buyout
+								{
+									Class = "MLWindow",
+									Name = "Price",
+									AnchorPoints = { 1, 0, 1, 1 },
+									AnchorOffsets = { -200, 12, -84, 0 },
+								},
+								{
+									Class = "ActionConfirmButton",
+									Name = "BtnBuyout",
+									AnchorPoints = { 1, 0, 1, 1 },
+									AnchorOffsets = { -80, nPadding, -nPadding, -nPadding },
+									Base = "BK3:btnHolo_ListView_Mid",
+									Text = Apollo.GetString("MarketplaceAuction_BuyoutHeader"),
+									DT_VCENTER = true,
+									DT_CENTER = true,
+									Font = kstrFont,
+								},
+							},
+						},
+					},
 				},
 			},
-		}):GetInstance(self);
+		}):GetInstance(self, self.twndMain:GetTabContainer("browse"));
 
 self.wndTreeView = self.wndMain:FindChild("TreeView");
 pcall(function() OnTreeWindowLoad(self, self.wndTreeView, self.wndTreeView); end, Print)
