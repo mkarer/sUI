@@ -13,6 +13,7 @@ require "MarketplaceLib";
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:CreateSubmodule("AuctionHouse");
+M:SetDefaultModuleState(false);
 
 local log;
 local AccountItemLib, MarketplaceLib, Apollo = AccountItemLib, MarketplaceLib, Apollo;
@@ -76,6 +77,7 @@ function M:OnEnable()
 end
 
 function M:OnDisable()
+	self:DisableSubmodules();
 	log:debug("%s disabled.", self:GetName());
 end
 
@@ -111,10 +113,13 @@ function M:Open()
 		Apollo.RemoveEventHandler("PlayerCurrencyChanged", self.MarketplaceAuction);
 		Apollo.RemoveEventHandler("OwnedItemAuctions", self.MarketplaceAuction);
 	end
+
+	self:EnableSubmodules();
 end
 
 function M:Close()
 	Event_CancelAuctionhouse();
+	self:DisableSubmodules();
 	self:UnregisterEvent("ItemAuctionBidResult");
 	self:UnregisterEvent("PostItemAuctionResult");
 	self:UnregisterEvent("ItemAuctionWon");
