@@ -93,6 +93,7 @@ function M:Open()
 		self.tSearch = self.SearchLib:New();
 		self:SetSortOrder("Name", "ASC");
 		self:CreateWindow();
+		self:EnableSubmodules();
 		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionResult");
 		self:RegisterEvent("PostItemAuctionResult", "OnItemAuctionResult");
 		self:RegisterEvent("ItemAuctionWon", "OnItemAuctionWon");
@@ -113,8 +114,6 @@ function M:Open()
 		Apollo.RemoveEventHandler("PlayerCurrencyChanged", self.MarketplaceAuction);
 		Apollo.RemoveEventHandler("OwnedItemAuctions", self.MarketplaceAuction);
 	end
-
-	self:EnableSubmodules();
 end
 
 function M:Close()
