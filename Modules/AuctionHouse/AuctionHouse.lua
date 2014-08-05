@@ -136,6 +136,7 @@ function M:Close()
 	self.wndResultsGrid = nil;
 	self.wndCurrentItem = nil;
 	self.wndSelectedItem = nil;
+	self.wndTreeView = nil;
 	self.tFilter = nil;
 	self.tSelectedCategory = nil;
 	self.nSelectedFamily = nil;
