@@ -15,6 +15,17 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 -- Main Modules
 -----------------------------------------------------------------------------
 
+local function EnableModule(self)
+	local bEnabled = self:__Enable();
+	if (not bEnabled and self.OverrideGeminiAddonStatus and self.EnabledState and self.OnEnable) then
+		bEnabled = self:OnEnable();
+	end
+
+	return bEnabled;
+end
+
+-----------------------------------------------------------------------------
+
 local tModulePrototype = {
 	-- Forms
 	InitializeForms = function(self, strModulePath)
@@ -104,6 +115,8 @@ local tModulePrototype = {
 		module.InitializeForms = self.InitializeForms;
 		module.EnableSubmodules = self.EnableSubmodules;
 		module.DisableSubmodules = self.DisableSubmodules;
+		module.__Enable = module.Enable;
+		module.Enable = EnableModule;
 
 		return module;
 	end,
