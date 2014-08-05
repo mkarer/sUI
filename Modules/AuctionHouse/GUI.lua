@@ -81,7 +81,7 @@ function M:OnNodeSelected(strNode)
 end
 
 local function OnTreeWindowLoad(self, wndHandler, wndControl)
-	tTree = self.TreeView:New(wndControl, self);
+	tTree = self.TreeView:New(wndControl);
 
 	local nNodeIdRoot = tTree:AddNode("Auctions");
 	local nNodeIdSelected, nNodeIdSelectedCategory;
