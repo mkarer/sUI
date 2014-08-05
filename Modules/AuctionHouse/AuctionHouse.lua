@@ -209,7 +209,7 @@ function M:OnItemAuctionResult(strEvent, eResult, aucCurr)
 			self:UpdateAuction(aucCurr, bResultOk);
 --			self:RefreshResults();
 		end
-	elseif (strEvent == "ItemAuctionPostResult" and eResult == MarketplaceLib.AuctionPostResult.Ok) then
+	elseif (strEvent == "PostItemAuctionResult" and eResult == MarketplaceLib.AuctionPostResult.Ok) then
 		S:Print("OK");
 	end
 end
