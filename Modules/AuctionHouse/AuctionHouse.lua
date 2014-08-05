@@ -91,7 +91,8 @@ function M:Open()
 		self.tSearch = self.SearchLib:New();
 		self:SetSortOrder("Name", "ASC");
 		self:CreateWindow();
-		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionBidResult");
+		self:RegisterEvent("ItemAuctionBidResult", "OnItemAuctionResult");
+		self:RegisterEvent("PostItemAuctionResult", "OnItemAuctionResult");
 		self:RegisterEvent("ItemAuctionWon", "OnItemAuctionWon");
 		self:RegisterEvent("VarChange_FrameCount", "GridVisibleItemsCheck");
 		self:RegisterEvent("Sezz_AuctionHouse_SearchCompleted", "OnSearchCompleted");
@@ -115,6 +116,7 @@ end
 function M:Close()
 	Event_CancelAuctionhouse();
 	self:UnregisterEvent("ItemAuctionBidResult");
+	self:UnregisterEvent("PostItemAuctionResult");
 	self:UnregisterEvent("ItemAuctionWon");
 	self:UnregisterEvent("VarChange_FrameCount");
 	self:UnregisterEvent("Sezz_AuctionHouse_SearchCompleted");
@@ -161,36 +163,49 @@ function M:OnItemAuctionWon(event, aucCurr)
 	end
 end
 
-local ktBidResultStrings = {
-	[MarketplaceLib.AuctionPostResult.AlreadyHasBid] = Apollo.GetString("MarketplaceAuction_AlreadyBid"),
-	[MarketplaceLib.AuctionPostResult.BidTooHigh] = Apollo.GetString("MarketplaceAuction_BidHigherThanBuyout"),
-	[MarketplaceLib.AuctionPostResult.BidTooLow] = Apollo.GetString("MarketplaceAuction_BidTooLow"),
---	[MarketplaceLib.AuctionPostResult.CannotFillOrder] = 90,
-	[MarketplaceLib.AuctionPostResult.CommodityDisabled] = Apollo.GetString("MarketplaceAuction_CommodityDisabled"),
---	[MarketplaceLib.AuctionPostResult.DbFailure] = 5,
---	[MarketplaceLib.AuctionPostResult.Item_BadId] = 6,
---	[MarketplaceLib.AuctionPostResult.ItemAuctionDisabled] = 123,
-	[MarketplaceLib.AuctionPostResult.NotEnoughCash] = Apollo.GetString("MarketplaceCredd_NotEnoughCash"),
---	[MarketplaceLib.AuctionPostResult.NotEnoughToFillQuantity] = 19,
-	[MarketplaceLib.AuctionPostResult.NotFound] = Apollo.GetString("MarketplaceAuction_NotFound"),
---	[MarketplaceLib.AuctionPostResult.NotReady] = 89,
+local ktAuctionResultStrings = {
 --	[MarketplaceLib.AuctionPostResult.Ok] = 0,
-	[MarketplaceLib.AuctionPostResult.OrderTooBig] = Apollo.GetString("MarketplaceAuction_OrderTooBig"),
---	[MarketplaceLib.AuctionPostResult.OwnItem] = 98,
-	[MarketplaceLib.AuctionPostResult.TooManyOrders] = Apollo.GetString("MarketplaceAuction_MaxOrders"),
+	[MarketplaceLib.AuctionPostResult.NotEnoughToFillQuantity] 	= Apollo.GetString("GenericError_Vendor_NotEnoughToFillQuantity"),
+	[MarketplaceLib.AuctionPostResult.NotEnoughCash] 			= Apollo.GetString("GenericError_Vendor_NotEnoughCash"),
+	[MarketplaceLib.AuctionPostResult.NotReady] 				= Apollo.GetString("MarketplaceAuction_TechnicalDifficulties"), -- Correct error?
+	[MarketplaceLib.AuctionPostResult.CannotFillOrder] 			= Apollo.GetString("MarketplaceAuction_TechnicalDifficulties"),
+	[MarketplaceLib.AuctionPostResult.TooManyOrders] 			= Apollo.GetString("MarketplaceAuction_MaxOrders"),
+	[MarketplaceLib.AuctionPostResult.OrderTooBig] 				= Apollo.GetString("MarketplaceAuction_OrderTooBig"),
+	[MarketplaceLib.AuctionPostResult.NotFound] 				= Apollo.GetString("MarketplaceAuction_NotFound"),
+	[MarketplaceLib.AuctionPostResult.BidTooLow] 				= Apollo.GetString("MarketplaceAuction_BidTooLow"),
+	[MarketplaceLib.AuctionPostResult.BidTooHigh] 				= Apollo.GetString("MarketplaceAuction_BidTooHigh"),
+	[MarketplaceLib.AuctionPostResult.OwnItem] 					= Apollo.GetString("MarketplaceAuction_AlreadyBid"), -- Correct error?
+	[MarketplaceLib.AuctionPostResult.AlreadyHasBid] 			= Apollo.GetString("MarketplaceAuction_AlreadyBid"),
+	[MarketplaceLib.AuctionPostResult.ItemAuctionDisabled] 		= Apollo.GetString("MarketplaceAuction_AuctionDisabled"),
+	[MarketplaceLib.AuctionPostResult.CommodityDisabled] 		= Apollo.GetString("MarketplaceAuction_CommodityDisabled"),
+	[MarketplaceLib.AuctionPostResult.DbFailure] 				= Apollo.GetString("MarketplaceAuction_TechnicalDifficulties"),
 };
 
-function M:OnItemAuctionBidResult(event, eAuctionBidResult, aucCurr)
-	local bResultOk = (eAuctionBidResult == MarketplaceLib.AuctionPostResult.Ok);
-	local strMessage = bResultOk and String_GetWeaselString(Apollo.GetString("MarketplaceAuction_BidAccepted"), aucCurr:GetItem():GetName()) or (ktBidResultStrings[eAuctionBidResult] and ktBidResultStrings[eAuctionBidResult] or "MarketplaceLib.AuctionPostResult: "..eAuctionBidResult);
+function M:OnItemAuctionResult(strEvent, eResult, aucCurr)
+	local bResultOk = (eResult == MarketplaceLib.AuctionPostResult.Ok);
+	local strMessage;
+
+	if (eResult == MarketplaceLib.AuctionPostResult.Ok) then
+		if (strEvent == "ItemAuctionBidResult") then
+			strMessage = String_GetWeaselString(Apollo.GetString("MarketplaceAuction_BidAccepted"), aucCurr:GetItem():GetName());
+		elseif (strEvent == "PostItemAuctionResult") then
+			strMessage = String_GetWeaselString(Apollo.GetString("MarketplaceAuction_PostAccepted"), aucCurr:GetItem():GetName());
+		else
+			strMessage = "Invalid Auction Result Event: "..strEvent;
+		end
+	else
+		strMessage = (ktAuctionResultStrings[eResult] and ktAuctionResultStrings[eResult] or "MarketplaceLib.AuctionPostResult: "..eResult);
+	end
 
 	S:Print(strMessage);
 
-	if (bResultOk or eAuctionBidResult == MarketplaceLib.AuctionPostResult.NotFound) then
+	if (strEvent == "ItemAuctionBidResult" and (eResult == MarketplaceLib.AuctionPostResult.Ok or eResult == MarketplaceLib.AuctionPostResult.NotFound)) then
 		if ((self.wndSelectedItem and self.wndSelectedItem:GetData() and self.wndSelectedItem:GetData() == aucCurr) or self:IsAuctionVisible(aucCurr)) then
 			self:ClearSelection();
 			self:UpdateAuction(aucCurr, bResultOk);
 --			self:RefreshResults();
 		end
+	elseif (strEvent == "ItemAuctionPostResult" and eResult == MarketplaceLib.AuctionPostResult.Ok) then
+		S:Print("OK");
 	end
 end
