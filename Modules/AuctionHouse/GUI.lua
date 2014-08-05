@@ -654,7 +654,7 @@ function M:CreateWindow()
 									Class = "CashWindow",
 									Name = "Bid",
 									AnchorPoints = { 1, 0, 1, 1 },
-									AnchorOffsets = { -410, 0, -284, 0 },
+									AnchorOffsets = { -470, 0, -284, 0 },
 									DT_RIGHT = true,
 									DT_VCENTER = true,
 									Font = kstrFont,
@@ -697,8 +697,8 @@ function M:CreateWindow()
 			},
 		}):GetInstance(self, self.twndMain:GetTabContainer("browse"));
 
-self.wndTreeView = self.wndMain:FindChild("TreeView");
-pcall(function() OnTreeWindowLoad(self, self.wndTreeView, self.wndTreeView); end, Print)
+		self.wndTreeView = self.wndMain:FindChild("TreeView");
+		OnTreeWindowLoad(self, self.wndTreeView, self.wndTreeView);
 
 		self.wndSearch = self.wndMain:FindChild("Search");
 		self.wndFilters = self.wndMain:FindChild("Filters");
