@@ -91,10 +91,19 @@ local tModulePrototype = {
 			module:Enable();
 		end
 	end,
+	DisableSubmodules = function(self)
+		S.Log:debug("Disabling %s submodules...", self:GetName());
+
+		for name, module in self:IterateModules() do
+			S.Log:debug("Disabling %s submodule: %s", self:GetName(), name);
+			module:Disable();
+		end
+	end,
 	CreateSubmodule = function(self, name, ...)
 		local module = self:NewModule(name, "Gemini:Event-1.0", ...);
 		module.InitializeForms = self.InitializeForms;
 		module.EnableSubmodules = self.EnableSubmodules;
+		module.DisableSubmodules = self.DisableSubmodules;
 
 		return module;
 	end,
