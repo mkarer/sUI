@@ -82,13 +82,10 @@ end
 -----------------------------------------------------------------------------
 
 function M:ShowCallMissed()
-	log:debug("SHOW")
 	self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(true);
 end
 
 function M:HideCallMissed(event)
-	log:debug("HIDE");
-	log:debug(event);
 	self.tButtonContainer:GetButton("Datachron").wndMain:FindChild("Pulse"):Show(false);
 end
 
