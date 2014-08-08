@@ -25,11 +25,12 @@ local AccountItemLib, MarketplaceLib, Apollo = AccountItemLib, MarketplaceLib, A
 function M:OnInitialize()
 	log = S.Log;
 	self:EnableProfile();
+end
+
+function M:OnEnable()
+	log:debug("%s enabled.", self:GetName());
 
 	self.MarketplaceAuction = Apollo.GetAddon("MarketplaceAuction");
-	self.ItemPreviewImproved = Apollo.GetAddon("ItemPreviewImproved");
-	self.GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
-
 	if (not self.MarketplaceAuction) then
 		self:SetEnabledState(false);
 		return;
@@ -42,14 +43,12 @@ function M:OnInitialize()
 			self:Open();
 		end
 	end
-end
 
-function M:OnEnable()
-	log:debug("%s enabled.", self:GetName());
-	
 	Apollo.RegisterSlashCommand("ah", "Open", self);
 	Apollo.LoadSprites(Apollo.GetAssetFolder().."\\Modules\\AuctionHouse\\Media\\Icons.xml");
 
+	self.ItemPreviewImproved = Apollo.GetAddon("ItemPreviewImproved");
+	self.GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
 	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
 	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
 	self.TreeView = Apollo.GetPackage("Sezz:Controls:TreeView-0.1").tPackage;

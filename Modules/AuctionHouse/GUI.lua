@@ -141,7 +141,7 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 	local nNodeIdShoppingLists = tTree:AddNode("Shopping Lists");
 	tTree:CollapseNode(nNodeIdShoppingLists);
 	local tShoppingListsSorted = {};
-	for i, tList in ipairs(self.P.ShoppingList) do
+	for i, tList in ipairs(self.DB.ShoppingList) do
 		tinsert(tShoppingListsSorted, { i, tList.Name });
 		sort(tShoppingListsSorted, function(a, b) return a[2] < b[2]; end);
 	end
@@ -204,7 +204,7 @@ local function OnSearch(self)
 	elseif (self.strSelectedShoppingList) then
 		local nShoppingListIndex;
 
-		for i, tList in ipairs(self.P.ShoppingList) do
+		for i, tList in ipairs(self.DB.ShoppingList) do
 			if (tList.Name == self.strSelectedShoppingList) then
 				nShoppingListIndex = i;
 			end
@@ -214,7 +214,7 @@ local function OnSearch(self)
 
 		self:SetSearchState(true);
 		self:UpdateListHeaders();
-		self.tSearch:SetMultipleFilters(self.P.ShoppingList[nShoppingListIndex].Searches);
+		self.tSearch:SetMultipleFilters(self.DB.ShoppingList[nShoppingListIndex].Searches);
 		self:ClearSelection();
 		self.tAuctions = {};
 		self.wndResultsGrid:SetVScrollPos(0);

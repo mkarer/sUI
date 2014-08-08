@@ -66,12 +66,12 @@ end
 
 function M:RestoreProfile()
 	-- OnRestore > RestoreProfile > OnEnable
-	if (not self.P[knTypeDamage]) then
-		self.P[knTypeDamage] = {};
+	if (not self.DB[knTypeDamage]) then
+		self.DB[knTypeDamage] = {};
 	end
 
-	if (not self.P[knTypeHeal]) then
-		self.P[knTypeHeal] = {};
+	if (not self.DB[knTypeHeal]) then
+		self.DB[knTypeHeal] = {};
 	end
 end
 
@@ -106,17 +106,17 @@ end
 function M:HandleCombatData(eCombatResult, strSpell, nType, nAmount)
 	if (strSpell and nAmount > 0) then
 		local bNewRecord = true;
-		if (self.P[nType][strSpell] and self.P[nType][strSpell][eCombatResult]) then
+		if (self.DB[nType][strSpell] and self.DB[nType][strSpell][eCombatResult]) then
 			-- New record?
-			bNewRecord = (self.P[nType][strSpell][eCombatResult] < nAmount);
+			bNewRecord = (self.DB[nType][strSpell][eCombatResult] < nAmount);
 		end
 
 		if (bNewRecord) then
-			if (not self.P[nType][strSpell]) then
-				self.P[nType][strSpell] = {};
+			if (not self.DB[nType][strSpell]) then
+				self.DB[nType][strSpell] = {};
 			end
 			
-			self.P[nType][strSpell][eCombatResult] = nAmount;
+			self.DB[nType][strSpell][eCombatResult] = nAmount;
 			self:ShowSplash(strSpell, nAmount, eCombatResult == eCombatResultCrit);
 
 			log:debug("NEW RECORD!! %s %d", strSpell, nAmount);

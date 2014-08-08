@@ -36,7 +36,7 @@ end
 
 function M:OnPostItemAuctionResult(strEvent, eResult, aucCurr)
 	if (strEvent == "PostItemAuctionResult" and eResult == MarketplaceLib.AuctionPostResult.Ok) then
-		AuctionHouse.P.ItemPrices[aucCurr:GetItem():GetItemId()] = {
+		AuctionHouse.DB.ItemPrices[aucCurr:GetItem():GetItemId()] = {
 			aucCurr:GetMinBid():GetAmount(),
 			aucCurr:GetBuyoutPrice():GetAmount(),
 		};
@@ -105,8 +105,8 @@ function tTabEventsHandler:SetItem(itemCurr)
 		local nVendorPrice = itemCurr:GetSellPrice() and itemCurr:GetSellPrice():GetAmount() or 0;
 		local nItemId = itemCurr:GetItemId();
 
-		local nBid = AuctionHouse.P.ItemPrices[nItemId] and AuctionHouse.P.ItemPrices[nItemId][1] or nVendorPrice;
-		local nBuyout = AuctionHouse.P.ItemPrices[nItemId] and AuctionHouse.P.ItemPrices[nItemId][2] or nVendorPrice + 1;
+		local nBid = AuctionHouse.DB.ItemPrices[nItemId] and AuctionHouse.DB.ItemPrices[nItemId][1] or nVendorPrice;
+		local nBuyout = AuctionHouse.DB.ItemPrices[nItemId] and AuctionHouse.DB.ItemPrices[nItemId][2] or nVendorPrice + 1;
 
 		if (nBid < nVendorPrice) then
 			nBid = nVendorPrice;

@@ -17,14 +17,15 @@ S.Profile = {
 };
 
 function S:OnSave(eLevel)
-	if (S.Profile[eLevel]) then
-		return S.Profile[eLevel];
+	if (self.Profile[eLevel]) then
+		return self.Profile[eLevel];
 	end
 end
 
 function S:OnRestore(eLevel, tSavedData)
-	if (S.Profile[eLevel]) then
-		S.Profile[eLevel] = tSavedData or {};
+	if (self.Profile[eLevel]) then
+		self.Profile[eLevel] = tSavedData or {};
+		self.bVariablesLoaded = true;
 		self:RaiseEvent("Sezz_VariablesLoaded", eLevel);
 	end
 end

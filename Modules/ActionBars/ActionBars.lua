@@ -26,15 +26,10 @@ local log;
 function M:OnInitialize()
 	log = S.Log;
 	self:InitializeForms();
+	self:EnableProfile();
 
 	-- Configuration
 	self.nShortcutBars = (ActionSetLib.ShortcutSet and ActionSetLib.ShortcutSet.Count) or (ActionSetLib.CodeEnumShortcutSet and ActionSetLib.CodeEnumShortcutSet.Count) or 9;
-	self.DB = {
-		buttonSize = 36,
-		buttonPadding = 2,
-		barPadding = 10, -- Menu needs atleast 10 because the toggle is ignored by ContainsMouse()
-	};
-
 	self.tAbilityQuickSwitch = {
 		-- Stalker
 		[23218] = 23161,
@@ -53,7 +48,6 @@ function M:OnInitialize()
 	};
 
 	self.tBars = {};
-	self:EnableProfile();
 
 	-- System Menu
 	self:RegisterAddonLoadedCallback("InterfaceMenuList", "EnableMainMenuFading");
@@ -89,18 +83,18 @@ function M:OnShowActionBarShortcut(event, nBar, bIsVisible, nShortcuts)
 
 	log:debug("ShowActionBarShortcut: Bar %d %s (%d)", nBar, bIsVisible and "SHOW" or "HIDE", nShortcuts);
 
-	if (self.P.CurrentShortcutBar and not bIsVisible and self.P.CurrentShortcutBar == nBar) then
+	if (self.DB.CurrentShortcutBar and not bIsVisible and self.DB.CurrentShortcutBar == nBar) then
 		-- Hiding the previously active bar
 		log:debug("Hiding the previously active bar");
 		if (self.tBars["Shortcut"..nBar]) then
 			self.tBars["Shortcut"..nBar].wndMain:Show(false, true);
 		end
 
-		self.P.CurrentShortcutBar = nil;
+		self.DB.CurrentShortcutBar = nil;
 	end
 
 	if (bIsVisible) then
-		self.P["CurrentShortcutBar"] = nBar;
+		self.DB["CurrentShortcutBar"] = nBar;
 		self:SetActiveShortcutBar(nBar, nShortcuts);
 	end
 end
@@ -112,7 +106,7 @@ function M:SetActiveShortcutBar(nActiveBarId, nShortcuts)
 		if (tBar) then
 			if (bShowBar) then
 				-- Save active bar number
-				self.P["CurrentShortcutBar"] = i;
+				self.DB["CurrentShortcutBar"] = i;
 
 				-- Resize (show only active buttons)
 				local nActiveButtons = nShortcuts or 0;
@@ -153,8 +147,8 @@ end
 
 function M:RestoreProfile()
 	if (S.myCharacter) then
-		GameLib.SetShortcutMount(self.P.SelectedMount or 0);
-		GameLib.SetShortcutPotion(self.P.SelectedPotion or 0);
+		GameLib.SetShortcutMount(self.DB.SelectedMount or 0);
+		GameLib.SetShortcutPotion(self.DB.SelectedPotion or 0);
 	end
 end
 
@@ -167,7 +161,7 @@ function M:CheckMountShortcut()
 			local nSpellId = tMountList[1].tTiers[1].splObject:GetId();
 
 			log:debug("Setting mount to: "..nSpellId);
-			self.P["SelectedMount"] = nSpellId;
+			self.DB["SelectedMount"] = nSpellId;
 			GameLib.SetShortcutMount(nSpellId);
 		end
 	end
@@ -182,7 +176,7 @@ function M:CheckPotionShortcut()
 			local nPotionId = tPotions[1].itemInBag:GetItemId();
 
 			log:debug("Setting potion to: "..nPotionId);
-			self.P["SelectedPotion"] = nPotionId;
+			self.DB["SelectedPotion"] = nPotionId;
 			GameLib.SetShortcutPotion(nPotionId);
 		end
 	end
@@ -286,10 +280,10 @@ function M:SetupActionBars()
 		self.tBars[barShortcut.strName] = barShortcut;
 	end
 
-	if (self.P.CurrentShortcutBar) then
+	if (self.DB.CurrentShortcutBar) then
 		-- Show last active bar
-		log:debug("Enabled Shortcut Bar: "..self.P.CurrentShortcutBar);
-		self:SetActiveShortcutBar(self.P.CurrentShortcutBar);
+		log:debug("Enabled Shortcut Bar: "..self.DB.CurrentShortcutBar);
+		self:SetActiveShortcutBar(self.DB.CurrentShortcutBar);
 	end
 
 	-----------------------------------------------------------------------------

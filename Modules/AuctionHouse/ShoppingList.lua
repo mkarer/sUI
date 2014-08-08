@@ -37,11 +37,11 @@ local M = S:GetModule("AuctionHouse");
 -----------------------------------------------------------------------------
 
 function M:RestoreProfile()
-	if (not self.P.ItemPrices) then
-		self.P.ItemPrices = {};
+	if (not self.DB.ItemPrices) then
+		self.DB.ItemPrices = {};
 	end
 
-	self.P.ShoppingList = {
+	self.DB.ShoppingList = {
 		{
 			Name = "BoE Pre-Raid Gear",
 			Searches = {

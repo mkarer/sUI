@@ -58,7 +58,7 @@ end
 function M:OnEnable()
 	Apollo.RegisterEventHandler("SystemKeyDown", "OnSystemKeyDown", self);
 
-	if (not self.P.Volume) then
+	if (not self.DB.Volume) then
 		self:RestoreProfile();
 	end
 end
@@ -68,8 +68,8 @@ function M:OnDisable()
 end
 
 function M:RestoreProfile()
-	if (not self.P.Volume or self.P.Volume <= 0 or self.P.Volume > 1) then
-		self.P.Volume = tonumber(Apollo.GetConsoleVariable("sound.volumeMaster")) or 1;
+	if (not self.DB.Volume or self.DB.Volume <= 0 or self.DB.Volume > 1) then
+		self.DB.Volume = tonumber(Apollo.GetConsoleVariable("sound.volumeMaster")) or 1;
 	end
 end
 
@@ -87,10 +87,10 @@ function M:ToggleSound()
 
 	if (fCurrentVolume == 0) then
 		tParams.strText = "Sound enabled.";
-		Apollo.SetConsoleVariable("sound.volumeMaster", self.P.Volume);
+		Apollo.SetConsoleVariable("sound.volumeMaster", self.DB.Volume);
 	else
 		tParams.strText = "Sound disabled.";
-		self.P.Volume = fCurrentVolume;
+		self.DB.Volume = fCurrentVolume;
 		Apollo.SetConsoleVariable("sound.volumeMaster", 0);
 	end
 

@@ -35,6 +35,17 @@ S.DB = {
 		AutoLootMail = {
 			bEnabled = true,
 		},
+		AuctionHouse = {
+			bEnabled = true,
+		},
+		-- Crit Line
+		CritLine = {},
+		-- Action Bars
+		ActionBars = {
+			buttonSize = 36,
+			buttonPadding = 2,
+			barPadding = 10, -- Menu needs atleast 10 because the toggle is ignored by ContainsMouse()
+		},
 	},
 
 	-- Hide Windows from Window Management
@@ -49,7 +60,7 @@ S.DB = {
 	-- Module Debugging
 	-- Disable to filter the messages in GeminiConsole
 	["debug"] = {
-		["Modules"] = false,			-- Module Prototype
+--		["Modules"] = false,			-- Module Prototype
 		["Modules/Chat"] = false,		-- Chat Module
 		["Modules/Automation"] = false,	-- Automation Module
 --		["Modules/MiniMap"] = false,	-- Minimap Module
