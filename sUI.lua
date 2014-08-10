@@ -24,6 +24,9 @@ local ktDependencies = {
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, true, ktDependencies, "Gemini:Hook-1.0", "Gemini:Event-1.0", "Gemini:Timer-1.0");
 local log;
 
+-- Lua API
+local strfind, gsub, strmatch, strsub = string.find, string.gsub, string.match, string.sub;
+
 -----------------------------------------------------------------------------------------------
 -- Initialization
 -----------------------------------------------------------------------------------------------
@@ -34,10 +37,11 @@ local function logDebug(self, ...)
 	end
 
 	-- Debugging Filter	
+	
 	local debugInfo = debug.getinfo(2);
-	local caller = string.gsub(debugInfo.short_src, "\\", "/");
-	local pathRootIndex = caller:find("Addons/sUI/") + 11;
-	local dir, file, ext = string.match(caller:sub(pathRootIndex), "(.-)([^/]-([^%.]+))$");
+	local caller = gsub(debugInfo.source, "\\", "/");
+	local pathRootIndex = strfind(caller, "/Addons/sUI/") ~= nil and (strfind(caller, "/Addons/sUI/") + 12) or (strfind(caller, "/Addons/") + 8);
+	local dir, file, ext = strmatch(strsub(caller, pathRootIndex), "(.-)([^/]-([^%.]+))$");
 	dir = dir:sub(1, -2);
 	file = string.gsub(file, "."..ext, "");
 
