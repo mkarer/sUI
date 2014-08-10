@@ -17,7 +17,7 @@ local M = AuctionHouse:CreateSubmodule("Sell");
 M.OverrideGeminiAddonStatus = true;
 
 -- Lua API
-local ipairs = ipairs;
+local pairs, ipairs, tinsert, tremove = pairs, ipairs, table.insert, table.remove;
 
 -----------------------------------------------------------------------------
 
@@ -27,15 +27,40 @@ end
 
 function M:OnEnable()
 	self:RegisterEvent("PostItemAuctionResult", "OnPostItemAuctionResult");
+	self:RegisterEvent("UpdateInventory", "OnUpdateInventory");
 end
 
 function M:OnDisable()
+	self:UnregisterEvent("UpdateInventory");
 	self:UnregisterEvent("PostItemAuctionResult");
+
+	self.tvwAuctionableItems = nil;
+	self.wndContent = nil;
+end
+
+function M:CreateTab(wndParent)
+	self.wndContent = AuctionHouse.GeminiGUI:Create(self.tWindowDefinitions):GetInstance(self, wndParent);
+
+	-- Initialize Tree
+	self.tvwAuctionableItems = AuctionHouse.TreeView:New(self.wndContent:FindChild("TreeView"));
+	self.strNodeAuctionableItems = self.tvwAuctionableItems:AddNode(AuctionHouse.L.AuctionableItems);
+
+	for _, itemCurr in ipairs(S.myCharacter:GetAuctionableItems()) do
+		if (itemCurr and itemCurr:IsAuctionable()) then
+			self.tvwAuctionableItems:AddChildNode(self.strNodeAuctionableItems, itemCurr:GetName(), itemCurr:GetIcon(), itemCurr);
+		end
+	end
+
+	self.tvwAuctionableItems:RegisterCallback("NodeSelected", "OnAuctionableItemSelected", self);
+	self.tvwAuctionableItems:Render();
 end
 
 -----------------------------------------------------------------------------
+-- Events
+-----------------------------------------------------------------------------
 
 function M:OnPostItemAuctionResult(strEvent, eResult, aucCurr)
+	-- Remember Price
 	if (strEvent == "PostItemAuctionResult" and eResult == MarketplaceLib.AuctionPostResult.Ok) then
 		AuctionHouse.DB.ItemPrices[aucCurr:GetItem():GetItemId()] = {
 			aucCurr:GetMinBid():GetAmount(),
@@ -44,15 +69,8 @@ function M:OnPostItemAuctionResult(strEvent, eResult, aucCurr)
 	end
 end
 
------------------------------------------------------------------------------
--- Sell Tab
------------------------------------------------------------------------------
-
-local tvwSellableItems, wndContent;
-local tTabEventsHandler = {};
-
-function tTabEventsHandler:OnChangeBidAmount()
-	local wndForm = wndContent:FindChild("ListItemForm");
+function M:OnChangeBidAmount()
+	local wndForm = self.wndContent:FindChild("ListItemForm");
 	local wndListItemButton = wndForm:FindChild("BtnListItem");
 	local itemCurr = wndForm:GetData();
 
@@ -76,8 +94,43 @@ function tTabEventsHandler:OnChangeBidAmount()
 	end
 end
 
-function tTabEventsHandler:SetItem(itemCurr)
-	local wndForm = wndContent:FindChild("ListItemForm");
+function M:OnUpdateInventory()
+	local tItemsRemoved = {};
+	local tItemsNew = S.myCharacter:GetAuctionableItems() or {};
+
+	for _, tNode in self.tvwAuctionableItems:IterateNodes(self.strNodeAuctionableItems) do
+		local itemCurr = tNode.tData;
+
+		if (itemCurr) then
+			local bFound = false;
+			for i, itemAuctionable in ipairs(tItemsNew) do
+				if (itemAuctionable == itemCurr) then
+					tremove(tItemsNew, i);
+					bFound = true;
+					break;
+				end
+			end
+
+			if (not bFound) then
+				tinsert(tItemsRemoved, itemCurr);
+				self.tvwAuctionableItems:RemoveNode(tNode.strName, true)
+			end
+		end
+	end
+
+	for _, itemNew in ipairs(tItemsNew) do
+		self.tvwAuctionableItems:AddChildNode(self.strNodeAuctionableItems, itemNew:GetName(), itemNew:GetIcon(), itemNew);
+	end
+
+	if (#tItemsNew > 0 or #tItemsRemoved > 0) then
+		self.tvwAuctionableItems:Render();
+	end
+end
+
+-----------------------------------------------------------------------------
+
+function M:SetItem(itemCurr)
+	local wndForm = self.wndContent:FindChild("ListItemForm");
 	wndForm:SetData(itemCurr);
 	wndForm:FindChild("BtnListItem"):SetData(itemCurr);
 
@@ -115,27 +168,14 @@ function tTabEventsHandler:SetItem(itemCurr)
 	self:OnChangeBidAmount();
 end
 
-function tTabEventsHandler:OnAuctionableItemSelected(strNode)
-	self:SetItem(tvwSellableItems:GetNodeData(strNode));
+function M:OnAuctionableItemSelected(strNode)
+	self:SetItem(self.tvwAuctionableItems:GetNodeData(strNode));
 end
 
 -----------------------------------------------------------------------------
 
 local function CreateTab(self, wndParent)
-	wndContent = self.GeminiGUI:Create(M.tWindowDefinitions):GetInstance(tTabEventsHandler, wndParent);
-
-	-- Initialize Tree
-	tvwSellableItems = self.TreeView:New(wndContent:FindChild("TreeView"));
-	local strNodeSellableItems = tvwSellableItems:AddNode("Sellable Items");
-
-	for _, itemCurr in ipairs(S.myCharacter:GetAuctionableItems()) do
-		if (itemCurr and itemCurr:IsAuctionable()) then
-			tvwSellableItems:AddChildNode(strNodeSellableItems, itemCurr:GetName(), itemCurr:GetIcon(), itemCurr);
-		end
-	end
-
-	tvwSellableItems:RegisterCallback("NodeSelected", "OnAuctionableItemSelected", tTabEventsHandler);
-	tvwSellableItems:Render();
+	return M:CreateTab(wndParent);
 end
 
 AuctionHouse:RegisterTab("sell", "Sell", "FAGavel", CreateTab, 1);
