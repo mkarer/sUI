@@ -13,6 +13,34 @@ local M = AuctionHouse:GetModule("Sell");
 
 -----------------------------------------------------------------------------
 
+local function ShowItemTooltip(self, wndHandler, wndControl) -- Build on mouse enter and not every hit to save computation time
+	if (wndHandler ~= wndControl) then return; end
+	local itemCurr = wndControl:GetParent():GetData();
+	if (not itemCurr) then return; end
+	Tooltip.GetItemTooltipForm(self, wndControl, itemCurr, { bPrimary = true, bSelling = false, itemModData = nil, itemCompare = itemCurr:GetEquippedItemForItemType() });
+end
+
+local function HideItemTooltip(self, wndHandler, wndControl)
+	if (wndHandler ~= wndControl) then return; end
+	wndControl:SetTooltipDoc(nil);
+end
+
+local function ShowItemPreview(self, wndHandler, wndControl, eMouseButton)
+	if (wndHandler ~= wndControl) then return; end
+	local itemCurr = wndControl:GetParent():GetData();
+	if (not itemCurr) then return; end
+
+	if (Apollo.IsControlKeyDown() and eMouseButton == GameLib.CodeEnumInputMouse.Right) then
+		if (itemCurr:GetHousingDecorInfoId() ~= nil and itemCurr:GetHousingDecorInfoId() ~= 0) then
+			Event_FireGenericEvent("DecorPreviewOpen", itemCurr:GetHousingDecorInfoId());
+		else
+			self.ItemPreviewImproved:OnShowItemInDressingRoom(itemCurr);
+		end
+	end
+end
+
+-----------------------------------------------------------------------------
+
 function M:InitializeWindowDefinitions()
 	if (self.tWindowDefinitions) then return; end
 
@@ -70,11 +98,11 @@ function M:InitializeWindowDefinitions()
 						AnchorOffsets = { 20, 20, AuctionHouse.GUI.nIconSizeBig + 2 * AuctionHouse.GUI.nIconBorderBig + 20, AuctionHouse.GUI.nIconSizeBig + 2 * AuctionHouse.GUI.nIconBorderBig + 20 },
 						Picture = true,
 						Sprite = "ClientSprites:WhiteFill",
-	--					Events = {
-	--						MouseEnter = ShowItemTooltip,
-	--						MouseExit = HideItemTooltip,
-	--						MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
-	--					},
+						Events = {
+							MouseEnter = ShowItemTooltip,
+							MouseExit = HideItemTooltip,
+							MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
+						},
 						Children = {
 							-- Icon
 							{
