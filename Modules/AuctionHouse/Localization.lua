@@ -34,6 +34,7 @@ AuctionHouse.L = {
 	NoResults = Apollo.GetString("Tradeskills_NoResults"),
 	Searching = Apollo.GetString("MarketplaceAuction_FetchingResults").."...",
 	ErrorTryClearingFilters = Apollo.GetString("MarketplaceAuction_TryClearingFilter"),
+	AuctionableItems = "Auctionable Items",
 	AuctionResultStrings = {
 --		[MarketplaceLib.AuctionPostResult.Ok] = 0,
 		[MarketplaceLib.AuctionPostResult.NotEnoughToFillQuantity] 	= Apollo.GetString("GenericError_Vendor_NotEnoughToFillQuantity"),
