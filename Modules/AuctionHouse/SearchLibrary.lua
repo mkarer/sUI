@@ -295,7 +295,7 @@ function Search:RequestAuctions(nPage, bForceRequest)
 
 	if (tSearchInfo.strSearchQuery) then
 		-- Exit early if too many items in the search
-		local tPackagedData = {};
+		local tPackagedData = {}; -- Table containing Item IDs
 		for _, tData in pairs(MarketplaceLib.SearchAuctionableItems(tSearchInfo.strSearchQuery, tSearchInfo.nFamilyId or 0, tSearchInfo.nCategoryId or 0, tSearchInfo.nTypeId or 0)) do
 			if (#tPackagedData > MarketplaceLib.kAuctionSearchMaxIds) then
 				break;
