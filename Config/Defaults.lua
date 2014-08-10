@@ -37,6 +37,9 @@ S.DB = {
 		},
 		AuctionHouse = {
 			bEnabled = true,
+			-- GUI
+			strFont = "CRB_Pixel", -- Nameplates
+			strFontLarge = "CRB_ButtonHeader",
 		},
 		-- Crit Line
 		CritLine = {},

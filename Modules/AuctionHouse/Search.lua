@@ -17,10 +17,6 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 -- Search
 -----------------------------------------------------------------------------
 
-local kstrNoResults = Apollo.GetString("Tradeskills_NoResults");
-local kstrSearching = Apollo.GetString("MarketplaceAuction_FetchingResults").."...";
-local kstrTryClearingFilter = Apollo.GetString("MarketplaceAuction_TryClearingFilter");
-
 function M:RefreshResults()
 	if (not self.bIsSearching and self.tAuctions and self.tFilter) then
 		self:SetSearchState(true);
@@ -39,7 +35,7 @@ function M:SetSearchState(bSearching)
 	self.bIsSearching = bSearching;
 	self.wndSearch:FindChild("BtnSearch"):Enable(not bSearching);
 	if (bSearching) then
-		self:SetStatusMessage(kstrSearching);
+		self:SetStatusMessage(self.L.Searching);
 	else
 		self:SetStatusMessage();
 	end
@@ -106,9 +102,9 @@ function M:DisplaySearchResults()
 	self:SortResults();
 
 	if (nTotalResults == 0) then
-		self:SetStatusMessage(kstrNoResults, true);
+		self:SetStatusMessage(self.L.NoResults, true);
 	elseif (nResultsFiltered == nTotalResults) then
-		self:SetStatusMessage(kstrNoResults .. " " .. nResultsFiltered .. " result"..(nResultsFiltered ~= 1 and "s" or "").." filtered." .. "\n" .. kstrTryClearingFilter, true);
+		self:SetStatusMessage(self.L.NoResults .. " " .. nResultsFiltered .. " result"..(nResultsFiltered ~= 1 and "s" or "").." filtered." .. "\n" .. self.L.ErrorTryClearingFilters, true);
 	end
 end
 

@@ -20,4 +20,4 @@ local function CreateTab(self, wndParent)
 	wndParent:SetStyle("Picture", true);
 end
 
-M:RegisterTab("history", "History", "FAHistory", CreateTab, 3);
+M:RegisterTab("history", "History", "FAHistory", CreateTab, 2);

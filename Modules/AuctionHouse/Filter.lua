@@ -17,8 +17,6 @@ local Apollo, MarketplaceLib = Apollo, MarketplaceLib;
 -- Filters
 -----------------------------------------------------------------------------
 
-local strSearchLocalized = Apollo.GetString("CRB_Search");
-
 local EscapePattern
 do
 	local tMatches = {
@@ -98,7 +96,7 @@ function M:GetCurrentFilter()
 
 	-- Search String
 	local strSearchQuery = self.wndMain:FindChild("Search"):FindChild("Text"):GetText();
-	if (strlen(strSearchQuery) == 0 or strSearchQuery == strSearchLocalized) then
+	if (strlen(strSearchQuery) == 0 or strSearchQuery == self.L.Search) then
 		strSearchQuery = nil;
 	end
 

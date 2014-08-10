@@ -115,6 +115,7 @@
 	<Script Name="Modules\ProcBar\Anchor.lua" />
 	<!-- Auction House -->
 	<Script Name="Modules\AuctionHouse\AuctionHouse.lua" />
+	<Script Name="Modules\AuctionHouse\Localization.lua" />
 	<Script Name="Modules\AuctionHouse\Utils.lua" />
 	<Script Name="Modules\AuctionHouse\GUI.lua" />
 	<Script Name="Modules\AuctionHouse\Filter.lua" />
@@ -123,9 +124,10 @@
 	<Script Name="Modules\AuctionHouse\ShoppingList.lua" />
 	<Script Name="Modules\AuctionHouse\ContextMenu.lua" />
 	<Script Name="Modules\AuctionHouse\GUI\Tabs.lua" />
-	<Script Name="Modules\AuctionHouse\GUI\TabSell.lua" />
 	<Script Name="Modules\AuctionHouse\GUI\TabHistory.lua" />
 	<Script Name="Modules\AuctionHouse\GUI\TabSettings.lua" />
+	<Script Name="Modules\AuctionHouse\Modules\Sell\Core.lua" />
+	<Script Name="Modules\AuctionHouse\Modules\Sell\WindowDefinitions.lua" />
 	<!-- Auction House (Carbine) -->
 	<Script Name="Modules\AuctionHouse\HighlightKnown.lua" />
 	<Script Name="Modules\AuctionHouse\AutoLootMail.lua" />

@@ -15,8 +15,6 @@ local Apollo = Apollo;
 
 -----------------------------------------------------------------------------
 
-local kstrFont = "CRB_Pixel"; -- TODO, also defined in GUI.lua
-
 -----------------------------------------------------------------------------
 -- Cash Pixie
 -----------------------------------------------------------------------------
@@ -34,20 +32,24 @@ local strColorDarkGold		= "ff826e03";
 local strColorDarkPlatin	= "ff828282";
 
 -- When using CRB_Pixel they all share the same width, will leave the calculcations here, they shouldn't be too much impact on performance.
-local nWidthCopper		= Apollo.GetTextWidth(kstrFont, "c");
-local nWidthSilver		= Apollo.GetTextWidth(kstrFont, "s");
-local nWidthGold		= Apollo.GetTextWidth(kstrFont, "g");
-local nWidthPlatin		= Apollo.GetTextWidth(kstrFont, "p");
-local nWidthSpace		= Apollo.GetTextWidth(kstrFont, " ");
-local nWidthNumbers		= Apollo.GetTextWidth(kstrFont, "88");
-
-local nPosSilver		= nWidthNumbers + nWidthSpace + nWidthCopper;
-local nPosGold			= nPosSilver + nWidthSilver + nWidthNumbers + nWidthSpace;
-local nPosPlatin		= nPosGold + nWidthGold + nWidthNumbers + nWidthSpace;
+local nWidthCopper, nWidthSilver, nWidthGold, nWidthPlatin, nWidthSpace, nWidthNumbers, nPosSilver, nPosGold, nPosPlatin;
 
 function M:CreateCashPixie(nAmount, bDarken)
 	local nPlatin, nGold, nSilver, nCopper = floor(nAmount / 1000000), floor(mod(nAmount / 10000, 100)), floor(mod(nAmount / 100, 100)), mod(nAmount, 100);
 	local tPixies = {};
+
+	-- Calculate Font Width
+	if (not nWidthCopper) then
+		nWidthCopper	= Apollo.GetTextWidth(self.DB.strFont, "c");
+		nWidthSilver	= Apollo.GetTextWidth(self.DB.strFont, "s");
+		nWidthGold		= Apollo.GetTextWidth(self.DB.strFont, "g");
+		nWidthPlatin	= Apollo.GetTextWidth(self.DB.strFont, "p");
+		nWidthSpace		= Apollo.GetTextWidth(self.DB.strFont, " ");
+		nWidthNumbers	= Apollo.GetTextWidth(self.DB.strFont, "88");
+		nPosSilver		= nWidthNumbers + nWidthSpace + nWidthCopper;
+		nPosGold		= nPosSilver + nWidthSilver + nWidthNumbers + nWidthSpace;
+		nPosPlatin		= nPosGold + nWidthGold + nWidthNumbers + nWidthSpace;
+	end
 
 	-- Platin
 	if (nPlatin > 0) then
@@ -58,7 +60,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 			},
 			strText = tostring(nPlatin),
 			crText = bDarken and strColorDarkAmount or strColorAmount,
-			strFont = kstrFont,
+			strFont = self.DB.strFont,
 			flagsText = {
 				DT_RIGHT = true,
 				DT_VCENTER = true,
@@ -72,7 +74,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 			},
 			strText = "p",
 			crText = bDarken and strColorDarkPlatin or strColorPlatin,
-			strFont = kstrFont,
+			strFont = self.DB.strFont,
 			flagsText = {
 				DT_RIGHT = true,
 				DT_VCENTER = true,
@@ -89,7 +91,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 			},
 			strText = tostring(#tPixies > 0 and format("%02d", nGold) or nGold),
 			crText = bDarken and strColorDarkAmount or strColorAmount,
-			strFont = kstrFont,
+			strFont = self.DB.strFont,
 			flagsText = {
 				DT_RIGHT = true,
 				DT_VCENTER = true,
@@ -103,7 +105,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 			},
 			strText = "g",
 			crText = bDarken and strColorDarkGold or strColorGold,
-			strFont = kstrFont,
+			strFont = self.DB.strFont,
 			flagsText = {
 				DT_RIGHT = true,
 				DT_VCENTER = true,
@@ -120,7 +122,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 			},
 			strText = tostring(#tPixies > 0 and format("%02d", nSilver) or nSilver),
 			crText = bDarken and strColorDarkAmount or strColorAmount,
-			strFont = kstrFont,
+			strFont = self.DB.strFont,
 			flagsText = {
 				DT_RIGHT = true,
 				DT_VCENTER = true,
@@ -134,7 +136,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 			},
 			strText = "s",
 			crText = bDarken and strColorDarkSilver or strColorSilver,
-			strFont = kstrFont,
+			strFont = self.DB.strFont,
 			flagsText = {
 				DT_RIGHT = true,
 				DT_VCENTER = true,
@@ -150,7 +152,7 @@ function M:CreateCashPixie(nAmount, bDarken)
 		},
 		strText = tostring(#tPixies > 0 and format("%02d", nCopper) or nCopper),
 		crText = bDarken and strColorDarkAmount or strColorAmount,
-		strFont = kstrFont,
+		strFont = self.DB.strFont,
 		flagsText = {
 			DT_RIGHT = true,
 			DT_VCENTER = true,
@@ -164,14 +166,12 @@ function M:CreateCashPixie(nAmount, bDarken)
 		},
 		strText = "c",
 		crText = bDarken and strColorDarkCopper or strColorCopper,
-		strFont = kstrFont,
+		strFont = self.DB.strFont,
 		flagsText = {
 			DT_RIGHT = true,
 			DT_VCENTER = true,
 		},
 	});
-
-SendVarToRover("bla", tPixies);
 
 	return tPixies;
 end

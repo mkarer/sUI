@@ -20,4 +20,4 @@ local function CreateTab(self, wndParent)
 	wndParent:SetStyle("Picture", true);
 end
 
-M:RegisterTab("settings", "Settings", "FACog", CreateTab, 4);
+M:RegisterTab("settings", "Settings", "FACog", CreateTab, 3);

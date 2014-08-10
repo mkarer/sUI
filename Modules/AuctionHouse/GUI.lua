@@ -17,6 +17,8 @@ require "ItemAuction";
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 local M = S:GetModule("AuctionHouse");
 
+-----------------------------------------------------------------------------
+
 local strlen, strfind, gmatch, format, tinsert, floor, max, strmatch, sort = string.len, string.find, string.gmatch, string.format, table.insert, math.floor, math.max, string.match, table.sort;
 local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 
@@ -24,38 +26,37 @@ local Apollo, MarketplaceLib, GameLib = Apollo, MarketplaceLib, GameLib;
 -- GUI
 -----------------------------------------------------------------------------
 
-local kstrFont = "CRB_Pixel"; -- Nameplates (update MLWindow top offset when changing font as it doesn't support DT_VCENTER)
-
-local ktQualityColors = {
-	[Item.CodeEnumItemQuality.Inferior] 		= "ItemQuality_Inferior",
-	[Item.CodeEnumItemQuality.Average] 			= "ItemQuality_Average",
-	[Item.CodeEnumItemQuality.Good] 			= "ItemQuality_Good",
-	[Item.CodeEnumItemQuality.Excellent] 		= "ItemQuality_Excellent",
-	[Item.CodeEnumItemQuality.Superb] 			= "ItemQuality_Superb",
-	[Item.CodeEnumItemQuality.Legendary] 		= "ItemQuality_Legendary",
-	[Item.CodeEnumItemQuality.Artifact]		 	= "ItemQuality_Artifact",
+M.GUI = {
+	nSearchResultItemSize	= 30,
+	nPanelWidthLeft			= 220,
+	nControlPadding			= 2,
+	nIconSizeSmall			= 28,
+	nIconSizeBig			= 40,
+	nIconBorderSmall		= 1,
+	nIconBorderBig			= 2,
+	-- Colors
+	Colors = {
+		Quality = {
+			[Item.CodeEnumItemQuality.Inferior] 		= "ItemQuality_Inferior",
+			[Item.CodeEnumItemQuality.Average] 			= "ItemQuality_Average",
+			[Item.CodeEnumItemQuality.Good] 			= "ItemQuality_Good",
+			[Item.CodeEnumItemQuality.Excellent] 		= "ItemQuality_Excellent",
+			[Item.CodeEnumItemQuality.Superb] 			= "ItemQuality_Superb",
+			[Item.CodeEnumItemQuality.Legendary] 		= "ItemQuality_Legendary",
+			[Item.CodeEnumItemQuality.Artifact]		 	= "ItemQuality_Artifact",
+		},
+		Duration = {
+			[ItemAuction.CodeEnumAuctionRemaining.Expiring]		= "ffff0000",
+			[ItemAuction.CodeEnumAuctionRemaining.LessThanHour]	= "ffff9900",
+			[ItemAuction.CodeEnumAuctionRemaining.Short]		= "ff99ff66",
+			[ItemAuction.CodeEnumAuctionRemaining.Long]			= "ffffffff",
+			[ItemAuction.CodeEnumAuctionRemaining.Very_Long]	= "ffffffff",
+		},
+	},
 };
 
-local ktDurationStrings = {
-	[ItemAuction.CodeEnumAuctionRemaining.Expiring]		= Apollo.GetString("MarketplaceAuction_Expiring"),
-	[ItemAuction.CodeEnumAuctionRemaining.LessThanHour]	= Apollo.GetString("MarketplaceAuction_LessThanHour"),
-	[ItemAuction.CodeEnumAuctionRemaining.Short]		= Apollo.GetString("MarketplaceAuction_Short"),
-	[ItemAuction.CodeEnumAuctionRemaining.Long]			= Apollo.GetString("MarketplaceAuction_Long"),
-	[ItemAuction.CodeEnumAuctionRemaining.Very_Long]	= format("<%dh", MarketplaceLib.kItemAuctionListTimeDays * 24);
-};
+-----------------------------------------------------------------------------
 
-local ktDurationColors = {
-	[ItemAuction.CodeEnumAuctionRemaining.Expiring]		= "ffff0000",
-	[ItemAuction.CodeEnumAuctionRemaining.LessThanHour]	= "ffff9900",
-	[ItemAuction.CodeEnumAuctionRemaining.Short]		= "ff99ff66",
-	[ItemAuction.CodeEnumAuctionRemaining.Long]			= "ffffffff",
-	[ItemAuction.CodeEnumAuctionRemaining.Very_Long]	= "ffffffff",
-};
-
-local kstrSearch = Apollo.GetString("CRB_Search");
-local nPadding = 2;
-local nItemSize = 30;
-local nIconBorder = 1;
 local tTree;
 
 function M:OnNodeSelected(strNode)
@@ -166,12 +167,12 @@ local function OnShowFilters(self, wndHandler, wndControl)
 	self.wndFilters:Show(true, true);
 
 	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
-	nT = self.wndSearch:GetHeight() + self.wndFilters:GetHeight() + 2 * nPadding;
+	nT = self.wndSearch:GetHeight() + self.wndFilters:GetHeight() + 2 * self.GUI.nControlPadding;
 	self.wndResults:SetAnchorOffsets(nL, nT, nR, nB);
 
 	local wndMessage = self.wndMain:FindChild("Message");
 	local nL, nT, nR, nB = wndMessage:GetAnchorOffsets();
-	nT = self.wndSearch:GetHeight() + self.wndFilters:GetHeight() + 2 * nPadding;
+	nT = self.wndSearch:GetHeight() + self.wndFilters:GetHeight() + 2 * self.GUI.nControlPadding;
 	wndMessage:SetAnchorOffsets(nL, nT, nR, nB);
 end
 
@@ -180,12 +181,12 @@ local function OnHideFilters(self, wndHandler, wndControl)
 	self.wndFilters:Show(false, true);
 
 	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
-	nT = self.wndSearch:GetHeight() + nPadding;
+	nT = self.wndSearch:GetHeight() + self.GUI.nControlPadding;
 	self.wndResults:SetAnchorOffsets(nL, nT, nR, nB);
 
 	local wndMessage = self.wndMain:FindChild("Message");
 	local nL, nT, nR, nB = wndMessage:GetAnchorOffsets();
-	nT = self.wndSearch:GetHeight() + nPadding;
+	nT = self.wndSearch:GetHeight() + self.GUI.nControlPadding;
 	wndMessage:SetAnchorOffsets(nL, nT, nR, nB);
 end
 
@@ -254,7 +255,7 @@ local function OnSelectItem(self, wndHandler, wndControl)
 
 	-- Resize Results
 	local nL, nT, nR, nB = self.wndResults:GetAnchorOffsets();
-	nB = -self.wndCurrentItem:GetHeight() - nPadding;
+	nB = -self.wndCurrentItem:GetHeight() - self.GUI.nControlPadding;
 	self.wndResults:SetAnchorOffsets(nL, nT, nR, nB);
 
 	-- Icon/Name
@@ -263,9 +264,9 @@ local function OnSelectItem(self, wndHandler, wndControl)
 	self.wndCurrentItem:SetData(aucCurr);
 
 	self.wndCurrentItem:FindChild("Name"):SetText(itemCurr:GetName());
-	self.wndCurrentItem:FindChild("IconContainer"):SetBGColor(ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior]);
+	self.wndCurrentItem:FindChild("IconContainer"):SetBGColor(self.GUI.Colors.Quality[itemCurr:GetItemQuality()] or self.GUI.Colors.Quality[Item.CodeEnumItemQuality.Inferior]);
 	self.wndCurrentItem:FindChild("Icon"):SetSprite(itemCurr:GetIcon());
-	self.wndCurrentItem:FindChild("Name"):SetTextColor(ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior]);
+	self.wndCurrentItem:FindChild("Name"):SetTextColor(self.GUI.Colors.Quality[itemCurr:GetItemQuality()] or self.GUI.Colors.Quality[Item.CodeEnumItemQuality.Inferior]);
 
 	-- Bid/Buyout
 	local nBuyoutPrice = aucCurr:GetBuyoutPrice():GetAmount();
@@ -285,7 +286,7 @@ local function OnSelectItem(self, wndHandler, wndControl)
 	self.wndCurrentItem:FindChild("BtnBid"):Enable(bCanBid and nMinBidPrice <= nPlayerCash);
 
 	-- Buyout
-	self.wndCurrentItem:FindChild("Price"):SetText(S:GetMoneyAML(nBuyoutPrice, kstrFont));
+	self.wndCurrentItem:FindChild("Price"):SetText(S:GetMoneyAML(nBuyoutPrice, self.DB.strFont));
 	self.wndCurrentItem:FindChild("BtnBuyout"):Enable(bCanBuyout);
 	self.wndCurrentItem:FindChild("BtnBuyout"):SetActionData(GameLib.CodeEnumConfirmButtonType.MarketplaceAuctionBuySubmit, aucCurr, true);
 
@@ -312,7 +313,7 @@ end
 
 local function OnSearchLostFocus(self, wndHandler, wndControl)
 	if (strlen(wndControl:GetText()) == 0) then
-		wndControl:SetText(kstrSearch);
+		wndControl:SetText(self.L.Search);
 	end
 end
 
@@ -398,7 +399,6 @@ function M:CreateWindow()
 	if (not self.wndMain or not self.wndMain:IsValid()) then
 		local nWidthCategories = 220;
 		local nWidthSearchButton = 100;
-		local nPaddingSearchControl = 4;
 		local nHeightSearch = 40;
 		local nHeightFilters = 140;
 		local nHeightHeader = 40;
@@ -413,7 +413,7 @@ function M:CreateWindow()
 				{
 					Name = "TreeView",
 					Class = "Window",
-					Font = kstrFont,
+					Font = self.DB.strFont,
 					AnchorPoints = { 0, 0, 0, 1 },
 					AnchorOffsets = { 0, 0, nWidthCategories, 0 },
 					VScroll = true,
@@ -430,12 +430,12 @@ function M:CreateWindow()
 					Name = "Search",
 					Border = false,
 					AnchorPoints = { 0, 0, 1, 0, },
-					AnchorOffsets = { nWidthCategories + nPadding, 0, 0, nHeightSearch },
+					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, 0, 0, nHeightSearch },
 					Children = {
 						-- Textbox
 						{
 							AnchorPoints = { 0, 0, 1, 1 },
-							AnchorOffsets = { nPadding, 0, 2 * (-nPadding - nWidthSearchButton) - nPadding, -nPadding },
+							AnchorOffsets = { self.GUI.nControlPadding, 0, 2 * (-self.GUI.nControlPadding - nWidthSearchButton) - self.GUI.nControlPadding, -self.GUI.nControlPadding },
 							Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 							Picture = true,
 							Children = {
@@ -446,7 +446,7 @@ function M:CreateWindow()
 									AnchorOffsets = { 8, 0, -8, 0 },
 									Text = "Search",
 									DT_VCENTER = true,
-									Font = kstrFont,
+									Font = self.DB.strFont,
 									Events = {
 										EditBoxReturn = OnSearch,
 										WindowLostFocus = OnSearchLostFocus,
@@ -459,12 +459,12 @@ function M:CreateWindow()
 							Class = "Button",
 							Name = "BtnSearch",
 							AnchorPoints = { 1, 0, 1, 1 },
-							AnchorOffsets = { 2 * (-nPadding - nWidthSearchButton), 0, 2 * -nPadding - nWidthSearchButton, -nPadding },
+							AnchorOffsets = { 2 * (-self.GUI.nControlPadding - nWidthSearchButton), 0, 2 * -self.GUI.nControlPadding - nWidthSearchButton, -self.GUI.nControlPadding },
 							Base = "BK3:btnHolo_ListView_Mid",
-							Text = kstrSearch,
+							Text = self.L.Search,
 							DT_VCENTER = true,
 							DT_CENTER = true,
-							Font = kstrFont,
+							Font = self.DB.strFont,
 							Events = {
 								ButtonSignal = OnSearch,
 								MouseButtonUp = OnSearchButtonUp,
@@ -474,13 +474,13 @@ function M:CreateWindow()
 						{
 							Class = "Button",
 							AnchorPoints = { 1, 0, 1, 1 },
-							AnchorOffsets = { -nPadding - nWidthSearchButton, 0, -nPadding, -nPadding },
+							AnchorOffsets = { -self.GUI.nControlPadding - nWidthSearchButton, 0, -self.GUI.nControlPadding, -self.GUI.nControlPadding },
 							Base = "BK3:btnHolo_ListView_Mid",
 							Text = "Filters [+]",
 							ButtonType = "Check",
 							DT_VCENTER = true,
 							DT_CENTER = true,
-							Font = kstrFont,
+							Font = self.DB.strFont,
 							Events = {
 								ButtonCheck = OnShowFilters,
 								ButtonUncheck = OnHideFilters,
@@ -492,16 +492,16 @@ function M:CreateWindow()
 				{
 					Name = "Message",
 					AnchorPoints = { 0, 0, 1, 0.5, },
-					AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
+					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, 0 },
 					DT_VCENTER = true,
 					DT_CENTER = true,
 					Visible = false,
-					Font = kstrFont,
+					Font = self.DB.strFont,
 				},
 				{
 					Name = "Results",
 					AnchorPoints = { 0, 0, 1, 1, },
-					AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, 0 },
+					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, 0 },
 					Children = {
 						-- Header
 						{
@@ -518,7 +518,7 @@ function M:CreateWindow()
 							Picture = true,
 							Sprite = "ClientSprites:WhiteFill",
 							AnchorPoints = { 0, 0, 1, 1, },
-							AnchorOffsets = { 0, nHeightHeader + nPadding, 0, 0 },
+							AnchorOffsets = { 0, nHeightHeader + self.GUI.nControlPadding, 0, 0 },
 							VScroll = true,
 							AutoHideScroll = false,
 							Template = "Holo_ScrollList",
@@ -533,7 +533,7 @@ function M:CreateWindow()
 					Picture = true,
 					Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 					AnchorPoints = { 0, 0, 1, 0, },
-					AnchorOffsets = { nWidthCategories + nPadding, nHeightSearch + nPadding, 0, nHeightFilters },
+					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, nHeightFilters },
 					Visible = false,
 					Children = {
 						-- Known Schematics
@@ -543,7 +543,7 @@ function M:CreateWindow()
 							AnchorOffsets = { 4, 8, 350, 30 },
 							Text = "Filter known Schematics",
 							Base = "HologramSprites:HoloCheckBoxBtn",
-							Font = kstrFont,
+							Font = self.DB.strFont,
 						},
 						-- Rune Slots
 						{
@@ -552,7 +552,7 @@ function M:CreateWindow()
 							AnchorOffsets = { 4, 38, 180, 60 },
 							Text = "Minimum Rune Slots",
 							Base = "HologramSprites:HoloCheckBoxBtn",
-							Font = kstrFont,
+							Font = self.DB.strFont,
 						},
 						{
 							Class = "EditBox",
@@ -561,7 +561,7 @@ function M:CreateWindow()
 							Text = "4",
 							DT_VCENTER = true,
 							DT_CENTER = true,
-							Font = kstrFont,
+							Font = self.DB.strFont,
 						},
 						-- Maximum Price
 						{
@@ -570,7 +570,7 @@ function M:CreateWindow()
 							AnchorOffsets = { 4, 68, 180, 90 },
 							Text = "Maximum Price",
 							Base = "HologramSprites:HoloCheckBoxBtn",
-							Font = kstrFont,
+							Font = self.DB.strFont,
 						},
 						{
 							Class = "CashWindow",
@@ -579,7 +579,7 @@ function M:CreateWindow()
 							Amount = 10000,
 							DT_VCENTER = true,
 							DT_RIGHT = true,
-							Font = kstrFont,
+							Font = self.DB.strFont,
 							AllowEditing = true,
 						},
 					},
@@ -591,7 +591,7 @@ function M:CreateWindow()
 					Picture = true,
 					Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 					AnchorPoints = { 0, 1, 1, 1, },
-					AnchorOffsets = { nWidthCategories + nPadding, -nHeightCurrentItem, 0, 0 },
+					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, -nHeightCurrentItem, 0, 0 },
 					Visible = false,
 					Children = {
 						{
@@ -614,7 +614,7 @@ function M:CreateWindow()
 										{
 											Name = "IconBackground",
 											AnchorPoints = { 0, 0, 1, 1 },
-											AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
+											AnchorOffsets = { self.GUI.nIconBorderSmall, self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall },
 											Picture = true,
 											BGColor = "black",
 											Sprite = "ClientSprites:WhiteFill",
@@ -646,7 +646,7 @@ function M:CreateWindow()
 									AnchorPoints = { 0, 0, 1, 1 },
 									AnchorOffsets = { nHeightCurrentItem - 2, 0, 0, 0 },
 									DT_VCENTER = true,
-									Font = kstrFont,
+									Font = self.DB.strFont,
 									AutoScaleTextOff = true,
 								},
 								-- Bid
@@ -657,7 +657,7 @@ function M:CreateWindow()
 									AnchorOffsets = { -470, 0, -284, 0 },
 									DT_RIGHT = true,
 									DT_VCENTER = true,
-									Font = kstrFont,
+									Font = self.DB.strFont,
 									AllowEditing = true,
 									Events = { CashWindowAmountChanged = OnChangeBidAmount },
 								},
@@ -665,12 +665,12 @@ function M:CreateWindow()
 									Class = "ActionConfirmButton",
 									Name = "BtnBid",
 									AnchorPoints = { 1, 0, 1, 1 },
-									AnchorOffsets = { -284, nPadding, -204, -nPadding },
+									AnchorOffsets = { -284, self.GUI.nControlPadding, -204, -self.GUI.nControlPadding },
 									Base = "BK3:btnHolo_ListView_Mid",
-									Text = Apollo.GetString("MarketplaceAuction_BidBtn"),
+									Text = self.L.Bid,
 									DT_VCENTER = true,
 									DT_CENTER = true,
-									Font = kstrFont,
+									Font = self.DB.strFont,
 								},
 								-- Buyout
 								{
@@ -683,12 +683,12 @@ function M:CreateWindow()
 									Class = "ActionConfirmButton",
 									Name = "BtnBuyout",
 									AnchorPoints = { 1, 0, 1, 1 },
-									AnchorOffsets = { -80, nPadding, -nPadding, -nPadding },
+									AnchorOffsets = { -80, self.GUI.nControlPadding, -self.GUI.nControlPadding, -self.GUI.nControlPadding },
 									Base = "BK3:btnHolo_ListView_Mid",
-									Text = Apollo.GetString("MarketplaceAuction_BuyoutHeader"),
+									Text = self.L.Buyout,
 									DT_VCENTER = true,
 									DT_CENTER = true,
-									Font = kstrFont,
+									Font = self.DB.strFont,
 								},
 							},
 						},
@@ -776,9 +776,9 @@ local ktListColumns = {
 				Name = "TimeRemaining",
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
-				Text = ktDurationStrings[eTimeRemaining],
-				TextColor = ktDurationColors[eTimeRemaining];
-				Font = kstrFont,
+				Text = self.L.DurationStrings[eTimeRemaining],
+				TextColor = self.GUI.Colors.Duration[eTimeRemaining];
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
@@ -798,7 +798,7 @@ local ktListColumns = {
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = nBagSlots,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
@@ -818,7 +818,7 @@ local ktListColumns = {
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = nLevel,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
@@ -838,7 +838,7 @@ local ktListColumns = {
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = nItemPower,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
@@ -863,11 +863,11 @@ local ktListColumns = {
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = nRuneSlots,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
-				TextColor = ktQualityColors[nRuneSlots + 1];
+				TextColor = self.GUI.Colors.Quality[nRuneSlots + 1];
 				UserData = nRuneSlots,
 			};
 		end,
@@ -896,7 +896,7 @@ local ktListColumns = {
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = nAssaultPower,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
@@ -927,7 +927,7 @@ local ktListColumns = {
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
 				Text = nSupportPower,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
@@ -951,7 +951,7 @@ local function CreateHeader(self, strName, strText, fPosition, fWidth)
 		Text = strText,
 		Name = strName,
 		Base = "BK3:btnHolo_ListView_Mid",
-		Font = kstrFont,
+		Font = self.DB.strFont,
 		DT_VCENTER = true,
 		DT_CENTER = true,
 		AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
@@ -1055,7 +1055,7 @@ function M:CreateListItem(aucCurr)
 		Picture = true,
 		Sprite = "ClientSprites:WhiteFill",
 		AnchorPoints = { 0, 0, 1, 0, },
-		AnchorOffsets = { -5, 0, 5, nItemSize + 1 },
+		AnchorOffsets = { -5, 0, 5, self.GUI.nSearchResultItemSize + 1 },
 		Name = "ListItemBuy",
 		Children = {
 			-- Icon + Name
@@ -1069,9 +1069,9 @@ function M:CreateListItem(aucCurr)
 						Name = "Name", -- TODO: It's actually the IconContainer, but I need the GetData() for sorting.
 						UserData = strName,
 						AnchorPoints = { 0, 0, 0, 0 },
-						AnchorOffsets = { 1, 1, nItemSize - 2, nItemSize - 2 },
+						AnchorOffsets = { 1, 1, self.GUI.nSearchResultItemSize - 2, self.GUI.nSearchResultItemSize - 2 },
 						Picture = true,
-						BGColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
+						BGColor = self.GUI.Colors.Quality[itemCurr:GetItemQuality()] or self.GUI.Colors.Quality[Item.CodeEnumItemQuality.Inferior],
 						Sprite = "ClientSprites:WhiteFill",
 						Events = {
 							MouseEnter = ShowItemTooltip,
@@ -1082,7 +1082,7 @@ function M:CreateListItem(aucCurr)
 							-- Count
 							{
 								AnchorPoints = { 0, 0, 1, 1 },
-								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder -2, -nIconBorder -1 },
+								AnchorOffsets = { self.GUI.nIconBorderSmall, self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall -2, -self.GUI.nIconBorderSmall -1 },
 								Text = strCount,
 								DT_RIGHT = true,
 								DT_BOTTOM = true,
@@ -1091,14 +1091,14 @@ function M:CreateListItem(aucCurr)
 							-- Icon
 							{
 								AnchorPoints = { 0, 0, 1, 1 },
-								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
+								AnchorOffsets = { self.GUI.nIconBorderSmall, self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall },
 								BGColor = "white",
 								Sprite = itemCurr:GetIcon(),
 							},
 							-- Background
 							{
 								AnchorPoints = { 0, 0, 1, 1 },
-								AnchorOffsets = { nIconBorder, nIconBorder, -nIconBorder, -nIconBorder },
+								AnchorOffsets = { self.GUI.nIconBorderSmall, self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall, -self.GUI.nIconBorderSmall },
 								BGColor = "black",
 								Sprite = "ClientSprites:WhiteFill",
 							},
@@ -1111,11 +1111,11 @@ function M:CreateListItem(aucCurr)
 			-- Name
 			{
 				AnchorPoints = { 0, 0, ktListColumns.Name.Width, 1 },
-				AnchorOffsets = { nItemSize + 4 + 6, 0, 0, 0 },
+				AnchorOffsets = { self.GUI.nSearchResultItemSize + 4 + 6, 0, 0, 0 },
 				Text = strName,
-				TextColor = ktQualityColors[itemCurr:GetItemQuality()] or ktQualityColors[Item.CodeEnumItemQuality.Inferior],
+				TextColor = self.GUI.Colors.Quality[itemCurr:GetItemQuality()] or self.GUI.Colors.Quality[Item.CodeEnumItemQuality.Inferior],
 				DT_VCENTER = true,
-				Font = kstrFont,
+				Font = self.DB.strFont,
 			},
 		},
 		UserData = aucCurr,
@@ -1252,7 +1252,7 @@ function M:GridVisibleItemsCheck(strEvent, strVar, nFrameCount)
 
 		for _, wndItem in ipairs(wndGrid:GetChildren()) do
 			local _, nPosY = wndItem:GetPos();
-			wndItem:Enable(nPosY < nHeight and nPosY + nItemSize > 0);
+			wndItem:Enable(nPosY < nHeight and nPosY + self.GUI.nSearchResultItemSize > 0);
 		end
 	end
 end
