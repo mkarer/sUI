@@ -397,7 +397,6 @@ function M:CreateWindow()
 	end
 	
 	if (not self.wndMain or not self.wndMain:IsValid()) then
-		local nWidthCategories = 220;
 		local nWidthSearchButton = 100;
 		local nHeightSearch = 40;
 		local nHeightFilters = 140;
@@ -415,7 +414,7 @@ function M:CreateWindow()
 					Class = "Window",
 					Font = self.DB.strFont,
 					AnchorPoints = { 0, 0, 0, 1 },
-					AnchorOffsets = { 0, 0, nWidthCategories, 0 },
+					AnchorOffsets = { 0, 0, self.GUI.nPanelWidthLeft, 0 },
 					VScroll = true,
 					AutoHideScroll = false,
 					Template = "Holo_ScrollListSmall",
@@ -430,7 +429,7 @@ function M:CreateWindow()
 					Name = "Search",
 					Border = false,
 					AnchorPoints = { 0, 0, 1, 0, },
-					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, 0, 0, nHeightSearch },
+					AnchorOffsets = { self.GUI.nPanelWidthLeft + self.GUI.nControlPadding, 0, 0, nHeightSearch },
 					Children = {
 						-- Textbox
 						{
@@ -492,7 +491,7 @@ function M:CreateWindow()
 				{
 					Name = "Message",
 					AnchorPoints = { 0, 0, 1, 0.5, },
-					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, 0 },
+					AnchorOffsets = { self.GUI.nPanelWidthLeft + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, 0 },
 					DT_VCENTER = true,
 					DT_CENTER = true,
 					Visible = false,
@@ -501,7 +500,7 @@ function M:CreateWindow()
 				{
 					Name = "Results",
 					AnchorPoints = { 0, 0, 1, 1, },
-					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, 0 },
+					AnchorOffsets = { self.GUI.nPanelWidthLeft + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, 0 },
 					Children = {
 						-- Header
 						{
@@ -514,7 +513,7 @@ function M:CreateWindow()
 						{
 							BGColor = "aa000000",
 							Name = "Grid",
---											Border = false,
+--							Border = false,
 							Picture = true,
 							Sprite = "ClientSprites:WhiteFill",
 							AnchorPoints = { 0, 0, 1, 1, },
@@ -527,13 +526,13 @@ function M:CreateWindow()
 				},
 				-- Search Filter
 				{
---									BGColor = "aa000000",
+--					BGColor = "aa000000",
 					Name = "Filters",
 					Border = true,
 					Picture = true,
 					Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 					AnchorPoints = { 0, 0, 1, 0, },
-					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, nHeightFilters },
+					AnchorOffsets = { self.GUI.nPanelWidthLeft + self.GUI.nControlPadding, nHeightSearch + self.GUI.nControlPadding, 0, nHeightFilters },
 					Visible = false,
 					Children = {
 						-- Known Schematics
@@ -591,7 +590,7 @@ function M:CreateWindow()
 					Picture = true,
 					Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 					AnchorPoints = { 0, 1, 1, 1, },
-					AnchorOffsets = { nWidthCategories + self.GUI.nControlPadding, -nHeightCurrentItem, 0, 0 },
+					AnchorOffsets = { self.GUI.nPanelWidthLeft + self.GUI.nControlPadding, -nHeightCurrentItem, 0, 0 },
 					Visible = false,
 					Children = {
 						{

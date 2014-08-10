@@ -36,6 +36,7 @@ function M:OnDisable()
 
 	self.tvwAuctionableItems = nil;
 	self.wndContent = nil;
+	self.itemSelected = nil;
 end
 
 function M:CreateTab(wndParent)
@@ -53,6 +54,11 @@ function M:CreateTab(wndParent)
 
 	self.tvwAuctionableItems:RegisterCallback("NodeSelected", "OnAuctionableItemSelected", self);
 	self.tvwAuctionableItems:Render();
+	self:DisableForm();
+end
+
+function M:DisableForm()
+	self.wndContent:FindChild("ListItemForm:BtnListItem"):Enable(false);
 end
 
 -----------------------------------------------------------------------------
@@ -96,6 +102,7 @@ end
 
 function M:OnUpdateInventory()
 	local tItemsRemoved = {};
+Print("Get Auctionable Items")
 	local tItemsNew = S.myCharacter:GetAuctionableItems() or {};
 
 	for _, tNode in self.tvwAuctionableItems:IterateNodes(self.strNodeAuctionableItems) do
@@ -103,7 +110,9 @@ function M:OnUpdateInventory()
 
 		if (itemCurr) then
 			local bFound = false;
+Print("Compare Items")
 			for i, itemAuctionable in ipairs(tItemsNew) do
+Print("Compare Item")
 				if (itemAuctionable == itemCurr) then
 					tremove(tItemsNew, i);
 					bFound = true;
@@ -113,16 +122,23 @@ function M:OnUpdateInventory()
 
 			if (not bFound) then
 				tinsert(tItemsRemoved, itemCurr);
-				self.tvwAuctionableItems:RemoveNode(tNode.strName, true)
+Print("Remove Node")
+				self.tvwAuctionableItems:RemoveNode(tNode.strName, true);
+				if (self.itemSelected == itemCurr) then
+					self:DisableForm();
+					self.itemSelected = nil;
+				end
 			end
 		end
 	end
 
 	for _, itemNew in ipairs(tItemsNew) do
+Print("Add Node")
 		self.tvwAuctionableItems:AddChildNode(self.strNodeAuctionableItems, itemNew:GetName(), itemNew:GetIcon(), itemNew);
 	end
 
 	if (#tItemsNew > 0 or #tItemsRemoved > 0) then
+Print("Render")
 		self.tvwAuctionableItems:Render();
 	end
 end
@@ -165,6 +181,7 @@ function M:SetItem(itemCurr)
 --		MarketplaceLib.RequestItemAuctionsByItems({ itemCurr:GetItemId() }, nPage, MarketplaceLib.AuctionSort.Buyout, bReverseSort, nil, nil, nil, nil)
 	end
 
+	self.itemSelected = itemCurr;
 	self:OnChangeBidAmount();
 end
 

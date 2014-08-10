@@ -70,10 +70,10 @@ function M:InitializeWindowDefinitions()
 			{
 				Name = "ListItemForm",
 				AnchorPoints = { 0, 0, 0, 0 },
-				AnchorOffsets = { AuctionHouse.GUI.nPanelWidthLeft + AuctionHouse.GUI.nControlPadding, 0, AuctionHouse.GUI.nPanelWidthLeft + AuctionHouse.GUI.nControlPadding + 440, 168 },
-				Border = true,
-	--			Picture = true,
-	--			Sprite = "BK3:UI_BK3_Holo_InsetDivider",
+				AnchorOffsets = { AuctionHouse.GUI.nPanelWidthLeft + AuctionHouse.GUI.nControlPadding * 2, 0, AuctionHouse.GUI.nPanelWidthLeft + AuctionHouse.GUI.nControlPadding + 440, 168 },
+				Border = false,
+				Picture = true,
+				Sprite = "BK3:UI_BK3_Holo_InsetDivider",
 				Children = {
 					-- Item Name
 					{
@@ -172,7 +172,7 @@ function M:InitializeWindowDefinitions()
 						Class = "ActionConfirmButton",
 						Name = "BtnListItem",
 						AnchorPoints = { 0, 0, 1, 0 },
-						AnchorOffsets = { 282 + AuctionHouse.GUI.nControlPadding, 102, 0, 152 },
+						AnchorOffsets = { 282 + AuctionHouse.GUI.nControlPadding, 102, -20, 152 },
 						Base = "BK3:btnHolo_ListView_Mid",
 						Text = AuctionHouse.L.PostItem,
 						DT_VCENTER = true,
