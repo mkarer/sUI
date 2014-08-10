@@ -15,9 +15,6 @@ local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 -- Main Modules
 -----------------------------------------------------------------------------
 
-
------------------------------------------------------------------------------
-
 local function EnableModule(self)
 	local bEnabled = self:__Enable();
 	if (not bEnabled and self.OverrideGeminiAddonStatus and self.EnabledState and self.OnEnable) then
