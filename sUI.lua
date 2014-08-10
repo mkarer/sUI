@@ -37,7 +37,6 @@ local function logDebug(self, ...)
 	end
 
 	-- Debugging Filter	
-	
 	local debugInfo = debug.getinfo(2);
 	local caller = gsub(debugInfo.source, "\\", "/");
 	local pathRootIndex = strfind(caller, "/Addons/sUI/") ~= nil and (strfind(caller, "/Addons/sUI/") + 12) or (strfind(caller, "/Addons/") + 8);
@@ -52,7 +51,6 @@ local function logDebug(self, ...)
 	elseif ((S.DB.debug[dir] ~= nil and S.DB.debug[dir] ~= true) and (S.DB.debug[file] ~= nil and S.DB.debug[file] ~= true)) then
 		self:_debug(...);
 	end
-
 end
 
 function S:OnInitialize()
