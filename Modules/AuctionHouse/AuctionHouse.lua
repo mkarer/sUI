@@ -27,6 +27,13 @@ local AccountItemLib, MarketplaceLib, Apollo = AccountItemLib, MarketplaceLib, A
 function M:OnInitialize()
 	log = S.Log;
 	self:EnableProfile();
+
+	self.ItemPreviewImproved = Apollo.GetAddon("ItemPreviewImproved");
+	self.GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
+	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
+	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
+	self.TreeView = Apollo.GetPackage("Sezz:Controls:TreeView-0.1").tPackage;
+	self.TabWindow = Apollo.GetPackage("Sezz:Controls:TabWindow-0.1").tPackage;
 end
 
 function M:OnEnable()
@@ -48,13 +55,6 @@ function M:OnEnable()
 
 	Apollo.RegisterSlashCommand("ah", "Open", self);
 	Apollo.LoadSprites(Apollo.GetAssetFolder().."\\Modules\\AuctionHouse\\Media\\Icons.xml");
-
-	self.ItemPreviewImproved = Apollo.GetAddon("ItemPreviewImproved");
-	self.GeminiGUI = Apollo.GetPackage("Gemini:GUI-1.0").tPackage;
-	self.SearchLib = Apollo.GetPackage("Sezz:AuctionHouse:Search-0.1").tPackage;
-	self.ContextMenu = Apollo.GetPackage("Sezz:Controls:ContextMenu-0.1").tPackage;
-	self.TreeView = Apollo.GetPackage("Sezz:Controls:TreeView-0.1").tPackage;
-	self.TabWindow = Apollo.GetPackage("Sezz:Controls:TabWindow-0.1").tPackage;
 
 	-- Temporary AuctionStats Support
 	self.AuctionStats = Apollo.GetAddon("AuctionStats");

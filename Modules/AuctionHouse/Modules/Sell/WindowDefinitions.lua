@@ -34,7 +34,7 @@ local function ShowItemPreview(self, wndHandler, wndControl, eMouseButton)
 		if (itemCurr:GetHousingDecorInfoId() ~= nil and itemCurr:GetHousingDecorInfoId() ~= 0) then
 			Event_FireGenericEvent("DecorPreviewOpen", itemCurr:GetHousingDecorInfoId());
 		else
-			self.ItemPreviewImproved:OnShowItemInDressingRoom(itemCurr);
+			AuctionHouse.ItemPreviewImproved:OnShowItemInDressingRoom(itemCurr);
 		end
 	end
 end
@@ -101,7 +101,7 @@ function M:InitializeWindowDefinitions()
 						Events = {
 							MouseEnter = ShowItemTooltip,
 							MouseExit = HideItemTooltip,
-							MouseButtonUp = self.ItemPreviewImproved and ShowItemPreview or nil,
+							MouseButtonUp = AuctionHouse.ItemPreviewImproved and ShowItemPreview or nil,
 						},
 						Children = {
 							-- Icon
