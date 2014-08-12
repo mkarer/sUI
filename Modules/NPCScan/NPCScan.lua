@@ -38,6 +38,10 @@ local fVolumeMaster = Apollo.GetConsoleVariable("sound.volumeMaster");
 local tWatchedUnits = {
 	["Goldensun Dawngrazer"] = true,
 	["Scorchwing"] = true,
+	["Subject K - Brute"] = true,
+	["Subject V - Tempest"] = true,
+	["Subject Tau"] = true,
+	["Subject J - Fiend"] = true,
 --	["Softsnow Jabbit"] = true,
 };
 
