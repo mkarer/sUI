@@ -15,7 +15,7 @@ local UnitFramesLayout = S:GetModule("UnitFramesCore"):GetModule("Layout");
 UnitFramesLayout:SetUnitFrameConfiguration("Player", {
 	-- Base
 	tAnchorPoints = { 0.5, 1, 0.5, 1 },
-	tAnchorOffsets = { -127, -126, 127, -92 },
+	tAnchorOffsets = { -127, -126, 127, -90 },
 	-- Health Bar
 	strTagsTextLeft = "[TClassColor][Name][TClose][Sezz:Role]",
 	strTagsTextRight = "[Sezz:HP]",
