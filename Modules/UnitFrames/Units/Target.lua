@@ -21,9 +21,9 @@ UnitFramesLayout:SetUnitFrameConfiguration("Target", {
 	strTagsTextRight = "[Sezz:HP]",
 	-- Cast Bar
 	bCastBarEnabled = true,
---	tCastBarAnchorPoints = { 0.5, 0.15, 0.5, 0.15 };
-	tCastBarAnchorPoints = { 0.5, -23, 0.5, -23 };
-	tCastBarAnchorOffsets = { -200, 0, 200, 36 };
+--	tCastBarAnchorPoints = { 0.5, 0.15, 0.5, 0.15 },
+	tCastBarAnchorPoints = { 0.5, -23, 0.5, -23 },
+	tCastBarAnchorOffsets = { -200, 0, 200, 36 },
 	-- Auras
 	bAurasEnabled = true,
 	tAurasAnchorPoints = { 0, 0, 0, 1 },
