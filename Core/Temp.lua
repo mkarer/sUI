@@ -39,8 +39,8 @@ function M:OnEnable()
 	self:RegisterEvent("Group_LootRulesChanged", "EventHandler");
 	self:RegisterEvent("Group_MemberConnect", "EventHandler");
 --	self:RegisterEvent("Group_MemberFlagsChanged", "EventHandler"); -- nMemberIdx, bFromPromotion, tChangedFlags (inv/kick/mark/disconnected/dps/healer/mainass/maintank/pending/raidass/ready/rolelocked/tank)
-	self:RegisterEvent("Group_MemberPromoted", "EventHandler");
-	self:RegisterEvent("Group_Mentor", "EventHandler");
+--	self:RegisterEvent("Group_MemberPromoted", "EventHandler");
+--	self:RegisterEvent("Group_Mentor", "EventHandler");
 	self:RegisterEvent("Group_MentorLeftAOI", "EventHandler");
 	self:RegisterEvent("Group_MentorRelationship", "EventHandler");
 	self:RegisterEvent("Group_Operation_Result", "EventHandler");
