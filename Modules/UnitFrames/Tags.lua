@@ -82,6 +82,7 @@ end
 
 function UnitFramesLayout:RegisterTags()
 
+	self.tUnitFrameController.Tags.Events["Sezz:Role"] = self.tUnitFrameController.Tags.Events["Role"];
 	self.tUnitFrameController.Tags.Methods["Sezz:Role"] = function(unit)
 		local strRole = unit:GetRole();
 
