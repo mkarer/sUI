@@ -56,7 +56,7 @@ Apollo.RegisterSlashCommand("focus", "SetFocus", M);
 
 -- Ready Check
 function M:ReadyCheck()
-	GroupLib.ReadyCheck("Are you ready?");
+	GroupLib.ReadyCheck(Apollo.GetString("RaidFrame_AreYouReady"));
 end
 
 Apollo.RegisterSlashCommand("rc", "ReadyCheck", M);
