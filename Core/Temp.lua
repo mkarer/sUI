@@ -43,7 +43,7 @@ function M:OnEnable()
 --	self:RegisterEvent("Group_Mentor", "EventHandler");
 	self:RegisterEvent("Group_MentorLeftAOI", "EventHandler");
 	self:RegisterEvent("Group_MentorRelationship", "EventHandler");
-	self:RegisterEvent("Group_Operation_Result", "EventHandler");
+--	self:RegisterEvent("Group_Operation_Result", "EventHandler"); -- strName, eResult (GroupLib.ActionResult)
 --	self:RegisterEvent("Group_ReadyCheck", "EventHandler"); -- initiating_playerindex message
 	self:RegisterEvent("Group_Referral", "EventHandler");
 	self:RegisterEvent("Group_Remove", "EventHandler"); -- someone has been removed, member indexes will change (last frame needs to be disabled)
