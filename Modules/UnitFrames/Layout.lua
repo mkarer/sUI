@@ -33,6 +33,7 @@ function M:CreateUnitFrame(strUnit, tSettings)
 	self:CreateAurasElement(strUnit, tSettings);
 	self:CreateThreatBarElement(strUnit, tSettings);
 	self:CreatePowerBarElement(strUnit);
+	self:CreateRoleElement(strUnit);
 
 	self.tUnitFrameController:CreateUnitFrame(strUnit, tSettings.tWindowDefinition);
 end

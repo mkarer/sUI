@@ -25,6 +25,10 @@ local tSettings = {
 	strTagsTextRight = "[Sezz:RaidHP]",
 	-- Shield Bar
 	bShieldBarEnabled = true,
+	-- Role
+	bRoleEnabled = true,
+	tRoleAnchorPoints = { 0.5, 1, 0.5, 1 },
+	tRoleAnchorOffsets = { -6, -13, 6, -1 },
 };
 
 -- Set Configuration
