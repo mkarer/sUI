@@ -74,6 +74,7 @@ function UnitFramesLayout:CreateHealthBarElement(strUnit, tSettings)
 				Element = "Text",
 				Tags = tSettings.strTagsTextRight,
 				Align = "Right",
+				Interval = 50,
 			},
 		};
 
