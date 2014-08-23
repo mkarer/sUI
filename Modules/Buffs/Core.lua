@@ -209,8 +209,7 @@ function M:OnAuraUpdated(tAura)
 
 	local tAuraData, nIndex = self:GetAura(tCache, tAura.idBuff);
 	if (tAuraData and nIndex) then
-		tAuraData.tControl:UpdateDuration(tAura.fTimeRemaining);
-		tAuraData.tControl:UpdateCount(tAura.nCount);
+		tAuraData.tControl:Update(tAura);
 	end
 end
 
