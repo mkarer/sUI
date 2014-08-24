@@ -479,13 +479,13 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			end
 
 			local SelectMenuItemMount = function(self, wndHandler, wndControl)
-				M.P["SelectedMount"] = wndHandler:GetData();
+				M.DB["SelectedMount"] = wndHandler:GetData();
 				GameLib.SetShortcutMount(wndHandler:GetData());
 				self:CloseMenu();
 			end
 
 			local SelectMenuItemPotion = function(self, wndHandler, wndControl)
-				M.P["SelectedPotion"] = wndHandler:GetData();
+				M.DB["SelectedPotion"] = wndHandler:GetData();
 				GameLib.SetShortcutPotion(wndHandler:GetData());
 				self:CloseMenu();
 			end
