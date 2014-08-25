@@ -19,7 +19,7 @@ Unit
 	ADD GetCastingSpellId
 	ADD GetCastingSpellIcon (but you'll also have to add actual icons :p)
 	FIX GetBuffs - fTimeRemaining doesn't change when a buff is refreshed (tested with Deadly Chain) -- Update 07/31 Deadly Chain is fixed! -- Update 08/25 Still/Again bugged on PTR.
-	<del>FIX GetBuffs - Some debuffs aren't in the array (like Frostbitten Chill, Coldburrow Cavern low body temp debuff), same issue with buffs</del>
+	~~FIX GetBuffs - Some debuffs aren't in the array (like Frostbitten Chill, Coldburrow Cavern low body temp debuff), same issue with buffs~~
 	ADD GetBuffs - fTimeGained would be awesome
 	ADD GetBuffs - unitSource would be even more awesome
 
