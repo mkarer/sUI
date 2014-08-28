@@ -7,10 +7,17 @@
 
 --]]
 
+require "GameLib";
+
+-----------------------------------------------------------------------------
+
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:GetAddon("SezzUI");
 
 -- Lua API
-local mod, format, floor, format, strlen, strsub, tonumber = math.mod, string.format, math.floor, string.format, string.len, string.sub, tonumber;
+local mod, format, floor, format, strlen, strsub, tonumber, ipairs, pairs = math.mod, string.format, math.floor, string.format, string.len, string.sub, tonumber, ipairs, pairs;
+
+-- WildStar API
+local GameLib = GameLib;
 
 -----------------------------------------------------------------------------
 -- Table Utilities
