@@ -15,7 +15,8 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateCastBarElement(strUnit, tSettings)
+function UnitFramesLayout:CreateCastBarElement(strUnit)
+	local tSettings = self.tSettings[strUnit];
 	if (not tSettings.bCastBarEnabled) then return; end
 
 	local tColors = self.tUnitFrameController.tColors;

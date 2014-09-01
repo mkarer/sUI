@@ -25,13 +25,13 @@ function M:OnInitialize()
 end
 
 function M:CreateUnitFrame(strUnit, tSettings)
-	self:InitializeUnitFrameXML(strUnit, tSettings);
-	self:CreateHealthBarElement(strUnit, tSettings);
-	self:CreateShieldBarElement(strUnit, tSettings);
-	self:CreateCastBarElement(strUnit, tSettings);
-	self:CreateExperienceBarElement(strUnit, tSettings);
-	self:CreateAurasElement(strUnit, tSettings);
-	self:CreateThreatBarElement(strUnit, tSettings);
+	self:InitializeUnitFrameXML(strUnit);
+	self:CreateHealthBarElement(strUnit);
+	self:CreateShieldBarElement(strUnit);
+	self:CreateCastBarElement(strUnit);
+	self:CreateExperienceBarElement(strUnit);
+	self:CreateAurasElement(strUnit);
+	self:CreateThreatBarElement(strUnit);
 	self:CreatePowerBarElement(strUnit);
 	self:CreateRoleElement(strUnit);
 	self:CreateLeaderElement(strUnit);
@@ -170,7 +170,9 @@ local function OnWindowHide(self, wndHandler, wndControl)
 	wndHandler:SetBGOpacity(0.2, 5e+20);
 end
 
-function M:InitializeUnitFrameXML(strUnit, tSettings)
+function M:InitializeUnitFrameXML(strUnit)
+	local tSettings = self.tSettings[strUnit];
+
 	-- Create Root Element
 	tSettings.tWindowDefinition = {
 		AnchorPoints = tSettings.tAnchorPoints,

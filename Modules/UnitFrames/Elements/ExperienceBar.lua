@@ -15,7 +15,8 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateExperienceBarElement(strUnit, tSettings)
+function UnitFramesLayout:CreateExperienceBarElement(strUnit)
+	local tSettings = self.tSettings[strUnit];
 	if (strUnit ~= "Player" or not tSettings.bExperienceBarEnabled) then return; end
 
 	local tColors = self.tUnitFrameController.tColors;

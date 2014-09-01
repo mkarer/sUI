@@ -15,8 +15,9 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateHealthBarElement(strUnit, tSettings)
+function UnitFramesLayout:CreateHealthBarElement(strUnit)
 	local tColors = self.tUnitFrameController.tColors;
+	local tSettings = self.tSettings[strUnit];
 
 	-------------------------------------------------------------------------
 	-- Health Bar

@@ -15,7 +15,8 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateThreatBarElement(strUnit, tSettings)
+function UnitFramesLayout:CreateThreatBarElement(strUnit)
+	local tSettings = self.tSettings[strUnit];
 	if (not tSettings.bThreatBarEnabled) then return; end
 
 	local tColors = self.tUnitFrameController.tColors;

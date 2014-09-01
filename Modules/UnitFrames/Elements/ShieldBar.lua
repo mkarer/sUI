@@ -15,7 +15,8 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateShieldBarElement(strUnit, tSettings)
+function UnitFramesLayout:CreateShieldBarElement(strUnit)
+	local tSettings = self.tSettings[strUnit];
 	if (not tSettings.bShieldBarEnabled) then return; end
 
 	local tColors = self.tUnitFrameController.tColors;

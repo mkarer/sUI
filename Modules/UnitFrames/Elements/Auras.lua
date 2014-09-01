@@ -19,7 +19,8 @@ local tinsert = table.insert;
 
 -----------------------------------------------------------------------------
 
-function UnitFramesLayout:CreateAurasElement(strUnit, tSettings)
+function UnitFramesLayout:CreateAurasElement(strUnit)
+	local tSettings = self.tSettings[strUnit];
 	if (not tSettings.bAurasEnabled) then return; end
 
 	-- Create Container
