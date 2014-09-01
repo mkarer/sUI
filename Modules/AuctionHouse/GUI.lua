@@ -123,10 +123,10 @@ local function OnTreeWindowLoad(self, wndHandler, wndControl)
 
 					local nNodeId = tTree:AddChildNode(nNodeIdCategory, strName, nil, { Type = "Type", Id = tDataType.nId });
 					tTree:CollapseNode(nNodeId);
-					if (strName == "Implant") then
-						nNodeIdSelected = nNodeId; -- TEMP
-						nNodeIdSelectedCategory = nNodeIdRootCategory;
-					end
+--					if (strName == "Implant") then
+--						nNodeIdSelected = nNodeId; -- TEMP
+--						nNodeIdSelectedCategory = nNodeIdRootCategory;
+--					end
 				end
 			end
 --		end
