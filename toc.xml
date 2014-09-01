@@ -31,6 +31,7 @@
 	<Script Name="Libs\SezzUnitFrames\Elements\Range.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\PowerBar.lua" />
 	<Script Name="Libs\SezzUnitFrames\Elements\Role.lua" />
+	<Script Name="Libs\SezzUnitFrames\Elements\Leader.lua" />
 	<!-- Flat Controls -->
 	<Script Name="Libs\SezzTreeView\SezzTreeView.lua" />
 	<Script Name="Libs\SezzTabWindow\SezzTabWindow.lua" />
@@ -85,6 +86,7 @@
 	<Script Name="Modules\UnitFrames\Elements\ThreatBar.lua" />
 	<Script Name="Modules\UnitFrames\Elements\PowerBar.lua" />
 	<Script Name="Modules\UnitFrames\Elements\Role.lua" />
+	<Script Name="Modules\UnitFrames\Elements\Leader.lua" />
 	<Script Name="Modules\UnitFrames\Units\Player.lua" />
 	<Script Name="Modules\UnitFrames\Units\Target.lua" />
 	<Script Name="Modules\UnitFrames\Units\TargetOfTarget.lua" />
