@@ -29,6 +29,10 @@ local tSettings = {
 	bRoleEnabled = true,
 	tRoleAnchorPoints = { 0.5, 1, 0.5, 1 },
 	tRoleAnchorOffsets = { -6, -13, 6, -1 },
+	-- Leader/Assistant
+	bLeaderEnabled = true,
+	tLeaderAnchorPoints = { 0, 1, 0, 1 },
+	tLeaderAnchorOffsets = { 1, -8, 13, 0 },
 };
 
 -- Set Configuration

@@ -34,6 +34,7 @@ function M:CreateUnitFrame(strUnit, tSettings)
 	self:CreateThreatBarElement(strUnit, tSettings);
 	self:CreatePowerBarElement(strUnit);
 	self:CreateRoleElement(strUnit);
+	self:CreateLeaderElement(strUnit);
 
 	self.tUnitFrameController:CreateUnitFrame(strUnit, tSettings.tWindowDefinition);
 end

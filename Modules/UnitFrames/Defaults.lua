@@ -66,6 +66,12 @@ UnitFramesLayout.tDefaults = {
 --	bRoleEnabled = true,
 --	tRoleAnchorPoints = { 0.5, 1, 0.5, 0 },
 --	tRoleAnchorOffsets = { -6, -10, 6, 0 },
+	-------------------------------------------------------------------------
+	-- Leader/Assistant Icon
+	-------------------------------------------------------------------------
+--	bLeaderEnabled = true,
+--	tLeaderAnchorPoints = { 0.5, 1, 0.5, 0 },
+--	tLeaderAnchorOffsets = { -6, -10, 6, 0 },
 
 
 
