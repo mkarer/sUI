@@ -2,8 +2,6 @@
 
 	s:UI MiniMap Modifications
 
-	TODO: Don't replace the full MiniMap.xml file, only the needed pars.
-
 	Martin Karer / Sezz, 2014
 	http://www.sezz.at
 
@@ -14,6 +12,7 @@ local M = S:CreateSubmodule("MiniMap", "Gemini:Hook-1.0");
 M:SetDefaultModuleState(false);
 local log, tMiniMap;
 local tinsert = table.insert;
+local bIsPTR = GameLib.GetVersionInfo().nVersionMajor >= 1;
 
 -----------------------------------------------------------------------------
 
@@ -27,7 +26,7 @@ local function UpdateMiniMapXml(xmlDoc)
 	S:UpdateElementInXml(tXml, "MapZonePvPFlag", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = -16, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 0, BAnchorOffset = 0, Font = "CRB_Pixel_O", Visible = 0 });
 	S:UpdateElementInXml(tXml, "MapZoneName", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 0, BAnchorOffset = 22, Font = "CRB_Pixel_O" });
 
-	if (GameLib.GetVersionInfo().nBuildNumber < 6800) then
+	if (not bIsPTR) then
 		S:UpdateElementInXml(tXml, "MinimapOptions", { LAnchorPoint = "Minimap_Right", LAnchorOffset = -380, TAnchorPoint = "Minimap_Top", TAnchorOffset = -422, RAnchorPoint = "Minimap_Right", RAnchorOffset = -130, BAnchorPoint = "Minimap_Top", BAnchorOffset = 227 });
 	end
 
@@ -61,7 +60,7 @@ function M:OnInitialize()
 				self.xmlDoc = UpdateMiniMapXml(self.xmlDoc);
 				self:_OnDocumentReady();
 
-				if (GameLib.GetVersionInfo().nBuildNumber >= 6800) then
+				if (bIsPTR) then
 					local nOptionsHeight = self.wndMinimapOptions:GetHeight();
 					local nOptionsWidth = self.wndMinimapOptions:GetWidth();
 					local nScreenWidth, nScreenHeight = Apollo.GetScreenSize();
