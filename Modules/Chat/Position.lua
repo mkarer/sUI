@@ -67,8 +67,8 @@ function M:UpdateChatChannel(wndChannel, wndChannelHooked)
 	emotesMenu:SetAnchorPoints(1, 0, 1, 0);
 	emotesMenu:SetAnchorOffsets(-164, -286, 2, -50);
 
-	local inputCatcher = wndChannel:FindChild("MouseCatcher");
-	inputCatcher:SetAnchorOffsets(-5, -31, 5, 5);
+--	local inputCatcher = wndChannel:FindChild("MouseCatcher");
+--	inputCatcher:SetAnchorOffsets(-5, -31, 5, 5);
 
 	local chat = wndChannel:FindChild("Chat");
 --	chat:SetAnchorOffsets(-18, 25, -1, -1);
@@ -85,6 +85,7 @@ function M:UpdateChatChannel(wndChannel, wndChannelHooked)
 	-- Bigger Options Form
 	wndChannel:FindChild("OptionsSubForm"):SetAnchorOffsets(-20, 2, 0, 0);
 
-	-- Hide Background
+	-- Hide Backgrounds
 	wndChannel:FindChild("BGArt"):SetSprite(nil);
+	wndChannel:FindChild("BGArt_SidePanel"):SetSprite(nil);
 end

@@ -124,8 +124,8 @@ local tCustomFilter = {
 			local tInfo = itemCurr:GetDetailedInfo();
 			local nRuneSlots = 0;
 			for _, tData in pairs(tInfo) do
-				if (tData.tSigils and tData.tSigils.arSigils) then
-					nRuneSlots = nRuneSlots + #tData.tSigils.arSigils;
+				if (tData.tRunes and tData.tRunes.arRuneSlots) then
+					nRuneSlots = nRuneSlots + #tData.tRunes.arRuneSlots;
 				end
 			end
 
