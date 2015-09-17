@@ -717,7 +717,7 @@ local ktAdditionalColumns = {
 	[1] = { "Level", "ItemLevel", "RuneSlots" }, -- Armor
 	[15] = { "Level", "ItemLevel", "RuneSlots" }, -- Gear
 	[20] = { "Level" }, -- Housing
-	[2] = { "Level", "ItemLevel", "RuneSlots", "AssaultPower", "SupportPower" }, -- Weapon
+	[2] = { "Level", "ItemLevel", "RuneSlots", "AssaultRating", "SupportRating" }, -- Weapon
 	[5] = { "BagSlots" }, -- Bag
 	ShoppingList = { "Level", "ItemLevel", "RuneSlots" },
 };
@@ -873,18 +873,18 @@ local ktListColumns = {
 		end,
 	},
 	-- Weapons
-	AssaultPower = {
+	AssaultRating = {
 		Text = "AP",
 		Description = "Assault Power",
 		Width = 0.07,
 		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
 			local tInfo = itemCurr:GetDetailedInfo();
-			local nAssaultPower = 0;
+			local nAssaultRating = 0;
 			for _, tData in pairs(tInfo) do
 				if (tData.arInnateProperties) then
 					for _, tInnateProperty in ipairs(tData.arInnateProperties) do
-						if (tInnateProperty.eProperty == Unit.CodeEnumProperties.AssaultPower) then
-							nAssaultPower = floor(tInnateProperty.nValue + 0.05);
+						if (tInnateProperty.eProperty == Unit.CodeEnumProperties.AssaultRating) then
+							nAssaultRating = floor(tInnateProperty.nValue + 0.05);
 							break;
 						end
 					end
@@ -892,30 +892,30 @@ local ktListColumns = {
 			end
 
 			return {
-				Name = "AssaultPower",
+				Name = "AssaultRating",
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
-				Text = nAssaultPower,
+				Text = nAssaultRating,
 				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
-				UserData = nAssaultPower,
+				UserData = nAssaultRating,
 			};
 		end,
 	},
-	SupportPower = {
+	SupportRating = {
 		Text = "SP",
 		Description = "Support Power",
 		Width = 0.08,
 		GetWindowDefinitions = function(self, aucCurr, itemCurr, fPosition, fWidth)
 			local tInfo = itemCurr:GetDetailedInfo();
-			local nSupportPower = 0;
+			local nSupportRating = 0;
 			for _, tData in pairs(tInfo) do
 				if (tData.arInnateProperties) then
 					for _, tInnateProperty in ipairs(tData.arInnateProperties) do
-						if (tInnateProperty.eProperty == Unit.CodeEnumProperties.SupportPower) then
-							nSupportPower = floor(tInnateProperty.nValue + 0.05);
+						if (tInnateProperty.eProperty == Unit.CodeEnumProperties.SupportRating) then
+							nSupportRating = floor(tInnateProperty.nValue + 0.05);
 							break;
 						end
 					end
@@ -923,21 +923,21 @@ local ktListColumns = {
 			end
 
 			return {
-				Name = "SupportPower",
+				Name = "SupportRating",
 				AnchorPoints = { fPosition, 0, fPosition + fWidth, 1 },
 				AnchorOffsets = { 0, 0, 0, 0 },
-				Text = nSupportPower,
+				Text = nSupportRating,
 				Font = self.DB.strFont,
 				DT_CENTER = true,
 				DT_VCENTER = true,
 				AutoScaleTextOff = true,
-				UserData = nSupportPower,
+				UserData = nSupportRating,
 			};
 		end,
 	},
 };
 
---for _, strColumn in ipairs( { "SupportPower", "AssaultPower", "RuneSlots", "ItemLevel", "Level", "BagSlots", "TimeRemaining" }) do
+--for _, strColumn in ipairs( { "SupportRating", "AssaultRating", "RuneSlots", "ItemLevel", "Level", "BagSlots", "TimeRemaining" }) do
 --	ktListColumns[strColumn].GetPixie = ktListColumns[strColumn].GetWindowDefinitions;
 --end
 
