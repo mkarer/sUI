@@ -57,7 +57,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 RSN Hurricane Force Chargers",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 1032,
+							[Unit.CodeEnumProperties.SupportRating] = 1032,
 						},
 						RuneSlots = 3,
 					},
@@ -176,7 +176,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 RSN Magma Refibrillators",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 1032, [Unit.CodeEnumProperties.Technology] = 90,
+							[Unit.CodeEnumProperties.AssaultRating] = 1032, [Unit.CodeEnumProperties.Technology] = 90,
 						},
 						RuneSlots = 3, Special = 53872,
 					},
@@ -270,7 +270,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 GRS Earthbound Power Sword",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 619,
+							[Unit.CodeEnumProperties.SupportRating] = 619,
 						},
 						RuneSlots = 3, Special = 53923,
 					},
@@ -325,7 +325,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 GRS Earthbound Power Sword",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 619, [Unit.CodeEnumProperties.Strength] = 80,
+							[Unit.CodeEnumProperties.AssaultRating] = 619, [Unit.CodeEnumProperties.Strength] = 80,
 						},
 						RuneSlots = 3, Special = 53923,
 					},
@@ -439,7 +439,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 PTL Loamsooth Carbine",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 1032, [Unit.CodeEnumProperties.Wisdom] = 80,
+							[Unit.CodeEnumProperties.SupportRating] = 1032, [Unit.CodeEnumProperties.Wisdom] = 80,
 						},
 						RuneSlots = 3,
 					},
@@ -492,7 +492,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 PTL Loamsooth Carbine",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 1032, [Unit.CodeEnumProperties.Dexterity] = 80,
+							[Unit.CodeEnumProperties.AssaultRating] = 1032, [Unit.CodeEnumProperties.Dexterity] = 80,
 						},
 						RuneSlots = 3,
 					},
@@ -618,7 +618,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 HVG Earthbound Slug Thrower",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 619,
+							[Unit.CodeEnumProperties.SupportRating] = 619,
 						},
 						RuneSlots = 3,
 					},
@@ -669,7 +669,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 HVG Earthbound Slug Thrower",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 619, [Unit.CodeEnumProperties.Dexterity] = 80,
+							[Unit.CodeEnumProperties.AssaultRating] = 619, [Unit.CodeEnumProperties.Dexterity] = 80,
 						},
 						RuneSlots = 3, Special = 53923,
 					},
@@ -958,7 +958,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 PSB Hurricane Neuroblade",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 1032,
+							[Unit.CodeEnumProperties.SupportRating] = 1032,
 						},
 						RuneSlots = 3,
 					},
@@ -1108,7 +1108,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 RSN Hurricane Force Chargers",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 1032,
+							[Unit.CodeEnumProperties.SupportRating] = 1032,
 						},
 						RuneSlots = 3,
 					},
@@ -1232,7 +1232,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 RSN Magma Refibrillators",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 1032, [Unit.CodeEnumProperties.Technology] = 90,
+							[Unit.CodeEnumProperties.AssaultRating] = 1032, [Unit.CodeEnumProperties.Technology] = 90,
 						},
 						RuneSlots = 3, Special = 53872,
 					},
@@ -1331,7 +1331,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 GRS Earthbound Power Sword",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 619,
+							[Unit.CodeEnumProperties.SupportRating] = 619,
 						},
 						RuneSlots = 3, Special = 53923,
 					},
@@ -1391,7 +1391,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 GRS Earthbound Power Sword",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 619, [Unit.CodeEnumProperties.Strength] = 80,
+							[Unit.CodeEnumProperties.AssaultRating] = 619, [Unit.CodeEnumProperties.Strength] = 80,
 						},
 						RuneSlots = 3, Special = 53923,
 					},
@@ -1510,7 +1510,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 PTL Loamsooth Carbine",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 1032, [Unit.CodeEnumProperties.Wisdom] = 80,
+							[Unit.CodeEnumProperties.SupportRating] = 1032, [Unit.CodeEnumProperties.Wisdom] = 80,
 						},
 						RuneSlots = 3,
 					},
@@ -1568,7 +1568,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 PTL Loamsooth Carbine",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 1032, [Unit.CodeEnumProperties.Dexterity] = 80,
+							[Unit.CodeEnumProperties.AssaultRating] = 1032, [Unit.CodeEnumProperties.Dexterity] = 80,
 						},
 						RuneSlots = 3,
 					},
@@ -1699,7 +1699,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 HVG Earthbound Slug Thrower",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 619,
+							[Unit.CodeEnumProperties.SupportRating] = 619,
 						},
 						RuneSlots = 3,
 					},
@@ -1755,7 +1755,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-4 HVG Earthbound Slug Thrower",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.AssaultPower] = 619, [Unit.CodeEnumProperties.Dexterity] = 80,
+							[Unit.CodeEnumProperties.AssaultRating] = 619, [Unit.CodeEnumProperties.Dexterity] = 80,
 						},
 						RuneSlots = 3, Special = 53923,
 					},
@@ -2059,7 +2059,7 @@ function M:RestoreProfile()
 					strSearchQuery = "Adventus' CW-3 PSB Hurricane Neuroblade",
 					tCustomFilter = {
 						MinStats = {
-							[Unit.CodeEnumProperties.SupportPower] = 1032,
+							[Unit.CodeEnumProperties.SupportRating] = 1032,
 						},
 						RuneSlots = 3,
 					},
