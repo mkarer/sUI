@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Addon Author="Sezz" APIVersion="9" Name="sUI" Description="Minimalistic User Interface">
+<Addon Author="Sezz" APIVersion="11" Name="sUI" Description="Minimalistic User Interface">
 	<!-- Libraries -->
 	<Script Name="Libs\LibError\LibError-1.0.lua" />
 	<Script Name="Libs\LibApolloFixes\LibApolloFixes-1.0.lua" />
@@ -58,8 +58,10 @@
 	<Script Name="Modules\Fixes\ConsoleVariables.lua" />
 	<Script Name="Modules\Fixes\AddonSettings.lua" />
 	<Script Name="Modules\Artwork\Panels.lua" />
+<!--
 	<Script Name="Modules\Crafting\RandomCraft.lua" />
 	<Form Name="Modules\Crafting\RandomCraft.xml" />
+-->
 	<Script Name="Modules\Crafting\Unmount.lua" />
 	<Script Name="Modules\PowerBar\PowerBar.lua" />
 	<Form Name="Modules\PowerBar\PowerBar.xml" />
