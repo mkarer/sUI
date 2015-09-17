@@ -237,6 +237,7 @@ function M:SetupActionBars()
 	local barBottomItems = {
 		{ type = "GC", id = 18, menu = "Recall" }, -- Recall
 		{ type = "GC", id = 26, menu = "Mount" }, -- Mount
+		{ type = "GC", id = 29, menu = "VanityPet" }, -- Vanity Pet
 		{ type = "A", id = 12 },
 		{ type = "A", id = 13 },
 		{ type = "A", id = 14 },
@@ -484,6 +485,13 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 				self:CloseMenu();
 			end
 
+			local SelectMenuItemVanityPet = function(self, wndHandler, wndControl)
+				M.DB["SelectedVanityPet"] = wndHandler:GetData();
+				GameLib.SummonVanityPet(wndHandler:GetData());
+				log:debug(wndHandler:GetData());
+				self:CloseMenu();
+			end
+
 			local SelectMenuItemPotion = function(self, wndHandler, wndControl)
 				M.DB["SelectedPotion"] = wndHandler:GetData();
 				GameLib.SetShortcutPotion(wndHandler:GetData());
@@ -544,33 +552,45 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 							end
 						end
-					elseif (self.Attributes.menu == "Mount") then
-						buttonContainer.SelectMenuItem = SelectMenuItemMount;
+					elseif (self.Attributes.menu == "Mount" or self.Attributes.menu == "VanityPet") then
+						local tList;
+						if (self.Attributes.menu == "Mount") then
+							buttonContainer.SelectMenuItem = SelectMenuItemMount;
+							tList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
+						else
+							buttonContainer.SelectMenuItem = SelectMenuItemVanityPet;
+							tList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.VanityPet) or {};
+						end
 
-						local tMountList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
-						for i, tMountData in pairs(tMountList) do
-							local tSpellObject = tMountData.tTiers[1].splObject;
-							local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
+						local i = 0;
+						for _, tSpellData in pairs(tList) do
+							if (tSpellData.bIsActive) then
+								local tSpellObject = tSpellData.tTiers[1].splObject;
+								local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
 
-							-- Icon
-							wndCurr:FindChild("Icon"):SetSprite(tSpellObject:GetIcon());
+								-- Icon
+								wndCurr:FindChild("Icon"):SetSprite(tSpellObject:GetIcon());
 
-							-- Data
-							wndCurr:SetData(tSpellObject:GetId());
+								-- Data
+								wndCurr:SetData(tSpellObject:GetId());
 
-							-- Tooltip
-							if (Tooltip and Tooltip.GetSpellTooltipForm) then
-								wndCurr:SetTooltipDoc(nil);
-								Tooltip.GetSpellTooltipForm(self, wndCurr, tSpellObject, {});
+								-- Tooltip
+								if (Tooltip and Tooltip.GetSpellTooltipForm) then
+									wndCurr:SetTooltipDoc(nil);
+									Tooltip.GetSpellTooltipForm(self, wndCurr, tSpellObject, {});
+								end
+
+								-- Position
+								local buttonPosition = i * (buttonSize + M.DB.buttonPadding);
+								wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+								nMenuHeight = buttonPosition + buttonSize;
+
+								-- Events
+								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
+
+								-- Done
+								i = i+ 1;
 							end
-
-							-- Position
-							local buttonPosition = (i - 1) * (buttonSize + M.DB.buttonPadding);
-							wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
-							nMenuHeight = buttonPosition + buttonSize;
-
-							-- Events
-							wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 						end
 					elseif (self.Attributes.menu == "Recall") then
 						local tAbilities = S:GetRecallAbilitiesList();
