@@ -77,6 +77,20 @@ local function ItemHasSpecial(itemCurr, nSpecialSpellId)
 	return false;
 end
 
+local function IsKnownSchematic(itemCurr)
+	local bIsKnownSchematic = false;
+	if (itemCurr:GetItemFamily() == 19) then
+		local tInfo = itemCurr:GetDetailedInfo();
+		if (tInfo and tInfo.tPrimary and tInfo.tPrimary.arTradeskillReqs) then
+			for _, tRequirement in pairs(tInfo.tPrimary.arTradeskillReqs) do
+				bIsKnownSchematic = tRequirement.bIsKnown;
+			end
+		end
+	end
+
+	return bIsKnownSchematic;
+end
+
 -----------------------------------------------------------------------------
 -- Filters Definitions
 -----------------------------------------------------------------------------
@@ -108,8 +122,7 @@ local tCustomFilter = {
 	-- fnFilter returns true when the auction is filtered and false when it should be displayed.
 	KnownSchematics = {
 		fnFilter = function(aucCurr)
-			local itemCurr = aucCurr:GetItem();
-			return (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
+			return IsKnownSchematic(aucCurr:GetItem());
 		end,
 	},
 	Name = {

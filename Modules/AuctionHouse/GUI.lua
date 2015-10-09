@@ -1018,11 +1018,25 @@ local kstrItemBGColors = {
 	KnownSchematic = "aa381010",
 };
 
+local function IsKnownSchematic(itemCurr)
+	local bIsKnownSchematic = false;
+	if (itemCurr:GetItemFamily() == 19) then
+		local tInfo = itemCurr:GetDetailedInfo();
+		if (tInfo and tInfo.tPrimary and tInfo.tPrimary.arTradeskillReqs) then
+			for _, tRequirement in pairs(tInfo.tPrimary.arTradeskillReqs) do
+				bIsKnownSchematic = tRequirement.bIsKnown;
+			end
+		end
+	end
+
+	return bIsKnownSchematic;
+end
+
 function M:CreateListItem(aucCurr)
 	local fPosition = ktListColumns.Name.Width;
 
 	local itemCurr = aucCurr:GetItem();
-	local bIsKnownSchematic = (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
+
 	local strCount = aucCurr:GetCount() ~= 1 and aucCurr:GetCount() or "";
 	local strName = itemCurr:GetName();
 
@@ -1031,7 +1045,7 @@ function M:CreateListItem(aucCurr)
 		strBGColor = kstrItemBGColors.Owned;
 	elseif (aucCurr:IsTopBidder()) then
 		strBGColor = kstrItemBGColors.TopBidder;
-	elseif (bIsKnownSchematic) then
+	elseif (IsKnownSchematic(itemCurr)) then
 		strBGColor = kstrItemBGColors.KnownSchematic;
 	else
 		strBGColor = kstrItemBGColors.Default;
@@ -1171,7 +1185,6 @@ function M:UpdateListItem(wndItem, aucCurr)
 	wndItem:SetData(aucCurr);
 
 	local itemCurr = aucCurr:GetItem();
-	local bIsKnownSchematic = (itemCurr:GetActivateSpell() and itemCurr:GetActivateSpell():GetTradeskillRequirements() and itemCurr:GetActivateSpell():GetTradeskillRequirements().bIsKnown);
 
 	-- Background Color
 	local strBGColor;
@@ -1179,7 +1192,7 @@ function M:UpdateListItem(wndItem, aucCurr)
 		strBGColor = kstrItemBGColors.Owned;
 	elseif (aucCurr:IsTopBidder()) then
 		strBGColor = kstrItemBGColors.TopBidder;
-	elseif (bIsKnownSchematic) then
+	elseif (IsKnownSchematic(itemCurr)) then
 		strBGColor = kstrItemBGColors.KnownSchematic;
 	else
 		strBGColor = kstrItemBGColors.Default;
