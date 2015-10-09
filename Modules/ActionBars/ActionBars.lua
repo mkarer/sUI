@@ -10,7 +10,7 @@
 		Vehicle Bar: [RMSBar] 0-5
 		Shortcut Bar: [SBar] 0-7
 
-	Martin Karer / Sezz, 2014
+	Martin Karer / Sezz, 2014-2015
 	http://www.sezz.at
 
 --]]
@@ -237,7 +237,7 @@ function M:SetupActionBars()
 	local barBottomItems = {
 		{ type = "GC", id = 18, menu = "Recall" }, -- Recall
 		{ type = "GC", id = 26, menu = "Mount" }, -- Mount
-		{ type = "GC", id = 29, menu = "VanityPet" }, -- Vanity Pet
+		{ type = "A", id = 36, menu = "VanityPet" }, -- Vanity Pet
 		{ type = "A", id = 12 },
 		{ type = "A", id = 13 },
 		{ type = "A", id = 14 },
@@ -488,8 +488,11 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 			local SelectMenuItemVanityPet = function(self, wndHandler, wndControl)
 				M.DB["SelectedVanityPet"] = wndHandler:GetData();
 				GameLib.SummonVanityPet(wndHandler:GetData());
-				log:debug(wndHandler:GetData());
 				self:CloseMenu();
+			end
+
+			local DragMenuItem = function(self, wndHandler, wndControl)
+				Apollo.BeginDragDrop(wndHandler, "DDNonCombat", wndHandler:FindChild("Icon"):GetSprite(), wndHandler:GetData());
 			end
 
 			local SelectMenuItemPotion = function(self, wndHandler, wndControl)
@@ -552,15 +555,10 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 							end
 						end
-					elseif (self.Attributes.menu == "Mount" or self.Attributes.menu == "VanityPet") then
-						local tList;
-						if (self.Attributes.menu == "Mount") then
-							buttonContainer.SelectMenuItem = SelectMenuItemMount;
-							tList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
-						else
-							buttonContainer.SelectMenuItem = SelectMenuItemVanityPet;
-							tList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.VanityPet) or {};
-						end
+					elseif (self.Attributes.menu == "Mount") then
+						-- Mounts
+						local tList = AbilityBook.GetAbilitiesList(Spell.CodeEnumSpellTag.Mount) or {};
+						buttonContainer.SelectMenuItem = SelectMenuItemMount;
 
 						local i = 0;
 						for _, tSpellData in pairs(tList) do
@@ -589,9 +587,49 @@ function M:CreateActionBar(barName, buttonType, dirHorizontal, buttonIdFrom, but
 								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
 
 								-- Done
-								i = i+ 1;
+								i = i + 1;
 							end
 						end
+					elseif (self.Attributes.menu == "VanityPet") then
+						-- Vanity Pets
+						buttonContainer.SelectMenuItem = SelectMenuItemVanityPet;
+						buttonContainer.DragMenuItem = DragMenuItem;
+
+						local arPetList = CollectiblesLib.GetVanityPetList()
+						table.sort(arPetList, function(a, b) return (a.strName < b.strName) end);
+
+						local i = 0;
+						for _, tPetInfo in pairs(arPetList) do
+							if (tPetInfo.bIsKnown) then
+								local tSpellObject = tPetInfo.splObject;
+								local wndCurr = Apollo.LoadForm(M.xmlDoc, "ActionBarFlyoutButton", self.wndMenu, self);
+
+								-- Icon
+								wndCurr:FindChild("Icon"):SetSprite(tSpellObject and tSpellObject:GetIcon() or "Icon_ItemArmorWaist_Unidentified_Buckle_0001");
+
+								-- Data
+								wndCurr:SetData(tPetInfo.nId);
+
+								-- Tooltip
+								if (Tooltip and Tooltip.GetSpellTooltipForm and tSpellObject) then
+									wndCurr:SetTooltipDoc(nil);
+									Tooltip.GetSpellTooltipForm(self, wndCurr, tSpellObject, {});
+								end
+
+								-- Position
+								local buttonPosition = i * (buttonSize + M.DB.buttonPadding);
+								wndCurr:SetAnchorOffsets(0, buttonPosition, buttonSize, buttonPosition + buttonSize);
+								nMenuHeight = buttonPosition + buttonSize;
+
+								-- Events
+								wndCurr:AddEventHandler("ButtonSignal", "SelectMenuItem", buttonContainer);
+								wndCurr:AddEventHandler("QueryBeginDragDrop", "DragMenuItem", buttonContainer);
+
+								-- Done
+								i = i + 1;
+							end
+						end
+
 					elseif (self.Attributes.menu == "Recall") then
 						local tAbilities = S:GetRecallAbilitiesList();
 
