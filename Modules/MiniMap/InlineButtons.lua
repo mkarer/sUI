@@ -4,7 +4,7 @@
 
 	TODO: Maybe they would be better on the left side of the MiniMap?
 
-	Martin Karer / Sezz, 2014
+	Martin Karer / Sezz, 2014-2015
 	http://www.sezz.at
 
 --]]
@@ -53,7 +53,7 @@ do
 		local tContainer = {};
 		tContainer.wndMain = Apollo.LoadForm(xmlDoc, "SezzMiniMapInlineButtonContainer", nil, tButtonContainer);
 		tContainer.tButtons = {};
-		tContainer.nButtonPadding = 7;
+		tContainer.nButtonPadding = 2;
 		tContainer.xmlDoc = xmlDoc;
 
 		tContainer.CreateButton = CreateButton;
@@ -86,6 +86,19 @@ end
 function M:OnEnable()
 	log:debug("%s enabled.", self:GetName());
 	self.tButtonContainer = CreateButtonContainer(self.xmlDoc);
+
+	-----------------------------------------------------------------------------
+	-- Rapid Transport
+	-----------------------------------------------------------------------------
+	local tButtonRapidTransport = self.tButtonContainer:CreateButton("RapidTransport", "IconSprites:Icon_MapNode_Map_RapidTransport");
+	tButtonRapidTransport.wndMain:SetTooltip(Apollo.GetString("CRB_RapidTransport"));
+
+	tButtonRapidTransport.InvokeTaxiWindow = function(self)
+		Event_FireGenericEvent("InvokeTaxiWindow");
+	end
+
+	tButtonRapidTransport.wndMain:AddEventHandler("ButtonSignal", "InvokeTaxiWindow", tButtonRapidTransport);
+	MiniMap:UpdateRapidTransportBtnHook(); -- Show/Hide
 
 	-----------------------------------------------------------------------------
 	-- Mail

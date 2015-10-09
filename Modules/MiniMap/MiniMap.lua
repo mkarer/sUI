@@ -65,6 +65,7 @@ function M:OnInitialize()
 
 		-- PVP Flag Update
 		tMiniMap.UpdatePvpFlag = M.UpdatePvpFlagHook;
+		tMiniMap.UpdateRapidTransportBtn = M.UpdateRapidTransportBtnHook;
 	else
 		-- MiniMap addon not found, disable me.
 		self:SetEnabledState(false);
@@ -186,4 +187,21 @@ function M:UpdatePvpFlagHook()
 	end
 
 	self.wndZoneName:SetTextColor(colorZone);
+end
+
+function M:UpdateRapidTransportBtnHook()
+	local InlineButtons = M:GetModule("InlineButtons");
+	if (InlineButtons.tButtonContainer) then
+		-- MiniMap.lua:1896
+		local wndRapidTransport = InlineButtons.tButtonContainer:GetButton("RapidTransport").wndMain;
+		local tZone = GameLib.GetCurrentZoneMap();
+		local nZoneId = 0;
+
+		if (tZone ~= nil) then
+			nZoneId = tZone.id;
+		end
+
+		local bOnArkship = tZone == nil or GameLib.IsTutorialZone(nZoneId);
+		wndRapidTransport:Show(not bOnArkship or wndRapidTransport:IsShown());
+	end
 end
