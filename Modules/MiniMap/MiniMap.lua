@@ -2,7 +2,7 @@
 
 	s:UI MiniMap Modifications
 
-	Martin Karer / Sezz, 2014
+	Martin Karer / Sezz, 2014-2015
 	http://www.sezz.at
 
 --]]
@@ -12,7 +12,6 @@ local M = S:CreateSubmodule("MiniMap", "Gemini:Hook-1.0");
 M:SetDefaultModuleState(false);
 local log, tMiniMap;
 local tinsert = table.insert;
-local bIsPTR = GameLib.GetVersionInfo().nVersionMajor >= 1;
 
 -----------------------------------------------------------------------------
 
@@ -21,14 +20,10 @@ local function UpdateMiniMapXml(xmlDoc)
 	local tXml = xmlDoc:ToTable();
 	S:UpdateElementInXml(tXml, "Minimap", { LAnchorOffset = -157, TAnchorPoint = 1, TAnchorOffset = -246, RAnchorPoint = 1, RAnchorOffset = -8, BAnchorPoint = 1, BAnchorOffset = -18, RelativeToClient = 0 });
 	S:UpdateElementInXml(tXml, "MinimapMouseCatcher", { Visible = 0 });
-	S:FindElementInXml(tXml, "Name", "MapRingBackground", true);
+	S:FindElementInXml(tXml, "Name", "MapRingBackgroundNew", true);
 	S:UpdateElementInXml(tXml, "ButtonContainer", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 1, TAnchorOffset = -22, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 1, BAnchorOffset = 0 });
 	S:UpdateElementInXml(tXml, "MapZonePvPFlag", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = -16, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 0, BAnchorOffset = 0, Font = "CRB_Pixel_O", Visible = 0 });
 	S:UpdateElementInXml(tXml, "MapZoneName", { LAnchorPoint = 0, LAnchorOffset = 0, TAnchorPoint = 0, TAnchorOffset = 0, RAnchorPoint = 1, RAnchorOffset = 0, BAnchorPoint = 0, BAnchorOffset = 22, Font = "CRB_Pixel_O" });
-
-	if (not bIsPTR) then
-		S:UpdateElementInXml(tXml, "MinimapOptions", { LAnchorPoint = "Minimap_Right", LAnchorOffset = -380, TAnchorPoint = "Minimap_Top", TAnchorOffset = -422, RAnchorPoint = "Minimap_Right", RAnchorOffset = -130, BAnchorPoint = "Minimap_Top", BAnchorOffset = 227 });
-	end
 
 	local tXmlMapMenuButton = S:FindElementInXml(tXml, "MapMenuButton");
 	tinsert(tXmlMapMenuButton, { __XmlNode = "Event", Name = "ButtonSignal", Function = "OnMenuBtnToggle" });
@@ -60,13 +55,11 @@ function M:OnInitialize()
 				self.xmlDoc = UpdateMiniMapXml(self.xmlDoc);
 				self:_OnDocumentReady();
 
-				if (bIsPTR) then
-					local nOptionsHeight = self.wndMinimapOptions:GetHeight();
-					local nOptionsWidth = self.wndMinimapOptions:GetWidth();
-					local nScreenWidth, nScreenHeight = Apollo.GetScreenSize();
+				local nOptionsHeight = self.wndMinimapOptions:GetHeight();
+				local nOptionsWidth = self.wndMinimapOptions:GetWidth();
+				local nScreenWidth, nScreenHeight = Apollo.GetScreenSize();
 
-					self.wndMinimapOptions:Move(nScreenWidth - nOptionsWidth - 157, nScreenHeight - nOptionsHeight, nOptionsHeight, nOptionsWidth);
-				end
+				self.wndMinimapOptions:Move(nScreenWidth - nOptionsWidth - 180, nScreenHeight - nOptionsHeight, nOptionsHeight, nOptionsWidth);
 			end
 		end
 
