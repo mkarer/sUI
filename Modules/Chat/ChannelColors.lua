@@ -58,7 +58,7 @@ function M:OnEnable()
 		[ChatSystemLib.ChatChannel_Instance] = colInstance,
 		[ChatSystemLib.ChatChannel_WarParty] = colInstance,
 		[ChatSystemLib.ChatChannel_WarPartyOfficer] = colInstance,
-		[ChatSystemLib.ChatChannel_Advice] = colChannel,
+--		[ChatSystemLib.ChatChannel_Advice] = colChannel,
 		[ChatSystemLib.ChatChannel_AccountWhisper] = { a = 1, r = 0, g = 0.98, b = 0.96 },
 		[ChatSystemLib.ChatChannel_Datachron] = colNpcSay,
 		[ChatSystemLib.ChatChannel_PlayerPath] = colCombat,

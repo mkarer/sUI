@@ -18,7 +18,7 @@ local kstrAddon = "SezzUI";
 local kiVersionData = { 0, 0, 1 };
 local kstrVersion = "v"..kiVersionData[1].."."..kiVersionData[2].."."..kiVersionData[3];
 local ktDependencies = {
-	"GameExit", -- Adding a dependency makes the addon load sooner, required to hook Carbine addons' OnLoad...
+	"WelcomeWindow", -- Adding a dependency makes the addon load sooner, required to hook Carbine addons' OnLoad...
 };
 
 local S = Apollo.GetPackage("Gemini:Addon-1.1").tPackage:NewAddon(kstrAddon, true, ktDependencies, "Gemini:Hook-1.0", "Gemini:Event-1.0", "Gemini:Timer-1.0");
